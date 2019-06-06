@@ -7,5 +7,8 @@
 				"targets": ">0.25%, not OperaMini all, not Samsung 4"
 			}
 		]
+	],
+	"plugins": [
+		"@babel/plugin-syntax-dynamic-import"
 	]
 }

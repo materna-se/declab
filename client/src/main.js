@@ -14,14 +14,14 @@ import Footer from "./components/footer.vue";
 // Helpers
 import Network from "./helpers/network";
 // Views
-import Index from "./views/index.vue";
-import Model from "./views/model.vue";
-import Builder from "./views/builder.vue";
-import Inputs from "./views/inputs.vue";
-import Outputs from "./views/outputs.vue";
-import Tests from "./views/tests.vue";
-import Playground from "./views/playground.vue";
-import Settings from "./views/settings.vue";
+const Index = () => import('./views/index.vue');
+const Model = () => import('./views/model.vue');
+const Builder = () => import('./views/builder.vue');
+const Inputs = () => import('./views/inputs.vue');
+const Outputs = () => import('./views/outputs.vue');
+const Tests = () => import('./views/tests.vue');
+const Playground = () => import('./views/playground.vue');
+const Settings = () => import('./views/settings.vue');
 
 Vue.use(VueRouter);
 

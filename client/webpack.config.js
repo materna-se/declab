@@ -39,7 +39,7 @@ module.exports = {
 		}
 	},
 	plugins: [
-		new WebPackEnvironmentPlugin(['NODE_ENV', 'API_HOST']),
+		new WebPackEnvironmentPlugin(['API_HOST']),
 		new VueLoaderPlugin(),
 		new WebPackHTMLPlugin({
 			filename: "index.html",
@@ -47,10 +47,22 @@ module.exports = {
 			hash: true
 		}),
 	],
+	optimization: {
+		splitChunks: {
+			chunks: 'all',
+			cacheGroups: {
+				vendors: {
+					name: 'vendor',
+					test: /[\\/]node_modules[\\/]/,
+				}
+			}
+		}
+	},
 	devtool: "eval-source-map",
 	output: {
 		path: Path.resolve(__dirname, "..", "server", "src", "main", "webapp"),
-		filename: "bundle.js"
+		filename: "[name].bundle.js?[hash]",
+		chunkFilename: '[name].bundle.js?[hash]'
 	},
 	devServer: {
 		port: 80
