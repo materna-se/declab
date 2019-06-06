@@ -1,0 +1,75 @@
+body {
+	font-family: "Ubuntu", sans-serif;
+}
+
+pre, code, kbd, samp, textarea {
+	font-family: "Source Code Pro", monospace;
+}
+
+a {
+	color: #3991dc;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+hr {
+	margin-top: 1.5rem;
+	margin-bottom: 1.5rem;
+}
+
+pre, code {
+	word-break: break-all;
+	color: inherit;
+}
+
+.btn-outline-secondary {
+	border-color: rgba(0, 0, 0, .125);
+}
+
+.bg-success {
+	background-color: #4caf50 !important;
+}
+
+.bg-warning {
+	background-color: #ffde3b !important;
+}
+
+.bg-danger {
+	background-color: #f44336 !important;
+}
+
+.border-success {
+	border-color: #4caf50 !important;
+}
+
+.border-danger {
+	border-color: #f44336 !important;
+}
+
+.border-lg {
+	border-width: 2px;
+}
+
+.text-success {
+	color: #4caf50 !important;
+}
+
+.text-danger {
+	color: #f44336 !important;
+}
+
+.custom-file-label {
+	border: 1px solid #ced4da;
+}
+
+.custom-file-label::after {
+	background-color: transparent;
+	border-left: 1px solid #ced4da;
+	color: #495057;
+}
+
+.c-pointer {
+	cursor: pointer;
+}
