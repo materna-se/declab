@@ -31,25 +31,5 @@ new Vue({
 		"dmn-header": Header,
 		"dmn-footer": Footer
 	},
-	router: new VueRouter({
-		routes: [
-			{path: '/', component: Index},
-			{path: '/:workspace/model', component: Model},
-			{path: '/:workspace/builder', component: Builder},
-			{path: '/:workspace/inputs', component: Inputs},
-			{path: '/:workspace/outputs', component: Outputs},
-			{path: '/:workspace/tests', component: Tests},
-			{path: '/:workspace/playground', component: Playground},
-			{path: '/:workspace/settings', component: Settings},
-			// TODO: Route for "Not Found"
-		]
-	}),
-	created() {
-		Network.setEndpoint(process.env.API_HOST, this.$route.params.workspace);
-	},
-	watch: {
-		async $route(to, from) {
-			Network.setEndpoint(process.env.API_HOST, to.params.workspace);
-		}
-	},
+	router: router
 });
