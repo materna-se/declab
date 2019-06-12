@@ -25,6 +25,23 @@ const Settings = () => import('./views/settings.vue');
 
 Vue.use(VueRouter);
 
+const router = new VueRouter({
+	routes: [
+		{path: '/', component: Index},
+		{path: '/:workspace/model', component: Model},
+		{path: '/:workspace/builder', component: Builder},
+		{path: '/:workspace/inputs', component: Inputs},
+		{path: '/:workspace/outputs', component: Outputs},
+		{path: '/:workspace/tests', component: Tests},
+		{path: '/:workspace/playground', component: Playground},
+		{path: '/:workspace/settings', component: Settings},
+		// TODO: Route for "Not Found"
+	]
+});
+router.afterEach((to, from) => {
+	Network.setEndpoint(process.env.API_HOST, to.params.workspace);
+});
+
 new Vue({
 	el: '#mount',
 	components: {
