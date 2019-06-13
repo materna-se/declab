@@ -1,4 +1,5 @@
 # DMN Tester
+![CircleCI](https://img.shields.io/circleci/build/github/materna-se/dmn-tester.svg?style=flat-square)
 
 ## Features
 ### Community
