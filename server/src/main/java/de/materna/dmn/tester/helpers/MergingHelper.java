@@ -1,28 +1,46 @@
 package de.materna.dmn.tester.helpers;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MergingHelper {
-	/**
-	 * Deep merges two given maps into a new one
-	 * The two given maps will not be changed
-	 */
-	public static Map<String, ?> mergeMaps(Map<String, ?> existingMap, Map<String, ?> newMap) {
-		Map<String, Object> mergedMap = new HashMap<>(existingMap);
+	public static Object merge(Object existing, Object template) {
+		if (template instanceof Map) {
+			Map<String, Object> existingMap = (Map<String, Object>) existing;
+			Map<String, Object> templateMap = (Map<String, Object>) template;
 
-		for (String key : newMap.keySet()) {
-			Object existingMapValue = existingMap.get(key);
-			Object newMapValue = newMap.get(key);
-
-			if (existingMapValue instanceof Map && newMapValue instanceof Map) {
-				mergedMap.put(key, mergeMaps((Map<String, ?>) existingMapValue, (Map<String, ?>) newMapValue));
-				continue;
+			Map<String, Object> mergedMap = new HashMap<>(existingMap);
+			for (String key : templateMap.keySet()) {
+				mergedMap.put(key, merge(mergedMap.get(key), templateMap.get(key)));
 			}
 
-			mergedMap.put(key, newMapValue);
+			return mergedMap;
 		}
 
-		return mergedMap;
+		if (template instanceof List) {
+			List<Object> existingList = (List<Object>) existing;
+			List<Object> templateList = (List<Object>) template;
+
+			Iterator<Object> existingIterator = existingList.iterator();
+			Iterator<Object> templateIterator = templateList.iterator();
+
+			List<Object> mergedList = new LinkedList<>();
+
+			while (existingIterator.hasNext() || templateIterator.hasNext()) {
+				if (!existingIterator.hasNext()) {
+					mergedList.add(templateIterator.next());
+					continue;
+				}
+				if (!templateIterator.hasNext()) {
+					mergedList.add(existingIterator.next());
+					continue;
+				}
+
+				mergedList.add(merge(existingIterator.next(), templateIterator.next()));
+			}
+
+			return mergedList;
+		}
+
+		return template;
 	}
 }

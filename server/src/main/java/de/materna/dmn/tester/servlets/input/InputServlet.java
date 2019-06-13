@@ -1,11 +1,11 @@
 package de.materna.dmn.tester.servlets.input;
 
 import de.materna.dmn.tester.helpers.MergingHelper;
+import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
+import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.model.beans.Workspace;
-import de.materna.dmn.tester.helpers.SerializationHelper;
-import de.materna.dmn.tester.persistence.WorkspaceManager;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
@@ -92,7 +92,11 @@ public class InputServlet {
 				throw new NotFoundException();
 			}
 
-			inputManager.persistFile(inputUUID, (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class));
+			PersistedInput input = (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class);
+			if (inputUUID.equals(input.getParent())) {
+				throw new BadRequestException(String.format("Input with uuid %s can't reference itself.", inputUUID));
+			}
+			inputManager.persistFile(inputUUID, input);
 
 			return Response.status(Response.Status.NO_CONTENT).build();
 		}
@@ -112,20 +116,15 @@ public class InputServlet {
 
 			PersistedInput input = inputManager.getFiles().get(inputUUID);
 			if (input == null) {
-				throw new NotFoundException(String.format("can't find input with uuid %s", inputUUID));
+				throw new NotFoundException(String.format("Can't find input with uuid %s.", inputUUID));
 			}
 			if (isInputInherited(inputManager, inputUUID)) {
-				throw new BadRequestException(String.format("input with uuid %s is inherited and can't be deleted", inputUUID));
+				throw new BadRequestException(String.format("Input with uuid %s is inherited and can't be deleted.", inputUUID));
 			}
 
 			inputManager.removeFile(inputUUID);
 
 			return Response.status(Response.Status.NO_CONTENT).build();
-		}
-		catch (BadRequestException exception) {
-			log.error(exception);
-
-			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 		catch (IOException exception) {
 			log.error(exception);
@@ -154,7 +153,7 @@ public class InputServlet {
 
 		PersistedInput parentInput = enrichInput(inputManager, inputManager.getFiles().get(input.getParent()));
 
-		return new PersistedInput(input.getName(), input.getParent(), MergingHelper.mergeMaps(parentInput.getValue(), input.getValue()));
+		return new PersistedInput(input.getName(), input.getParent(), (Map<String, ?>) MergingHelper.merge(parentInput.getValue(), input.getValue()));
 	}
 
 	/**
