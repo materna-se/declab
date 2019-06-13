@@ -11,4 +11,4 @@ jobs:
 
     steps:
       - checkout
-      - run: mvn test
+      - run: cd ./server && mvn test
