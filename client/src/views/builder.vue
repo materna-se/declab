@@ -1,17 +1,17 @@
 <template>
 	<div class="container-fluid">
-		<div class="row mb-2" v-if="alert.message !== null">
+		<div class="row mb-4" v-if="alert.message !== null">
 			<div class="col-12">
 				<alert v-bind:alert="alert"></alert>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-8 mb-4">
-				<div class="row">
-					<div class="col-6 mb-2">
+				<div class="row mb-2">
+					<div class="col-6">
 						<h3 class="mb-0">Input</h3>
 					</div>
-					<div class="col-6 mb-2">
+					<div class="col-6">
 						<div class="input-group">
 							<div class="input-group-prepend">
 								<span class="input-group-text">Template</span>
@@ -21,17 +21,23 @@
 								<option v-for="(input, key) in inputs" v-bind:value="key">{{input.name}}</option>
 							</select>
 						</div>
-						<div class="input-group">
-							<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.input.name">
-							<div class="input-group-append">
-								<button class="btn btn-outline-secondary" v-on:click="addInput">Save Input</button>
-							</div>
-						</div>
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-12 mb-4">
-						<json-builder v-bind:template="model.template" v-bind:fixed="true" v-on:update:values="model.input.value = $event; getModelOutputs();"></json-builder>
+					<div class="col-12">
+						<div class="card card-borderless mb-2">
+							<div class="card-body p-0">
+								<json-builder v-bind:template="model.template" v-bind:fixed="true" v-on:update:values="model.input.value = $event; getModelOutputs();"></json-builder>
+							</div>
+							<div class="card-footer card-footer-border">
+								<div class="input-group">
+									<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.input.name">
+									<div class="input-group-append">
+										<button class="btn btn-outline-secondary" v-on:click="addInput">Save Input</button>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -153,4 +159,12 @@
 </script>
 
 <style>
+	.card-footer-border {
+		border: 1px solid rgba(0, 0, 0, .125);
+		border-top: none;
+	}
+
+	.card-borderless {
+		border: none;
+	}
 </style>

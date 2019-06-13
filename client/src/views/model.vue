@@ -1,11 +1,6 @@
 <template>
 	<div class="container-fluid">
-		<div class="row mb-2">
-			<div class="col-12">
-				<h3 class="mb-0">Model</h3>
-			</div>
-		</div>
-		<div class="row mb-2" v-if="alert.message !== null">
+		<div class="row mb-4" v-if="alert.message !== null">
 			<div class="col-12">
 				<alert v-bind:alert="alert"></alert>
 			</div>
