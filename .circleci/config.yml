@@ -4,11 +4,11 @@ jobs:
     docker:
       - image: circleci/openjdk:8-jdk
 
-    working_directory: ~/dmn-tester
-
     environment:
       MAVEN_OPTS: -Xmx3200m
 
     steps:
-      - checkout
-      - run: cd ./server && mvn test
+      - run: git clone https://github.com/materna-se/dmn-tester.git
+      - run: git clone https://github.com/materna-se/jdec.git
+      - run: cd ./jdec && mvn install
+      - run: cd ./dmn-tester/server && mvn test
