@@ -14,13 +14,17 @@ public class WorkspaceManager {
 	private WorkspaceManager() {
 	}
 
-	public Workspace getWorkspace(String name) throws IOException {
+	public Workspace get(String name) throws IOException {
 		Workspace workspace = workspaces.get(name);
 		if (workspace == null) {
 			workspace = new Workspace(name);
 			workspaces.put(name, workspace);
 		}
 		return workspace;
+	}
+
+	public void invalidate(String name) {
+		workspaces.remove(name);
 	}
 
 	public static synchronized WorkspaceManager getInstance() {

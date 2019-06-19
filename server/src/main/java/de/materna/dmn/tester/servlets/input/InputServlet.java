@@ -24,7 +24,7 @@ public class InputServlet {
 	@Produces("application/json")
 	public Response getInputs(@PathParam("workspace") String workspaceName, @QueryParam("merge") boolean merge) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 			Map<String, PersistedInput> workspaceInputs = inputManager.getFiles();
 
@@ -43,7 +43,7 @@ public class InputServlet {
 	@Produces("application/json")
 	public Response getInput(@PathParam("workspace") String workspaceName, @PathParam("uuid") String inputUUID, @QueryParam("merge") boolean merge) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 
 			PersistedInput input = inputManager.getFiles().get(inputUUID);
@@ -66,7 +66,7 @@ public class InputServlet {
 	@Consumes("application/json")
 	public Response createInput(@PathParam("workspace") String workspaceName, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 			String uuid = UUID.randomUUID().toString();
 
 			workspace.getInputManager().persistFile(uuid, (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class));
@@ -86,7 +86,7 @@ public class InputServlet {
 	@Produces("application/json")
 	public Response editInput(@PathParam("workspace") String workspaceName, @PathParam("uuid") String inputUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 			if (!inputManager.getFiles().containsKey(inputUUID)) {
 				throw new NotFoundException();
@@ -111,7 +111,7 @@ public class InputServlet {
 	@Path("/inputs/{uuid}")
 	public Response deleteInput(@PathParam("workspace") String workspaceName, @PathParam("uuid") String inputUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 
 			PersistedInput input = inputManager.getFiles().get(inputUUID);

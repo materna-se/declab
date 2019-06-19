@@ -30,7 +30,7 @@ public class BackupServlet {
 	public Response getBackup(@PathParam("workspace") String workspaceName) {
 		StreamingOutput streamingOutput = (OutputStream outputStream) -> {
 			try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
-				Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
+				Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 
 				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).filter(path -> !Files.isDirectory(path)).forEach(path -> {
 					try {
@@ -52,11 +52,12 @@ public class BackupServlet {
 	@Path("/backup")
 	@Consumes("multipart/form-data")
 	public Response importBackup(@PathParam("workspace") String workspaceName, MultipartFormDataInput multipartFormDataInput) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
+		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
 
 		InputPart inputPart = multipartFormDataInput.getFormDataMap().get("backup").get(0);
 		try (InputStream inputStream = inputPart.getBody(InputStream.class, null)) {
 			try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
+				Workspace workspace = workspaceManager.get(workspaceName);
 
 				while (true) {
 					ZipEntry zipEntry = zipInputStream.getNextEntry();
@@ -69,6 +70,10 @@ public class BackupServlet {
 			}
 		}
 
+		// If the workspace is cached, we need to invalidate it.
+		workspaceManager.invalidate(workspaceName);
+
+		Workspace workspace = workspaceManager.get(workspaceName);
 		workspace.getDecisionSession().importModel(workspace.getModelManager().getFile());
 
 		return Response.status(Response.Status.NO_CONTENT).build();

@@ -34,7 +34,7 @@ public class ModelServlet {
 	@Produces("application/json")
 	public Response getModel(@PathParam("workspace") String workspaceName) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 
 			DMNModel dmnModel = workspace.getDecisionSession().getModel();
 
@@ -51,13 +51,13 @@ public class ModelServlet {
 	@Consumes("text/xml")
 	public Response importModel(@PathParam("workspace") String workspaceName, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 
 			ImportResult importResult = workspace.getDecisionSession().importModel(body);
 
 			workspace.getModelManager().persistFile(body);
 
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(importResult.getMessages())).build();
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(importResult)).build();
 
 		}
 		catch (ImportException exception) {
@@ -73,7 +73,7 @@ public class ModelServlet {
 	@Produces("application/json")
 	public Response getInputs(@PathParam("workspace") String workspaceName) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getInputs(workspace.getDecisionSession()))).build();
 		}
@@ -90,7 +90,7 @@ public class ModelServlet {
 	@Produces("application/json")
 	public Response calculateOutputs(@PathParam("workspace") String workspaceName, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 
 			Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 			});
