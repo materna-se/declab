@@ -1,7 +1,7 @@
 package de.materna.dmn.tester.servlets.backup;
 
-import de.materna.dmn.tester.servlets.model.beans.Workspace;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.dmn.tester.servlets.model.beans.Workspace;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -52,11 +52,11 @@ public class BackupServlet {
 	@Path("/backup")
 	@Consumes("multipart/form-data")
 	public Response importBackup(@PathParam("workspace") String workspaceName, MultipartFormDataInput multipartFormDataInput) throws IOException {
-		InputPart inputPart = multipartFormDataInput.getFormDataMap().get("backup").get(0);
+		Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
 
+		InputPart inputPart = multipartFormDataInput.getFormDataMap().get("backup").get(0);
 		try (InputStream inputStream = inputPart.getBody(InputStream.class, null)) {
 			try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
-				Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
 
 				while (true) {
 					ZipEntry zipEntry = zipInputStream.getNextEntry();
@@ -68,6 +68,8 @@ public class BackupServlet {
 				}
 			}
 		}
+
+		workspace.getDecisionSession().importModel(workspace.getModelManager().getFile());
 
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}

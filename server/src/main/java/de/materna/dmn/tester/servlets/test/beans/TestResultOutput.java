@@ -34,7 +34,7 @@ public class TestResultOutput {
 
 	@JsonProperty
 	public boolean isEqual() {
-		if (calculated == null) {
+		if (calculated == null) { // "expected" can't be null, so we can skip the check.
 			return false;
 		}
 
@@ -42,6 +42,8 @@ public class TestResultOutput {
 			return expected.getValue() == null && calculated.getValue() == null;
 		}
 
-		return expected.getValue().equals(calculated.getValue());
+		// In order to compare the values, we will serialize it. In the future, we should walk through the maps.
+		SerializationHelper serializationHelper = SerializationHelper.getInstance();
+		return serializationHelper.toJSON(expected.getValue()).equals(serializationHelper.toJSON(calculated.getValue()));
 	}
 }
