@@ -3,13 +3,14 @@ package de.materna.dmn.tester.servlets.model;
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.materna.dmn.tester.drools.DroolsAnalyzer;
 import de.materna.dmn.tester.drools.DroolsExecutor;
-import de.materna.dmn.tester.drools.DroolsLogger;
-import de.materna.dmn.tester.servlets.model.beans.Model;
-import de.materna.dmn.tester.servlets.output.beans.Output;
-import de.materna.dmn.tester.servlets.model.beans.Workspace;
 import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.input.beans.RawInput;
+import de.materna.dmn.tester.servlets.model.beans.Model;
+import de.materna.dmn.tester.servlets.model.beans.Workspace;
+import de.materna.dmn.tester.servlets.output.beans.Output;
+import de.materna.jdec.beans.ImportResult;
+import de.materna.jdec.exceptions.ImportException;
 import org.apache.log4j.Logger;
 import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.feel.FEEL;
@@ -41,8 +42,6 @@ public class ModelServlet {
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(model)).build();
 		}
 		catch (IOException exception) {
-			log.error(exception);
-
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
 	}
@@ -54,18 +53,18 @@ public class ModelServlet {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().getWorkspace(workspaceName);
 
-			// Logging of the outputs during model import
-			DroolsLogger.start();
-			workspace.getDecisionSession().importModel(body);
-			List<String> warnings = DroolsLogger.stop();
+			ImportResult importResult = workspace.getDecisionSession().importModel(body);
 
 			workspace.getModelManager().persistFile(body);
 
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(warnings)).build();
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(importResult.getMessages())).build();
 
 		}
+		catch (ImportException exception) {
+			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
+		}
 		catch (Exception exception) {
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(SerializationHelper.getInstance().toJSON(DroolsLogger.stop())).build();
+			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
 	}
 

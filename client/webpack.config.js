@@ -58,7 +58,7 @@ module.exports = {
 			}
 		}
 	},
-	devtool: "eval-source-map",
+	devtool: "source-map",
 	output: {
 		path: Path.resolve(__dirname, "..", "server", "src", "main", "webapp"),
 		filename: "[name].bundle.js?[hash]",
