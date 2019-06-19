@@ -1,8 +1,8 @@
 <template>
 	<div class="container-fluid">
-		<div class="row mb-4" v-if="alert.message !== null">
+		<div class="row mb-4" v-if="result.visible">
 			<div class="col-12">
-				<alert v-bind:alert="alert"></alert>
+				<dmn-import-result v-bind:result="result"></dmn-import-result>
 			</div>
 		</div>
 		<div class="row mb-4">
@@ -72,11 +72,11 @@
 <script>
 	import Network from "../helpers/network";
 
-	import Alert from "../components/alert.vue";
+	import DMNImportResult from "../components/dmn-import-result.vue";
 
 	export default {
 		components: {
-			"alert": Alert
+			"dmn-import-result": DMNImportResult,
 		},
 		async mounted() {
 			await this.getModel();
@@ -84,9 +84,10 @@
 		},
 		data() {
 			return {
-				alert: {
-					message: null,
-					state: null
+				result: {
+					visible: false,
+					successful: true,
+					messages: []
 				},
 
 				model: {
@@ -116,10 +117,11 @@
 
 				const fileReader = new FileReader();
 				fileReader.addEventListener("load", async function (readerEvent) {
-					const response = await Network.importModel(readerEvent.target.result);
-					vue.alert = {
-						message: response.warnings.join("<br>"),
-						state: response.status === 503 ? "danger" : "success"
+					const result = await Network.importModel(readerEvent.target.result);
+					vue.result = {
+						visible: true,
+						successful: result.successful,
+						messages: result.messages
 					};
 
 					// Refresh the displayed information about the loaded model

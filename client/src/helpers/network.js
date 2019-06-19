@@ -22,8 +22,8 @@ export default {
 		});
 
 		return {
-			status: response.status,
-			warnings: await response.json()
+			successful: response.status !== 503,
+			messages: (await response.json()).messages
 		};
 	},
 
