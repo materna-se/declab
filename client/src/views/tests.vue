@@ -295,12 +295,7 @@
 			// Helper
 			//
 			getDifference(expected, calculated) {
-				try {
-					return new DiffMatchPatch().diff_main(expected !== null ? expected.value : '', calculated !== null ? calculated.value : '');
-				}
-				catch (error) {
-					console.error(error);
-				}
+				return new DiffMatchPatch().diff_main(expected !== null ? JSON.stringify(expected.value) : '', calculated !== null ? JSON.stringify(calculated.value) : '');
 			}
 		}
 	};

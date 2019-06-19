@@ -1,6 +1,7 @@
 package de.materna.dmn.tester.servlets.test.beans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.servlets.output.beans.EnrichedOutput;
 import de.materna.dmn.tester.servlets.output.beans.Output;
 
