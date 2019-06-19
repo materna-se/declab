@@ -84,55 +84,73 @@ export default {
 		}
 	},
 
-	merge: function (current, template) {
-		const currentValue = current.value;
+	merge: function (existing, template) {
+		const existingValue = existing.value;
 		const templateValue = template.value;
 
 		switch (typeof templateValue) {
 			case "string":
 			case "number":
 			case "boolean":
-				current.value = templateValue;
+				existing.value = templateValue;
 				return;
 			case "object":
-				// Check if it's a collection
-				if (template.collection) {
-					// The first element will always exist. We will use it as a template
-					const currentElement = currentValue[0];
-
-					// After that, we will remove all elements
-					currentValue.splice(0, currentValue.length);
-
-					for (const templateChild of templateValue) {
-						const currentChild = JSON.parse(JSON.stringify(currentElement));
-						this.merge(currentChild, templateChild);
-
-						currentValue.push(currentChild);
+				if (!template.collection) {
+					for (const key in templateValue) {
+						this.merge(existingValue[key], templateValue[key]);
 					}
 					return;
 				}
 
-				for (const childKey in templateValue) {
-					this.merge(currentValue[childKey], templateValue[childKey]);
+				// The first element will always exist. We will use it as a structure element.
+				const structureElement = existingValue[0];
+
+				// After that, we can remove all elements.
+				existingValue.splice(0, existingValue.length);
+
+				for (const templateElement of templateValue) {
+					const existingElement = JSON.parse(JSON.stringify(structureElement));
+
+					this.merge(existingElement, templateElement);
+
+					existingValue.push(existingElement);
 				}
 		}
 	},
 
-	addTemplate: function (object, parentObject) {
-		if (object.type === "string" || object.type === "number" || object.type === "boolean") {
-			object.template = parentObject.value;
+	addTemplate: function (existing, template) {
+		if (existing.type === "string" || existing.type === "number" || existing.type === "boolean") {
+			existing.template = template.value;
 			return;
 		}
 
-		if (object.collection) {
-			for (let i = 0; i < object.value.length; i++) {
-				this.addTemplate(object.value[i], parentObject.value[i]);
+		if (existing.collection) {
+			for (let i = 0; i < existing.value.length; i++) {
+				this.addTemplate(existing.value[i], template.value[i]);
 			}
 			return;
 		}
 
-		for (const key in object.value) {
-			this.addTemplate(object.value[key], parentObject.value[key]);
+		for (const key in existing.value) {
+			this.addTemplate(existing.value[key], template.value[key]);
+		}
+	},
+
+	removeTemplate: function (existing) {
+		if (existing.type === "string" || existing.type === "number" || existing.type === "boolean") {
+			delete existing.template;
+			return;
+		}
+
+		if (existing.collection) {
+			for (let i = 0; i < existing.value.length; i++) {
+				this.removeTemplate(existing.value[i]);
+			}
+			return;
+		}
+
+		for (const key in existing.value) {
+			this.removeTemplate(existing.value[key]);
 		}
 	},
 };

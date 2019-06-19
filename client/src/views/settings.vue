@@ -6,14 +6,13 @@
 			</div>
 		</div>
 		<div class="row mb-4">
-			<div class="col-6">
+			<div class="col-3">
 				<h4 class="mb-2">Import</h4>
-				<div class="input-group">
+				<div class="input-group mb-4">
 					<label class="custom-file-label" for="file">Select DMN Backup...</label>
 					<input accept=".dtar" class="custom-file-input" id="file" name="file" type="file" v-on:change="importBackup">
 				</div>
-			</div>
-			<div class="col-6">
+
 				<h4 class="mb-2">Export</h4>
 				<a v-bind:href="endpoint + '/backup'">
 					<button class="btn btn-block btn-outline-secondary">Export</button>
