@@ -1,5 +1,5 @@
 <template>
-	<json-builder-table v-bind:value="values" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot"></json-builder-table>
+	<json-builder-table v-bind:value="values" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues"></json-builder-table>
 </template>
 
 <script>
@@ -18,8 +18,12 @@
 			convert: {
 				default: false
 			},
-			// Does not allow the addition of new key value pairs to the json
+			// Does not allow the structure to be changed
 			fixed: {
+				default: false
+			},
+			// Does not allow the values to be changed
+			fixedValues: {
 				default: false
 			},
 			// Does not allow a different root type
