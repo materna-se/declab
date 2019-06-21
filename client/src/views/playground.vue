@@ -5,7 +5,7 @@
 				<h3 class="mb-2">Expression</h3>
 				<div class="card">
 					<div class="card-body">
-						<feel-editor v-on:update:value="expression = $event; getRawModelOutputs();"></feel-editor>
+						<feel-editor v-on:update:value="expression = $event; getRawResult();"></feel-editor>
 					</div>
 				</div>
 			</div>
@@ -23,7 +23,7 @@
 				<h3 class="mb-2">Context</h3>
 				<div class="card">
 					<div class="card-body">
-						<json-builder v-bind:template="model.template" v-on:update:values="model.input.value = $event; getRawModelOutputs();"></json-builder>
+						<json-builder v-bind:template="model.template" v-on:update:values="model.input.value = $event; getRawResult();"></json-builder>
 					</div>
 				</div>
 			</div>
@@ -44,7 +44,7 @@
 			"feel-editor": FEELEditor,
 		},
 		mounted() {
-			this.getRawModelOutputs();
+			this.getRawResult();
 		},
 		data() {
 			return {
@@ -65,8 +65,8 @@
 			//
 			// Model
 			//
-			async getRawModelOutputs() {
-				const response = await Network.getRawModelOutput(this.expression, this.model.input.value);
+			async getRawResult() {
+				const response = await Network.getRawResult(this.expression, this.model.input.value);
 				if (response.status !== 200) {
 					this.executed = false;
 					return;

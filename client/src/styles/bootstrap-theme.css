@@ -73,3 +73,32 @@ pre, code {
 .c-pointer {
 	cursor: pointer;
 }
+
+
+.table-minimize th,
+.table-minimize td {
+	padding: .2rem;
+}
+
+.td-minimize {
+	width: 1px;
+}
+
+.input-group-text {
+	background-color: #f8f9fa;
+}
+
+.input-group-text-disabled {
+	background-color: #e7ebee;
+	border-color: #cfd4d8;
+	color: #495057;
+}
+
+.input-group-table {
+	background-color: #f8f9fa;
+	border-left-color: #dee2e6;
+	border-top-color: #dee2e6;
+	border-right-color: #dee2e6;
+	border-bottom-color: transparent;
+	border-radius: 0;
+}

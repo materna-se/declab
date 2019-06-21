@@ -88,7 +88,7 @@ public class ModelServlet {
 	@Path("/model/inputs")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public Response calculateOutputs(@PathParam("workspace") String workspaceName, String body) {
+	public Response calculateModelResult(@PathParam("workspace") String workspaceName, String body) {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 
@@ -109,7 +109,7 @@ public class ModelServlet {
 	@Path("/model/inputs/raw")
 	@Consumes("application/json")
 	@Produces("text/plain")
-	public Response calculateRawOutputs(String body) {
+	public Response calculateRawResult(String body) {
 		RawInput rawInput = (RawInput) SerializationHelper.getInstance().toClass(body, RawInput.class);
 
 		try {

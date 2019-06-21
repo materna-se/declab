@@ -33,7 +33,7 @@ export default {
 		});
 	},
 
-	getModelOutputs: function (input) {
+	getModelResult: function (input) {
 		return fetch(this._endpoint + "/model/inputs", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
@@ -43,7 +43,7 @@ export default {
 		});
 	},
 
-	getRawModelOutput: function (expression, context) {
+	getRawResult: function (expression, context) {
 		return fetch(this._endpoint + "/model/inputs/raw", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
