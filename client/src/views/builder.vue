@@ -6,7 +6,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-8 mb-4">
+			<div class="col-6 mb-4">
 				<div class="row mb-2">
 					<div class="col-6">
 						<h3 class="mb-0">Input</h3>
@@ -27,7 +27,7 @@
 					<div class="col-12">
 						<div class="card card-borderless mb-2">
 							<div class="card-body p-0">
-								<json-builder v-bind:template="model.template" v-bind:fixed="true" v-on:update:values="model.input.value = $event; getModelOutputs();"></json-builder>
+								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:values="model.input.value = $event; getModelResult();"></json-builder>
 							</div>
 							<div class="card-footer card-footer-border">
 								<div class="input-group">
@@ -41,14 +41,24 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-4 mb-4">
+			<div class="col-6 mb-4">
 				<h3 class="mb-2">Outputs</h3>
-				<div class="card mb-2" v-for="(output, key) in model.outputs">
+				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
 					<div class="card-header">
 						<h4 class="mb-0">{{key}}</h4>
 					</div>
 					<div class="card-body">
-						<pre class="mb-0"><code>{{output.value}}</code></pre>
+						<p class="mb-0 text-center text-muted" v-if="model.visibleOutputs[key] !== true" v-on:click="$set(model.visibleOutputs, key, true)">Click to expand!</p>
+						<div v-else>
+							<h5 class="mb-2">Output</h5>
+							<pre class="mb-2"><code>{{output.value}}</code></pre>
+
+							<div v-if="Object.keys(model.result.context[key]).length !== 0">
+								<h5 class="mb-2">Context</h5>
+								<p class="mb-0 text-center text-muted" v-if="model.visibleContexts[key] !== true" v-on:click="$set(model.visibleContexts, key, true)">Click to expand!</p>
+								<json-builder class="mb-0" v-else v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+							</div>
+						</div>
 					</div>
 					<div class="card-footer">
 						<div class="input-group">
@@ -92,11 +102,16 @@
 				model: {
 					input: {
 						name: null,
-						value: {}
+						value: {},
+						template: {}
 					},
-					outputs: {},
 
-					template: {},
+					result: {
+						context: {},
+						outputs: {}
+					},
+					visibleOutputs: {},
+					visibleContexts: {}
 				}
 			}
 		},
@@ -105,10 +120,10 @@
 			// Model
 			//
 			async getModelInputs() {
-				this.model.template = await Network.getModelInputs();
+				this.model.input.template = await Network.getModelInputs();
 			},
-			async getModelOutputs() {
-				this.model.outputs = await Network.getModelOutputs(this.model.input.value);
+			async getModelResult() {
+				this.model.result = await Network.getModelResult(this.model.input.value);
 			},
 
 			//
@@ -148,19 +163,24 @@
 			// Helpers
 			//
 			importInput: function (input) {
-				const currentInput = JSON.parse(JSON.stringify(this.model.template));
+				const currentInput = JSON.parse(JSON.stringify(this.model.input.template));
 				const templateInput = Converter.enrich(input);
 				Converter.merge(currentInput, templateInput);
 
-				this.model.template = currentInput;
+				this.model.input.template = currentInput;
 			}
 		}
 	};
 </script>
 
-<style>
+<style scoped>
+	.card-header-border {
+		border: 1px solid #dee2e6;
+		border-bottom: none;
+	}
+
 	.card-footer-border {
-		border: 1px solid rgba(0, 0, 0, .125);
+		border: 1px solid #dee2e6;
 		border-top: none;
 	}
 

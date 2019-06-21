@@ -2,11 +2,13 @@ package de.materna.dmn.tester.servlets.model;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.materna.dmn.tester.drools.DroolsAnalyzer;
+import de.materna.dmn.tester.drools.DroolsDebugger;
 import de.materna.dmn.tester.drools.DroolsExecutor;
 import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.input.beans.RawInput;
 import de.materna.dmn.tester.servlets.model.beans.Model;
+import de.materna.dmn.tester.servlets.model.beans.ModelResult;
 import de.materna.dmn.tester.servlets.model.beans.Workspace;
 import de.materna.dmn.tester.servlets.output.beans.Output;
 import de.materna.jdec.beans.ImportResult;
@@ -94,9 +96,14 @@ public class ModelServlet {
 
 			Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 			});
-			Map<String, Output> outputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), inputs);
 
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(outputs)).build();
+			// TODO: We should merge outputs and context.
+			DroolsDebugger debugger = new DroolsDebugger(workspace.getDecisionSession());
+			debugger.start();
+			Map<String, Output> outputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), inputs);
+			Map<String, Map<String, Object>> context = debugger.stop();
+
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, context))).build();
 		}
 		catch (IOException exception) {
 			log.error(exception);
