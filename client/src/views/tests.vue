@@ -82,11 +82,13 @@
 										<h5 class="mb-2">Decision</h5>
 										<p class="mb-4"><code>{{decision}}</code></p>
 										<h5 class="mb-2">Output</h5>
-										<span v-for="difference of getDifference(output.expected, output.calculated)">
-											<code class="difference-minus" v-if="difference[0] === -1">{{difference[1]}}</code>
-											<code class="difference-plus" v-else-if="difference[0] === 1">{{difference[1]}}</code>
-											<code v-else>{{difference[1]}}</code>
-										</span>
+										<div style="white-space: pre">
+											<span v-for="difference of getDifference(output.expected, output.calculated)">
+												<code class="difference-minus" v-if="difference[0] === -1">{{difference[1]}}</code>
+												<code class="difference-plus" v-else-if="difference[0] === 1">{{difference[1]}}</code>
+												<code v-else>{{difference[1]}}</code>
+											</span>
+										</div>
 										<div v-if="!output.equal">
 											<button class="btn btn-block btn-outline-secondary mt-4" v-on:click="amendOutput(output.expected, output.calculated)">Save as Correct</button>
 										</div>
@@ -295,7 +297,7 @@
 			// Helper
 			//
 			getDifference(expected, calculated) {
-				return new DiffMatchPatch().diff_main(expected !== null ? JSON.stringify(expected.value) : '', calculated !== null ? JSON.stringify(calculated.value) : '');
+				return new DiffMatchPatch().diff_main(expected !== null ? JSON.stringify(expected.value, null, 3) : '', calculated !== null ? JSON.stringify(calculated.value, null, 3) : '');
 			}
 		}
 	};
