@@ -1,7 +1,6 @@
 package de.materna.dmn.tester.servlets.test.beans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.servlets.output.beans.EnrichedOutput;
 import de.materna.dmn.tester.servlets.output.beans.Output;
 
@@ -43,8 +42,14 @@ public class TestResultOutput {
 			return expected.getValue() == null && calculated.getValue() == null;
 		}
 
-		// In order to compare the values, we will serialize it. In the future, we should walk through the maps.
-		SerializationHelper serializationHelper = SerializationHelper.getInstance();
-		return serializationHelper.toJSON(expected.getValue()).equals(serializationHelper.toJSON(calculated.getValue()));
+		return expected.getValue().equals((expected, calculated) -> {
+			// JSON has only one data type for numbers.
+			// Because of this, we need to make sure that 1 and 1.0 are equal.
+			if (expected.isNumber() && calculated.isNumber()) {
+				return expected.asDouble() == calculated.asDouble() ? 0 : 1;
+			}
+
+			return expected.equals(calculated) ? 0 : 1;
+		}, calculated.getValue());
 	}
 }
