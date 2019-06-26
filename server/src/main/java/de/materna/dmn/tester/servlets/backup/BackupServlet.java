@@ -1,7 +1,7 @@
 package de.materna.dmn.tester.servlets.backup;
 
 import de.materna.dmn.tester.persistence.WorkspaceManager;
-import de.materna.dmn.tester.servlets.model.beans.Workspace;
+import de.materna.dmn.tester.beans.Workspace;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;

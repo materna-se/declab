@@ -2,14 +2,14 @@ package de.materna.dmn.tester.servlets.input.beans;
 
 import java.util.Map;
 
-public class RawInput {
+public class Decision {
 	private String expression;
 	private Map<String, Object> context;
 
-	public RawInput() {
+	public Decision() {
 	}
 
-	public RawInput(String expression, Map<String, Object> context) {
+	public Decision(String expression, Map<String, Object> context) {
 		this.expression = expression;
 		this.context = context;
 	}

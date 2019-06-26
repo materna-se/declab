@@ -1,6 +1,6 @@
 package de.materna.dmn.tester.persistence;
 
-import de.materna.dmn.tester.servlets.model.beans.Workspace;
+import de.materna.dmn.tester.beans.Workspace;
 
 import java.io.IOException;
 import java.util.HashMap;

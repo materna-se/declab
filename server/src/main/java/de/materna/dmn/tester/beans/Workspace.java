@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.servlets.model.beans;
+package de.materna.dmn.tester.beans;
 
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;

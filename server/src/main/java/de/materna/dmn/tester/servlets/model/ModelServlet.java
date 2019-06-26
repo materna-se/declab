@@ -6,10 +6,10 @@ import de.materna.dmn.tester.drools.DroolsDebugger;
 import de.materna.dmn.tester.drools.DroolsExecutor;
 import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
-import de.materna.dmn.tester.servlets.input.beans.RawInput;
+import de.materna.dmn.tester.servlets.input.beans.Decision;
 import de.materna.dmn.tester.servlets.model.beans.Model;
 import de.materna.dmn.tester.servlets.model.beans.ModelResult;
-import de.materna.dmn.tester.servlets.model.beans.Workspace;
+import de.materna.dmn.tester.beans.Workspace;
 import de.materna.dmn.tester.servlets.output.beans.Output;
 import de.materna.jdec.beans.ImportResult;
 import de.materna.jdec.exceptions.ImportException;
@@ -117,14 +117,14 @@ public class ModelServlet {
 	@Consumes("application/json")
 	@Produces("text/plain")
 	public Response calculateRawResult(String body) {
-		RawInput rawInput = (RawInput) SerializationHelper.getInstance().toClass(body, RawInput.class);
+		Decision decision = (Decision) SerializationHelper.getInstance().toClass(body, Decision.class);
 
 		try {
 			List<FEELProfile> profiles = new ArrayList<>();
 			profiles.add(new KieExtendedFEELProfile());
 			FEEL feel = FEEL.newInstance(profiles);
 
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(feel.evaluate(rawInput.getExpression(), rawInput.getContext()))).build();
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(feel.evaluate(decision.getExpression(), decision.getContext()))).build();
 		}
 		catch (Exception exception) {
 			exception.printStackTrace();

@@ -2,7 +2,7 @@ package de.materna.dmn.tester.servlets.output;
 
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
-import de.materna.dmn.tester.servlets.model.beans.Workspace;
+import de.materna.dmn.tester.beans.Workspace;
 import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import org.apache.log4j.Logger;

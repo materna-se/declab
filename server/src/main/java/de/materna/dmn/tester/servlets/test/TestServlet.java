@@ -6,7 +6,7 @@ import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.EnrichedOutput;
 import de.materna.dmn.tester.servlets.output.beans.Output;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
-import de.materna.dmn.tester.servlets.model.beans.Workspace;
+import de.materna.dmn.tester.beans.Workspace;
 import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.input.InputServlet;
