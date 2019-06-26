@@ -58,6 +58,7 @@
 
 						<h5 class="mb-2">Parent</h5>
 						<select class="form-control mb-4" v-bind:value="input.parent" v-on:change="setParent($event.target.value)">
+							<option value="" selected></option>
 							<option v-for="(input, uuid) in inputs" v-bind:value="uuid">{{input.name}}</option>
 						</select>
 
@@ -193,8 +194,12 @@
 			// Helper
 			//
 			async setParent(parent) {
+				if(parent === "") {
+					parent = null;
+				}
+
 				this.input.parent = parent;
-				this.input.template = await this.getTemplateValue(parent, parent);
+				this.input.template = parent === null ? Converter.enrich({}) : await this.getTemplateValue(parent, parent);
 			},
 			async getTemplateValue(uuid, parentUUID) {
 				const mergedInput = await Network.getInput(uuid, true);
