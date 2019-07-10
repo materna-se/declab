@@ -114,8 +114,8 @@
 
 			// Initialize theme
 			monaco.editor.defineTheme('feel-theme', {
-				base: 'vs', // Dark :(
-				inherit: false, // Wir wollen nicht die bereits vorhandenen Rules.
+				base: 'vs',
+				inherit: false, // We do not want to inherit rules.
 				rules: [
 					{token: 'feel-keyword', foreground: 'd73a49'},
 					{token: 'feel-numeric', foreground: '005cc5'},

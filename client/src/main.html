@@ -15,6 +15,7 @@
 </head>
 <body>
 <div id="mount">
+	<loading-indicator v-bind:loading="loading"></loading-indicator>
 	<dmn-header></dmn-header>
 	<transition name="fade" mode="out-in" appear>
 		<router-view></router-view>

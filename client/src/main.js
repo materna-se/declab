@@ -11,6 +11,7 @@ import VueRouter from "vue-router";
 // Components
 import Header from "./components/header.vue";
 import Footer from "./components/footer.vue";
+import LoadingIndicator from "./components/loading-indicator.vue";
 // Helpers
 import Network from "./helpers/network";
 // Views
@@ -38,15 +39,27 @@ const router = new VueRouter({
 		// TODO: Route for "Not Found"
 	]
 });
-router.afterEach((to, from) => {
-	Network.setEndpoint(process.env.API_HOST, to.params.workspace);
-});
 
-new Vue({
+const vue = new Vue({
 	el: '#mount',
+	router: router,
 	components: {
 		"dmn-header": Header,
-		"dmn-footer": Footer
+		"dmn-footer": Footer,
+		"loading-indicator": LoadingIndicator
 	},
-	router: router
+	data: function () {
+		return {
+			loading: false
+		};
+	}
+});
+
+router.beforeEach((to, from, next) => {
+	vue.loading = true;
+	next();
+});
+router.afterEach((to, from) => {
+	Network.setEndpoint(process.env.API_HOST, to.params.workspace);
+	vue.loading = false;
 });
