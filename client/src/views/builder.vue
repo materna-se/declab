@@ -6,7 +6,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-6 mb-4">
+			<div class="mb-4" v-if="mode !== 2" v-bind:class="{'col-6': mode === 0, 'col-12': mode === 1}">
 				<div class="row mb-2">
 					<div class="col-6">
 						<h3 class="mb-0">Input</h3>
@@ -41,24 +41,32 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-6 mb-4">
-				<h3 class="mb-2">Outputs</h3>
+			<div class="mb-4" v-if="mode !== 1" v-bind:class="{'col-6': mode === 0, 'col-12': mode === 2}">
+				<div class="row">
+					<div class="col-10">
+						<h3 class="mb-2">Outputs</h3>
+					</div>
+					<div class="col-2">
+						<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="detachWorker">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
+								<path d="M8 12h9.76l-2.5-2.5 1.41-1.42L21.59 13l-4.92 4.92-1.41-1.42 2.5-2.5H8v-2m11-9a2 2 0 0 1 2 2v4.67l-2-2V7H5v12h14v-.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z" fill="currentColor"></path>
+							</svg>
+						</button>
+					</div>
+				</div>
 				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
 					<div class="card-header">
 						<h4 class="mb-0">{{key}}</h4>
 					</div>
 					<div class="card-body">
-						<p class="mb-0 text-center text-muted" v-if="model.visibleOutputs[key] !== true" v-on:click="$set(model.visibleOutputs, key, true)">Click to expand!</p>
-						<div v-else>
 							<h5 class="mb-2">Output</h5>
-							<pre class="mb-2"><code>{{output.value}}</code></pre>
+						<json-builder class="mb-0" v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
 
-							<div v-if="Object.keys(model.result.context[key]).length !== 0">
+						<div class="mt-2" v-if="Object.keys(model.result.context[key]).length !== 0">
 								<h5 class="mb-2">Context</h5>
 								<p class="mb-0 text-center text-muted" v-if="model.visibleContexts[key] !== true" v-on:click="$set(model.visibleContexts, key, true)">Click to expand!</p>
 								<json-builder class="mb-0" v-else v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
 							</div>
-						</div>
 					</div>
 					<div class="card-footer">
 						<div class="input-group">
@@ -86,10 +94,6 @@
 			"alert": Alert,
 			"json-builder": JSONBuilder
 		},
-		async mounted() {
-			await this.getModelInputs();
-			await this.getInputs();
-		},
 		data() {
 			return {
 				alert: {
@@ -110,9 +114,42 @@
 						context: {},
 						outputs: {}
 					},
-					visibleOutputs: {},
 					visibleContexts: {}
-				}
+				},
+
+				// 0: Both
+				// 1: Input
+				// 2: Output
+				mode: 0,
+				worker: null
+			}
+		},
+		async mounted() {
+			const vue = this;
+
+			await this.getModelInputs();
+			await this.getInputs();
+
+			// If window.opener is not null, we are the worker attached to the main window.
+			if (window.opener !== null) {
+				window.dispatchEvent(new Event('aftermount'));
+
+				// Listen for inputs.
+				window.addEventListener("message", function (e) {
+					const data = e.data;
+					if (data.type === undefined) {
+						return;
+					}
+
+					switch (data.type) {
+						case "getModelResult": {
+							vue.model.input.value = data.data;
+							vue.getModelResult();
+						}
+					}
+				});
+
+				this.mode = 2;
 			}
 		},
 		methods: {
@@ -123,6 +160,14 @@
 				this.model.input.template = await Network.getModelInputs();
 			},
 			async getModelResult() {
+				// If we have a detached worker, we don't want to calculate the results here.
+				if (this.mode === 1) {
+					this.worker.postMessage({
+						type: "getModelResult",
+						data: this.model.input.value
+					});
+				}
+
 				this.model.result = await Network.getModelResult(this.model.input.value);
 			},
 
@@ -162,13 +207,26 @@
 			//
 			// Helpers
 			//
-			importInput: function (input) {
+			detachWorker() {
+				const vue = this;
+
+				// We need to detach the output.
+				this.worker = window.open(location.href);
+				this.worker.addEventListener("aftermount", function () {
+					vue.mode = 1;
+					vue.getModelResult();
+				});
+				this.worker.addEventListener("beforeunload", function () {
+					vue.mode = 0;
+				});
+			},
+			importInput(input) {
 				const currentInput = JSON.parse(JSON.stringify(this.model.input.template));
 				const templateInput = Converter.enrich(input);
 				Converter.merge(currentInput, templateInput);
 
 				this.model.input.template = currentInput;
-			}
+			},
 		}
 	};
 </script>

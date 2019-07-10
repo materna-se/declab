@@ -12,7 +12,7 @@
 				<div class="col-4">
 					<p class="mb-0 text-right">
 						<small class="text-muted">
-							Version 1.0.3
+							Version 1.1.0
 						</small>
 					</p>
 				</div>

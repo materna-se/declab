@@ -59,7 +59,9 @@ router.beforeEach((to, from, next) => {
 	vue.loading = true;
 	next();
 });
-router.afterEach((to, from) => {
+router.afterEach(async (to, from) => {
 	Network.setEndpoint(process.env.API_HOST, to.params.workspace);
-	vue.loading = false;
+
+	// TODO: We should set loading to false when the mounted function is returned.
+	setTimeout(() => vue.loading = false, 500);
 });
