@@ -132,16 +132,16 @@
 
 			// If window.opener is not null, we are the worker attached to the main window.
 			if (window.opener !== null) {
-				window.dispatchEvent(new Event('aftermount'));
-
-				// Listen for inputs.
+				// Listen for messages.
 				window.addEventListener("message", function (e) {
 					const data = e.data;
+					// We need to ignore messages from third parties (webpack, ...).
 					if (data.type === undefined) {
 						return;
 					}
 
 					switch (data.type) {
+						// getModelResult will be received when the inputs are updated.
 						case "getModelResult": {
 							vue.model.input.value = data.data;
 							vue.getModelResult();
@@ -150,6 +150,9 @@
 				});
 
 				this.mode = 2;
+
+				// After mounting vue, we fire an event so that the opener can send the current inputs.
+				window.dispatchEvent(new Event('aftermount'));
 			}
 		},
 		methods: {
@@ -210,12 +213,14 @@
 			detachWorker() {
 				const vue = this;
 
-				// We need to detach the output.
+				// We need to detach the output into another window.
 				this.worker = window.open(location.href);
+				// This custom event will be received when vue has finished mounting.
 				this.worker.addEventListener("aftermount", function () {
 					vue.mode = 1;
 					vue.getModelResult();
 				});
+				// This event will be received when the opened window is closed or the user navigates away.
 				this.worker.addEventListener("beforeunload", function () {
 					vue.mode = 0;
 				});
