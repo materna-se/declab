@@ -2,6 +2,6 @@
 target/
 
 ##### Project #####
-src/main/webapp/*
-!src/main/webapp/WEB-INF/ # "You must white-list folders first, before being able to white-list files within a given folder."
-!src/main/webapp/WEB-INF/web.xml
+src/main/webapp/*.html
+src/main/webapp/*.js
+src/main/webapp/*.js.map
