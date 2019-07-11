@@ -43,12 +43,8 @@
 						</div>
 
 						<h5 class="mb-2">Input</h5>
-						<pre class="mb-0"><code>{{input.value}}</code></pre>
-
-						<div v-if="input.parent !== null">
-							<h5 class="mt-4 mb-2">Enriched Input</h5>
-							<pre class="mb-0"><code>{{input.enrichedValue}}</code></pre>
-						</div>
+						<json-builder v-if="input.parent === null" v-bind:template="input.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+						<json-builder v-else v-bind:template="input.enrichedValue" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
 					</div>
 				</div>
 				<div class="card" v-if="mode === 'ADD' || mode === 'EDIT'">

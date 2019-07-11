@@ -34,33 +34,39 @@ public class DroolsAnalyzer {
 	}
 
 	private static ModelInput getInput(DMNType type) {
-		// In order to decide if the input is complex, we get the number of child inputs
-		// If the input contains child inputs, we consider it complex
-		if (type.getFields().size() == 0) {
-			if (type.getAllowedValues().size() == 0) {
-				if (type.isCollection()) {
-					// It's a collection, we wrap the child inputs in an array
-					LinkedList<ModelInput> inputs = new LinkedList<>();
-					inputs.add(new ModelInput(type.getBaseType().getName(), type.isCollection()));
-					return new ComplexModelInput(type.getName(), type.isCollection(), inputs);
-				}
+		// FIX: By explicitly using getBaseType, we avoid the wrong (?) type resolution of the drools engine.
+		DMNType baseType = getBaseType(type);
 
-				return new ModelInput(type.getName(), type.isCollection());
+		// In order to decide if the input is complex, we get the number of child inputs.
+		// If the input contains child inputs, we consider it complex.
+		if (type.getFields().size() != 0) { // Is the input complex?
+			if (type.isCollection()) { // Is the input a complex collection?
+				LinkedList<ComplexModelInput> inputs = new LinkedList<>();
+				inputs.add(new ComplexModelInput(baseType.getName(), baseType.isCollection(), getChildInputs(type.getFields())));
+				return new ComplexModelInput(type.getName(), type.isCollection(), inputs);
 			}
 
-			// It is a normal input, in addition it contains a list of allowed values
-			// FIX: By explicitly using getBaseType, we avoid the wrong type resolution of the drools engine
-			return new ModelInput(type.getBaseType().getName(), type.isCollection(), DroolsHelper.convertOptions(type.getBaseType().getName(), type.getAllowedValues()));
+			return new ComplexModelInput(type.getName(), type.isCollection(), getChildInputs(type.getFields()));
 		}
 
-		if (type.isCollection()) {
-			// It's a collection, we wrap the child inputs in an array
-			LinkedList<ComplexModelInput> inputs = new LinkedList<>();
-			inputs.add(new ComplexModelInput(type.getBaseType().getName(), false, getChildInputs(type.getFields())));
+		if (type.isCollection()) { // Is the input a simple collection?
+			if (baseType.getAllowedValues().size() == 0) { // Is the input a simple collection that contains a list of allowed values?
+				LinkedList<ModelInput> inputs = new LinkedList<>();
+				inputs.add(new ModelInput(baseType.getName(), baseType.isCollection()));
+				return new ComplexModelInput(type.getName(), type.isCollection(), inputs);
+			}
+
+			// The input is a simple collection.
+			LinkedList<ModelInput> inputs = new LinkedList<>();
+			inputs.add(new ModelInput(baseType.getName(), baseType.isCollection(), DroolsHelper.convertOptions(baseType.getName(), baseType.getAllowedValues())));
 			return new ComplexModelInput(type.getName(), type.isCollection(), inputs);
 		}
+		if (type.getAllowedValues().size() != 0) { // Is the input simple that contains a list of allowed values?
+			return new ModelInput(baseType.getName(), baseType.isCollection(), DroolsHelper.convertOptions(baseType.getName(), baseType.getAllowedValues()));
+		}
 
-		return new ComplexModelInput(type.getName(), type.isCollection(), getChildInputs(type.getFields()));
+		// The input is as simple as it gets.
+		return new ModelInput(type.getName(), type.isCollection());
 	}
 
 	/**
@@ -77,5 +83,13 @@ public class DroolsAnalyzer {
 		}
 
 		return inputs;
+	}
+
+	private static DMNType getBaseType(DMNType type) {
+		if (type.getBaseType() != null) {
+			return getBaseType(type.getBaseType());
+		}
+
+		return type;
 	}
 }
