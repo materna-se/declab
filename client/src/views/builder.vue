@@ -59,14 +59,13 @@
 						<h4 class="mb-0">{{key}}</h4>
 					</div>
 					<div class="card-body">
-							<h5 class="mb-2">Output</h5>
+						<h5 class="mb-2">Output</h5>
 						<json-builder class="mb-0" v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
 
 						<div class="mt-2" v-if="Object.keys(model.result.context[key]).length !== 0">
-								<h5 class="mb-2">Context</h5>
-								<p class="mb-0 text-center text-muted" v-if="model.visibleContexts[key] !== true" v-on:click="$set(model.visibleContexts, key, true)">Click to expand!</p>
-								<json-builder class="mb-0" v-else v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
-							</div>
+							<h5 class="mb-2">Context</h5>
+							<json-builder class="mb-0" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+						</div>
 					</div>
 					<div class="card-footer">
 						<div class="input-group">
@@ -168,7 +167,7 @@
 					this.worker.postMessage({
 						type: "getModelResult",
 						data: this.model.input.value
-					});
+					}, "*");
 				}
 
 				this.model.result = await Network.getModelResult(this.model.input.value);
