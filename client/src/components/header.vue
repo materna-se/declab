@@ -8,7 +8,7 @@
 			<li class="nav-item dropdown" v-if="$route.params.workspace !== undefined" v-on:mouseenter="route.visible = true" v-for="route of routes" v-bind:key="route.name" v-on:mouseleave="route.visible = false">
 				<a href="#" class="nav-link dropdown-toggle">{{route.name}}</a>
 				<div class="dropdown-menu" v-bind:class="{'show': route.visible}">
-					<router-link class="dropdown-item" v-for="childRoute of route.routes" v-bind:to="'/' + $route.params.workspace + '/' + childRoute.path">{{childRoute.name}}</router-link>
+					<router-link class="dropdown-item" v-for="childRoute of route.routes"v-bind:key="childRoute.name" v-bind:to="'/' + $route.params.workspace + '/' + childRoute.path">{{childRoute.name}}</router-link>
 				</div>
 			</li>
 		</ul>

@@ -8,7 +8,7 @@ export default {
 	//
 	// Model
 	//
-	getModel: function () {
+	getModel() {
 		return fetch(this._endpoint + "/model").then(function (response) {
 			return response.json();
 		});
@@ -27,13 +27,13 @@ export default {
 		};
 	},
 
-	getModelInputs: function () {
+	getModelInputs() {
 		return fetch(this._endpoint + "/model/inputs").then(function (response) {
 			return response.json();
 		});
 	},
 
-	getModelResult: function (input) {
+	getModelResult(input) {
 		return fetch(this._endpoint + "/model/inputs", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
@@ -43,7 +43,7 @@ export default {
 		});
 	},
 
-	getRawResult: function (expression, context) {
+	getRawResult(expression, context) {
 		return fetch(this._endpoint + "/model/inputs/raw", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
@@ -57,7 +57,7 @@ export default {
 	//
 	// Inputs
 	//
-	getInputs: function (merge) {
+	getInputs(merge) {
 		if (merge === undefined) {
 			merge = false;
 		}
@@ -67,7 +67,7 @@ export default {
 		});
 	},
 
-	getInput: function (uuid, merge) {
+	getInput(uuid, merge) {
 		if (merge === undefined) {
 			merge = false;
 		}
@@ -77,7 +77,7 @@ export default {
 		});
 	},
 
-	addInput: function (input) {
+	addInput(input) {
 		return fetch(this._endpoint + "/inputs", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
@@ -85,7 +85,7 @@ export default {
 		});
 	},
 
-	editInput: function (uuid, input) {
+	editInput(uuid, input) {
 		return fetch(this._endpoint + "/inputs/" + uuid, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
@@ -93,7 +93,7 @@ export default {
 		});
 	},
 
-	deleteInput: function (uuid) {
+	deleteInput(uuid) {
 		return fetch(this._endpoint + "/inputs/" + uuid, {
 			method: "DELETE"
 		});
@@ -102,13 +102,13 @@ export default {
 	//
 	// Outputs
 	//
-	getOutputs: function () {
+	getOutputs() {
 		return fetch(this._endpoint + "/outputs").then(function (response) {
 			return response.json();
 		});
 	},
 
-	addOutput: function (output) {
+	addOutput(output) {
 		return fetch(this._endpoint + "/outputs", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
@@ -116,7 +116,7 @@ export default {
 		});
 	},
 
-	editOutput: function (uuid, output) {
+	editOutput(uuid, output) {
 		return fetch(this._endpoint + "/outputs/" + uuid, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
@@ -124,7 +124,7 @@ export default {
 		});
 	},
 
-	deleteOutput: function (uuid) {
+	deleteOutput(uuid) {
 		return fetch(this._endpoint + "/outputs/" + uuid, {
 			method: "DELETE"
 		});
@@ -133,13 +133,13 @@ export default {
 	//
 	// Tests
 	//
-	getTests: function () {
+	getTests() {
 		return fetch(this._endpoint + "/tests").then(function (response) {
 			return response.json();
 		});
 	},
 
-	addTest: function (test) {
+	addTest(test) {
 		return fetch(this._endpoint + "/tests", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
@@ -147,7 +147,7 @@ export default {
 		});
 	},
 
-	editTest: function (uuid, test) {
+	editTest(uuid, test) {
 		return fetch(this._endpoint + "/tests/" + uuid, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
@@ -155,17 +155,21 @@ export default {
 		});
 	},
 
-	deleteTest: function (uuid) {
+	deleteTest(uuid) {
 		return fetch(this._endpoint + "/tests/" + uuid, {method: "DELETE"});
 	},
 
-	executeTest: function (uuid) {
-		return fetch(this._endpoint + "/tests/" + uuid, {method: "POST"}).then(function (response) {
-			return response.json();
-		});
+	async executeTest(uuid) {
+		const start = new Date().getTime();
+		const response = await fetch(this._endpoint + "/tests/" + uuid, {method: "POST"});
+		const end = new Date().getTime();
+
+		const test = await response.json();
+		test.tps = Math.round(1000 / (end - start));
+		return test;
 	},
 
-	importBackup: function (backup) {
+	importBackup(backup) {
 		const formData = new FormData();
 		formData.append("backup", backup);
 
