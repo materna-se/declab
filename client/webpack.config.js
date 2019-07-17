@@ -1,6 +1,6 @@
 const Path = require("path");
 
-const WebPackEnvironmentPlugin = require("webpack/lib/EnvironmentPlugin");
+const WebPackDefinePlugin = require("webpack/lib/DefinePlugin");
 const VueLoaderPlugin = require('vue-loader').VueLoaderPlugin;
 const WebPackHTMLPlugin = require("html-webpack-plugin");
 
@@ -39,7 +39,10 @@ module.exports = {
 		}
 	},
 	plugins: [
-		new WebPackEnvironmentPlugin(['API_HOST']),
+		new WebPackDefinePlugin({
+			'process.env.API_HOST': JSON.stringify(process.env.API_HOST),
+			'process.env.VERSION': JSON.stringify(process.env.npm_package_version)
+		}),
 		new VueLoaderPlugin(),
 		new WebPackHTMLPlugin({
 			filename: "index.html",

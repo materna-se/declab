@@ -12,7 +12,7 @@
 				<div class="col-4">
 					<p class="mb-0 text-right">
 						<small class="text-muted">
-							Version 1.1.0
+							Version {{version}}
 						</small>
 					</p>
 				</div>
@@ -20,6 +20,16 @@
 		</div>
 	</footer>
 </template>
+
+<script>
+	export default  {
+		data() {
+			return {
+				version: process.env.VERSION
+			};
+		}
+	}
+</script>
 
 <style>
 	/* Enables the sticky footer */
