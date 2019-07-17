@@ -34,7 +34,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>de.materna</groupId>
+			<groupId>com.github.materna-se</groupId>
 			<artifactId>jdec</artifactId>
 			<version>[1.0.0,]</version>
 		</dependency>
