@@ -39,7 +39,7 @@ public class DroolsAnalyzer {
 
 		// In order to decide if the input is complex, we get the number of child inputs.
 		// If the input contains child inputs, we consider it complex.
-		if (type.getFields().size() != 0) { // Is the input complex?
+		if (type.getFields().size() != 0) { // Is it a complex input?
 			if (type.isCollection()) { // Is the input a complex collection?
 				LinkedList<ComplexModelInput> inputs = new LinkedList<>();
 				inputs.add(new ComplexModelInput(baseType.getName(), baseType.isCollection(), getChildInputs(type.getFields())));
@@ -49,20 +49,21 @@ public class DroolsAnalyzer {
 			return new ComplexModelInput(type.getName(), type.isCollection(), getChildInputs(type.getFields()));
 		}
 
+		if (type.getAllowedValues().size() != 0) { // Is it a simple input that contains a list of allowed values?
+			return new ModelInput(baseType.getName(), baseType.isCollection(), DroolsHelper.convertOptions(baseType.getName(), type.getAllowedValues()));
+		}
+
 		if (type.isCollection()) { // Is the input a simple collection?
-			if (baseType.getAllowedValues().size() == 0) { // Is the input a simple collection that contains a list of allowed values?
+			if (baseType.getAllowedValues().size() != 0) { // Is the input a simple collection that contains a list of allowed values?
 				LinkedList<ModelInput> inputs = new LinkedList<>();
-				inputs.add(new ModelInput(baseType.getName(), baseType.isCollection()));
+				inputs.add(new ModelInput(baseType.getName(), baseType.isCollection(), DroolsHelper.convertOptions(baseType.getName(), baseType.getAllowedValues())));
 				return new ComplexModelInput(type.getName(), type.isCollection(), inputs);
 			}
 
 			// The input is a simple collection.
 			LinkedList<ModelInput> inputs = new LinkedList<>();
-			inputs.add(new ModelInput(baseType.getName(), baseType.isCollection(), DroolsHelper.convertOptions(baseType.getName(), baseType.getAllowedValues())));
+			inputs.add(new ModelInput(baseType.getName(), baseType.isCollection()));
 			return new ComplexModelInput(type.getName(), type.isCollection(), inputs);
-		}
-		if (type.getAllowedValues().size() != 0) { // Is the input simple that contains a list of allowed values?
-			return new ModelInput(baseType.getName(), baseType.isCollection(), DroolsHelper.convertOptions(baseType.getName(), baseType.getAllowedValues()));
 		}
 
 		// The input is as simple as it gets.
