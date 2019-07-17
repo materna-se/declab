@@ -33,10 +33,10 @@
 
 <script>
 	import Network from "../helpers/network";
-	import Converter from "../components/json-builder-converter";
+	import Converter from "../components/json/json-builder-converter";
 
-	import FEELEditor from "../components/feel-editor.vue";
-	import JSONBuilder from "../components/json-builder.vue";
+	import FEELEditor from "../components/dmn/dmn-editor.vue";
+	import JSONBuilder from "../components/json/json-builder.vue";
 
 	export default {
 		components: {

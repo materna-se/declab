@@ -43,6 +43,8 @@ export default {
 			return undefined;
 		}
 
+		console.info(value);
+
 		switch (typeof value.value) {
 			case "string":
 			case "number":
@@ -57,6 +59,7 @@ export default {
 				// Check if it's a collection
 				if (value.collection) {
 					const cleanedArray = [];
+					console.info(value.value);
 					for (const childValue of value.value) {
 						const cleanedChildValue = this.clean(childValue);
 						if (cleanedChildValue !== undefined) {

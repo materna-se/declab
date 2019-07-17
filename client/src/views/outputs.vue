@@ -71,7 +71,7 @@
 <script>
 	import Network from "../helpers/network";
 
-	import JSONBuilder from "../components/json-builder.vue";
+	import JSONBuilder from "../components/json/json-builder.vue";
 
 	export default {
 		components: {

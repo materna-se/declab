@@ -72,7 +72,7 @@
 <script>
 	import Network from "../helpers/network";
 
-	import DMNImportResult from "../components/dmn-import-result.vue";
+	import DMNImportResult from "../components/dmn/dmn-import-result.vue";
 
 	export default {
 		components: {

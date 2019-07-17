@@ -16,7 +16,7 @@
 			<div class="col-4 mb-4">
 				<div class="list-group">
 					<div class="list-group-item list-group-item-action c-pointer" v-for="(input, uuid) in inputs" v-bind:key="uuid" v-on:click.self="setViewMode(uuid)">
-						<span class="d-block float-left mr-4">{{input.name}}</span>
+						<span class="d-block float-left mr-4" v-on:click="setViewMode(uuid)">{{input.name}}</span>
 						<div class="float-right">
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setEditMode(uuid)">
 								<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"></path>
@@ -74,9 +74,9 @@
 
 <script>
 	import Network from "../helpers/network";
-	import Converter from "../components/json-builder-converter";
+	import Converter from "../components/json/json-builder-converter";
 
-	import JSONBuilder from "../components/json-builder.vue";
+	import JSONBuilder from "../components/json/json-builder.vue";
 
 	export default {
 		components: {

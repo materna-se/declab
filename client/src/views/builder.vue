@@ -83,10 +83,10 @@
 
 <script>
 	import Network from "../helpers/network";
-	import Converter from "../components/json-builder-converter";
+	import Converter from "../components/json/json-builder-converter";
 
 	import Alert from "../components/alert.vue";
-	import JSONBuilder from "../components/json-builder.vue";
+	import JSONBuilder from "../components/json/json-builder.vue";
 
 	export default {
 		components: {
