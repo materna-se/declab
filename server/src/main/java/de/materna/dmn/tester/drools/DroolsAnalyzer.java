@@ -42,11 +42,11 @@ public class DroolsAnalyzer {
 		if (type.getFields().size() != 0) { // Is it a complex input?
 			if (type.isCollection()) { // Is the input a complex collection?
 				LinkedList<ComplexModelInput> inputs = new LinkedList<>();
-				inputs.add(new ComplexModelInput(baseType.getName(), baseType.isCollection(), getChildInputs(type.getFields())));
-				return new ComplexModelInput(type.getName(), type.isCollection(), inputs);
+				inputs.add(new ComplexModelInput("object", baseType.isCollection(), getChildInputs(type.getFields())));
+				return new ComplexModelInput("array", type.isCollection(), inputs);
 			}
 
-			return new ComplexModelInput(type.getName(), type.isCollection(), getChildInputs(type.getFields()));
+			return new ComplexModelInput("object", type.isCollection(), getChildInputs(type.getFields()));
 		}
 
 		if (type.getAllowedValues().size() != 0) { // Is it a simple input that contains a list of allowed values?
@@ -57,7 +57,7 @@ public class DroolsAnalyzer {
 			if (baseType.getAllowedValues().size() != 0) { // Is the input a simple collection that contains a list of allowed values?
 				LinkedList<ModelInput> inputs = new LinkedList<>();
 				inputs.add(new ModelInput(baseType.getName(), baseType.isCollection(), DroolsHelper.convertOptions(baseType.getName(), baseType.getAllowedValues())));
-				return new ComplexModelInput(type.getName(), type.isCollection(), inputs);
+				return new ComplexModelInput("array", type.isCollection(), inputs);
 			}
 
 			// The input is a simple collection.
