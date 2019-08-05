@@ -33,6 +33,11 @@
 				</svg>
 			</button>
 		</div>
+		<div class="input-group" v-else-if="value.type === 'null'" v-bind:style="{'opacity': value.value === value.template ? '0.6' : '1'}">
+			<span class="input-group-text">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16"><path d="M15.354 1.354l-.707-.707-2.777 2.776A5.967 5.967 0 0 0 8 2C4.691 2 2 4.691 2 8c0 1.475.537 2.824 1.423 3.87L.647 14.646l.707.707 2.776-2.776A5.965 5.965 0 0 0 8 14c3.309 0 6-2.691 6-6a5.965 5.965 0 0 0-1.423-3.87l2.777-2.776zM3 8c0-2.757 2.243-5 5-5 1.198 0 2.284.441 3.146 1.146l-7 7C3.441 10.284 3 9.198 3 8zm10 0c0 2.757-2.243 5-5 5-1.198 0-2.284-.441-3.146-1.146l7-7C12.559 5.716 13 6.802 13 8z" fill="currentColor"></path></svg>
+			</span>
+		</div>
 		<div v-else-if="value.collection">
 			<p class="my-4 text-center text-muted" v-if="value.value.length === 0 && !fixed">Please select a type!</p>
 			<div class="input-group-text input-group-table" v-else>
@@ -85,7 +90,7 @@
 		<div class="input-group" v-if="value.options !== undefined && !fixedValues">
 			<button type="button" class="btn btn-white mr-compact mt-compact" v-for="option of value.options" v-on:click="$set(value, 'value', option)">{{option}}</button>
 		</div>
-		<div class="input-group mt-compact" v-if="!['string', 'date', 'number', 'boolean'].includes(value.type) && !fixed">
+		<div class="input-group mt-compact" v-if="!['string', 'date', 'number', 'boolean', 'null'].includes(value.type) && !fixed">
 			<input class="form-control" placeholder="Enter Key..." v-model="key" v-if="!value.collection">
 			<div v-bind:class="[value.collection ? 'btn-group ml-auto': 'input-group-append']">
 				<button type="button" class="btn btn-white" v-on:click="addValue(value, 'string')">
@@ -101,6 +106,11 @@
 				<button type="button" class="btn btn-white" v-on:click="addValue(value, 'boolean')">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 						<path d="M19 19H5V5h10V3H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8h-2m-11.09-.92L6.5 11.5 11 16 21 6l-1.41-1.42L11 13.17l-3.09-3.09z" fill="currentColor"></path>
+					</svg>
+				</button>
+				<button type="button" class="btn btn-white" v-on:click="addValue(value, 'null')">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16">
+						<path d="M15.354 1.354l-.707-.707-2.777 2.776A5.967 5.967 0 0 0 8 2C4.691 2 2 4.691 2 8c0 1.475.537 2.824 1.423 3.87L.647 14.646l.707.707 2.776-2.776A5.965 5.965 0 0 0 8 14c3.309 0 6-2.691 6-6a5.965 5.965 0 0 0-1.423-3.87l2.777-2.776zM3 8c0-2.757 2.243-5 5-5 1.198 0 2.284.441 3.146 1.146l-7 7C3.441 10.284 3 9.198 3 8zm10 0c0 2.757-2.243 5-5 5-1.198 0-2.284-.441-3.146-1.146l7-7C12.559 5.716 13 6.802 13 8z" fill="currentColor"></path>
 					</svg>
 				</button>
 				<button type="button" class="btn btn-white" v-on:click="addValue(value, 'object')">
@@ -146,6 +156,9 @@
 							case "boolean":
 								value.value.push({type: type, collection: false});
 								break;
+							case "null":
+								value.value.push({type: type, collection: false, value: null});
+								break;
 							case "object":
 								value.value.push({type: 'object', collection: false, value: {}});
 								break;
@@ -160,6 +173,9 @@
 							case "number":
 							case "boolean":
 								this.$set(value.value, this.key, {type: type, collection: false});
+								break;
+							case "null":
+								this.$set(value.value, this.key, {type: type, collection: false, value: null});
 								break;
 							case "object":
 								this.$set(value.value, this.key, {type: 'object', collection: false, value: {}});

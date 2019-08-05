@@ -10,29 +10,37 @@ export default {
 					value: value
 				};
 			case "object":
-				// Check if it's a collection
-				if (Array.isArray(value)) {
-					const enrichedArray = [];
-					for (const childValue of value) {
-						enrichedArray.push(this.enrich(childValue));
-					}
+				// Check if it is null.
+				if (value === null) {
 					return {
-						type: "array",
-						collection: true,
-						value: enrichedArray
+						type: "null",
+						collection: false,
+						value: null
 					};
 				}
 
-				// If it's not a collection, it's a complex input
-				const enrichedObject = {};
-				for (const childKey in value) {
-					const childValue = value[childKey];
-					enrichedObject[childKey] = this.enrich(childValue);
+				// Check if it is a complex input.
+				if (!Array.isArray(value)) {
+					const enrichedObject = {};
+					for (const childKey in value) {
+						const childValue = value[childKey];
+						enrichedObject[childKey] = this.enrich(childValue);
+					}
+					return {
+						type: "object",
+						collection: false,
+						value: enrichedObject
+					};
+				}
+
+				const enrichedArray = [];
+				for (const childValue of value) {
+					enrichedArray.push(this.enrich(childValue));
 				}
 				return {
-					type: "object",
-					collection: false,
-					value: enrichedObject
+					type: "array",
+					collection: true,
+					value: enrichedArray
 				};
 		}
 	},
@@ -43,32 +51,19 @@ export default {
 			return undefined;
 		}
 
-		switch (typeof value.value) {
+		switch (value.type) {
 			case "string":
 			case "number":
-			case "boolean":
 				// It's a simple input
 				if (value.value === "") {
 					return undefined;
 				}
 
 				return value.value;
+			case "boolean":
+			case "null":
+				return value.value;
 			case "object":
-				// Check if it's a collection
-				if (value.collection) {
-					const cleanedArray = [];
-					for (const childValue of value.value) {
-						const cleanedChildValue = this.clean(childValue);
-						if (cleanedChildValue !== undefined) {
-							cleanedArray.push(cleanedChildValue);
-						}
-					}
-					if (cleanedArray.length === 0) {
-						return undefined;
-					}
-					return cleanedArray;
-				}
-
 				// If it's not a collection, it's a complex input
 				const cleanedObject = {};
 				for (const childKey in value.value) {
@@ -81,27 +76,42 @@ export default {
 					return undefined;
 				}
 				return cleanedObject;
+			case "array":
+				const cleanedArray = [];
+				for (const childValue of value.value) {
+					const cleanedChildValue = this.clean(childValue);
+					if (cleanedChildValue !== undefined) {
+						cleanedArray.push(cleanedChildValue);
+					}
+				}
+				if (cleanedArray.length === 0) {
+					return undefined;
+				}
+				return cleanedArray;
 		}
 	},
 
 	merge: function (existing, template) {
 		const existingValue = existing.value;
+		const templateType = template.type;
+		const templateCollection = template.collection;
 		const templateValue = template.value;
 
-		switch (typeof templateValue) {
+		switch (templateType) {
 			case "string":
 			case "number":
 			case "boolean":
+			case "null":
+				existing.type = templateType;
+				existing.collection = templateCollection;
 				existing.value = templateValue;
 				return;
 			case "object":
-				if (!template.collection) {
-					for (const key in templateValue) {
-						this.merge(existingValue[key], templateValue[key]);
-					}
-					return;
+				for (const key in templateValue) {
+					this.merge(existingValue[key], templateValue[key]);
 				}
-
+				return;
+			case "array":
 				// The first element will always exist. We will use it as a structure element.
 				const structureElement = existingValue[0];
 
@@ -115,42 +125,49 @@ export default {
 
 					existingValue.push(existingElement);
 				}
+				return;
 		}
 	},
 
 	addTemplate: function (existing, template) {
-		if (existing.type === "string" || existing.type === "number" || existing.type === "boolean") {
-			existing.template = template.value;
-			return;
-		}
-
-		if (existing.collection) {
-			for (let i = 0; i < existing.value.length; i++) {
-				this.addTemplate(existing.value[i], template.value[i]);
-			}
-			return;
-		}
-
-		for (const key in existing.value) {
-			this.addTemplate(existing.value[key], template.value[key]);
+		switch (existing.type) {
+			case "string":
+			case "number":
+			case "boolean":
+			case "null":
+				existing.template = template.value;
+				return;
+			case "object":
+				for (const key in existing.value) {
+					this.addTemplate(existing.value[key], template.value[key]);
+				}
+				return;
+			case "array":
+				for (let i = 0; i < existing.value.length; i++) {
+					this.addTemplate(existing.value[i], template.value[i]);
+				}
+				return;
 		}
 	},
 
 	removeTemplate: function (existing) {
-		if (existing.type === "string" || existing.type === "number" || existing.type === "boolean") {
-			delete existing.template;
-			return;
-		}
-
-		if (existing.collection) {
-			for (let i = 0; i < existing.value.length; i++) {
-				this.removeTemplate(existing.value[i]);
-			}
-			return;
-		}
-
-		for (const key in existing.value) {
-			this.removeTemplate(existing.value[key]);
+		switch (existing.type) {
+			case "string":
+			case "number":
+			case "boolean":
+			case "null":
+				delete existing.template;
+				return;
+			case "object":
+				for (const key in existing.value) {
+					this.removeTemplate(existing.value[key]);
+				}
+				return;
+			case "array":
+				for (let i = 0; i < existing.value.length; i++) {
+					this.removeTemplate(existing.value[i]);
+				}
+				return;
 		}
 	},
 };
