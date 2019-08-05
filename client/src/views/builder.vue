@@ -62,7 +62,7 @@
 						<h5 class="mb-2">Output</h5>
 						<json-builder class="mb-0" v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
 
-						<div class="mt-2" v-if="Object.keys(model.result.context[key]).length !== 0">
+						<div class="mt-4" v-if="Object.keys(model.result.context[key]).length !== 0">
 							<h5 class="mb-2">Context</h5>
 							<json-builder class="mb-0" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
 						</div>

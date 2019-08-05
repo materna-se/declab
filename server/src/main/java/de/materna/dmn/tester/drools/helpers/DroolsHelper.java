@@ -24,7 +24,7 @@ public class DroolsHelper {
 					continue;
 				case "number":
 					// According to the dmn specification, input ranges like [0..999] could be specified as an allowed value
-					// As we don't allow this at the moment, we'll catch the error
+					// We'll catch the exception for now.
 					try {
 						convertedOptions.add(Double.valueOf(option.toString()));
 					}
