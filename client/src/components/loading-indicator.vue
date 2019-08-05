@@ -19,7 +19,7 @@
 		width: 100%;
 		height: 4px;
 
-		background: linear-gradient(to right, #c1dfc4 0%, #deecdd 100%);
+		background: #6cb3ff;
 		overflow: hidden;
 	}
 
