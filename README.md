@@ -41,7 +41,7 @@ easily imported and exported using the graphical user interface.
 ## Development
 ### Server
 The following applications are required for server development:
-- **Java 8** (support for newer java versions is being reviewed at the moment)
+- **Java 12**
 - **Maven**
 - **WildFly or JBoss** (support for other application servers will be added in the future)
 
