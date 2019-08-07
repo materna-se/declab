@@ -10,5 +10,5 @@ jobs:
     steps:
       - run: git clone https://github.com/materna-se/dmn-tester.git
       - run: git clone https://github.com/materna-se/jdec.git
-      - run: cd ./jdec && mvn install -Dgpg.skip
+      - run: cd ./jdec && mvn install -Dgpg.skip -Dmaven.javadoc.skip=true
       - run: cd ./dmn-tester/server && mvn test
