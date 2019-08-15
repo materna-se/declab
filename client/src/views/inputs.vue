@@ -59,7 +59,7 @@
 						</select>
 
 						<h5 class="mb-2">Input</h5>
-						<json-builder v-bind:template="input.template" v-bind:fixed-root="true" v-on:update:values="input.value = $event"></json-builder>
+						<json-builder v-bind:template="input.template" v-bind:fixed-root="true" v-on:update:value="input.value = $event"></json-builder>
 
 						<hr>
 

@@ -23,7 +23,7 @@
 				<h3 class="mb-2">Context</h3>
 				<div class="card">
 					<div class="card-body">
-						<json-builder v-bind:template="model.template" v-on:update:values="model.input.value = $event; getRawResult();"></json-builder>
+						<json-builder v-bind:template="model.template" v-on:update:value="model.input.value = $event; getRawResult();"></json-builder>
 					</div>
 				</div>
 			</div>

@@ -1,5 +1,5 @@
 <template>
-	<json-builder-table v-bind:value="values" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues"></json-builder-table>
+	<json-builder-table v-bind:value="values" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues" v-if="values !== null"></json-builder-table>
 </template>
 
 <script>
@@ -33,23 +33,27 @@
 		},
 		data: function () {
 			return {
-				values: this.enrichTemplate(this.template)
+				values: null
 			}
+		},
+		mounted() {
+			this.values = this.enrichTemplate(this.template);
+			this.returnValue(this.values);
 		},
 		watch: {
 			template: function (template) {
 				this.values = this.enrichTemplate(template);
+				this.returnValue(this.values);
 			},
 			values: {
 				handler: function (values) {
-					const cleanedObject = Converter.clean(values);
-					this.$emit('update:values', cleanedObject === undefined ? {} : cleanedObject)
+					this.returnValue(values);
 				},
 				deep: true
 			}
 		},
 		methods: {
-			enrichTemplate: function (template) {
+			enrichTemplate(template) {
 				if (template === null) {
 					return Converter.enrich({});
 				}
@@ -58,6 +62,10 @@
 				}
 
 				return template;
+			},
+			returnValue(value) {
+				const cleanedObject = Converter.clean(value);
+				this.$emit('update:value', cleanedObject === undefined ? {} : cleanedObject)
 			}
 		}
 	};

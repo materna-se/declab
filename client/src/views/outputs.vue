@@ -55,7 +55,7 @@
 						</select>
 
 						<h5 class="mb-2">Output</h5>
-						<json-builder v-bind:template="output.template" v-bind:convert="true" v-on:update:values="output.value = $event"></json-builder>
+						<json-builder v-bind:template="output.template" v-bind:convert="true" v-on:update:value="output.value = $event"></json-builder>
 
 						<hr>
 

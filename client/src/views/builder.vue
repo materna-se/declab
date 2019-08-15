@@ -27,7 +27,7 @@
 					<div class="col-12">
 						<div class="card card-borderless mb-2">
 							<div class="card-body p-0">
-								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:values="model.input.value = $event; getModelResult();"></json-builder>
+								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:value="model.input.value = $event; getModelResult();"></json-builder>
 							</div>
 							<div class="card-footer card-footer-border">
 								<div class="input-group">
@@ -106,7 +106,7 @@
 					input: {
 						name: null,
 						value: {},
-						template: {}
+						template: Converter.enrich({})
 					},
 
 					result: {
