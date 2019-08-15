@@ -13,7 +13,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-4 mb-4">
+			<div class="col-3 mb-4">
 				<div class="row mb-2">
 					<div class="col-6">
 						<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="executeTests">
@@ -48,7 +48,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-8 mb-4">
+			<div class="col-9 mb-4">
 				<div class="card" v-if="mode === 'VIEW'">
 					<div class="card-header">
 						<h4 class="mb-0">{{test.name}}</h4>

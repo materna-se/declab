@@ -13,7 +13,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-4 mb-4">
+			<div class="col-3 mb-4">
 				<div class="list-group">
 					<div class="list-group-item list-group-item-action c-pointer" v-for="(output, uuid) in outputs" v-bind:key="uuid" v-on:click.self="setViewMode(uuid)">
 						<span class="d-block float-left mr-4" v-on:click="setViewMode(uuid)">{{output.name}}</span>
@@ -31,7 +31,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-8 mb-4">
+			<div class="col-9 mb-4">
 				<div class="card" v-if="mode === 'VIEW'">
 					<div class="card-header">
 						<h4 class="mb-0">{{output.name}}</h4>
