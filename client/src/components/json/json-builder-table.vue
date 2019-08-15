@@ -51,19 +51,19 @@
 					<td>
 						<json-builder-table v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues"></json-builder-table>
 					</td>
-					<td class="td-minimize bg-light">
+					<td class="td-minimize bg-light" v-if="!fixed">
 						<button type="button" class="btn btn-white d-block float-left mb-compact" v-bind:disabled="fixedValues" v-on:click="value.value.splice(childIndex + 1, 0, JSON.parse(JSON.stringify(childValue)))">
-							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="transform: scale(1,-1);">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="transform: scale(1,-1); margin: 3px 0">
 								<path d="M2 16h8v-2H2m16 0v-4h-2v4h-4v2h4v4h2v-4h4v-2m-8-8H2v2h12m0 2H2v2h12v-2z" fill="currentColor"></path>
 							</svg>
 						</button>
 						<button type="button" class="btn btn-white d-block float-left mb-compact" v-bind:disabled="fixedValues" v-on:click="value.value.splice(childIndex, 0, JSON.parse(JSON.stringify(childValue)))">
-							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="margin: 3px 0">
 								<path d="M2 16h8v-2H2m16 0v-4h-2v4h-4v2h4v4h2v-4h4v-2m-8-8H2v2h12m0 2H2v2h12v-2z" fill="currentColor"></path>
 							</svg>
 						</button>
 						<button type="button" class="btn btn-white d-block float-left" v-bind:disabled="fixedValues" v-on:click="value.value.splice(childIndex, 1)">
-							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="margin: 3px 0">
 								<path d="M2 6v2h12V6H2m0 4v2h9v-2H2m12.17.76l-1.41 1.41L15.59 15l-2.83 2.83 1.41 1.41L17 16.41l2.83 2.83 1.41-1.41L18.41 15l2.83-2.83-1.41-1.41L17 13.59l-2.83-2.83M2 14v2h9v-2H2z" fill="currentColor"></path>
 							</svg>
 						</button>
@@ -82,6 +82,13 @@
 					</td>
 					<td>
 						<json-builder-table v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues"></json-builder-table>
+					</td>
+					<td class="td-minimize bg-light" v-if="!fixed">
+						<button type="button" class="btn btn-white d-block" v-on:click="$delete(value.value, childKey)">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="margin: 3px 0">
+								<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"></path>
+							</svg>
+						</button>
 					</td>
 				</tr>
 				</tbody>
