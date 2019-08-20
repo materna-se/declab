@@ -2,7 +2,7 @@
 .git
 
 ##### Node.js #####
-node_modules
+/client/node_modules
 
 ##### Java #####
-target
+/server/.idea

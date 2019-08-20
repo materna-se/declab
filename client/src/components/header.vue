@@ -26,7 +26,7 @@
 <style>
 	.navbar,
 	.navbar .dropdown-item:active {
-		background: #6cb3ff;
+		background: #518cca;
 	}
 
 	.navbar .navbar-brand,
