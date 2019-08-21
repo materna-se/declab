@@ -1,5 +1,7 @@
-# declab
+![](./docs/logo.png)
+
 ![CircleCI](https://img.shields.io/circleci/build/github/materna-se/dmn-tester.svg?style=flat-square)
+![Docker](https://img.shields.io/docker/pulls/maternase/dmn-tester?style=flat-square)
 
 ## Features
 ### Community
