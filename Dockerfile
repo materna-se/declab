@@ -2,7 +2,7 @@ FROM jboss/wildfly:17.0.1.Final
 
 WORKDIR /opt/jboss/wildfly
 
-COPY ["./server/target/tester-1.0.0.war", "./standalone/deployments/ROOT.war"]
+COPY ["./server/target/declab-1.2.0.war", "./standalone/deployments/ROOT.war"]
 
 RUN ["mkdir", "./standalone/data"]
 # TODO: We should only give permissions to the jboss group.
