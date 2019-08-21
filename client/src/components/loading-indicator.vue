@@ -19,7 +19,7 @@
 		width: 100%;
 		height: 4px;
 
-		background: #6cb3ff;
+		background: #8cb8e6;
 		overflow: hidden;
 	}
 
@@ -31,7 +31,7 @@
 
 		width: 25%;
 
-		background-color: rgba(0, 0, 0, 0.3);
+		background-color: #d0e7ff;
 		animation: loading-animation 2s infinite ease-out;
 	}
 

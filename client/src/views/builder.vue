@@ -112,8 +112,7 @@
 					result: {
 						context: {},
 						outputs: {}
-					},
-					visibleContexts: {}
+					}
 				},
 
 				// 0: Both
@@ -130,7 +129,7 @@
 			await this.getInputs();
 
 			// If window.opener is not null, we are the worker attached to the main window.
-			if (window.opener !== null) {
+			if (window.opener !== undefined && window.opener !== null) { // Workaround because Microsoft Edge is not compliant (window.opener is undefined).
 				// Listen for messages.
 				window.addEventListener("message", function (e) {
 					const data = e.data;
