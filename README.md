@@ -1,6 +1,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/materna-se/dmn-tester/master/docs/logo.png">
   <br><br>
+  <img src="https://img.shields.io/github/license/materna-se/dmn-tester.svg?style=flat-square">
   <img src="https://img.shields.io/circleci/build/github/materna-se/dmn-tester.svg?style=flat-square">
   <img src="https://img.shields.io/docker/pulls/maternase/dmn-tester?style=flat-square">
 </p>
