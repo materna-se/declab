@@ -8,7 +8,7 @@ jobs:
       MAVEN_OPTS: -Xmx3200m
 
     steps:
-      - run: git clone https://github.com/materna-se/dmn-tester.git
+      - run: git clone https://github.com/materna-se/declab.git
       - run: git clone https://github.com/materna-se/jdec.git
       - run: cd ./jdec && mvn install -Dgpg.skip -Dmaven.javadoc.skip=true
-      - run: cd ./dmn-tester/server && mvn test
+      - run: cd ./declab/server && mvn test

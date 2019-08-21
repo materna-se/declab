@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/materna-se/dmn-tester/master/docs/logo.png">
+  <img src="https://raw.githubusercontent.com/materna-se/declab/master/docs/logo.png">
   <br><br>
-  <img src="https://img.shields.io/github/license/materna-se/dmn-tester.svg?style=flat-square">
-  <img src="https://img.shields.io/circleci/build/github/materna-se/dmn-tester.svg?style=flat-square">
-  <img src="https://img.shields.io/docker/pulls/maternase/dmn-tester?style=flat-square">
+  <img src="https://img.shields.io/github/license/materna-se/declab.svg?style=flat-square">
+  <img src="https://img.shields.io/circleci/build/github/materna-se/declab.svg?style=flat-square">
+  <img src="https://img.shields.io/docker/pulls/maternase/declab?style=flat-square">
 </p>
 
 ## Features
@@ -63,8 +63,8 @@ web archive can be copied into the specified directory (for example `./standalon
 If the test framework should be executed in a Docker Container,
 the project can be built and executed by using the included Dockerfile.
 ```
-docker build -t dmn-tester:1.0.0 .
-docker run -p 127.0.0.1:8080:8080 dmn-tester:1.0.0 
+docker build -t declab:1.0.0 .
+docker run -p 127.0.0.1:8080:8080 declab:1.0.0 
 ```
 
 ### Client
