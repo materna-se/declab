@@ -3,18 +3,14 @@
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-8">
-					<p class="mb-0 text-left">
-					<small class="text-muted">
+					<small class="d-block text-muted">
 						Developed and mantained by <a href="https://www.materna.de" target="_blank">Materna Information & Communications SE</a>. Available under the Apache 2.0 License.
 					</small>
-					</p>
 				</div>
 				<div class="col-4">
-					<p class="mb-0 text-right">
-						<small class="text-muted">
-							Version {{version}}
-						</small>
-					</p>
+					<small class="d-block text-right text-muted">
+						Version {{version}}
+					</small>
 				</div>
 			</div>
 		</div>

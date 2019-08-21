@@ -3,24 +3,13 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
-	<title>DMN Tester</title>
-	<style>
-		.fade-enter-active, .fade-leave-active {
-			transition: all .2s ease;
-		}
-
-		.fade-enter, .fade-leave-to {
-			opacity: 0
-		}
-	</style>
+	<title>declab</title>
 </head>
 <body>
 <div id="mount">
 	<loading-indicator v-bind:loading="loading"></loading-indicator>
 	<dmn-header></dmn-header>
-	<transition name="fade" mode="out-in" appear>
-		<router-view></router-view>
-	</transition>
+	<router-view></router-view>
 	<dmn-footer></dmn-footer>
 </div>
 <link href="https://fonts.googleapis.com/css?family=Ubuntu:400,500,700|Source+Code+Pro:400" rel="stylesheet">

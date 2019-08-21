@@ -1,7 +1,7 @@
 <template>
 	<nav class="navbar navbar-expand mb-4">
 		<!-- Manual / route -->
-		<router-link to="/" class="navbar-brand">DMN Tester</router-link>
+		<router-link to="/" class="navbar-brand">dec<span class="navbar-brand-secondary">lab</span></router-link>
 
 		<!-- Builder for all custom routes -->
 		<ul class="navbar-nav mr-auto">
@@ -26,13 +26,20 @@
 <style>
 	.navbar,
 	.navbar .dropdown-item:active {
-		background: #518cca;
+		background: #556890;
 	}
 
 	.navbar .navbar-brand,
-	.navbar .nav-link,
-	.navbar .dropdown-item:active {
+	.navbar .nav-link {
 		color: #ffffff;
+	}
+
+	.navbar .navbar-brand {
+		font-size: 1.5rem;
+	}
+
+	.navbar .navbar-brand .navbar-brand-secondary {
+		color: #c0c8db;
 	}
 
 	/* We can't select a dropdown item if there is a margin-top property. */

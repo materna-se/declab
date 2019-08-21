@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class DroolsDebugger {
 	private static final Logger log = Logger.getLogger(DroolsDebugger.class);
+
 	private DecisionSession decisionSession;
 	private Map<String, Map<String, Object>> context;
 	private DMNRuntimeEventListener listener;
@@ -56,6 +57,12 @@ public class DroolsDebugger {
 		decisionSession.getRuntime().addListener(listener);
 	}
 
+	public Map<String, Map<String, Object>> stop() {
+		decisionSession.getRuntime().removeListener(listener);
+
+		return context;
+	}
+
 	private Object cleanResult(Object result) {
 		if (result instanceof Map) {
 			Map<String, Object> results = (Map<String, Object>) result;
@@ -72,11 +79,5 @@ public class DroolsDebugger {
 		}
 
 		return result;
-	}
-
-	public Map<String, Map<String, Object>> stop() {
-		decisionSession.getRuntime().removeListener(listener);
-
-		return context;
 	}
 }
