@@ -112,14 +112,14 @@
 				}
 			});
 
-			// Initialize theme
+			// Initialize monaco theme
 			monaco.editor.defineTheme('feel-theme', {
 				base: 'vs',
-				inherit: false, // We do not want to inherit rules.
+				inherit: false, // We don't want to inherit rules.
 				rules: [
-					{token: 'feel-keyword', foreground: 'd73a49'},
+					{token: 'feel-keyword', foreground: 'ec5b69', fontStyle: 'bold'}, // Lighter foreground color to counteract the bold font.
 					{token: 'feel-numeric', foreground: '005cc5'},
-					{token: 'feel-boolean', foreground: '005cc5'},
+					{token: 'feel-boolean', foreground: 'd73a49'},
 					{token: 'feel-string', foreground: '22863a'},
 					{token: 'feel-function', foreground: '6f42c1'},
 				],
