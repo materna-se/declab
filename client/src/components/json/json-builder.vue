@@ -54,9 +54,6 @@
 		},
 		methods: {
 			enrichTemplate(template) {
-				if (template === null) {
-					return Converter.enrich({});
-				}
 				if (this.convert) {
 					return Converter.enrich(template);
 				}
