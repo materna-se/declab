@@ -30,7 +30,7 @@
 						<h4 class="mb-0">Export</h4>
 					</div>
 					<div class="card-body">
-						<a v-bind:href="endpoint + '/backup'">
+						<a v-bind:href="endpoint">
 							<button class="btn btn-block btn-outline-secondary">Export</button>
 						</a>
 					</div>
@@ -40,6 +40,7 @@
 						<h4 class="mb-0">Deletion</h4>
 					</div>
 					<div class="card-body">
+						<p class="mb-2 text-danger">The deletion of workspaces is permanent and cannot be undone.</p>
 						<button class="btn btn-block btn-outline-danger" v-on:click="deleteWorkspace">Delete</button>
 					</div>
 				</div>
