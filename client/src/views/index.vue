@@ -30,7 +30,7 @@
 		},
 		methods: {
 			enterWorkspace() {
-				if (this.workspace === null) {
+				if (this.workspace === null || this.workspace === "") {
 					return;
 				}
 

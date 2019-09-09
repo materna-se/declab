@@ -21,7 +21,7 @@
 					<div class="card-body">
 						<div class="input-group">
 							<label class="custom-file-label" for="file">Select DMN Backup...</label>
-							<input accept=".dtar" class="custom-file-input" id="file" name="file" type="file" v-on:change="importBackup">
+							<input accept=".dtar" class="custom-file-input" id="file" name="file" type="file" v-on:change="importWorkspace">
 						</div>
 					</div>
 				</div>
@@ -33,6 +33,14 @@
 						<a v-bind:href="endpoint + '/backup'">
 							<button class="btn btn-block btn-outline-secondary">Export</button>
 						</a>
+					</div>
+				</div>
+				<div class="card mb-4">
+					<div class="card-header">
+						<h4 class="mb-0">Deletion</h4>
+					</div>
+					<div class="card-body">
+						<button class="btn btn-block btn-outline-danger" v-on:click="deleteWorkspace">Delete</button>
 					</div>
 				</div>
 			</div>
@@ -66,12 +74,16 @@
 			};
 		},
 		methods: {
-			async importBackup(event) {
-				await Network.importBackup(event.target.files[0]);
+			async importWorkspace(event) {
+				await Network.importWorkspace(event.target.files[0]);
 				this.alert = {
 					message: "The backup was successfully imported.",
 					state: "success"
 				};
+			},
+			async deleteWorkspace() {
+				await Network.deleteWorkspace();
+				this.$router.push('/');
 			}
 		}
 	};

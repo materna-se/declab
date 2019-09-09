@@ -169,13 +169,18 @@ export default {
 		return test;
 	},
 
-	importBackup(backup) {
+	importWorkspace(backup) {
 		const formData = new FormData();
 		formData.append("backup", backup);
 
-		return fetch(this._endpoint + "/backup", {
+		return fetch(this._endpoint, {
 			method: "PUT",
 			body: formData
+		});
+	},
+	deleteWorkspace() {
+		return fetch(this._endpoint, {
+			method: "DELETE"
 		});
 	}
 }
