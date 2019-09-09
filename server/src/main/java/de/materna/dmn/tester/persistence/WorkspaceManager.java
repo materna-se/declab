@@ -1,8 +1,10 @@
 package de.materna.dmn.tester.persistence;
 
 import de.materna.dmn.tester.beans.Workspace;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +23,11 @@ public class WorkspaceManager {
 			workspaces.put(name, workspace);
 		}
 		return workspace;
+	}
+
+	public void remove(String name) throws IOException {
+		FileUtils.deleteDirectory(Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", name).toFile());
+		invalidate(name);
 	}
 
 	public void invalidate(String name) {

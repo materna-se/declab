@@ -1,7 +1,7 @@
 package de.materna.dmn.tester;
 
 import de.materna.dmn.tester.filters.CSRFFilter;
-import de.materna.dmn.tester.servlets.backup.BackupServlet;
+import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
 import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.dmn.tester.servlets.model.ModelServlet;
 import de.materna.dmn.tester.servlets.output.OutputServlet;
@@ -9,7 +9,6 @@ import de.materna.dmn.tester.servlets.test.TestServlet;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,7 +22,7 @@ public class MainApplication extends Application {
 		singletons.add(new InputServlet());
 		singletons.add(new OutputServlet());
 		singletons.add(new TestServlet());
-		singletons.add(new BackupServlet());
+		singletons.add(new WorkspaceServlet());
 
 		classes.add(CSRFFilter.class);
 	}

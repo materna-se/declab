@@ -1,7 +1,7 @@
-package de.materna.dmn.tester.servlets.backup;
+package de.materna.dmn.tester.servlets.workspace;
 
-import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.beans.Workspace;
+import de.materna.dmn.tester.persistence.WorkspaceManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -21,13 +21,13 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 @Path("/workspaces/{workspace}")
-public class BackupServlet {
-	private static final Logger log = Logger.getLogger(BackupServlet.class);
+public class WorkspaceServlet {
+	private static final Logger log = Logger.getLogger(WorkspaceServlet.class);
 
 	@GET
-	@Path("/backup")
+	@Path("")
 	@Produces("application/zip")
-	public Response getBackup(@PathParam("workspace") String workspaceName) {
+	public Response exportWorkspace(@PathParam("workspace") String workspaceName) {
 		StreamingOutput streamingOutput = (OutputStream outputStream) -> {
 			try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
 				Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
@@ -45,13 +45,13 @@ public class BackupServlet {
 			}
 		};
 
-		return Response.status(Response.Status.OK).header("Content-Disposition", "attachment; filename=\"backup.dtar\"").entity(streamingOutput).build();
+		return Response.status(Response.Status.OK).header("Content-Disposition", "attachment; filename=\"" + workspaceName + ".dtar\"").entity(streamingOutput).build();
 	}
 
 	@PUT
-	@Path("/backup")
+	@Path("")
 	@Consumes("multipart/form-data")
-	public Response importBackup(@PathParam("workspace") String workspaceName, MultipartFormDataInput multipartFormDataInput) throws IOException {
+	public Response importWorkspace(@PathParam("workspace") String workspaceName, MultipartFormDataInput multipartFormDataInput) throws IOException {
 		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
 
 		InputPart inputPart = multipartFormDataInput.getFormDataMap().get("backup").get(0);
@@ -75,6 +75,14 @@ public class BackupServlet {
 
 		Workspace workspace = workspaceManager.get(workspaceName);
 		workspace.getDecisionSession().importModel(workspace.getModelManager().getFile());
+
+		return Response.status(Response.Status.NO_CONTENT).build();
+	}
+
+	@DELETE
+	@Path("")
+	public Response deleteWorkspace(@PathParam("workspace") String workspaceName) throws IOException {
+		WorkspaceManager.getInstance().remove(workspaceName);
 
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
