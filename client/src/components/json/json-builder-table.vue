@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="input-group" v-if="value.type === 'string' || value.type === 'date'" v-bind:style="{'opacity': value.value === value.template ? '0.6' : '1'}">
+		<div class="input-group" v-if="value.type === 'string' || value.type === 'date' || value.type === 'time' || value.type === 'dateTime'" v-bind:style="{'opacity': value.value === value.template ? '0.6' : '1'}">
 			<div class="input-group-prepend">
 				<span class="input-group-text">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 11a2 2 0 0 1 2 2v4H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2m-2 2v2h2v-2H4m16 0v2h2v2h-2a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2v2h-2m-8-6v4h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V7h2m0 8h2v-2h-2v2z" fill="currentColor"></path></svg>
@@ -38,7 +38,29 @@
 				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" style="margin: 2px 0"><path d="M15.354 1.354l-.707-.707-2.777 2.776A5.967 5.967 0 0 0 8 2C4.691 2 2 4.691 2 8c0 1.475.537 2.824 1.423 3.87L.647 14.646l.707.707 2.776-2.776A5.965 5.965 0 0 0 8 14c3.309 0 6-2.691 6-6a5.965 5.965 0 0 0-1.423-3.87l2.777-2.776zM3 8c0-2.757 2.243-5 5-5 1.198 0 2.284.441 3.146 1.146l-7 7C3.441 10.284 3 9.198 3 8zm10 0c0 2.757-2.243 5-5 5-1.198 0-2.284-.441-3.146-1.146l7-7C12.559 5.716 13 6.802 13 8z" fill="currentColor"></path></svg>
 			</span>
 		</div>
-		<div v-else-if="value.collection">
+		<div v-else-if="value.type === 'object'">
+			<p class="my-4 text-center text-muted" v-if="Object.keys(value.value).length === 0 && !fixed">Please select a type!</p>
+			<table class="table table-bordered table-minimize mb-0">
+				<tbody>
+				<tr v-for="(childValue, childKey) in value.value">
+					<td class="td-minimize bg-light">
+						<span class="input-group-text input-group-text-disabled w-100">{{childKey}}</span>
+					</td>
+					<td>
+						<json-builder-table v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues"></json-builder-table>
+					</td>
+					<td class="td-minimize bg-light" v-if="!fixed">
+						<button type="button" class="btn btn-white d-block" v-on:click="$delete(value.value, childKey)">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="margin: 3px 0">
+								<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"></path>
+							</svg>
+						</button>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<div v-else-if="value.type === 'array'">
 			<p class="my-4 text-center text-muted" v-if="value.value.length === 0 && !fixed">Please select a type!</p>
 			<div class="input-group-text input-group-table" v-else>
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -73,31 +95,12 @@
 			</table>
 		</div>
 		<div v-else>
-			<p class="my-4 text-center text-muted" v-if="Object.keys(value.value).length === 0 && !fixed">Please select a type!</p>
-			<table class="table table-bordered table-minimize mb-0">
-				<tbody>
-				<tr v-for="(childValue, childKey) in value.value">
-					<td class="td-minimize bg-light">
-						<span class="input-group-text input-group-text-disabled w-100">{{childKey}}</span>
-					</td>
-					<td>
-						<json-builder-table v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues"></json-builder-table>
-					</td>
-					<td class="td-minimize bg-light" v-if="!fixed">
-						<button type="button" class="btn btn-white d-block" v-on:click="$delete(value.value, childKey)">
-							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="margin: 3px 0">
-								<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"></path>
-							</svg>
-						</button>
-					</td>
-				</tr>
-				</tbody>
-			</table>
+			<p class="my-2 text-center text-muted">{{value.type}} is not supported yet!</p>
 		</div>
 		<div class="input-group" v-if="value.options !== undefined && !fixedValues">
 			<button type="button" class="btn btn-white mr-compact mt-compact" v-for="option of value.options" v-on:click="$set(value, 'value', option)">{{option}}</button>
 		</div>
-		<div class="input-group mt-compact" v-if="!['string', 'date', 'number', 'boolean', 'null'].includes(value.type) && !fixed">
+		<div class="input-group mt-compact" v-if="['object', 'array'].includes(value.type) && !fixed">
 			<input class="form-control" placeholder="Enter Key..." v-model="key" v-if="!value.collection">
 			<div v-bind:class="[value.collection ? 'btn-group ml-auto': 'input-group-append']">
 				<button type="button" class="btn btn-white" v-on:click="addValue(value, 'string')">

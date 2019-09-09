@@ -19,6 +19,8 @@ public class DroolsHelper {
 			switch (type) {
 				case "string":
 				case "date":
+				case "time":
+				case "dateTime":
 					// We need to remove the quotation marks from the allowed value
 					convertedOptions.add(option.toString().substring(1, option.toString().length() - 1));
 					continue;
