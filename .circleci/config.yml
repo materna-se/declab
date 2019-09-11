@@ -6,19 +6,22 @@ jobs:
     environment:
       MAVEN_OPTS: -Xmx3200m
     steps:
-      - attach_workspace:
-          at: ./artifacts
       - run: git clone https://github.com/materna-se/declab.git
       - run: git clone https://github.com/materna-se/jdec.git
       - run: cd ./jdec && mvn install -Dgpg.skip -Dmaven.javadoc.skip=true
       - run: cd ./declab/server && mvn package
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - ./jdec
+            - ./declab
 
   publish:
       docker:
         - image: cibuilds/github:0.10
       steps:
         - attach_workspace:
-            at: ./artifacts
+            at: ~/
         - run: cd ./declab/server && ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -recreate -replace 1.2.3 ./target/declab-1.2.3.war
 
 workflows:
