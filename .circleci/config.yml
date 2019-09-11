@@ -1,19 +1,30 @@
 version: 2
 jobs:
-  build:
+  build_client:
+    docker:
+      - image: node:12.10.0-alpine
+    environment:
+      API_HOST: ./api
+    steps:
+      - run: git clone https://github.com/materna-se/declab.git
+      - run: cd ./declab/client && npm run build
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - ./declab
+
+  build_server:
     docker:
       - image: circleci/openjdk:11-jdk-stretch
     environment:
       MAVEN_OPTS: -Xmx3200m
     steps:
-      - run: git clone https://github.com/materna-se/declab.git
-      - run: git clone https://github.com/materna-se/jdec.git
-      - run: cd ./jdec && mvn install -Dgpg.skip -Dmaven.javadoc.skip=true
+      - attach_workspace:
+          at: ~/project
       - run: cd ./declab/server && mvn package
       - persist_to_workspace:
           root: ~/project
           paths:
-            - ./jdec
             - ./declab
 
   publish:
@@ -28,7 +39,11 @@ workflows:
   version: 2
   build_and_publish:
     jobs:
-      - build
+      - build_client
+      - build_server:
+          requires:
+            - build_client
       - publish:
           requires:
-            - build
+            - build_client
+            - build_server
