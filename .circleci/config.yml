@@ -1,14 +1,24 @@
 version: 2
 jobs:
-  build:
+  - build:
     docker:
       - image: circleci/openjdk:11-jdk-stretch
-
     environment:
       MAVEN_OPTS: -Xmx3200m
-
     steps:
+      - attach_workspace:
+          at: ./artifacts
       - run: git clone https://github.com/materna-se/declab.git
       - run: git clone https://github.com/materna-se/jdec.git
       - run: cd ./jdec && mvn install -Dgpg.skip -Dmaven.javadoc.skip=true
-      - run: cd ./declab/server && mvn test
+      - run: cd ./declab/server && mvn package
+
+  - publish:
+      requires:
+        - test
+      docker:
+        - image: cibuilds/github:0.10
+      steps:
+        - attach_workspace:
+            at: ./artifacts
+        - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -recreate ./artifacts/declab/server/target/declab-1.2.3.war
