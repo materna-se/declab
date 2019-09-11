@@ -8,7 +8,7 @@ jobs:
     steps:
       - run: apk add --no-cache git
       - run: git clone https://github.com/materna-se/declab.git
-      - run: cd ./declab/client && npm run build
+      - run: cd ./declab/client && npm install && npm run build
       - persist_to_workspace:
           root: ~/project
           paths:
