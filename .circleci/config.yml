@@ -19,7 +19,7 @@ jobs:
       steps:
         - attach_workspace:
             at: ./artifacts
-        - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -recreate ./artifacts/declab/server/target/declab-1.2.3.war
+        - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -recreate -replace 1.2.3 ./artifacts/declab/server/target/declab-1.2.3.war
 
 workflows:
   version: 2
