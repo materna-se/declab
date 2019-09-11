@@ -4,6 +4,7 @@ export default {
 			case "string":
 			case "number":
 			case "boolean":
+				// TODO: We should recognize date, time and dateTime.
 				return {
 					type: typeof value,
 					collection: false,
@@ -53,6 +54,9 @@ export default {
 
 		switch (value.type) {
 			case "string":
+			case "date":
+			case "time":
+			case "dateTime":
 			case "number":
 				// It's a simple input
 				if (value.value === "") {

@@ -2,18 +2,13 @@ package de.materna.dmn.tester.drools;
 
 import de.materna.jdec.DecisionSession;
 import org.apache.log4j.Logger;
-import org.kie.dmn.api.core.event.AfterEvaluateContextEntryEvent;
-import org.kie.dmn.api.core.event.BeforeEvaluateContextEntryEvent;
-import org.kie.dmn.api.core.event.BeforeEvaluateDecisionEvent;
-import org.kie.dmn.api.core.event.DMNRuntimeEventListener;
+import org.kie.dmn.api.core.event.*;
 import org.kie.dmn.core.ast.DMNFunctionDefinitionEvaluator;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class DroolsDebugger {
-	private static final Logger log = Logger.getLogger(DroolsDebugger.class);
-
 	private DecisionSession decisionSession;
 	private Map<String, Map<String, Object>> context;
 	private DMNRuntimeEventListener listener;
@@ -42,7 +37,7 @@ public class DroolsDebugger {
 			@Override
 			public void afterEvaluateContextEntry(AfterEvaluateContextEntryEvent event) {
 				// We only want the root context as it includes the child context.
-				if (--level != 0) {
+				if (decision == null || --level != 0) {
 					return;
 				}
 
@@ -52,6 +47,11 @@ public class DroolsDebugger {
 				}
 
 				context.get(decision).put(key, cleanResult(event.getExpressionResult()));
+			}
+
+			@Override
+			public void afterEvaluateDecision(AfterEvaluateDecisionEvent event) {
+				decision = null;
 			}
 		};
 		decisionSession.getRuntime().addListener(listener);
