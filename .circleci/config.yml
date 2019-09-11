@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  - build:
+  build:
     docker:
       - image: circleci/openjdk:11-jdk-stretch
     environment:
@@ -13,7 +13,7 @@ jobs:
       - run: cd ./jdec && mvn install -Dgpg.skip -Dmaven.javadoc.skip=true
       - run: cd ./declab/server && mvn package
 
-  - publish:
+  publish:
       requires:
         - test
       docker:
