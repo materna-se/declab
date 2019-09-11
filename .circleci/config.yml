@@ -14,8 +14,6 @@ jobs:
       - run: cd ./declab/server && mvn package
 
   publish:
-      requires:
-        - build
       docker:
         - image: cibuilds/github:0.10
       steps:
@@ -28,4 +26,6 @@ workflows:
   build_and_publish:
     jobs:
       - build
-      - publish
+      - publish:
+          requires:
+            - buildbuild
