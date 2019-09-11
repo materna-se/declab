@@ -16,7 +16,7 @@ To provide an overview of the imported model, the included decisions, inputs and
 #### Powerful Builder
 To simplify the creation of tests, the test framework supports the user by providing a powerful builder.
 It supports complex data types and an increasing number of FEEL data types
-(`feel:string`, `feel:date`, `feel:time`, `feel:dateTime`, `feel:number` and `feel:boolean`).
+(`feel:string`, `feel:number` and `feel:boolean`). Support for `feel:date`, `feel:time`, `feel:dateTime` is planned.
 The builder also suggests values that are predefined inside the imported model.
 
 ![](./docs/builder.png)
