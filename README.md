@@ -33,15 +33,11 @@ a clear overview of the differences between the expected and calculated output.
 
 ![](./docs/test-output.png)
 
-### Enterprise
-#### Import and Export
-The inputs, outputs and tests created using the test framework can be
-easily imported and exported using the graphical user interface.
+#### Playground
+To accelerate the development time of decisions, FEEL expressions
+can be executed in real time using the playground.
 
-`TODO`
-
-## Documentation
-`TODO`
+![](./docs/playground.png)
 
 ## Development
 ### Server
