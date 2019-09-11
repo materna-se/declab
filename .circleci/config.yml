@@ -28,4 +28,4 @@ workflows:
       - build
       - publish:
           requires:
-            - buildbuild
+            - build
