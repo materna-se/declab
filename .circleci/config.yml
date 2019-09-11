@@ -15,7 +15,7 @@ jobs:
 
   publish:
       requires:
-        - test
+        - build
       docker:
         - image: cibuilds/github:0.10
       steps:
