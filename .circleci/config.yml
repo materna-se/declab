@@ -13,8 +13,8 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - ./jdec
-            - ./declab
+            - jdec
+            - declab
 
   publish:
       docker:
