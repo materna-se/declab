@@ -63,11 +63,11 @@ public class DroolsAnalyzer {
 			// The input is a simple collection.
 			LinkedList<ModelInput> inputs = new LinkedList<>();
 			inputs.add(new ModelInput(baseType.getName(), baseType.isCollection()));
-			return new ComplexModelInput(type.getName(), type.isCollection(), inputs);
+			return new ComplexModelInput("array", type.isCollection(), inputs);
 		}
 
 		// The input is as simple as it gets.
-		return new ModelInput(type.getName(), type.isCollection());
+		return new ModelInput(baseType.getName(), type.isCollection());
 	}
 
 	/**
