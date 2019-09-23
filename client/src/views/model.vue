@@ -94,8 +94,7 @@
 					name: null,
 					decisions: [],
 					inputs: {
-						type: null,
-						collection: false,
+						type: "object",
 						value: {}
 					},
 					knowledgeModels: []
