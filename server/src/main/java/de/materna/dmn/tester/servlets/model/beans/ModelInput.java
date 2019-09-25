@@ -6,27 +6,20 @@ import java.util.List;
 
 public class ModelInput {
 	private String type;
-	private boolean collection;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private List<Object> options;
 
-	public ModelInput(String type, boolean collection) {
+	public ModelInput(String type) {
 		this.type = type;
-		this.collection = collection;
 	}
 
-	public ModelInput(String type, boolean collection, List<Object> options) {
+	public ModelInput(String type, List<Object> options) {
 		this.type = type;
-		this.collection = collection;
 		this.options = options;
 	}
 
 	public String getType() {
 		return type;
-	}
-
-	public boolean isCollection() {
-		return collection;
 	}
 
 	public List<Object> getOptions() {

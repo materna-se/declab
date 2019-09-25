@@ -5,7 +5,7 @@ import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
-import de.materna.dmn.tester.beans.Workspace;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;

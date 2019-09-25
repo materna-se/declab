@@ -9,7 +9,7 @@ import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.input.beans.Decision;
 import de.materna.dmn.tester.servlets.model.beans.Model;
 import de.materna.dmn.tester.servlets.model.beans.ModelResult;
-import de.materna.dmn.tester.beans.Workspace;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.dmn.tester.servlets.output.beans.Output;
 import de.materna.jdec.beans.ImportResult;
 import de.materna.jdec.exceptions.ImportException;

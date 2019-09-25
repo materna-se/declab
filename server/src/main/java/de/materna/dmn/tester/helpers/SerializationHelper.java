@@ -2,6 +2,7 @@ package de.materna.dmn.tester.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -12,7 +13,7 @@ import java.io.IOException;
 public class SerializationHelper {
 	private static SerializationHelper instance;
 
-	private ObjectMapper objectMapper = new ObjectMapper().registerModules(new ParameterNamesModule(), new JavaTimeModule(), new Jdk8Module());
+	private ObjectMapper objectMapper = new ObjectMapper().registerModules(new ParameterNamesModule(), new JavaTimeModule(), new Jdk8Module()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	private SerializationHelper() {
 	}

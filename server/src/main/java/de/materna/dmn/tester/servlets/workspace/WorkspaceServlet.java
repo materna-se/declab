@@ -1,6 +1,6 @@
 package de.materna.dmn.tester.servlets.workspace;
 
-import de.materna.dmn.tester.beans.Workspace;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;

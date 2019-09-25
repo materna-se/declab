@@ -1,6 +1,6 @@
 package de.materna.dmn.tester.persistence;
 
-import de.materna.dmn.tester.beans.Workspace;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;

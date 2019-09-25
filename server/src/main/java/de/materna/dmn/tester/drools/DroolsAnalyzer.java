@@ -42,32 +42,32 @@ public class DroolsAnalyzer {
 		if (type.getFields().size() != 0) { // Is it a complex input?
 			if (type.isCollection()) { // Is the input a complex collection?
 				LinkedList<ComplexModelInput> inputs = new LinkedList<>();
-				inputs.add(new ComplexModelInput("object", baseType.isCollection(), getChildInputs(type.getFields())));
-				return new ComplexModelInput("array", type.isCollection(), inputs);
+				inputs.add(new ComplexModelInput("object", getChildInputs(type.getFields())));
+				return new ComplexModelInput("array", inputs);
 			}
 
-			return new ComplexModelInput("object", type.isCollection(), getChildInputs(type.getFields()));
+			return new ComplexModelInput("object", getChildInputs(type.getFields()));
 		}
 
 		if (type.getAllowedValues().size() != 0) { // Is it a simple input that contains a list of allowed values?
-			return new ModelInput(baseType.getName(), baseType.isCollection(), DroolsHelper.convertOptions(baseType.getName(), type.getAllowedValues()));
+			return new ModelInput(baseType.getName(), DroolsHelper.convertOptions(baseType.getName(), type.getAllowedValues()));
 		}
 
 		if (type.isCollection()) { // Is the input a simple collection?
 			if (baseType.getAllowedValues().size() != 0) { // Is the input a simple collection that contains a list of allowed values?
 				LinkedList<ModelInput> inputs = new LinkedList<>();
-				inputs.add(new ModelInput(baseType.getName(), baseType.isCollection(), DroolsHelper.convertOptions(baseType.getName(), baseType.getAllowedValues())));
-				return new ComplexModelInput("array", type.isCollection(), inputs);
+				inputs.add(new ModelInput(baseType.getName(), DroolsHelper.convertOptions(baseType.getName(), baseType.getAllowedValues())));
+				return new ComplexModelInput("array", inputs);
 			}
 
 			// The input is a simple collection.
 			LinkedList<ModelInput> inputs = new LinkedList<>();
-			inputs.add(new ModelInput(baseType.getName(), baseType.isCollection()));
-			return new ComplexModelInput("array", type.isCollection(), inputs);
+			inputs.add(new ModelInput(baseType.getName()));
+			return new ComplexModelInput("array", inputs);
 		}
 
 		// The input is as simple as it gets.
-		return new ModelInput(baseType.getName(), type.isCollection());
+		return new ModelInput(baseType.getName());
 	}
 
 	/**
