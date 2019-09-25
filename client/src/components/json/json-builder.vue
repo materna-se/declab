@@ -1,5 +1,5 @@
 <template>
-	<json-builder-table v-bind:value="values" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues" v-if="values !== null"></json-builder-table>
+	<json-builder-table v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues" v-if="value !== null"></json-builder-table>
 </template>
 
 <script>
@@ -33,21 +33,21 @@
 		},
 		data: function () {
 			return {
-				values: null
+				value: null
 			}
 		},
 		mounted() {
-			this.values = this.enrichTemplate(this.template);
-			this.returnValue(this.values);
+			this.value = this.enrichTemplate(this.template);
+			this.returnValue(this.value);
 		},
 		watch: {
 			template: function (template) {
-				this.values = this.enrichTemplate(template);
-				this.returnValue(this.values);
+				this.value = this.enrichTemplate(template);
+				this.returnValue(this.value);
 			},
-			values: {
-				handler: function (values) {
-					this.returnValue(values);
+			value: {
+				handler: function (value) {
+					this.returnValue(value);
 				},
 				deep: true
 			}
@@ -60,9 +60,15 @@
 
 				return template;
 			},
-			returnValue(value) {
+			cleanValue(value) {
 				const cleanedObject = Converter.clean(value);
-				this.$emit('update:value', cleanedObject === undefined ? {} : cleanedObject)
+				return cleanedObject === undefined ? {} : cleanedObject;
+			},
+			returnValue(value) {
+				/**
+				 * Template muss irgendwie über <textarea> verändert werden...
+				 */
+				this.$emit('update:value', this.cleanValue(value));
 			}
 		}
 	};
