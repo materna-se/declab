@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<textarea class="form-control w-100 mb-2" v-bind:value="JSON.stringify(cleanedValue)" v-on:input="importValue($event.target.value)"></textarea>
+		<textarea class="form-control w-100 mb-1" v-bind:value="JSON.stringify(cleanedValue)" v-on:input="importValue($event.target.value)"></textarea>
 		<json-builder-table v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues" v-if="value !== null"></json-builder-table>
 	</div>
 </template>
@@ -51,7 +51,6 @@
 			},
 			value: {
 				handler: function (value) {
-					console.info("handler", value);
 					this.exportValue(value);
 				},
 				deep: true
