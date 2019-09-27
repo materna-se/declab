@@ -1,11 +1,18 @@
 package de.materna.dmn.tester.drools.helpers;
 
+import de.materna.dmn.tester.drools.DroolsAnalyzer;
+import org.apache.log4j.Logger;
 import org.kie.dmn.api.core.DMNUnaryTest;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class DroolsHelper {
+	private static final Logger log = Logger.getLogger(DroolsAnalyzer.class);
+
 	/**
 	 * Drools does not return a correctly typed list of allowed values
 	 * This method converts the list of allowed values manually
@@ -36,5 +43,42 @@ public class DroolsHelper {
 			}
 		}
 		return convertedOptions;
+	}
+
+	/**
+	 * We need to convert strings that are in fact date, time, dateTime or duration inputs.
+	 * To do this, we're deep converting all key-value pairs.
+	 */
+	public static Object convertTimeValue(Object input) throws DatatypeConfigurationException {
+		if (input instanceof List) { // Is the input a list?
+			// We need to iterate through all elements.
+			List<Object> inputs = (List<Object>) input;
+			for (int i = 0; i < inputs.size(); i++) {
+				inputs.set(i, convertTimeValue(inputs.get(i)));
+			}
+			return inputs;
+		}
+		if (input instanceof Map) { // Is the input a map?
+			// We need to iterate through all key-value pairs.
+			Map<String, Object> inputs = (Map<String, Object>) input;
+			for (Map.Entry<String, Object> entry : inputs.entrySet()) {
+				inputs.put(entry.getKey(), convertTimeValue(entry.getValue()));
+			}
+			return inputs;
+		}
+
+		if (input instanceof String) { // Is the input a string?
+			// We need to check if it can be parsed to a gregorian calender or to a duration.
+			DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
+			try {
+				return datatypeFactory.newXMLGregorianCalendar((String) input);
+			}
+			catch (IllegalArgumentException dateException) {
+				return input;
+			}
+		}
+
+		// It's a primitive value.
+		return input;
 	}
 }

@@ -21,6 +21,7 @@ import org.kie.dmn.feel.parser.feel11.profiles.KieExtendedFEELProfile;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,7 +106,7 @@ public class ModelServlet {
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, context))).build();
 		}
-		catch (IOException exception) {
+		catch (IOException | DatatypeConfigurationException exception) {
 			log.error(exception);
 
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();

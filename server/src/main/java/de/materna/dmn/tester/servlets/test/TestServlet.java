@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -111,7 +112,7 @@ public class TestServlet {
 
 			return Response.status(Response.Status.OK).entity(new TestResult(comparedOutputs)).build();
 		}
-		catch (IOException exception) {
+		catch (IOException | DatatypeConfigurationException exception) {
 			log.error(exception);
 
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
