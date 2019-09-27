@@ -226,9 +226,7 @@
 			importInput(input) {
 				const currentInput = JSON.parse(JSON.stringify(this.model.input.template));
 				const templateInput = Converter.enrich(input);
-				Converter.merge(currentInput, templateInput);
-
-				this.model.input.template = currentInput;
+				this.model.input.template = Converter.merge(currentInput, templateInput);
 			},
 		}
 	};

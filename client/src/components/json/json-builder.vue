@@ -65,7 +65,7 @@
 				return cleanedObject === undefined ? {} : cleanedObject;
 			},
 			importValue(value) {
-				this.value = this.enrichTemplate(JSON.parse(value));
+				this.value = Converter.merge(this.value, this.enrichTemplate(JSON.parse(value)));
 				this.exportValue(this.value);
 			},
 			exportValue(value) {

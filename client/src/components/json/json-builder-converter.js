@@ -4,10 +4,8 @@ export default {
 			case "string":
 			case "number":
 			case "boolean":
-				// TODO: We should recognize date, time and dateTime.
 				return {
 					type: typeof value,
-					collection: false,
 					value: value
 				};
 			case "object":
@@ -15,7 +13,6 @@ export default {
 				if (value === null) {
 					return {
 						type: "null",
-						collection: false,
 						value: null
 					};
 				}
@@ -29,7 +26,6 @@ export default {
 					}
 					return {
 						type: "object",
-						collection: false,
 						value: enrichedObject
 					};
 				}
@@ -40,7 +36,6 @@ export default {
 				}
 				return {
 					type: "array",
-					collection: true,
 					value: enrichedArray
 				};
 		}
@@ -96,41 +91,36 @@ export default {
 	},
 
 	merge: function (existing, template) {
-		const existingValue = existing.value;
-		const templateType = template.type;
-		const templateCollection = template.collection;
-		const templateValue = template.value;
-
-		switch (templateType) {
-			case "string":
-			case "number":
-			case "boolean":
-			case "null":
-				existing.type = templateType;
-				existing.collection = templateCollection;
-				existing.value = templateValue;
-				return;
-			case "object":
-				for (const key in templateValue) {
-					this.merge(existingValue[key], templateValue[key]);
-				}
-				return;
-			case "array":
-				// The first element will always exist. We will use it as a structure element.
-				const structureElement = existingValue[0];
-
-				// After that, we can remove all elements.
-				existingValue.splice(0, existingValue.length);
-
-				for (const templateElement of templateValue) {
-					const existingElement = JSON.parse(JSON.stringify(structureElement));
-
-					this.merge(existingElement, templateElement);
-
-					existingValue.push(existingElement);
-				}
-				return;
+		if (existing === undefined) {
+			return template;
 		}
+
+		if (existing.type === "object" && template.type === "object") {
+			const mergedObject = JSON.parse(JSON.stringify(existing.value));
+			for (const key in template.value) {
+				mergedObject[key] = this.merge(existing.value[key], template.value[key]);
+			}
+			return {
+				type: "object",
+				value: mergedObject,
+			};
+		}
+
+		if(existing.type === "array" && template.type === "array") {
+			const mergedArray = JSON.parse(JSON.stringify(existing.value));
+			for (let i = 0; i < template.value.length; i++) {
+				mergedArray.push(this.merge(existing.value[i], template.value[i]));
+			}
+			return {
+				type: "array",
+				value: mergedArray,
+			};
+		}
+
+		return {
+			type: template.type,
+			value: template.value,
+		};
 	},
 
 	addTemplate: function (existing, template) {
