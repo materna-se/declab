@@ -56,25 +56,37 @@
 				</div>
 				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
 					<div class="card-header">
-						<h4 class="mb-0">{{key}}</h4>
-					</div>
-					<div class="card-body">
-						<h5 class="mb-2">Output</h5>
-						<json-builder class="mb-0" v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
-
-						<div class="mt-4" v-if="Object.keys(model.result.context[key]).length !== 0">
-							<h5 class="mb-2">Context</h5>
-							<json-builder class="mb-0" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
-						</div>
-					</div>
-					<div class="card-footer">
-						<div class="input-group">
-							<input type="text" class="form-control" placeholder="Enter Name..." v-model="output.name">
-							<div class="input-group-append">
-								<button class="btn btn-outline-secondary" v-on:click="addOutput(key, output)">Save Output</button>
+						<div class="row">
+							<div class="col-10">
+								<h4 class="mb-0">{{key}}</h4>
+							</div>
+							<div class="col-2">
+								<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" class="d-block float-right" style="cursor: pointer" v-on:click="$set(model.result.visible, key, model.result.visible[key] !== true)">
+									<path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z" fill="currentColor" v-if="model.result.visible[key]"></path>
+									<path d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6-6-6 1.41-1.42z" fill="currentColor" v-else></path>
+								</svg>
 							</div>
 						</div>
 					</div>
+					<template v-if="model.result.visible[key]">
+						<div class="card-body">
+							<h5 class="mb-2">Output</h5>
+							<json-builder class="mb-0" v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+
+							<div class="mt-4" v-if="Object.keys(model.result.context[key]).length !== 0">
+								<h5 class="mb-2">Context</h5>
+								<json-builder class="mb-0" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+							</div>
+						</div>
+						<div class="card-footer">
+							<div class="input-group">
+								<input type="text" class="form-control" placeholder="Enter Name..." v-model="output.name">
+								<div class="input-group-append">
+									<button class="btn btn-outline-secondary" v-on:click="addOutput(key, output)">Save Output</button>
+								</div>
+							</div>
+						</div>
+					</template>
 				</div>
 			</div>
 		</div>
@@ -110,8 +122,9 @@
 					},
 
 					result: {
+						outputs: {},
 						context: {},
-						outputs: {}
+						visible: {}
 					}
 				},
 
@@ -130,7 +143,7 @@
 
 			// If window.opener is not null, we are the worker attached to the main window.
 			if (window.opener !== undefined && window.opener !== null) { // Workaround because Microsoft Edge is not compliant (window.opener is undefined).
-				// Listen for messages.
+				// Receive all messages that are sent by the main window.
 				window.addEventListener("message", function (e) {
 					const data = e.data;
 					// We need to ignore messages from third parties (webpack, ...).
@@ -145,6 +158,10 @@
 							vue.getModelResult();
 						}
 					}
+				});
+				// Listen to attempts to unload the window and switch back to mode 0.
+				window.opener.addEventListener("unload", function (e) {
+					window.close();
 				});
 
 				this.mode = 2;
@@ -169,7 +186,9 @@
 					}, "*");
 				}
 
-				this.model.result = await Network.getModelResult(this.model.input.value);
+				const result = await Network.getModelResult(this.model.input.value);
+				this.model.result.outputs = result.outputs;
+				this.model.result.context = result.context;
 			},
 
 			//
