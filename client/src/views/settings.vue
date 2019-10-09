@@ -5,15 +5,20 @@
 				<alert v-bind:alert="alert"></alert>
 			</div>
 		</div>
-		<div class="row mb-2">
-			<div class="col-12">
-				<h3 class="mb-0">Settings</h3>
-			</div>
-		</div>
 		<div class="row mb-4">
 			<div class="col-4">
 			</div>
 			<div class="col-4">
+				<div class="card mb-4">
+					<div class="card-header">
+						<h4 class="mb-0">Configuration</h4>
+					</div>
+					<div class="card-body">
+						<h5 class="mb-2">Developer Mode</h5>
+						<p class="mb-2">The developer mode enables features like using raw JSON in the builder. It is intended for developers and should be used with caution.</p>
+						<input type="checkbox" v-model="configuration.developerMode" v-on:change="updateDeveloperMode">
+					</div>
+				</div>
 				<div class="card mb-4">
 					<div class="card-header">
 						<h4 class="mb-0">Import</h4>
@@ -30,7 +35,7 @@
 						<h4 class="mb-0">Export</h4>
 					</div>
 					<div class="card-body">
-						<a v-bind:href="endpoint">
+						<a v-bind:href="configuration.endpoint">
 							<button class="btn btn-block btn-outline-secondary">Export</button>
 						</a>
 					</div>
@@ -57,6 +62,7 @@
 
 <script>
 	import Network from "../helpers/network";
+	import Configuration from "../helpers/configuration";
 
 	import Alert from "../components/alert.vue";
 
@@ -71,7 +77,10 @@
 					state: null
 				},
 
-				endpoint: Network._endpoint,
+				configuration: {
+					endpoint: Network._endpoint,
+					developerMode: Configuration.getDeveloperMode(),
+				}
 			};
 		},
 		methods: {
@@ -85,6 +94,11 @@
 			async deleteWorkspace() {
 				await Network.deleteWorkspace();
 				this.$router.push('/');
+			},
+
+			// Helpers
+			updateDeveloperMode() {
+				Configuration.setDeveloperMode(this.configuration.developerMode);
 			}
 		}
 	};

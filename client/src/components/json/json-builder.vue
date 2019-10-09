@@ -1,13 +1,14 @@
 <template>
 	<div>
-		<textarea class="form-control w-100 mb-1" v-bind:value="JSON.stringify(cleanedValue)" v-on:input="importValue($event.target.value)"></textarea>
-		<json-builder-table v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues" v-if="value !== null"></json-builder-table>
+		<textarea class="form-control w-100 mb-1" v-if="developerMode === true" v-bind:value="JSON.stringify(cleanedValue)" v-on:input="importValue($event.target.value)"></textarea>
+		<json-builder-table v-if="value !== null" v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues"></json-builder-table>
 	</div>
 </template>
 
 <script>
-	import Converter from "./json-builder-converter";
+	import Configuration from "../../helpers/configuration";
 
+	import Converter from "./json-builder-converter";
 	import JSONBuilderTable from "./json-builder-table.vue";
 
 	export default {
@@ -36,6 +37,8 @@
 		},
 		data: function () {
 			return {
+				developerMode: Configuration.getDeveloperMode(),
+
 				value: null,
 				cleanedValue: null,
 			}
