@@ -109,12 +109,13 @@
 		<!--
 		Create a new key-value pair or append a new element to the array.
 		-->
-		<div class="input-group mt-1" v-if="['object', 'array'].includes(value.type) && !fixed">
+		<div class="input-group mt-1" v-if="['object', 'array'].includes(value.type) || !fixed">
 			<input class="form-control" placeholder="Enter Key..." v-model="key" v-if="value.type === 'object'">
 			<div v-bind:class="[value.type === 'object' ? 'input-group-append': 'btn-group ml-auto']">
 				<button type="button" class="btn btn-white" style="border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem" v-on:mouseenter="visible = true" v-on:mouseleave="visible = false">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
-						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"></path>
+						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor" v-if="['object', 'array'].includes(value.type)"></path>
+						<path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z" fill="currentColor" v-else></path>
 					</svg>
 				</button>
 				<div class="dropdown-menu" v-on:mouseenter="visible = true" v-on:mouseleave="visible = false" v-bind:class="{show: visible}">
@@ -177,7 +178,7 @@
 		methods: {
 			addValue(type, value) {
 				// An empty key is allowed if the type is "array".
-				if (this.key === null && value.type !== 'array') {
+				if (this.key === null && value.type === 'object') {
 					return;
 				}
 
@@ -210,6 +211,7 @@
 								this.$set(value.value, this.key, {type: type});
 								break;
 							case "null":
+								// TODO: Shouldn't the value be undefined?
 								this.$set(value.value, this.key, {type: type, value: null});
 								break;
 							case "object":
@@ -220,6 +222,27 @@
 								break;
 						}
 						break;
+					default:
+						switch (type) {
+							case "string":
+							case "dateTime":
+							case "number":
+							case "boolean":
+								value.type = type;
+								break;
+							case "null":
+								value.type = type;
+								value.value = null;
+								break;
+							case "object":
+								value.type = type;
+								value.value = {};
+								break;
+							case "array":
+								value.type = type;
+								value.value = [];
+								break;
+						}
 				}
 
 				this.key = null;
