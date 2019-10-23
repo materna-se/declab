@@ -29,9 +29,6 @@ jobs:
             - ./declab
 
   publish:
-      branches:
-        only:
-          - master
       docker:
         - image: cibuilds/github:0.10
       steps:
@@ -48,6 +45,10 @@ workflows:
           requires:
             - build_client
       - publish:
+          filters:
+            branches:
+              only:
+                - master
           requires:
             - build_client
             - build_server
