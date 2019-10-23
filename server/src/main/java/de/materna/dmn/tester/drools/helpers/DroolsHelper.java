@@ -3,15 +3,17 @@ package de.materna.dmn.tester.drools.helpers;
 import de.materna.dmn.tester.drools.DroolsAnalyzer;
 import org.apache.log4j.Logger;
 import org.kie.dmn.api.core.DMNUnaryTest;
+import org.kie.dmn.core.ast.DMNFunctionDefinitionEvaluator;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class DroolsHelper {
-	private static final Logger log = Logger.getLogger(DroolsAnalyzer.class);
+	private static final Logger log = Logger.getLogger(DroolsHelper.class);
 
 	/**
 	 * Drools does not return a correctly typed list of allowed values
@@ -80,5 +82,23 @@ public class DroolsHelper {
 
 		// It's a primitive value.
 		return input;
+	}
+
+	public static Object removeFunctionDefinitions(Object result) {
+		if (result instanceof Map) {
+			Map<String, Object> results = (Map<String, Object>) result;
+
+			Map<String, Object> cleanedResults = new LinkedHashMap<>();
+			for (Map.Entry<String, Object> entry : results.entrySet()) {
+				cleanedResults.put(entry.getKey(), removeFunctionDefinitions(entry.getValue()));
+			}
+			return cleanedResults;
+		}
+
+		if (result instanceof DMNFunctionDefinitionEvaluator.DMNFunction) {
+			return null;
+		}
+
+		return result;
 	}
 }

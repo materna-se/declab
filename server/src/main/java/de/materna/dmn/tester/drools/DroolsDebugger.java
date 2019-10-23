@@ -1,16 +1,20 @@
 package de.materna.dmn.tester.drools;
 
+import de.materna.dmn.tester.drools.helpers.DroolsHelper;
+import de.materna.dmn.tester.servlets.model.beans.ExecutionContext;
+import de.materna.dmn.tester.servlets.model.beans.ExecutionKnowledgeModel;
 import de.materna.jdec.DecisionSession;
 import org.apache.log4j.Logger;
 import org.kie.dmn.api.core.event.*;
-import org.kie.dmn.core.ast.DMNFunctionDefinitionEvaluator;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DroolsDebugger {
+	private static final Logger log = Logger.getLogger(DroolsDebugger.class);
+
 	private DecisionSession decisionSession;
-	private Map<String, Map<String, Object>> context;
+
+	private Map<String, ExecutionContext> context;
 	private DMNRuntimeEventListener listener;
 
 	public DroolsDebugger(DecisionSession decisionSession) {
@@ -20,64 +24,75 @@ public class DroolsDebugger {
 	public void start() {
 		context = new LinkedHashMap<>();
 		listener = new DMNRuntimeEventListener() {
-			private String decision;
-			private int level;
+			private ExecutionContext decision;
+			private int decisionContextLevel;
 
+			private Stack<ExecutionKnowledgeModel> knowledgeModels = new Stack<>();
+
+			/**
+			 * We need to create a new execution context for every decision.
+			 * This will be later filled with all context entries.
+			 */
 			@Override
 			public void beforeEvaluateDecision(BeforeEvaluateDecisionEvent event) {
-				decision = event.getDecision().getName();
-				context.put(decision, new LinkedHashMap<>());
+				decision = new ExecutionContext(new HashMap<>(), new LinkedList<>());
+				context.put(event.getDecision().getName(), decision);
 			}
 
 			@Override
+			public void beforeEvaluateBKM(BeforeEvaluateBKMEvent event) {
+				knowledgeModels.push(new ExecutionKnowledgeModel(event.getBusinessKnowledgeModel().getBusinessKnowledModel().getName(), new ExecutionContext(), 0));
+			}
+
+			/**
+			 * We only want the root contexts of the decision.
+			 * To achieve this, we will store the context level and add only level 0 entries to the execution context.
+			 */
+			@Override
 			public void beforeEvaluateContextEntry(BeforeEvaluateContextEntryEvent event) {
-				++level;
+				if (knowledgeModels.empty()) {
+					++decisionContextLevel;
+					return;
+				}
+
+				knowledgeModels.peek().incrementContextLevel();
 			}
 
 			@Override
 			public void afterEvaluateContextEntry(AfterEvaluateContextEntryEvent event) {
 				// We only want the root context as it includes the child context.
-				if (decision == null || --level != 0) {
+				if (knowledgeModels.empty()) {
+					// The context entry is attached to a decision.
+					if (--decisionContextLevel != 0) {
+						return;
+					}
+
+					String key = event.getVariableName();
+					if (!key.equals("__RESULT__")) {
+						decision.getContext().put(key, DroolsHelper.removeFunctionDefinitions(event.getExpressionResult()));
+					}
 					return;
 				}
 
-				String key = event.getVariableName();
-				if (key.equals("__RESULT__")) {
+				// The context entry is attached to a knowledge model.
+				ExecutionKnowledgeModel knowledgeModel = knowledgeModels.peek();
+				if (knowledgeModel.decrementContextLevel() != 0) {
 					return;
 				}
-
-				context.get(decision).put(key, cleanResult(event.getExpressionResult()));
+				knowledgeModel.getContext().getContext().put(event.getVariableName(), DroolsHelper.removeFunctionDefinitions(event.getExpressionResult()));
 			}
 
 			@Override
-			public void afterEvaluateDecision(AfterEvaluateDecisionEvent event) {
-				decision = null;
+			public void afterEvaluateBKM(AfterEvaluateBKMEvent event) {
+				knowledgeModels.pop();
 			}
 		};
 		decisionSession.getRuntime().addListener(listener);
 	}
 
-	public Map<String, Map<String, Object>> stop() {
+	public Map<String, ExecutionContext> stop() {
 		decisionSession.getRuntime().removeListener(listener);
 
 		return context;
-	}
-
-	private Object cleanResult(Object result) {
-		if (result instanceof Map) {
-			Map<String, Object> results = (Map<String, Object>) result;
-
-			Map<String, Object> cleanedResults = new LinkedHashMap<>();
-			for (Map.Entry<String, Object> entry : results.entrySet()) {
-				cleanedResults.put(entry.getKey(), cleanResult(entry.getValue()));
-			}
-			return cleanedResults;
-		}
-
-		if (result instanceof DMNFunctionDefinitionEvaluator.DMNFunction) {
-			return null;
-		}
-
-		return result;
 	}
 }

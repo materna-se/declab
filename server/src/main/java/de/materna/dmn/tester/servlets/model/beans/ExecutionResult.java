@@ -4,15 +4,14 @@ import de.materna.dmn.tester.servlets.output.beans.Output;
 
 import java.util.Map;
 
-public class ModelResult {
+public class ExecutionResult {
 	private Map<String, Output> outputs;
-	private Map<String, Map<String, Object>> context;
+	private Map<String, ExecutionContext> context;
 
-	public ModelResult() {
-
+	public ExecutionResult() {
 	}
 
-	public ModelResult(Map<String, Output> outputs, Map<String, Map<String, Object>> context) {
+	public ExecutionResult(Map<String, Output> outputs, Map<String, ExecutionContext> context) {
 		this.outputs = outputs;
 		this.context = context;
 	}
@@ -21,7 +20,7 @@ public class ModelResult {
 		return outputs;
 	}
 
-	public Map<String, Map<String, Object>> getContext() {
+	public Map<String, ExecutionContext> getContext() {
 		return context;
 	}
 }

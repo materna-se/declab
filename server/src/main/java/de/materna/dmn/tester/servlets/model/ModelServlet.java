@@ -7,8 +7,9 @@ import de.materna.dmn.tester.drools.DroolsExecutor;
 import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.input.beans.Decision;
+import de.materna.dmn.tester.servlets.model.beans.ExecutionContext;
 import de.materna.dmn.tester.servlets.model.beans.Model;
-import de.materna.dmn.tester.servlets.model.beans.ModelResult;
+import de.materna.dmn.tester.servlets.model.beans.ExecutionResult;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.dmn.tester.servlets.output.beans.Output;
 import de.materna.jdec.beans.ImportResult;
@@ -102,9 +103,9 @@ public class ModelServlet {
 			DroolsDebugger debugger = new DroolsDebugger(workspace.getDecisionSession());
 			debugger.start();
 			Map<String, Output> outputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), inputs);
-			Map<String, Map<String, Object>> context = debugger.stop();
+			Map<String, ExecutionContext> context = debugger.stop();
 
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, context))).build();
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ExecutionResult(outputs, context))).build();
 		}
 		catch (IOException | DatatypeConfigurationException exception) {
 			log.error(exception);
