@@ -2,6 +2,7 @@
 	<div>
 		<textarea class="form-control w-100 mb-1" v-if="developerMode === true" v-bind:value="JSON.stringify(cleanedValue)" v-on:input="importValue($event.target.value)"></textarea>
 		<json-builder-table v-if="value !== null" v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues"></json-builder-table>
+		<json-builder-selector v-if="!fixed && !fixedRoot" v-bind:value="value" v-bind:mode="'edit'"></json-builder-selector>
 	</div>
 </template>
 
@@ -10,10 +11,12 @@
 
 	import Converter from "./json-builder-converter";
 	import JSONBuilderTable from "./json-builder-table.vue";
+	import JSONBuilderSelector from "./json-builder-selector.vue";
 
 	export default {
 		components: {
-			"json-builder-table": JSONBuilderTable
+			"json-builder-table": JSONBuilderTable,
+			"json-builder-selector": JSONBuilderSelector
 		},
 		props: {
 			// Template, read-only
