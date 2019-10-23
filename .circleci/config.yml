@@ -29,6 +29,9 @@ jobs:
             - ./declab
 
   publish:
+      branches:
+        only:
+          - master
       docker:
         - image: cibuilds/github:0.10
       steps:
