@@ -69,10 +69,7 @@
 		methods: {
 			async importWorkspace(event) {
 				await Network.importWorkspace(event.target.files[0]);
-				this.alert = {
-					message: "The backup was successfully imported.",
-					state: "success"
-				};
+				this.$root.displayAlert("The backup was successfully imported.", "success");
 			},
 			async deleteWorkspace() {
 				await Network.deleteWorkspace();

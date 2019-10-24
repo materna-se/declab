@@ -162,7 +162,6 @@
 			//
 			async getModelInputs() {
 				this.model.input.template = await Network.getModelInputs();
-				console.info(this.$root.displayAlert("ja", "success"));
 			},
 			async getModelResult() {
 				// If we have a detached worker, we don't want to calculate the results here.
@@ -178,14 +177,9 @@
 					const result = await Network.getModelResult(this.model.input.value);
 					this.model.result.outputs = result.outputs;
 					this.model.result.context = result.context;
-
-					this.alert.message = null;
 				}
 				catch (e) {
-					this.alert = {
-						message: "The output can't be calculated right now.",
-						state: "danger"
-					};
+					this.$root.displayAlert("The output can't be calculated right now.", "danger");
 				}
 			},
 
@@ -201,10 +195,8 @@
 					value: this.model.input.value
 				});
 				await this.getInputs();
-				this.alert = {
-					message: "The input was successfully saved.",
-					state: "success"
-				};
+
+				this.$root.displayAlert("The input was successfully saved.", "success");
 			},
 
 			//
@@ -216,10 +208,8 @@
 					decision: decision,
 					value: output.value
 				});
-				this.alert = {
-					message: "The output was successfully saved.",
-					state: "success"
-				};
+
+				this.$root.displayAlert("The output was successfully saved.", "success");
 			},
 
 			//
