@@ -68,6 +68,10 @@
 							{
 								name: "Playground",
 								path: "playground"
+							},
+							{
+								name: "Publisher",
+								path: "publisher"
 							}
 						]
 					},
