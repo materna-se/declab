@@ -1,5 +1,5 @@
 <template>
-	<div class="container-fluid">
+	<div>
 		<div class="row">
 			<div class="col-8 mb-4">
 				<h3 class="mb-2">Expression</h3>

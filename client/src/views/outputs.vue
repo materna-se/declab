@@ -1,5 +1,5 @@
 <template>
-	<div class="container-fluid">
+	<div>
 		<div class="row">
 			<div class="col-10 mb-2">
 				<h3 class="mb-0">Outputs</h3>

@@ -1,5 +1,5 @@
 <template>
-	<div class="container-fluid">
+	<div>
 		<div class="row mb-4" v-if="result.visible">
 			<div class="col-12">
 				<dmn-import-result v-bind:result="result"></dmn-import-result>
