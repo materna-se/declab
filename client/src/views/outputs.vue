@@ -1,10 +1,10 @@
 <template>
 	<div class="container-fluid">
 		<div class="row">
-			<div class="col-10 mb-2">
+			<div class="col-11 mb-2">
 				<h3 class="mb-0">Outputs</h3>
 			</div>
-			<div class="col-2 mb-2">
+			<div class="col-1 mb-2">
 				<button class="btn btn-block btn-outline-secondary" v-on:click="setAddMode">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"></path>
