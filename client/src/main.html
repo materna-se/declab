@@ -9,7 +9,14 @@
 <div id="mount">
 	<loading-indicator v-bind:loading="loading"></loading-indicator>
 	<dmn-header></dmn-header>
-	<router-view></router-view>
+	<div class="container-fluid">
+		<div class="row mb-4" v-if="alert.message !== null">
+			<div class="col-12">
+				<alert v-bind:alert="alert"></alert>
+			</div>
+		</div>
+		<router-view></router-view>
+	</div>
 	<dmn-footer></dmn-footer>
 </div>
 <link href="https://fonts.googleapis.com/css?family=Ubuntu:400,500,700|Source+Code+Pro:400" rel="stylesheet">

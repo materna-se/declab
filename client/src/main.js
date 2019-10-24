@@ -9,9 +9,10 @@ import "./styles/bootstrap-theme.css"
 import Vue from "vue";
 import VueRouter from "vue-router";
 // Components
-import Header from "./components/header.vue";
-import Footer from "./components/footer.vue";
 import LoadingIndicator from "./components/loading-indicator.vue";
+import Header from "./components/header.vue";
+import Alert from "./components/alert.vue";
+import Footer from "./components/footer.vue";
 // Helpers
 import Network from "./helpers/network";
 // Views
@@ -44,14 +45,28 @@ const vue = new Vue({
 	el: '#mount',
 	router: router,
 	components: {
+		"loading-indicator": LoadingIndicator,
 		"dmn-header": Header,
+		"alert": Alert,
 		"dmn-footer": Footer,
-		"loading-indicator": LoadingIndicator
 	},
 	data: function () {
 		return {
-			loading: false
+			loading: false,
+
+			alert: {
+				message: null,
+				state: null
+			},
 		};
+	},
+	methods: {
+		displayAlert(message, state) {
+			this.alert = {
+				message: message,
+				state: state
+			}
+		}
 	}
 });
 
