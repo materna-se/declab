@@ -102,3 +102,14 @@ pre, code {
 	border-bottom-color: transparent;
 	border-radius: 0;
 }
+
+/* Styling for diff-match-patch */
+.difference-minus {
+	background: yellow;
+	text-decoration: line-through;
+}
+
+.difference-plus {
+	background: yellow;
+	text-decoration: underline;
+}

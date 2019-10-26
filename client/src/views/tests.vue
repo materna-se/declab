@@ -1,10 +1,10 @@
 <template>
 	<div>
 		<div class="row mb-2">
-			<div class="col-10">
+			<div class="col-11">
 				<h3 class="mb-0">Tests</h3>
 			</div>
-			<div class="col-2">
+			<div class="col-1">
 				<button class="btn btn-block btn-outline-secondary" v-on:click="setAddMode">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"></path>
@@ -66,7 +66,7 @@
 								<div class="card">
 									<div class="card-body">
 										<h5 class="mb-2">Name</h5>
-										<p class="mb-4"><code>{{inputs[test.input].name}}</code></p>
+										<p class="mb-4">{{inputs[test.input].name}}</p>
 										<h5 class="mb-2">Input</h5>
 										<pre class="mb-0"><code>{{JSON.stringify(inputs[test.input].value, null, 3)}}</code></pre>
 									</div>
@@ -79,9 +79,9 @@
 								<div class="card mt-2 border-lg" v-for="(output, decision) in test.result.outputs" v-bind:key="test.uuid + '-' + decision" v-bind:class="[output.equal ? 'border-success' : 'border-danger']">
 									<div class="card-body">
 										<h5 class="mb-2">Name</h5>
-										<p class="mb-4"><code>{{output.expected.name}}</code></p>
+										<p class="mb-4">{{output.expected.name}}</p>
 										<h5 class="mb-2">Decision</h5>
-										<p class="mb-4"><code>{{decision}}</code></p>
+										<p class="mb-4">{{decision}}</p>
 										<h5 class="mb-2">Output</h5>
 										<div style="white-space: pre">
 											<span v-for="difference of getDifference(output.expected, output.calculated)">
@@ -131,16 +131,6 @@
 <style>
 	.badge-md {
 		padding: 0.5em .4em;
-	}
-
-	.difference-minus {
-		background: yellow;
-		text-decoration: line-through;
-	}
-
-	.difference-plus {
-		background: yellow;
-		text-decoration: underline;
 	}
 </style>
 

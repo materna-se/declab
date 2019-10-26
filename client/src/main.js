@@ -23,6 +23,7 @@ const Inputs = () => import('./views/inputs.vue');
 const Outputs = () => import('./views/outputs.vue');
 const Tests = () => import('./views/tests.vue');
 const Playground = () => import('./views/playground.vue');
+const Publisher = () => import('./views/publisher.vue');
 const Settings = () => import('./views/settings.vue');
 
 Vue.use(VueRouter);
@@ -37,6 +38,7 @@ const router = new VueRouter({
 		{path: '/:workspace/tests', component: Tests},
 		{path: '/:workspace/playground', component: Playground},
 		{path: '/:workspace/settings', component: Settings},
+		{path: '/:workspace/publisher', component: Publisher},
 		// TODO: Route for "Not Found"
 	]
 });

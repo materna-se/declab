@@ -5,7 +5,7 @@
 			This version is not stable. Please export your workspace regularly!
 		</div>
 		<p class="mb-2">If the workspace does not exist yet, it is created implicitly. To collaborate, you can share your link with others.</p>
-		<input placeholder="Enter Workspace..." class="form-control mb-2" v-model="workspace">
+		<input placeholder="Enter Workspace..." class="form-control mb-2" v-model="workspace" v-on:keydown.enter="enterWorkspace">
 		<button class="btn btn-block btn-outline-secondary" v-on:click="enterWorkspace">Enter Workspace</button>
 	</div>
 </template>
