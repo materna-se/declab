@@ -1,54 +1,52 @@
 <template>
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col-12">
-				<div class="row">
-					<div class="col-10 mb-2">
-						<h3 class="mb-0">Publisher</h3>
-					</div>
-					<div class="col-1 mb-2">
-						<button class="btn btn-block btn-outline-secondary" v-on:click="expandAll">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
-								<path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7m4.5-10.09l4.5-4.5V10h2V3h-7v2h3.59l-4.5 4.5 1.41 1.41z" fill="currentColor"></path>
-							</svg>
-						</button>
-					</div>
-					<div class="col-1 mb-2">
-						<button class="btn btn-block btn-outline-secondary" v-on:click="collapseAll">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
-								<path d="M19.5 3.09L15 7.59V4h-2v7h7V9h-3.59l4.5-4.5-1.41-1.41M4 13v2h3.59l-4.5 4.5 1.41 1.41 4.5-4.5V20h2v-7H4z" fill="currentColor"></path>
-							</svg>
-						</button>
-					</div>
+	<div class="row">
+		<div class="col-12">
+			<div class="row">
+				<div class="col-10 mb-2">
+					<h3 class="mb-0">Publisher</h3>
 				</div>
+				<div class="col-1 mb-2">
+					<button class="btn btn-block btn-outline-secondary" v-on:click="expandAll">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
+							<path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7m4.5-10.09l4.5-4.5V10h2V3h-7v2h3.59l-4.5 4.5 1.41 1.41z" fill="currentColor"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="col-1 mb-2">
+					<button class="btn btn-block btn-outline-secondary" v-on:click="collapseAll">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
+							<path d="M19.5 3.09L15 7.59V4h-2v7h7V9h-3.59l4.5-4.5-1.41-1.41M4 13v2h3.59l-4.5 4.5 1.41 1.41 4.5-4.5V20h2v-7H4z" fill="currentColor"></path>
+						</svg>
+					</button>
+				</div>
+			</div>
 
-				<div class="card mb-2" v-for="(test, uuid) in tests" v-bind:key="uuid">
-					<div class="card-body">
-						<h4 class="mb-0 c-pointer" v-on:click="changeVisibility(test)">{{test.name}}</h4>
-						<div class="card mt-2 border-lg" v-if="test.visibility" v-bind:class="[test.result.equal ? 'border-success' : 'border-danger']">
-							<div class="card-body">
-								<template v-if="test.description !== null">
-									<h5 class="mb-2">Description</h5>
-									<p class="mb-4">{{test.description}}</p>
-								</template>
+			<div class="card mb-2" v-for="(test, uuid) in tests" v-bind:key="uuid">
+				<div class="card-body">
+					<h4 class="mb-0 c-pointer" v-on:click="changeVisibility(test)">{{test.name}}</h4>
+					<div class="card mt-2 border-lg" v-if="test.visibility" v-bind:class="[test.result.equal ? 'border-success' : 'border-danger']">
+						<div class="card-body">
+							<template v-if="test.description !== null">
+								<h5 class="mb-2">Description</h5>
+								<p class="mb-4">{{test.description}}</p>
+							</template>
 
-								<h5 class="mb-2 c-pointer" v-on:click="changeInputVisibility(test)">Input</h5>
-								<json-builder v-if="test.inputVisibility" v-bind:template="inputs[test.input].value" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
+							<h5 class="mb-2 c-pointer" v-on:click="changeInputVisibility(test)">Input</h5>
+							<json-builder v-if="test.inputVisibility" v-bind:template="inputs[test.input].value" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
 
-								<h5 class="mt-2 mb-0 c-pointer" v-on:click="changeOutputVisibility(test)">Outputs</h5>
-								<div class="card mt-2 mb-0 border-lg" v-if="test.outputVisibility" v-for="(output, decision) in test.result.outputs" v-bind:key="test.uuid + '-' + decision" v-bind:class="[output.equal ? 'border-success' : 'border-danger']">
-									<div class="card-body">
-										<h6 class="mb-2">Decision</h6>
-										<p class="mb-4">{{decision}}</p>
+							<h5 class="mt-2 mb-0 c-pointer" v-on:click="changeOutputVisibility(test)">Outputs</h5>
+							<div class="card mt-2 mb-0 border-lg" v-if="test.outputVisibility" v-for="(output, decision) in test.result.outputs" v-bind:key="test.uuid + '-' + decision" v-bind:class="[output.equal ? 'border-success' : 'border-danger']">
+								<div class="card-body">
+									<h6 class="mb-2">Decision</h6>
+									<p class="mb-4">{{decision}}</p>
 
-										<h6 class="mb-2">Output</h6>
-										<div style="white-space: pre">
-											<span v-for="difference of getDifference(output.expected, output.calculated)">
-												<code class="difference-minus" v-if="difference[0] === -1">{{difference[1]}}</code>
-												<code class="difference-plus" v-else-if="difference[0] === 1">{{difference[1]}}</code>
-												<code v-else>{{difference[1]}}</code>
-											</span>
-										</div>
+									<h6 class="mb-2">Output</h6>
+									<div style="white-space: pre">
+										<span v-for="difference of getDifference(output.expected, output.calculated)">
+											<code class="difference-minus" v-if="difference[0] === -1">{{difference[1]}}</code>
+											<code class="difference-plus" v-else-if="difference[0] === 1">{{difference[1]}}</code>
+											<code v-else>{{difference[1]}}</code>
+										</span>
 									</div>
 								</div>
 							</div>
