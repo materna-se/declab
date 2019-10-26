@@ -27,30 +27,30 @@
 						<h4 class="mb-0 c-pointer" v-on:click="changeVisibility(test)">{{test.name}}</h4>
 						<div class="card mt-2 border-lg" v-if="test.visibility" v-bind:class="[test.result.equal ? 'border-success' : 'border-danger']">
 							<div class="card-body">
-								<h5 class="mb-2">Description</h5>
-								<p class="mb-4">{{test.description}}</p>
+								<template v-if="test.description !== null">
+									<h5 class="mb-2">Description</h5>
+									<p class="mb-4">{{test.description}}</p>
+								</template>
 
 								<h5 class="mb-2 c-pointer" v-on:click="changeInputVisibility(test)">Input</h5>
 								<json-builder v-if="test.inputVisibility" v-bind:template="inputs[test.input].value" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
-								<p class="text-muted mb-4" v-else>hidden</p>
 
-								<h5 class="mt-2 mb-2 c-pointer" v-on:click="changeOutputVisibility(test)">Outputs</h5>
-								<div class="card mb-0 border-lg" v-if="test.outputVisibility" v-for="(output, decision) in test.result.outputs" v-bind:key="test.uuid + '-' + decision" v-bind:class="[output.equal ? 'border-success' : 'border-danger']">
+								<h5 class="mt-2 mb-0 c-pointer" v-on:click="changeOutputVisibility(test)">Outputs</h5>
+								<div class="card mt-2 mb-0 border-lg" v-if="test.outputVisibility" v-for="(output, decision) in test.result.outputs" v-bind:key="test.uuid + '-' + decision" v-bind:class="[output.equal ? 'border-success' : 'border-danger']">
 									<div class="card-body">
 										<h6 class="mb-2">Decision</h6>
 										<p class="mb-4">{{decision}}</p>
 
 										<h6 class="mb-2">Output</h6>
 										<div style="white-space: pre">
-												<span v-for="difference of getDifference(output.expected, output.calculated)">
-													<code class="difference-minus" v-if="difference[0] === -1">{{difference[1]}}</code>
-													<code class="difference-plus" v-else-if="difference[0] === 1">{{difference[1]}}</code>
-													<code v-else>{{difference[1]}}</code>
-												</span>
-										</div>
+											<span v-for="difference of getDifference(output.expected, output.calculated)">
+												<code class="difference-minus" v-if="difference[0] === -1">{{difference[1]}}</code>
+												<code class="difference-plus" v-else-if="difference[0] === 1">{{difference[1]}}</code>
+												<code v-else>{{difference[1]}}</code>
+											</span>
 										</div>
 									</div>
-								<p class="text-muted mb-0" v-else>hidden</p>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -126,7 +126,7 @@
 				this.tests = await Network.getTests();
 				for (const uuid in this.tests) {
 					const test = this.tests[uuid];
-					this.$set(test,"visibility",false);
+					this.$set(test, "visibility", false);
 					this.$set(test, "inputVisibility", false);
 					this.$set(test, "outputVisibility", false);
 				}
