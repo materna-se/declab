@@ -34,7 +34,6 @@
 
 				this.timeout = setTimeout(function () {
 					vue.alert.message = null;
-					console.info("null");
 					vue.timeout = null;
 				}, 4000);
 			}
