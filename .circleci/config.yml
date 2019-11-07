@@ -46,11 +46,8 @@ workflows:
             - build_client
       - publish:
           filters:
-            branches:
-              only:
-                - master
             tags:
-              only: /.*/
+              only: /^\d\.\d\.\d*$/
           requires:
             - build_client
             - build_server
