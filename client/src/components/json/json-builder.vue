@@ -51,9 +51,12 @@
 			this.exportValue(this.value);
 		},
 		watch: {
-			template: function (template) {
-				this.value = this.convert ? this.enrichTemplate(template) : template;
-				this.exportValue(this.value);
+			template: {
+				handler: function (template) {
+					this.value = this.convert ? this.enrichTemplate(template) : template;
+					this.exportValue(this.value);
+				},
+				deep: true
 			},
 			value: {
 				handler: function (value) {
