@@ -49,6 +49,8 @@ workflows:
             branches:
               only:
                 - master
+            tags:
+              only: /.*/
           requires:
             - build_client
             - build_server
