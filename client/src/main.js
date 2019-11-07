@@ -24,6 +24,7 @@ const Outputs = () => import('./views/outputs.vue');
 const Tests = () => import('./views/tests.vue');
 const Playground = () => import('./views/playground.vue');
 const Publisher = () => import('./views/publisher.vue');
+const Discoverer = () => import('./views/discoverer.vue');
 const Settings = () => import('./views/settings.vue');
 
 Vue.use(VueRouter);
@@ -37,8 +38,9 @@ const router = new VueRouter({
 		{path: '/:workspace/outputs', component: Outputs},
 		{path: '/:workspace/tests', component: Tests},
 		{path: '/:workspace/playground', component: Playground},
-		{path: '/:workspace/settings', component: Settings},
 		{path: '/:workspace/publisher', component: Publisher},
+		{path: '/:workspace/discoverer', component: Discoverer},
+		{path: '/:workspace/settings', component: Settings},
 		// TODO: Route for "Not Found"
 	]
 });

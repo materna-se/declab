@@ -72,6 +72,10 @@
 							{
 								name: "Publisher",
 								path: "publisher"
+							},
+							{
+								name: "Discoverer",
+								path: "discoverer"
 							}
 						]
 					},
