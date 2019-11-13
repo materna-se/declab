@@ -42,12 +42,16 @@ workflows:
     jobs:
       - build_client:
           filters:
+            branches:
+              only: /.*/
             tags:
               only: /.*/
       - build_server:
           requires:
             - build_client
           filters:
+            branches:
+              only: /.*/
             tags:
               only: /.*/
       - publish:
@@ -56,6 +60,6 @@ workflows:
             - build_server
           filters:
             branches:
-              only: /^(.(?!master))*$/
+              ignore: /.*/
             tags:
               only: /.*/
