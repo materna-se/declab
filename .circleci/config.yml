@@ -50,6 +50,6 @@ workflows:
             - build_server
           filters:
             branches:
-              ignore: /.*/
+              only: /^master$/
             tags:
               only: /.*/
