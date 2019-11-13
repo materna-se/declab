@@ -113,6 +113,8 @@
 
 					const outputs = (await Network.getModelResult(input)).outputs;
 
+					// Check if the last result is the first or if the attached output is the same.
+					// If it's not, we'll create a new result set.
 					const lastResult = this.options.results[this.options.results.length - 1];
 					if (lastResult === undefined || JSON.stringify(lastResult.outputs) !== JSON.stringify(outputs)) {
 						this.options.results.push({
