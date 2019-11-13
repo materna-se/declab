@@ -6,7 +6,7 @@
 	#monaco-container,
 	.monaco-editor {
 		width: 100%;
-		height: 300px;
+		height: 200px;
 	}
 </style>
 
@@ -14,6 +14,11 @@
 	import * as monaco from 'monaco-editor'
 
 	export default {
+		props: {
+			value: {
+				default: null
+			}
+		},
 		mounted() {
 			const vue = this;
 
@@ -115,9 +120,9 @@
 			// Initialize monaco theme
 			monaco.editor.defineTheme('feel-theme', {
 				base: 'vs',
-				inherit: false, // We don't want to inherit rules.
+				inherit: false, // We don't want to inherit rules
 				rules: [
-					{token: 'feel-keyword', foreground: 'ec5b69', fontStyle: 'bold'}, // Lighter foreground color to counteract the bold font.
+					{token: 'feel-keyword', foreground: 'ec5b69', fontStyle: 'bold'}, // Lighter foreground color to counteract the bold font
 					{token: 'feel-numeric', foreground: '005cc5'},
 					{token: 'feel-boolean', foreground: 'd73a49'},
 					{token: 'feel-string', foreground: '22863a'},
@@ -145,7 +150,9 @@
 
 				minimap: {
 					enabled: false
-				}
+				},
+
+				value: this.value
 			});
 			editor.onKeyUp(function () {
 				vue.$emit('update:value', editor.getValue());
