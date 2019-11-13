@@ -104,22 +104,14 @@
 		},
 		methods: {
 			//
-			// Inputs
+			// Network
 			//
 			async getInputs() {
 				this.inputs = await Network.getInputs(true);
 			},
-
-			//
-			// Outputs
-			//
 			async getOutputs() {
 				this.outputs = await Network.getOutputs();
 			},
-
-			//
-			// Tests
-			//
 			async getTests() {
 				this.tests = await Network.getTests();
 				for (const uuid in this.tests) {
