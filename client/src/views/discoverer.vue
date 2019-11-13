@@ -113,8 +113,22 @@
 
 					const outputs = (await Network.getModelResult(input)).outputs;
 
-					const output = (await Network.getModelResult(input)).outputs; // TODO: outputs, not output
-					this.options.results.push({input, output});
+					const lastResult = this.options.results[this.options.results.length - 1];
+					if (lastResult === undefined || JSON.stringify(lastResult.outputs) !== JSON.stringify(outputs)) {
+						this.options.results.push({
+							range: {
+								start: element,
+								stop: element
+							},
+							input,
+							outputs
+						});
+						continue;
+					}
+
+					lastResult.range.stop = element;
+
+					// await new Promise(((resolve, reject) => setTimeout(resolve, 500)));
 				}
 			}
 		}
