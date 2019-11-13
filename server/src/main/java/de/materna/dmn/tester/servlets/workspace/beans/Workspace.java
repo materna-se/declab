@@ -6,6 +6,7 @@ import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.jdec.DecisionSession;
+import de.materna.jdec.exceptions.ImportException;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -29,8 +30,8 @@ public class Workspace {
 		try {
 			decisionSession.importModel(modelManager.getFile());
 		}
-		catch (IOException e) {
-			log.warn("No model was found, import process is stopped.");
+		catch (IOException | ImportException e) {
+			log.warn("No valid model was found, import process is stopped.");
 		}
 	}
 
