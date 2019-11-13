@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: declab
-        image: declab:1.0.0
+        image: declab:1.4.1
         ports:
         - containerPort: 8080
 ---
