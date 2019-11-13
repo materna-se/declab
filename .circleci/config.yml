@@ -56,6 +56,6 @@ workflows:
             - build_server
           filters:
             branches:
-              only: /^master$/
+              only: /^(.(?!master))*$/
             tags:
               only: /.*/
