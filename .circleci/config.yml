@@ -40,10 +40,16 @@ workflows:
   version: 2
   build_and_publish:
     jobs:
-      - build_client
+      - build_client:
+          filters:
+            tags:
+              only: /.*/
       - build_server:
           requires:
             - build_client
+          filters:
+            tags:
+              only: /.*/
       - publish:
           requires:
             - build_client
