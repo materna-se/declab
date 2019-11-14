@@ -8,19 +8,29 @@
 		<div class="row">
 			<div class="col-4">
 				<h4 class="mb-2">Input</h4>
+
+				<h5 class="mb-2">Template</h5>
 				<select id="form-inputs" class="form-control mb-4" v-model="input" v-on:change="initializeDiscovery">
 					<option v-for="(input, uuid) in inputs" v-bind:value="uuid">{{input.name}}</option>
 				</select>
 
-				<h4 class="mb-2">Selector</h4>
-				<input type="text" placeholder="Enter JSONPath..." class="form-control mb-4" v-model="options.path">
+				<h5 class="mb-2">Selector</h5>
+				<input type="text" placeholder="Enter JSONPath..." class="form-control mb-4" v-model="options.inputSelector">
 
-				<h4 class="mb-2">Values</h4>
+				<h5 class="mb-2">Values</h5>
 				<div class="card mb-4">
 					<div class="card-body">
-						<feel-editor v-bind:value="'[1, 2, 3]'" v-on:update:value="options.expression = $event"></feel-editor>
+						<feel-editor v-bind:value="options.expression" v-on:update:value="options.expression = $event"></feel-editor>
 					</div>
 				</div>
+
+				<h4 class="mb-2">Result</h4>
+
+				<h5 class="mb-2">Decision</h5>
+				<input type="text" placeholder="Enter Decision..." class="form-control mb-4" v-model="options.resultDecision">
+
+				<h5 class="mb-2">Selector</h5>
+				<input type="text" placeholder="Enter JSONPath..." class="form-control mb-4" v-model="options.resultSelector">
 
 				<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="startDiscovery">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
@@ -42,7 +52,7 @@
 						<json-builder class="mb-2" v-bind:template="result.input" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
 
 						<h6 class="mb-2">Outputs</h6>
-						<json-builder class="mb-0" v-bind:template="result.outputs" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
+						<json-builder class="mb-0" v-bind:template="result.output" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
 					</div>
 				</div>
 			</div>
@@ -72,11 +82,13 @@
 
 				options: {
 					input: {},
+					inputSelector: "$",
 
-					path: "$.Person.Age",
-					expression: "[1,2,3]",
+					expression: "[1, 2, 3]",
 
-					results: []
+					results: [],
+					resultDecision: null,
+					resultSelector: "$",
 				},
 			}
 		},
@@ -108,30 +120,52 @@
 				for (let i = 0; i < elements.length; i++) {
 					const element = elements[i];
 
-					const input = JSON.parse(JSON.stringify(this.options.input));
-					JSONPath.value(input, this.options.path, element);
+					// Get the current input and calculate the current output.
+					let currentInput = JSON.parse(JSON.stringify(this.options.input));
+					if (this.options.inputSelector !== "$") {
+						JSONPath.value(currentInput, this.options.inputSelector, element);
+					}
+					else {
+						currentInput = element;
+					}
+					const currentOutput = (await Network.getModelResult(currentInput)).outputs;
 
-					const outputs = (await Network.getModelResult(input)).outputs;
+					// Get the last ouput. If this.options.results is empty, we'll create a new result set.
+					let lastResult = this.options.results[this.options.results.length - 1];
+					const lastOutput = lastResult === undefined ? undefined : lastResult.output;
 
-					// Check if the last result is the first or if the attached output is the same.
-					// If it's not, we'll create a new result set.
-					const lastResult = this.options.results[this.options.results.length - 1];
-					if (lastResult === undefined || JSON.stringify(lastResult.outputs) !== JSON.stringify(outputs)) {
-						this.options.results.push({
-							range: {
-								start: element,
-								stop: element
-							},
-							input,
-							outputs
-						});
+					// Get the selection.
+					let currentOutputSelection = currentOutput;
+					let lastOutputSelection = lastOutput;
+
+					// If a result decision is set, select it.
+					if (this.options.resultDecision !== null && this.options.resultDecision !== "") {
+						currentOutputSelection = currentOutputSelection[this.options.resultDecision].value;
+					}
+
+					// If the result selector is not $, select it with JSONPath.
+					if (this.options.resultSelector !== "$") {
+						currentOutputSelection = JSON.stringify(JSONPath.value(currentOutputSelection, this.options.resultSelector));
+					}
+
+					// Check if the current output is the same as the last output. If it is, we'll create a new result set.
+					if (JSON.stringify(currentOutputSelection) !== JSON.stringify(lastOutputSelection)) {
+						this.addResult(element, currentInput, currentOutputSelection);
 						continue;
 					}
 
 					lastResult.range.stop = element;
-
-					// await new Promise(((resolve, reject) => setTimeout(resolve, 500)));
 				}
+			},
+			addResult(element, input, output) {
+				this.options.results.push({
+					range: {
+						start: element,
+						stop: element
+					},
+					input: input,
+					output: output
+				});
 			}
 		}
 	};
