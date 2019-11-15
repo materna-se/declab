@@ -42,9 +42,9 @@ jobs:
     docker:
       - image: circleci/buildpack-deps:xenial
     steps:
-      - setup_remote_docker
       - attach_workspace:
           at: ~/project
+      - setup_remote_docker
       - run: cd ./declab && docker login -u ${$DOCKER_USER} -p ${$DOCKER_PASSWORD} && docker build --build-arg VERSION=1.4.3 -t maternase/declab:1.4.3 . && docker push maternase/declab:1.4.3
 
 workflows:
