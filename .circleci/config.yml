@@ -1,13 +1,13 @@
 version: 2
 jobs:
+  # Build
   build_client:
     docker:
       - image: node:12.10.0-alpine
     environment:
       API_HOST: ./api
     steps:
-      - run: apk add --no-cache git
-      - run: git clone https://github.com/materna-se/declab.git
+      - checkout
       - run: cd ./declab/client && npm install && npm run build
       - persist_to_workspace:
           root: ~/project
@@ -28,13 +28,21 @@ jobs:
           paths:
             - ./declab
 
-  publish:
+  publish_release:
       docker:
         - image: cibuilds/github:0.10
       steps:
         - attach_workspace:
             at: ~/project
         - run: cd ./declab/server && ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -recreate -replace ${CIRCLE_TAG} ./target/declab-${CIRCLE_TAG}.war
+
+  publish_container:
+    docker:
+      - image: ubuntu:18.04
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run: cd ./declab/server && docker build --build-arg VERSION=${CIRCLE_TAG} -t maternase/declab:${CIRCLE_TAG} . && docker push maternase/declab:${CIRCLE_TAG}
 
 workflows:
   version: 2
@@ -46,6 +54,7 @@ workflows:
               only: /.*/
             tags:
               only: /.*/
+
       - build_server:
           requires:
             - build_client
@@ -54,12 +63,23 @@ workflows:
               only: /.*/
             tags:
               only: /.*/
-      - publish:
+
+      #- publish_release:
+      #    requires:
+      #      - build_client
+      #      - build_server
+      #    filters:
+      #      branches:
+      #        ignore: /.*/
+      #      tags:
+      #        only: /.*/
+
+      - publish_container:
           requires:
             - build_client
             - build_server
           filters:
             branches:
-              ignore: /.*/
+              only: /.*/ # TODO: ignore
             tags:
               only: /.*/

@@ -6,7 +6,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-4">
+			<div class="col-4 mb-4">
 				<h4 class="mb-2">Input</h4>
 
 				<h5 class="mb-2">Template</h5>
@@ -32,13 +32,13 @@
 				<h5 class="mb-2">Selector</h5>
 				<input type="text" placeholder="Enter JSONPath..." class="form-control mb-4" v-model="options.resultSelector">
 
-				<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="startDiscovery">
+				<button class="btn btn-block btn-outline-secondary mb-0" v-on:click="startDiscovery">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M8 5.14v14l11-7-11-7z" fill="currentColor"></path>
 					</svg>
 				</button>
 			</div>
-			<div class="col-8" v-if="input !== null">
+			<div class="col-8 mb-4" v-if="input !== null">
 				<h4 class="mb-2">Input</h4>
 				<json-builder class="mb-4" v-bind:template="options.input" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
 
