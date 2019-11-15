@@ -7,7 +7,8 @@ jobs:
     environment:
       API_HOST: ./api
     steps:
-      - checkout
+      - run: apk add --no-cache git
+      - run: git clone https://github.com/materna-se/declab.git
       - run: cd ./declab/client && npm install && npm run build
       - persist_to_workspace:
           root: ~/project
@@ -48,36 +49,36 @@ workflows:
   version: 2
   build_and_publish:
     jobs:
-      #- build_client:
-      #    filters:
-      #      branches:
-      #        only: /.*/
-      #      tags:
-      #        only: /.*/
+      - build_client:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
 
-      #- build_server:
-      #    requires:
-      #      - build_client
-      #    filters:
-      #      branches:
-      #        only: /.*/
-      #      tags:
-      #        only: /.*/
-      #
-      #- publish_release:
-      #    requires:
-      #      - build_client
-      #      - build_server
-      #    filters:
-      #      branches:
-      #        ignore: /.*/
-      #      tags:
-      #        only: /.*/
+      - build_server:
+          requires:
+            - build_client
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
+
+      - publish_release:
+          requires:
+            - build_client
+            - build_server
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
 
       - publish_container:
-          #requires:
-          #  - build_client
-          #  - build_server
+          requires:
+            - build_client
+            - build_server
           filters:
             branches:
               only: /.*/ # TODO: ignore
