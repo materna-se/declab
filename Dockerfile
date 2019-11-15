@@ -1,7 +1,6 @@
-ARG VERSION
-
 FROM jboss/wildfly:17.0.1.Final
 
+ARG VERSION
 WORKDIR /opt/jboss/wildfly
 
 COPY ["./server/target/declab-${VERSION}.war", "./standalone/deployments/ROOT.war"]
