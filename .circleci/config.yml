@@ -1,6 +1,5 @@
 version: 2
 jobs:
-  # Build
   build_client:
     docker:
       - image: circleci/node:12.10.0-stretch
@@ -45,7 +44,7 @@ jobs:
       - attach_workspace:
           at: ~/project
       - setup_remote_docker
-      - run: cd ./declab && docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD} && docker build --build-arg VERSION=1.4.3 -t maternase/declab:1.4.3 . && docker push maternase/declab:1.4.3
+      - run: cd ./declab && docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD} && docker build --build-arg VERSION=${CIRCLE_TAG} -t maternase/declab:${CIRCLE_TAG} . && docker push maternase/declab:${CIRCLE_TAG}
 
 workflows:
   version: 2
@@ -81,6 +80,6 @@ workflows:
             - build_server
           filters:
             branches:
-              only: /.*/ # TODO: ignore
+              ignore: /.*/
             tags:
               only: /.*/
