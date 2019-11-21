@@ -74,7 +74,7 @@ public class WorkspaceServlet {
 		workspaceManager.invalidate(workspaceName);
 
 		Workspace workspace = workspaceManager.get(workspaceName);
-		workspace.getDecisionSession().importModel(workspace.getModelManager().getFile());
+		workspace.getDecisionSession().importModel("main", "main", workspace.getModelManager().getFile());
 
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}

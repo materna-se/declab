@@ -28,7 +28,7 @@ public class Workspace {
 		decisionSession = new DecisionSession();
 
 		try {
-			decisionSession.importModel(modelManager.getFile());
+			decisionSession.importModel("main", "main", modelManager.getFile());
 		}
 		catch (IOException | ImportException e) {
 			log.warn("No valid model was found, import process is stopped.");

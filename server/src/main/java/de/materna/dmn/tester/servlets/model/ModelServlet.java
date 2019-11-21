@@ -39,7 +39,7 @@ public class ModelServlet {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 
-			DMNModel dmnModel = workspace.getDecisionSession().getModel();
+			DMNModel dmnModel = workspace.getDecisionSession().getRuntime().getModels().get(0);
 
 			Model model = new Model(dmnModel.getName(), dmnModel.getDecisions(), dmnModel.getBusinessKnowledgeModels(), dmnModel.getDecisionServices());
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(model)).build();
@@ -56,7 +56,7 @@ public class ModelServlet {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 
-			ImportResult importResult = workspace.getDecisionSession().importModel(body);
+			ImportResult importResult = workspace.getDecisionSession().importModel("main", "main", body);
 
 			workspace.getModelManager().persistFile(body);
 

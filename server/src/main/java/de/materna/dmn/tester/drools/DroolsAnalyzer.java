@@ -25,7 +25,7 @@ public class DroolsAnalyzer {
 		ComplexModelInput modelInput = new ComplexModelInput("object", false);
 
 		Map<String, ModelInput> inputs = new HashMap<>();
-		for (InputDataNode inputDataNode : decisionSession.getModel().getInputs()) {
+		for (InputDataNode inputDataNode : decisionSession.getRuntime().getModels().get(0).getInputs()) {
 			inputs.put(inputDataNode.getName(), getInput(inputDataNode.getType()));
 		}
 		modelInput.setValue(inputs);
