@@ -16,7 +16,8 @@
 		"bootstrap": "^4.3.1",
 		"diff-match-patch": "^1.0.4",
 		"monaco-editor": "^0.17.0",
-		"jsonpath": "^1.0.2"
+		"jsonpath": "^1.0.2",
+		"lodash.debounce": "^4.0.8"
 	},
 	"devDependencies": {
 		"webpack": "^4.30.0",
