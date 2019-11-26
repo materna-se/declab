@@ -107,9 +107,14 @@ export default {
 		}
 
 		if(existing.type === "array" && template.type === "array") {
-			const mergedArray = JSON.parse(JSON.stringify(existing.value));
-			for (let i = 0; i < template.value.length; i++) {
-				mergedArray.push(this.merge(existing.value[i], template.value[i]));
+			// The first element will always exist. We will use it as a structure element.
+			const existingStructure = existing.value[0];
+
+			const mergedArray = [];
+			for (const templateElement of template.value) {
+				const existingElement = JSON.parse(JSON.stringify(existingStructure));
+
+				mergedArray.push(this.merge(existingElement, templateElement));
 			}
 			return {
 				type: "array",
