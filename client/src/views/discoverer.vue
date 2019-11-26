@@ -135,13 +135,8 @@
 					const lastOutput = lastResult === undefined ? undefined : lastResult.output;
 
 					// Get the selection.
-					let currentOutputSelection = currentOutput;
+					let currentOutputSelection = currentOutput[this.options.resultDecision].value;
 					let lastOutputSelection = lastOutput;
-
-					// If a result decision is set, select it.
-					if (this.options.resultDecision !== null && this.options.resultDecision !== "") {
-						currentOutputSelection = currentOutputSelection[this.options.resultDecision].value;
-					}
 
 					// If the result selector is not $, select it with JSONPath.
 					if (this.options.resultSelector !== "$") {
