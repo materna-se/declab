@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.filters;
+package de.materna.dmn.tester.servlets.filters;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
