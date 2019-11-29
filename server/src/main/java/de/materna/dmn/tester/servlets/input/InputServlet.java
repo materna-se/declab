@@ -1,11 +1,11 @@
 package de.materna.dmn.tester.servlets.input;
 
 import de.materna.dmn.tester.helpers.MergingHelper;
-import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;

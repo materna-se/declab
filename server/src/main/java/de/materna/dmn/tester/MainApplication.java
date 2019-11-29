@@ -1,6 +1,6 @@
 package de.materna.dmn.tester;
 
-import de.materna.dmn.tester.filters.CSRFFilter;
+import de.materna.dmn.tester.servlets.filters.CSRFFilter;
 import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
 import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.dmn.tester.servlets.model.ModelServlet;

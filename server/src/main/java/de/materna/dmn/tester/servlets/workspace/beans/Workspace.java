@@ -6,7 +6,7 @@ import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.jdec.DecisionSession;
-import de.materna.jdec.exceptions.ImportException;
+import de.materna.jdec.model.ImportException;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;

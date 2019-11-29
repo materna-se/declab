@@ -1,6 +1,6 @@
 package de.materna.dmn.tester.persistence;
 
-import de.materna.dmn.tester.helpers.SerializationHelper;
+import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 

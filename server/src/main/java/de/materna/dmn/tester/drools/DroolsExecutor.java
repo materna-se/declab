@@ -1,9 +1,9 @@
 package de.materna.dmn.tester.drools;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.servlets.output.beans.Output;
 import de.materna.jdec.DecisionSession;
+import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
 import org.kie.dmn.api.core.DMNModel;
 

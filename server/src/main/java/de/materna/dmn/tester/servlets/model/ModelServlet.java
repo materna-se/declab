@@ -1,18 +1,18 @@
 package de.materna.dmn.tester.servlets.model;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.materna.dmn.tester.drools.DroolsAnalyzer;
 import de.materna.dmn.tester.drools.DroolsDebugger;
 import de.materna.dmn.tester.drools.DroolsExecutor;
-import de.materna.dmn.tester.helpers.SerializationHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.input.beans.Decision;
 import de.materna.dmn.tester.servlets.model.beans.Model;
 import de.materna.dmn.tester.servlets.model.beans.ModelResult;
-import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.dmn.tester.servlets.output.beans.Output;
-import de.materna.jdec.beans.ImportResult;
-import de.materna.jdec.exceptions.ImportException;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.jdec.drools.DroolsAnalyzer;
+import de.materna.jdec.model.ImportException;
+import de.materna.jdec.model.ImportResult;
+import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
 import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.feel.FEEL;
@@ -77,8 +77,9 @@ public class ModelServlet {
 	public Response getInputs(@PathParam("workspace") String workspaceName) {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			DMNModel model = workspace.getDecisionSession().getRuntime().getModels().get(0);
 
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getInputs(workspace.getDecisionSession()))).build();
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getInputs(model))).build();
 		}
 		catch (IOException exception) {
 			log.error(exception);
