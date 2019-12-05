@@ -21,7 +21,7 @@
 		props: {
 			// Template, read-only
 			template: {},
-			// Converts normal json into the used complex structure
+			// Converts a plain JSON object into the needed complex structure
 			convert: {
 				default: false
 			},
@@ -53,7 +53,7 @@
 		watch: {
 			template: {
 				handler: function (template) {
-					this.value = this.convert ? this.enrichTemplate(template) : template;
+					this.value = this.convert ? this.enrichTemplate(template) : JSON.parse(JSON.stringify(template));
 					this.exportValue(this.value);
 				},
 				deep: true
