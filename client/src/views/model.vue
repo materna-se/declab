@@ -1,10 +1,5 @@
 <template>
 	<div>
-		<div class="row mb-4" v-if="result.visible">
-			<div class="col-12">
-				<dmn-import-result v-bind:result="result"></dmn-import-result>
-			</div>
-		</div>
 		<div class="row mb-4">
 			<div class="col-12">
 				<div class="card">
@@ -71,25 +66,15 @@
 
 <script>
 	import Network from "../helpers/network";
-
-	import DMNImportResult from "../components/dmn/dmn-import-result.vue";
+	import AlertHelper from "../components/alert-helper";
 
 	export default {
-		components: {
-			"dmn-import-result": DMNImportResult,
-		},
 		async mounted() {
 			await this.getModel();
 			await this.getInputs();
 		},
 		data() {
 			return {
-				result: {
-					visible: false,
-					successful: true,
-					messages: []
-				},
-
 				model: {
 					name: null,
 					decisions: [],
@@ -117,12 +102,18 @@
 				const fileReader = new FileReader();
 				fileReader.addEventListener("load", async function (readerEvent) {
 					const result = await Network.importModel(readerEvent.target.result);
-					vue.result = {
-						visible: true,
-						successful: result.successful,
-						messages: result.messages
-					};
 
+					vue.$root.displayAlert(AlertHelper.buildList((() => {
+						if (result.successful && result.messages.length === 0) {
+							return "The model was successfully imported.";
+						}
+
+						if (result.successful) {
+							return "The model was imported, but the following warnings have occurred:";
+						}
+
+						return "The model could not be imported, but the following errors have occurred:";
+					})(), result.messages), result.successful ? "success" : "danger");
 					// Refresh the displayed information about the loaded model
 					vue.getModel();
 					vue.getInputs();

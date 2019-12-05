@@ -1,16 +1,19 @@
 package de.materna.dmn.tester.drools;
 
 import de.materna.jdec.DecisionSession;
-import org.apache.log4j.Logger;
+import org.kie.dmn.api.core.DMNMessage;
 import org.kie.dmn.api.core.event.*;
 import org.kie.dmn.core.ast.DMNFunctionDefinitionEvaluator;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class DroolsDebugger {
 	private DecisionSession decisionSession;
 	private Map<String, Map<String, Object>> context;
+	private List<String> messages;
 	private DMNRuntimeEventListener listener;
 
 	public DroolsDebugger(DecisionSession decisionSession) {
@@ -19,6 +22,7 @@ public class DroolsDebugger {
 
 	public void start() {
 		context = new LinkedHashMap<>();
+		messages = new LinkedList<>();
 		listener = new DMNRuntimeEventListener() {
 			private String decision;
 			private int level;
@@ -52,15 +56,25 @@ public class DroolsDebugger {
 			@Override
 			public void afterEvaluateDecision(AfterEvaluateDecisionEvent event) {
 				decision = null;
+
+				for (DMNMessage message : event.getResult().getMessages()) {
+					messages.add(message.getFeelEvent().getMessage());
+				}
 			}
 		};
 		decisionSession.getRuntime().addListener(listener);
 	}
 
-	public Map<String, Map<String, Object>> stop() {
+	public void stop() {
 		decisionSession.getRuntime().removeListener(listener);
+	}
 
+	public Map<String, Map<String, Object>> getContext() {
 		return context;
+	}
+
+	public List<String> getMessages() {
+		return messages;
 	}
 
 	private Object cleanResult(Object result) {

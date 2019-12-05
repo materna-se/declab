@@ -99,13 +99,12 @@ public class ModelServlet {
 			Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 			});
 
-			// TODO: We should merge outputs and context.
 			DroolsDebugger debugger = new DroolsDebugger(workspace.getDecisionSession());
 			debugger.start();
 			Map<String, Output> outputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), inputs);
-			Map<String, Map<String, Object>> context = debugger.stop();
+			debugger.stop();
 
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, context))).build();
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, debugger.getContext(), debugger.getMessages()))).build();
 		}
 		catch (IOException | DatatypeConfigurationException exception) {
 			log.error(exception);

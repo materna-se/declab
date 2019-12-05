@@ -90,6 +90,7 @@
 
 <script>
 	import Network from "../helpers/network";
+	import AlertHelper from "../components/alert-helper";
 	import Converter from "../components/json/json-builder-converter";
 
 	import JSONBuilder from "../components/json/json-builder.vue";
@@ -174,11 +175,16 @@
 					}, "*");
 				}
 
-
 				try {
 					const result = await Network.getModelResult(this.model.input.value);
 					this.model.result.outputs = result.outputs;
 					this.model.result.context = result.context;
+					if (result.messages.length > 0) {
+						this.$root.displayAlert(AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "danger");
+						return;
+					}
+
+					this.$root.displayAlert(null, "danger");
 				}
 				catch (e) {
 					this.$root.displayAlert("The output can't be calculated right now.", "danger");
