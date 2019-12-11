@@ -101,8 +101,11 @@
 
 				const fileReader = new FileReader();
 				fileReader.addEventListener("load", async function (readerEvent) {
+					vue.$root.displayAlert(null, null);
+
 					const result = await Network.importModel(readerEvent.target.result);
 
+					// Refresh the displayed information about the loaded model
 					vue.$root.displayAlert(AlertHelper.buildList((() => {
 						if (result.successful && result.messages.length === 0) {
 							return "The model was successfully imported.";
@@ -114,7 +117,6 @@
 
 						return "The model could not be imported, but the following errors have occurred:";
 					})(), result.messages), result.successful ? "success" : "danger");
-					// Refresh the displayed information about the loaded model
 					vue.getModel();
 					vue.getInputs();
 

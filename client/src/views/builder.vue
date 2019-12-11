@@ -184,7 +184,7 @@
 						return;
 					}
 
-					this.$root.displayAlert(null, "danger");
+					this.$root.displayAlert(null, null);
 				}
 				catch (e) {
 					this.$root.displayAlert("The output can't be calculated right now.", "danger");
