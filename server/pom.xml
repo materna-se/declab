@@ -3,7 +3,7 @@
 
 	<groupId>de.materna</groupId>
 	<artifactId>declab</artifactId>
-	<version>1.4.8</version>
+	<version>1.5.1</version>
 
 	<packaging>war</packaging>
 
