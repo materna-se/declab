@@ -1,7 +1,6 @@
 package de.materna.dmn.tester.servlets.model;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.materna.dmn.tester.drools.DroolsDebugger;
 import de.materna.dmn.tester.drools.DroolsExecutor;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.input.beans.Decision;
@@ -10,6 +9,7 @@ import de.materna.dmn.tester.servlets.model.beans.ModelResult;
 import de.materna.dmn.tester.servlets.output.beans.Output;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.drools.DroolsAnalyzer;
+import de.materna.jdec.drools.DroolsDebugger;
 import de.materna.jdec.model.ImportException;
 import de.materna.jdec.model.ImportResult;
 import de.materna.jdec.serialization.SerializationHelper;
@@ -104,7 +104,7 @@ public class ModelServlet {
 			Map<String, Output> outputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), inputs);
 			debugger.stop();
 
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, debugger.getContext(), debugger.getMessages()))).build();
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, debugger.getDecisions(), debugger.getMessages()))).build();
 		}
 		catch (IOException | DatatypeConfigurationException exception) {
 			log.error(exception);
