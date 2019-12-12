@@ -26,7 +26,7 @@
 <style>
 	.navbar,
 	.navbar .dropdown-item:active {
-		background: #556890;
+		background: #7aade1;
 	}
 
 	.navbar .navbar-brand,
@@ -39,7 +39,7 @@
 	}
 
 	.navbar .navbar-brand .navbar-brand-secondary {
-		color: #c0c8db;
+		color: #c9def3;
 	}
 
 	/* We can't select a dropdown item if there is a margin-top property. */
