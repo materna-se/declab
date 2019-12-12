@@ -173,6 +173,7 @@
 						type: "getModelResult",
 						data: this.model.input.value
 					}, "*");
+					return;
 				}
 
 				try {
@@ -231,11 +232,13 @@
 				// This custom event will be received when vue has finished mounting.
 				this.worker.addEventListener("aftermount", function () {
 					vue.mode = 1;
+					vue.$root.displayAlert(null, null);
 					vue.getModelResult();
 				});
 				// This event will be received when the opened window is closed or the user navigates away.
 				this.worker.addEventListener("beforeunload", function () {
 					vue.mode = 0;
+					vue.getModelResult();
 				});
 			},
 			importInput(input) {
