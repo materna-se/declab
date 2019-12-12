@@ -1,6 +1,6 @@
 {
 	"name": "declab",
-	"version": "1.5.1",
+	"version": "1.5.4",
 	"private": true,
 	"scripts": {
 		"dev": "webpack-dev-server --open --hot",
@@ -15,7 +15,7 @@
 		"whatwg-fetch": "^3.0.0",
 		"bootstrap": "^4.4.1",
 		"diff-match-patch": "^1.0.4",
-		"monaco-editor": "^0.17.0",
+		"monaco-editor": "^0.18.1",
 		"jsonpath": "^1.0.2",
 		"lodash.debounce": "^4.0.8"
 	},
@@ -24,8 +24,8 @@
 		"webpack-cli": "^3.3.10",
 		"webpack-dev-server": "^3.9.0",
 		"babel-loader": "^8.0.6",
-		"@babel/core": "^7.7.4",
-		"@babel/preset-env": "^7.7.4",
+		"@babel/core": "^7.7.5",
+		"@babel/preset-env": "^7.7.6",
 		"@babel/plugin-syntax-dynamic-import": "^7.7.4",
 		"html-webpack-plugin": "^3.2.0",
 		"vue-loader": "^15.7.2",
