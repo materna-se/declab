@@ -87,6 +87,7 @@
 <script>
 	import Network from "../helpers/network";
 	import Configuration from "../helpers/configuration";
+	import AlertHelper from "../components/alert-helper";
 
 	export default {
 		data() {
@@ -99,12 +100,25 @@
 		},
 		methods: {
 			async importWorkspace(event) {
-				await Network.importWorkspace(event.target.files[0]);
-				this.$root.displayAlert("The backup was successfully imported.", "success");
+				this.$root.loading = true;
+
+				const result = await Network.importWorkspace(event.target.files[0]);
+				this.$root.displayAlert(AlertHelper.buildList((() => {
+					if (result.successful && result.messages.length === 0) {
+						return "The workspace was successfully imported.";
+					}
+
+					if (result.successful) {
+						return "The workspace was imported, but the following warnings have occurred:";
+					}
+
+					return "The workspace could not be imported, the following errors have occurred:";
+				})(), result.messages), result.successful ? "success" : "danger");
+				this.$root.loading = false;
 			},
 			async deleteWorkspace() {
 				await Network.deleteWorkspace();
-				this.$router.push('/');
+				await this.$router.push('/');
 			},
 
 			// Helpers

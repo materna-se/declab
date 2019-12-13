@@ -27,12 +27,12 @@
 			}
 		},
 		methods: {
-			enterWorkspace() {
+			async enterWorkspace() {
 				if (this.workspace === null || this.workspace === "") {
 					return;
 				}
 
-				this.$router.push('/' + this.workspace + '/model');
+				await this.$router.push('/' + this.workspace + '/model');
 			}
 		}
 	};

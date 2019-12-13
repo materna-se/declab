@@ -2,6 +2,8 @@ package de.materna.dmn.tester.servlets.workspace;
 
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.jdec.model.ImportException;
+import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -74,8 +76,12 @@ public class WorkspaceServlet {
 		workspaceManager.invalidate(workspaceName);
 
 		Workspace workspace = workspaceManager.get(workspaceName);
-		workspace.getDecisionSession().importModel("main", "main", workspace.getModelManager().getFile());
-
+		try {
+			workspace.getDecisionSession().importModel("main", "main", workspace.getModelManager().getFile());
+		}
+		catch (ImportException exception) {
+			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
+		}
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 
