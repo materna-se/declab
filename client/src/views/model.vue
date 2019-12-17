@@ -105,17 +105,8 @@
 					vue.$root.loading = true;
 
 					const result = await Network.importModel(readerEvent.target.result);
-					vue.$root.displayAlert(AlertHelper.buildList((() => {
-						if (result.successful && result.messages.length === 0) {
-							return "The model was successfully imported.";
-						}
-
-						if (result.successful) {
-							return "The model was imported, but the following warnings have occurred:";
-						}
-
-						return "The model could not be imported, the following errors have occurred:";
-					})(), result.messages), result.successful ? "success" : "danger");
+					const resultAlert = this.getResultAlert(result);
+					vue.$root.displayAlert(AlertHelper.buildList(resultAlert.message, result.messages), resultAlert.state);
 					vue.$root.loading = false;
 					vue.getModel();
 					vue.getInputs();
@@ -124,6 +115,30 @@
 					inputEvent.target.value = null;
 				});
 				fileReader.readAsText(inputEvent.target.files[0], "UTF-8");
+			},
+
+			//
+			// Helpers
+			//
+			getResultAlert(result) {
+				if (result.successful && result.messages.length === 0) {
+					return {
+						message: "The model was successfully imported.",
+						state: "success"
+					};
+				}
+
+				if (result.successful) {
+					return {
+						message: "The model was imported, but the following warnings have occurred:",
+						state: "warning"
+					};
+				}
+
+				return {
+					message: "The model could not be imported, the following errors have occurred:",
+					state: "danger"
+				};
 			}
 		}
 	};
