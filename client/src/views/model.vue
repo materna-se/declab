@@ -105,7 +105,7 @@
 					vue.$root.loading = true;
 
 					const result = await Network.importModel(readerEvent.target.result);
-					const resultAlert = this.getResultAlert(result);
+					const resultAlert = vue.getResultAlert(result);
 					vue.$root.displayAlert(AlertHelper.buildList(resultAlert.message, result.messages), resultAlert.state);
 					vue.$root.loading = false;
 					vue.getModel();
