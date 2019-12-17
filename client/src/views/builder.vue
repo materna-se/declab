@@ -49,6 +49,11 @@
 						</button>
 					</div>
 				</div>
+				<div class="row mb-4" v-if="alert.message !== null">
+					<div class="col-12">
+						<alert v-bind:alert="alert"/>
+					</div>
+				</div>
 				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
 					<div class="card-header">
 						<div class="row">
@@ -93,14 +98,21 @@
 	import AlertHelper from "../components/alert-helper";
 	import Converter from "../components/json/json-builder-converter";
 
+	import Alert from "../components/alert.vue";
 	import JSONBuilder from "../components/json/json-builder.vue";
 
 	export default {
 		components: {
-			"json-builder": JSONBuilder
+			"alert": Alert,
+			"json-builder": JSONBuilder,
 		},
 		data() {
 			return {
+				alert: {
+					message: null,
+					state: null
+				},
+
 				inputs: {},
 
 				model: {
@@ -181,14 +193,14 @@
 					this.model.result.outputs = result.outputs;
 					this.model.result.context = result.context;
 					if (result.messages.length > 0) {
-						this.$root.displayAlert(AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "danger");
+						this.displayAlert(AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "warning");
 						return;
 					}
 
-					this.$root.displayAlert(null, null);
+					this.displayAlert(null, null);
 				}
 				catch (e) {
-					this.$root.displayAlert("The output can't be calculated right now.", "danger");
+					this.displayAlert("The output can't be calculated right now.", "danger");
 				}
 			},
 
@@ -224,6 +236,12 @@
 			//
 			// Helpers
 			//
+			displayAlert(message, state) {
+				this.alert = {
+					message: message,
+					state: state
+				}
+			},
 			detachWorker() {
 				const vue = this;
 
@@ -232,7 +250,7 @@
 				// This custom event will be received when vue has finished mounting.
 				this.worker.addEventListener("aftermount", function () {
 					vue.mode = 1;
-					vue.$root.displayAlert(null, null);
+					vue.displayAlert(null, null);
 					vue.getModelResult();
 				});
 				// This event will be received when the opened window is closed or the user navigates away.
