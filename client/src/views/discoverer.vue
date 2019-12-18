@@ -34,7 +34,7 @@
 			</div>
 			<div class="col-8 mb-4" v-if="input !== null">
 				<h4 class="mb-2">Input</h4>
-				<json-builder class="mb-4" v-bind:template="options.input" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
+				</>ilder class="mb-4" v-bind:template="options.input" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
 
 				<h4 class="mb-2">Results</h4>
 				<div class="card mb-4" v-for="result of options.results">
