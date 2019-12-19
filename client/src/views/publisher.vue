@@ -34,7 +34,7 @@
 							<h5 class="mb-2 c-pointer" v-on:click="changeInputVisibility(test)">Input</h5>
 							<json-builder v-if="test.inputVisibility" v-bind:template="inputs[test.input].value" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"/>
 
-							<h5 class="mt-2 mb-0 c-pointer" v-on:click="changeOutputVisibility(test)">Outputs</h5>
+							<h5 class="mt-2 mb-0 c-pointer" v-on:click="changeOutputVisibility(test)">Output</h5>
 							<div class="card mt-2 mb-0 border-lg" v-if="test.outputVisibility" v-for="(output, decision) in test.result.outputs" v-bind:key="test.uuid + '-' + decision" v-bind:class="[output.equal ? 'border-success' : 'border-danger']">
 								<div class="card-body">
 									<h6 class="mb-2">Decision</h6>

@@ -75,7 +75,7 @@
 						</div>
 						<div class="row">
 							<div class="col-12">
-								<h4 class="mb-0">Outputs</h4>
+								<h4 class="mb-0">Output</h4>
 								<div class="card mt-2 border-lg" v-for="(output, decision) in test.result.outputs" v-bind:key="test.uuid + '-' + decision" v-bind:class="[output.equal ? 'border-success' : 'border-danger']">
 									<div class="card-body">
 										<h5 class="mb-2">Name</h5>
@@ -112,7 +112,7 @@
 							<option v-for="(input, uuid) in inputs" v-bind:value="uuid">{{input.name}}</option>
 						</select>
 
-						<h5 class="mb-2">Outputs</h5>
+						<h5 class="mb-2">Output</h5>
 						<select id="form-output" size="15" multiple class="form-control mb-4" v-model="test.outputs">
 							<option v-for="(output, uuid) in outputs" v-bind:value="uuid">{{output.name}}</option>
 						</select>
