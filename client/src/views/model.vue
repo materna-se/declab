@@ -108,8 +108,8 @@
 					const resultAlert = vue.getResultAlert(result);
 					vue.$root.displayAlert(AlertHelper.buildList(resultAlert.message, result.messages), resultAlert.state);
 					vue.$root.loading = false;
-					vue.getModel();
-					vue.getInputs();
+					await vue.getModel();
+					await vue.getInputs();
 
 					// To allow another execution of the listener, we have to reset the value
 					inputEvent.target.value = null;

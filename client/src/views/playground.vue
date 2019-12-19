@@ -5,7 +5,7 @@
 				<h3 class="mb-2">Expression</h3>
 				<div class="card">
 					<div class="card-body">
-						<feel-editor v-on:update:value="expression = $event; getRawResult();"></feel-editor>
+						<feel-editor v-on:update:value="expression = $event; getRawResult();"/>
 					</div>
 				</div>
 			</div>
@@ -23,7 +23,7 @@
 				<h3 class="mb-2">Context</h3>
 				<div class="card">
 					<div class="card-body">
-						<json-builder v-bind:template="model.template" v-on:update:value="model.input.value = $event; getRawResult();"></json-builder>
+						<json-builder v-bind:template="model.template" v-on:update:value="model.input.value = $event; getRawResult();"/>
 					</div>
 				</div>
 			</div>

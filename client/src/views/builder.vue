@@ -22,7 +22,7 @@
 					<div class="col-12">
 						<div class="card card-borderless mb-2">
 							<div class="card-body p-0">
-								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:value="model.input.value = $event; getModelResult();"></json-builder>
+								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:value="model.input.value = $event; getModelResult();"/>
 							</div>
 							<div class="card-footer card-footer-border">
 								<div class="input-group">
@@ -71,11 +71,11 @@
 					<template v-if="model.result.visible[key]">
 						<div class="card-body">
 							<h5 class="mb-2">Output</h5>
-							<json-builder class="mb-0" v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+							<json-builder class="mb-0" v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 
 							<div class="mt-4" v-if="Object.keys(model.result.context[key]).length !== 0">
 								<h5 class="mb-2">Context</h5>
-								<json-builder class="mb-0" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+								<json-builder class="mb-0" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 							</div>
 						</div>
 						<div class="card-footer">
@@ -161,7 +161,7 @@
 					}
 				});
 				// Listen to attempts to unload the window and switch back to mode 0.
-				window.opener.addEventListener("unload", function (e) {
+				window.opener.addEventListener("unload", function () {
 					window.close();
 				});
 

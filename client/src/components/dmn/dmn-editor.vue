@@ -29,7 +29,7 @@
 					root: [
 						[/(?:true|false)/, "feel-boolean"],
 						[/[0-9]+/, "feel-numeric"],
-						[/(?:\"(?:.*?)\")/, "feel-string"],
+						[/(?:"(?:.*?)")/, "feel-string"],
 						[/(?:(?:[a-z ]+\()|(?:\()|(?:\)))/, "feel-function"],
 						[/(?:if|then|else)/, "feel-keyword"],
 						[/(?:for|in|return)/, "feel-keyword"],
@@ -37,17 +37,17 @@
 				}
 			});
 			monaco.languages.registerCompletionItemProvider('feel-language', {
-				provideCompletionItems: function (model, position) {
+				provideCompletionItems: function () {
 					const suggestions = [];
 
 					const suggestionTypes = {
-							Snippet: [
-								["if", "if $1 then\n\t$0\nelse\n\t"],
-								["for", "for element in $1 return\n\t$0"],
-							],
-							Function: [
-								// String
-								["substring(string, start position, length?)", "substring($1, $2, $3)"],
+						Snippet: [
+							["if", "if $1 then\n\t$0\nelse\n\t"],
+							["for", "for element in $1 return\n\t$0"],
+						],
+						Function: [
+							// String
+							["substring(string, start position, length?)", "substring($1, $2, $3)"],
 								["string length(string)", "string length($1)"],
 								["upper case(string)", "upper case($1)"],
 								["lower case(string)", "lower case($1)"],

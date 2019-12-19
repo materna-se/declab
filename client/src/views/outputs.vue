@@ -41,7 +41,7 @@
 						<p class="mb-4"><code>{{output.decision}}</code></p>
 
 						<h5 class="mb-2">Output</h5>
-						<json-builder v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+						<json-builder v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 					</div>
 				</div>
 				<div class="card" v-if="mode === 'ADD' || mode === 'EDIT'">
@@ -55,7 +55,7 @@
 						</select>
 
 						<h5 class="mb-2">Output</h5>
-						<json-builder v-bind:template="output.template" v-bind:convert="true" v-on:update:value="output.value = $event"></json-builder>
+						<json-builder v-bind:template="output.template" v-bind:convert="true" v-on:update:value="output.value = $event"/>
 
 						<hr>
 

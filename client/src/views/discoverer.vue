@@ -20,7 +20,7 @@
 				<h5 class="mb-2">Values</h5>
 				<div class="card mb-4">
 					<div class="card-body">
-						<feel-editor v-bind:value="options.expression" v-on:update:value="options.expression = $event; startDebouncedDiscovery()"></feel-editor>
+						<feel-editor v-bind:value="options.expression" v-on:update:value="options.expression = $event; startDebouncedDiscovery()"/>
 					</div>
 				</div>
 
@@ -51,12 +51,12 @@
 						<!-- If options.resultDecision is not set, we'll iterate over all decisions. -->
 						<template v-if="options.resultDecision !== null && options.resultDecision !== ''">
 							<h6 class="mt-2 mb-2">{{options.resultDecision}}</h6>
-							<json-builder class="mb-0" v-bind:template="result.output" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
+							<json-builder class="mb-0" v-bind:template="result.output" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"/>
 						</template>
 						<template v-else>
 							<div v-for="(output, decision) in result.output" class="mt-2">
 								<h6 class="mb-2">{{decision}}</h6>
-								<json-builder class="mb-0" v-bind:template="output.value" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
+								<json-builder class="mb-0" v-bind:template="output.value" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"/>
 							</div>
 						</template>
 					</div>

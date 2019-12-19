@@ -50,7 +50,7 @@
 						<span class="input-group-text input-group-text-disabled w-100">{{childKey}}</span>
 					</td>
 					<td>
-						<json-builder-table v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues"></json-builder-table>
+						<json-builder-table v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues"/>
 					</td>
 					<td class="td-minimize bg-light" v-if="!fixed">
 						<button type="button" class="btn btn-white" v-on:click="$delete(value.value, childKey)">
@@ -74,7 +74,7 @@
 				<tbody>
 				<tr v-for="(childValue, childIndex) of value.value" v-bind:key="childIndex">
 					<td>
-						<json-builder-table v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues"></json-builder-table>
+						<json-builder-table v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues"/>
 					</td>
 					<td class="td-minimize bg-light" v-if="!fixedValues">
 						<button type="button" class="btn btn-white mb-1" v-on:click="value.value.splice(childIndex + 1, 0, JSON.parse(JSON.stringify(childValue)))">
@@ -109,7 +109,7 @@
 		<!--
 		Create a new key-value pair or append a new element to the array.
 		-->
-		<json-builder-selector v-if="['object', 'array'].includes(value.type) && !fixed" v-bind:value="value" v-bind:mode="'add'"></json-builder-selector>
+		<json-builder-selector v-if="['object', 'array'].includes(value.type) && !fixed" v-bind:value="value" v-bind:mode="'add'"/>
 	</div>
 </template>
 

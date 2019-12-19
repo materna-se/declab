@@ -68,7 +68,7 @@
 										<h5 class="mb-2">Name</h5>
 										<p class="mb-4">{{inputs[test.input].name}}</p>
 										<h5 class="mb-2">Input</h5>
-										<json-builder v-bind:template="inputs[test.input].value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+										<json-builder v-bind:template="inputs[test.input].value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 									</div>
 								</div>
 							</div>
