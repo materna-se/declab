@@ -200,7 +200,7 @@
 					this.displayAlert(null, null);
 				}
 				catch (e) {
-					this.displayAlert("The output can't be calculated right now.", "danger");
+					this.displayAlert("The output can't be calculated.", "danger");
 				}
 			},
 
