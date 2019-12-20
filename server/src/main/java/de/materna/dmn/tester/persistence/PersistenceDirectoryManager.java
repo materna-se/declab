@@ -20,9 +20,7 @@ public class PersistenceDirectoryManager<T> {
 	private Class<T> entityClass;
 
 	public PersistenceDirectoryManager(String workspace, String entity, Class<T> entityClass) throws IOException {
-		// TODO: Get the data directory in a different way so it can be used in other application servers.
 		directory = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", workspace, entity);
-		Files.createDirectories(directory);
 
 		// We can't identify the generic type at runtime, so we need to save it for serialization
 		this.entityClass = entityClass;
@@ -34,16 +32,18 @@ public class PersistenceDirectoryManager<T> {
 	public Map<String, T> getFiles() throws IOException {
 		Map<String, T> values = new HashMap<>();
 
-		try (Stream<Path> stream = Files.list(directory)) {
-			Iterator<Path> iterator = stream.iterator();
-			while (iterator.hasNext()) {
-				Path path = iterator.next();
+		if (Files.exists(directory)) {
+			try (Stream<Path> stream = Files.list(directory)) {
+				Iterator<Path> iterator = stream.iterator();
+				while (iterator.hasNext()) {
+					Path path = iterator.next();
 
-				// We need to remove the file extension.
-				String key = path.getFileName().toString().split("\\.")[0];
-				T value = (T) SerializationHelper.getInstance().toClass(new String(Files.readAllBytes(path), StandardCharsets.UTF_8), entityClass);
+					// We need to remove the file extension.
+					String key = path.getFileName().toString().split("\\.")[0];
+					T value = (T) SerializationHelper.getInstance().toClass(new String(Files.readAllBytes(path), StandardCharsets.UTF_8), entityClass);
 
-				values.put(key, value);
+					values.put(key, value);
+				}
 			}
 		}
 
@@ -51,6 +51,7 @@ public class PersistenceDirectoryManager<T> {
 	}
 
 	public void persistFile(String key, T value) throws IOException {
+		Files.createDirectories(directory);
 		Files.write(Paths.get(directory.toString(), key + ".json"), SerializationHelper.getInstance().toJSON(value).getBytes(StandardCharsets.UTF_8));
 	}
 
