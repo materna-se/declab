@@ -21,7 +21,6 @@ import org.kie.dmn.feel.parser.feel11.profiles.KieExtendedFEELProfile;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,8 +38,13 @@ public class ModelServlet {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
 
-			DMNModel dmnModel = workspace.getDecisionSession().getRuntime().getModels().get(0);
+			List<DMNModel> dmnModels = workspace.getDecisionSession().getRuntime().getModels();
+			//
+			if (dmnModels.size() == 0) {
+				return Response.status(Response.Status.BAD_REQUEST).build();
+			}
 
+			DMNModel dmnModel = dmnModels.get(0);
 			Model model = new Model(dmnModel.getName(), dmnModel.getDecisions(), dmnModel.getBusinessKnowledgeModels(), dmnModel.getDecisionServices());
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(model)).build();
 		}
@@ -64,9 +68,9 @@ public class ModelServlet {
 
 		}
 		catch (ImportException exception) {
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
+			return Response.status(Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
 		}
-		catch (Exception exception) {
+		catch (IOException exception) {
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
 	}
@@ -106,7 +110,7 @@ public class ModelServlet {
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, debugger.getDecisions(), debugger.getMessages()))).build();
 		}
-		catch (IOException | DatatypeConfigurationException exception) {
+		catch (IOException exception) {
 			log.error(exception);
 
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();

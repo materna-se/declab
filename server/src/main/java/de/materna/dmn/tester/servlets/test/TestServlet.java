@@ -98,7 +98,7 @@ public class TestServlet {
 			}
 
 			Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
-			// drools will execute the persisted input, the result is in the format <Decision, Output>.
+			// Drools will execute the persisted input, the result is in the format <Decision, Output>.
 			Map<String, Output> calculatedOutputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), InputServlet.enrichInput(inputManager, inputManager.getFiles().get(test.getInput())).getValue());
 
 			Map<String, TestResultOutput> comparedOutputs = new HashMap<>();
@@ -112,7 +112,7 @@ public class TestServlet {
 
 			return Response.status(Response.Status.OK).entity(new TestResult(comparedOutputs)).build();
 		}
-		catch (IOException | DatatypeConfigurationException exception) {
+		catch (IOException exception) {
 			log.error(exception);
 
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();

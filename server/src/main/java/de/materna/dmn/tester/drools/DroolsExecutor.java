@@ -20,8 +20,8 @@ public class DroolsExecutor {
 	/**
 	 * Uses evaluateInputs to convert all calculated results into our own class hierarchy.
 	 */
-	public static Map<String, Output> getOutputs(DecisionSession decisionSession, Map<String, ?> inputs) throws DatatypeConfigurationException {
-		ObjectMapper objectMapper = SerializationHelper.getInstance().getObjectMapper();
+	public static Map<String, Output> getOutputs(DecisionSession decisionSession, Map<String, ?> inputs) {
+		ObjectMapper objectMapper = SerializationHelper.getInstance().getJSONMapper();
 
 		Map<String, Output> outputs = new LinkedHashMap<>();
 
