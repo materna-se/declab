@@ -42,7 +42,7 @@
 			</span>
 		</div>
 		<div v-else-if="value.type === 'object'">
-			<p class="my-4 text-center text-muted" v-if="Object.keys(value.value).length === 0 && !fixed">Please select a type!</p>
+			<p class="my-4 text-center text-muted" v-if="Object.keys(value.value).length === 0 && !fixed"><small>Please select a type!</small></p>
 			<table class="table table-bordered table-minimize mb-0">
 				<tbody>
 				<tr v-for="(childValue, childKey) in value.value">
@@ -64,7 +64,7 @@
 			</table>
 		</div>
 		<div v-else-if="value.type === 'array'">
-			<p class="my-4 text-center text-muted" v-if="value.value.length === 0 && !fixed">Please select a type!</p>
+			<p class="my-4 text-center text-muted" v-if="value.value.length === 0 && !fixed"><small>Please select a type!</small></p>
 			<div class="input-group-text input-group-table" v-else>
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 					<path d="M7 13v-2h14v2H7m0 6v-2h14v2H7M7 7V5h14v2H7M3 8V5H2V4h2v4H3m-1 9v-1h3v4H2v-1h2v-.5H3v-1h1V17H2m2.25-7a.75.75 0 0 1 .75.75c0 .2-.08.39-.21.52L3.12 13H5v1H2v-.92L4 11H2v-1h2.25z" fill="currentColor"/>
@@ -98,7 +98,7 @@
 			</table>
 		</div>
 		<div v-else>
-			<p class="my-2 text-center text-muted">{{value.type}} is not supported yet!</p>
+			<p class="my-2 text-center text-muted"><small>{{value.type}} is not supported yet!</small></p>
 		</div>
 		<!--
 		Displays the allowed values. When the respective button is clicked, it is set as a new value.
