@@ -1,6 +1,7 @@
 package de.materna.dmn.tester.servlets.test;
 
 import de.materna.dmn.tester.drools.DroolsExecutor;
+import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.input.InputServlet;
@@ -14,10 +15,10 @@ import de.materna.dmn.tester.servlets.test.beans.TestResultOutput;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
+import org.kie.dmn.api.core.DMNModel;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,6 +93,8 @@ public class TestServlet {
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
+			DMNModel dmnModel = DroolsHelper.getModel(workspace.getDecisionSession());
+
 			PersistedTest test = testManager.getFiles().get(testUUID);
 			if (test == null) {
 				throw new NotFoundException();
@@ -99,7 +102,7 @@ public class TestServlet {
 
 			Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
 			// Drools will execute the persisted input, the result is in the format <Decision, Output>.
-			Map<String, Output> calculatedOutputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), InputServlet.enrichInput(inputManager, inputManager.getFiles().get(test.getInput())).getValue());
+			Map<String, Output> calculatedOutputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), dmnModel, InputServlet.enrichInput(inputManager, inputManager.getFiles().get(test.getInput())).getValue());
 
 			Map<String, TestResultOutput> comparedOutputs = new HashMap<>();
 
