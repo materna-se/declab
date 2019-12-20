@@ -31,20 +31,25 @@
 					</div>
 				</div>
 				<div class="list-group">
-					<div class="list-group-item list-group-item-action c-pointer" v-for="(test, uuid) in tests" v-bind:key="uuid" v-on:click.self="setViewMode(uuid)" v-bind:class="[test.equal === undefined ? '' : (test.equal ? 'bg-success text-white' : 'bg-danger text-white')]">
-						<span class="d-block float-left mr-4" v-on:click="setViewMode(uuid)">{{test.name}}</span>
-						<div class="float-right">
-							<span class="badge badge-light badge-md d-block float-left mr-2" v-if="test.tps !== undefined">{{test.tps}} / s</span>
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setEditMode(uuid)">
-								<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
-							</svg>
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setDuplicateMode(uuid)">
-								<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"/>
-							</svg>
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left" v-on:click="deleteTest(uuid)">
-								<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
-							</svg>
+					<template v-if="Object.keys(tests).length !== 0">
+						<div class="list-group-item list-group-item-action c-pointer" v-for="(test, uuid) in tests" v-bind:key="uuid" v-on:click.self="setViewMode(uuid)" v-bind:class="[test.equal === undefined ? '' : (test.equal ? 'bg-success text-white' : 'bg-danger text-white')]">
+							<span class="d-block float-left mr-4" v-on:click="setViewMode(uuid)">{{test.name}}</span>
+							<div class="float-right">
+								<span class="badge badge-light badge-md d-block float-left mr-2" v-if="test.tps !== undefined">{{test.tps}} / s</span>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setEditMode(uuid)">
+									<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
+								</svg>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setDuplicateMode(uuid)">
+									<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"/>
+								</svg>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left" v-on:click="deleteTest(uuid)">
+									<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
+								</svg>
+							</div>
 						</div>
+					</template>
+					<div class="list-group-item" v-else>
+						<empty-collection/>
 					</div>
 				</div>
 			</div>
@@ -138,10 +143,12 @@
 	import Network from "../helpers/network";
 	import DiffMatchPatch from 'diff-match-patch';
 	import JSONBuilder from "../components/json/json-builder.vue";
+	import EmptyCollectionComponent from "../components/empty-collection.vue";
 
 	export default {
 		components: {
-			"json-builder": JSONBuilder
+			"json-builder": JSONBuilder,
+			"empty-collection": EmptyCollectionComponent
 		},
 		async mounted() {
 			await this.getInputs();
