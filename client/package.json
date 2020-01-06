@@ -17,7 +17,7 @@
 		"diff-match-patch": "^1.0.4",
 		"monaco-editor": "^0.18.1",
 		"jsonpath": "^1.0.2",
-		"lodash.debounce": "^4.0.8"
+		"lodash": "^4.17.15"
 	},
 	"devDependencies": {
 		"webpack": "^4.41.5",
