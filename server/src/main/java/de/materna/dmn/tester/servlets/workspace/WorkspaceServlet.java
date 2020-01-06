@@ -55,11 +55,15 @@ public class WorkspaceServlet {
 	@Consumes("multipart/form-data")
 	public Response importWorkspace(@PathParam("workspace") String workspaceName, MultipartFormDataInput multipartFormDataInput) throws IOException {
 		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
+		Workspace workspace = workspaceManager.get(workspaceName);
+
+		// If the workspace does not exist yet, it will be created.
+		java.nio.file.Path path = workspace.getTestManager().getDirectory().getParent();
+		Files.createDirectories(path);
 
 		InputPart inputPart = multipartFormDataInput.getFormDataMap().get("backup").get(0);
 		try (InputStream inputStream = inputPart.getBody(InputStream.class, null)) {
 			try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
-				Workspace workspace = workspaceManager.get(workspaceName);
 
 				while (true) {
 					ZipEntry zipEntry = zipInputStream.getNextEntry();
@@ -67,7 +71,11 @@ public class WorkspaceServlet {
 						break;
 					}
 
-					Files.write(Paths.get(workspace.getTestManager().getDirectory().getParent().toString(), zipEntry.getName()), IOUtils.toByteArray(zipInputStream));
+					// If the directory for the entity does not exist yet, it will be created.
+					java.nio.file.Path path1 = Paths.get(path.toString(), zipEntry.getName());
+					Files.createDirectories(path1.getParent());
+
+					Files.write(path1, IOUtils.toByteArray(zipInputStream));
 				}
 			}
 		}
@@ -75,7 +83,6 @@ public class WorkspaceServlet {
 		// If the workspace is cached, we need to invalidate it.
 		workspaceManager.invalidate(workspaceName);
 
-		Workspace workspace = workspaceManager.get(workspaceName);
 		try {
 			workspace.getDecisionSession().importModel("main", "main", workspace.getModelManager().getFile());
 		}
