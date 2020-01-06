@@ -12,10 +12,11 @@
 
 					<h5 class="mb-2">Protection</h5>
 					<p class="mb-2">This feature is currently in developement.</p>
+					<!--
 					<p class="mb-0"><b>PUBLIC: </b> Anonymous users can create, read, update and delete entities inside this workspace.</p>
 					<p class="mb-0"><b>PROTECTED: </b> Anonymous users can read, authenticated users can also create, update and delete entities inside this workspace.</p>
 					<p class="mb-2"><b>PRIVATE: </b> Anonymous users can't enter the workspace, authenticated users can create, read, update and delete entities inside this workspace.</p>
-
+					-->
 					<div class="d-flex">
 						<div class="btn-group mb-0 mr-2">
 							<button type="button" class="btn btn-outline-secondary">
