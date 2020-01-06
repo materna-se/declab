@@ -4,7 +4,7 @@
 			<div class="row">
 				<div class="col-8">
 					<small class="d-block text-muted">
-						Developed and mantained by <a href="https://www.materna.de" target="_blank">Materna Information & Communications SE</a>. Available under the Apache 2.0 License.
+						Developed and maintained by <a href="https://www.materna.de" target="_blank">Materna Information & Communications SE</a>. Available under the Apache 2.0 License.
 					</small>
 				</div>
 				<div class="col-4">
