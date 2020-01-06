@@ -125,6 +125,7 @@ export default {
 		return {
 			type: template.type,
 			value: template.value,
+			options: template.options !== undefined ? template.options : existing.options,
 		};
 	},
 
