@@ -48,13 +48,11 @@
 		},
 		mounted() {
 			this.value = this.convert ? this.enrichTemplate(this.template) : this.template;
-			this.exportValue(this.value);
 		},
 		watch: {
 			template: {
 				handler: function (template) {
 					this.value = this.convert ? this.enrichTemplate(template) : JSON.parse(JSON.stringify(template));
-					this.exportValue(this.value);
 				},
 				deep: true
 			},
