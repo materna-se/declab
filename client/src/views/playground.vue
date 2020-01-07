@@ -42,8 +42,8 @@
 
 	import FEELEditor from "../components/dmn/dmn-editor.vue";
 	import JSONBuilder from "../components/json/json-builder.vue";
-	import Alert from "../components/alert.vue";
-	import AlertHelper from "../components/alert-helper";
+	import Alert from "../components/alert/alert.vue";
+	import AlertHelper from "../components/alert/alert-helper";
 
 	export default {
 		components: {

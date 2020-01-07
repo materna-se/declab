@@ -95,10 +95,10 @@
 
 <script>
 	import Network from "../helpers/network";
-	import AlertHelper from "../components/alert-helper";
+	import AlertHelper from "../components/alert/alert-helper";
 	import Converter from "../components/json/json-builder-converter";
 
-	import Alert from "../components/alert.vue";
+	import Alert from "../components/alert/alert.vue";
 	import JSONBuilder from "../components/json/json-builder.vue";
 
 	export default {

@@ -66,7 +66,7 @@
 
 <script>
 	import Network from "../helpers/network";
-	import AlertHelper from "../components/alert-helper";
+	import AlertHelper from "../components/alert/alert-helper";
 
 	export default {
 		async mounted() {

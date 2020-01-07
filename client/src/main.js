@@ -11,7 +11,7 @@ import VueRouter from "vue-router";
 // Components
 import LoadingIndicator from "./components/loading-indicator.vue";
 import Header from "./components/header.vue";
-import Alert from "./components/alert.vue";
+import Alert from "./components/alert/alert.vue";
 import Footer from "./components/footer.vue";
 // Helpers
 import Network from "./helpers/network";
@@ -81,7 +81,7 @@ router.beforeEach((to, from, next) => {
 router.afterEach(async (to, from) => {
 	vue.alert.message = null;
 
-	Network.setEndpoint(process.env.API_HOST, to.params.workspace);
+	Network.setEndpoint(process.env.DECLAB_HOST, to.params.workspace);
 
 	setTimeout(() => vue.loading = false, 500);
 });

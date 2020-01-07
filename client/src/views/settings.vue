@@ -88,7 +88,7 @@
 <script>
 	import Network from "../helpers/network";
 	import Configuration from "../helpers/configuration";
-	import AlertHelper from "../components/alert-helper";
+	import AlertHelper from "../components/alert/alert-helper";
 
 	export default {
 		data() {
