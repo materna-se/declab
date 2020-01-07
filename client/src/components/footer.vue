@@ -9,7 +9,7 @@
 				</div>
 				<div class="col-4">
 					<small class="d-block text-right text-muted">
-						Version {{version}}
+						Version {{version}} (built at {{time}})
 					</small>
 				</div>
 			</div>
@@ -21,7 +21,8 @@
 	export default  {
 		data() {
 			return {
-				version: process.env.VERSION
+				version: process.env.DECLAB_VERSION,
+				time: process.env.DECLAB_TIME,
 			};
 		}
 	}
