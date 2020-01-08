@@ -1,6 +1,8 @@
 package de.materna.dmn.tester.servlets.workspace;
 
 import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.dmn.tester.servlets.filters.ReadAccess;
+import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.model.ModelImportException;
 import de.materna.jdec.serialization.SerializationHelper;
@@ -22,11 +24,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+//TODO Add log messages
+
 @Path("/workspaces/{workspace}")
 public class WorkspaceServlet {
 	private static final Logger log = Logger.getLogger(WorkspaceServlet.class);
 
 	@GET
+	@ReadAccess
 	@Path("")
 	@Produces("application/zip")
 	public Response exportWorkspace(@PathParam("workspace") String workspaceName) {
@@ -51,6 +56,7 @@ public class WorkspaceServlet {
 	}
 
 	@PUT
+	@WriteAccess
 	@Path("")
 	@Consumes("multipart/form-data")
 	public Response importWorkspace(@PathParam("workspace") String workspaceName, MultipartFormDataInput multipartFormDataInput) throws IOException {
@@ -93,6 +99,7 @@ public class WorkspaceServlet {
 	}
 
 	@DELETE
+	@WriteAccess
 	@Path("")
 	public Response deleteWorkspace(@PathParam("workspace") String workspaceName) throws IOException {
 		WorkspaceManager.getInstance().remove(workspaceName);
