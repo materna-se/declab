@@ -8,14 +8,14 @@
 				<div class="col-1 mb-2">
 					<button class="btn btn-block btn-outline-secondary" v-on:click="expandAll">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
-							<path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7m4.5-10.09l4.5-4.5V10h2V3h-7v2h3.59l-4.5 4.5 1.41 1.41z" fill="currentColor"></path>
+							<path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7m4.5-10.09l4.5-4.5V10h2V3h-7v2h3.59l-4.5 4.5 1.41 1.41z" fill="currentColor"/>
 						</svg>
 					</button>
 				</div>
 				<div class="col-1 mb-2">
 					<button class="btn btn-block btn-outline-secondary" v-on:click="collapseAll">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
-							<path d="M19.5 3.09L15 7.59V4h-2v7h7V9h-3.59l4.5-4.5-1.41-1.41M4 13v2h3.59l-4.5 4.5 1.41 1.41 4.5-4.5V20h2v-7H4z" fill="currentColor"></path>
+							<path d="M19.5 3.09L15 7.59V4h-2v7h7V9h-3.59l4.5-4.5-1.41-1.41M4 13v2h3.59l-4.5 4.5 1.41 1.41 4.5-4.5V20h2v-7H4z" fill="currentColor"/>
 						</svg>
 					</button>
 				</div>
@@ -32,9 +32,9 @@
 							</template>
 
 							<h5 class="mb-2 c-pointer" v-on:click="changeInputVisibility(test)">Input</h5>
-							<json-builder v-if="test.inputVisibility" v-bind:template="inputs[test.input].value" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"></json-builder>
+							<json-builder v-if="test.inputVisibility" v-bind:template="inputs[test.input].value" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"/>
 
-							<h5 class="mt-2 mb-0 c-pointer" v-on:click="changeOutputVisibility(test)">Outputs</h5>
+							<h5 class="mt-2 mb-0 c-pointer" v-on:click="changeOutputVisibility(test)">Output</h5>
 							<div class="card mt-2 mb-0 border-lg" v-if="test.outputVisibility" v-for="(output, decision) in test.result.outputs" v-bind:key="test.uuid + '-' + decision" v-bind:class="[output.equal ? 'border-success' : 'border-danger']">
 								<div class="card-body">
 									<h6 class="mb-2">Decision</h6>
@@ -125,7 +125,7 @@
 				for (const uuid in this.tests) {
 					const test = this.tests[uuid];
 
-					const tempRes = await Network.executeTest(uuid)
+					const tempRes = await Network.executeTest(uuid);
 					this.$set(test, "result", tempRes);
 				}
 			},

@@ -22,7 +22,7 @@
 					<div class="col-12">
 						<div class="card card-borderless mb-2">
 							<div class="card-body p-0">
-								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:value="model.input.value = $event; getModelResult();"></json-builder>
+								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:value="model.input.value = $event; getModelResult();"/>
 							</div>
 							<div class="card-footer card-footer-border">
 								<div class="input-group">
@@ -39,14 +39,19 @@
 			<div class="mb-4" v-if="mode !== 1" v-bind:class="{'col-6': mode === 0, 'col-12': mode === 2}">
 				<div class="row">
 					<div class="col-10">
-						<h3 class="mb-2">Outputs</h3>
+						<h3 class="mb-2">Output</h3>
 					</div>
 					<div class="col-2">
 						<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="detachWorker">
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
-								<path d="M8 12h9.76l-2.5-2.5 1.41-1.42L21.59 13l-4.92 4.92-1.41-1.42 2.5-2.5H8v-2m11-9a2 2 0 0 1 2 2v4.67l-2-2V7H5v12h14v-.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z" fill="currentColor"></path>
+								<path d="M8 12h9.76l-2.5-2.5 1.41-1.42L21.59 13l-4.92 4.92-1.41-1.42 2.5-2.5H8v-2m11-9a2 2 0 0 1 2 2v4.67l-2-2V7H5v12h14v-.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z" fill="currentColor"/>
 							</svg>
 						</button>
+					</div>
+				</div>
+				<div class="row mb-4" v-if="alert.message !== null">
+					<div class="col-12">
+						<alert v-bind:alert="alert"/>
 					</div>
 				</div>
 				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
@@ -57,8 +62,8 @@
 							</div>
 							<div class="col-2">
 								<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" class="d-block float-right" style="cursor: pointer" v-on:click="$set(model.result.visible, key, model.result.visible[key] !== true)">
-									<path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z" fill="currentColor" v-if="model.result.visible[key]"></path>
-									<path d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6-6-6 1.41-1.42z" fill="currentColor" v-else></path>
+									<path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z" fill="currentColor" v-if="model.result.visible[key]"/>
+									<path d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6-6-6 1.41-1.42z" fill="currentColor" v-else/>
 								</svg>
 							</div>
 						</div>
@@ -66,11 +71,11 @@
 					<template v-if="model.result.visible[key]">
 						<div class="card-body">
 							<h5 class="mb-2">Output</h5>
-							<json-builder class="mb-0" v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+							<json-builder class="mb-0" v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 
 							<div class="mt-4" v-if="Object.keys(model.result.context[key]).length !== 0">
 								<h5 class="mb-2">Context</h5>
-								<json-builder class="mb-0" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+								<json-builder class="mb-0" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 							</div>
 						</div>
 						<div class="card-footer">
@@ -90,17 +95,24 @@
 
 <script>
 	import Network from "../helpers/network";
-	import AlertHelper from "../components/alert-helper";
+	import AlertHelper from "../components/alert/alert-helper";
 	import Converter from "../components/json/json-builder-converter";
 
+	import Alert from "../components/alert/alert.vue";
 	import JSONBuilder from "../components/json/json-builder.vue";
 
 	export default {
 		components: {
-			"json-builder": JSONBuilder
+			"alert": Alert,
+			"json-builder": JSONBuilder,
 		},
 		data() {
 			return {
+				alert: {
+					message: null,
+					state: null
+				},
+
 				inputs: {},
 
 				model: {
@@ -149,7 +161,7 @@
 					}
 				});
 				// Listen to attempts to unload the window and switch back to mode 0.
-				window.opener.addEventListener("unload", function (e) {
+				window.opener.addEventListener("unload", function () {
 					window.close();
 				});
 
@@ -173,6 +185,7 @@
 						type: "getModelResult",
 						data: this.model.input.value
 					}, "*");
+					return;
 				}
 
 				try {
@@ -180,14 +193,14 @@
 					this.model.result.outputs = result.outputs;
 					this.model.result.context = result.context;
 					if (result.messages.length > 0) {
-						this.$root.displayAlert(AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "danger");
+						this.displayAlert(AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "warning");
 						return;
 					}
 
-					this.$root.displayAlert(null, "danger");
+					this.displayAlert(null, null);
 				}
 				catch (e) {
-					this.$root.displayAlert("The output can't be calculated right now.", "danger");
+					this.displayAlert("The output can't be calculated.", "danger");
 				}
 			},
 
@@ -223,6 +236,12 @@
 			//
 			// Helpers
 			//
+			displayAlert(message, state) {
+				this.alert = {
+					message: message,
+					state: state
+				}
+			},
 			detachWorker() {
 				const vue = this;
 
@@ -231,11 +250,13 @@
 				// This custom event will be received when vue has finished mounting.
 				this.worker.addEventListener("aftermount", function () {
 					vue.mode = 1;
+					vue.displayAlert(null, null);
 					vue.getModelResult();
 				});
 				// This event will be received when the opened window is closed or the user navigates away.
 				this.worker.addEventListener("beforeunload", function () {
 					vue.mode = 0;
+					vue.getModelResult();
 				});
 			},
 			importInput(input) {

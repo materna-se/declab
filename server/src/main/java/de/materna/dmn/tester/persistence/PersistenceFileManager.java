@@ -11,7 +11,6 @@ public class PersistenceFileManager {
 
 	public PersistenceFileManager(String workspace, String entity) throws IOException {
 		file = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", workspace, entity);
-		Files.createDirectories(file.getParent());
 	}
 
 	public String getFile() throws IOException {
@@ -19,6 +18,7 @@ public class PersistenceFileManager {
 	}
 
 	public void persistFile(String value) throws IOException {
+		Files.createDirectories(file.getParent());
 		Files.write(file, value.getBytes(StandardCharsets.UTF_8));
 	}
 

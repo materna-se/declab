@@ -7,7 +7,7 @@
 			<div class="col-1 mb-2">
 				<button class="btn btn-block btn-outline-secondary" v-on:click="setAddMode">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
-						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"></path>
+						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
 					</svg>
 				</button>
 			</div>
@@ -15,19 +15,24 @@
 		<div class="row">
 			<div class="col-3 mb-4">
 				<div class="list-group">
-					<div class="list-group-item list-group-item-action c-pointer" v-for="(input, uuid) in inputs" v-bind:key="uuid" v-on:click.self="setViewMode(uuid)">
-						<span class="d-block float-left mr-4" v-on:click="setViewMode(uuid)">{{input.name}}</span>
-						<div class="float-right">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setEditMode(uuid)">
-								<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"></path>
-							</svg>
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setDuplicateMode(uuid)">
-								<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"></path>
-							</svg>
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left" v-on:click="deleteInput(uuid)">
-								<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"></path>
-							</svg>
+					<template v-if="Object.keys(inputs).length !== 0">
+						<div class="list-group-item list-group-item-action c-pointer" v-for="(input, uuid) in inputs" v-bind:key="uuid" v-on:click.self="setViewMode(uuid)">
+							<span class="d-block float-left mr-4" v-on:click="setViewMode(uuid)">{{input.name}}</span>
+							<div class="float-right">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setEditMode(uuid)">
+									<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
+								</svg>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setDuplicateMode(uuid)">
+									<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"/>
+								</svg>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left" v-on:click="deleteInput(uuid)">
+									<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
+								</svg>
+							</div>
 						</div>
+					</template>
+					<div class="list-group-item" v-else>
+						<empty-collection/>
 					</div>
 				</div>
 			</div>
@@ -43,8 +48,8 @@
 						</div>
 
 						<h5 class="mb-2">Input</h5>
-						<json-builder v-if="input.parent === null" v-bind:template="input.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
-						<json-builder v-else v-bind:template="input.enrichedValue" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"></json-builder>
+						<json-builder v-if="input.parent === null" v-bind:template="input.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
+						<json-builder v-else v-bind:template="input.enrichedValue" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 					</div>
 				</div>
 				<div class="card" v-if="mode === 'ADD' || mode === 'EDIT'">
@@ -54,12 +59,12 @@
 
 						<h5 class="mb-2">Parent</h5>
 						<select class="form-control mb-4" v-bind:value="input.parent" v-on:change="setParent($event.target.value)">
-							<option value="" selected></option>
+							<option value="" selected/>
 							<option v-for="(input, uuid) in inputs" v-bind:value="uuid">{{input.name}}</option>
 						</select>
 
 						<h5 class="mb-2">Input</h5>
-						<json-builder v-bind:template="input.template" v-bind:fixed-root="true" v-on:update:value="input.value = $event"></json-builder>
+						<json-builder v-bind:template="input.template" v-bind:fixed-root="true" v-on:update:value="input.value = $event"/>
 
 						<hr>
 
@@ -77,10 +82,12 @@
 	import Converter from "../components/json/json-builder-converter";
 
 	import JSONBuilder from "../components/json/json-builder.vue";
+	import EmptyCollectionComponent from "../components/empty-collection.vue";
 
 	export default {
 		components: {
-			"json-builder": JSONBuilder
+			"json-builder": JSONBuilder,
+			"empty-collection": EmptyCollectionComponent
 		},
 		async mounted() {
 			await this.getInputs();

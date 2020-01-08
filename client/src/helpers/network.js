@@ -169,14 +169,19 @@ export default {
 		return test;
 	},
 
-	importWorkspace(backup) {
+	async importWorkspace(backup) {
 		const formData = new FormData();
 		formData.append("backup", backup);
 
-		return fetch(this._endpoint, {
+		const response = await fetch(this._endpoint, {
 			method: "PUT",
 			body: formData
 		});
+
+		return {
+			successful: response.status !== 503,
+			messages: (await response.json()).messages
+		};
 	},
 	deleteWorkspace() {
 		return fetch(this._endpoint, {

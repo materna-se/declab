@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<textarea class="form-control w-100 mb-1" v-if="developerMode === true" v-bind:value="JSON.stringify(cleanedValue)" v-on:input="importValue($event.target.value)"></textarea>
-		<json-builder-table v-if="value !== null" v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues"></json-builder-table>
-		<json-builder-selector v-if="!fixed && !fixedRoot" v-bind:value="value" v-bind:mode="'edit'"></json-builder-selector>
+		<textarea class="form-control w-100 mb-1" v-if="developerMode === true" v-bind:value="JSON.stringify(cleanedValue)" v-on:input="importValue($event.target.value)"/>
+		<json-builder-table v-if="value !== null" v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues"/>
+		<json-builder-selector v-if="!fixed && !fixedRoot" v-bind:value="value" v-bind:mode="'edit'"/>
 	</div>
 </template>
 
@@ -48,13 +48,11 @@
 		},
 		mounted() {
 			this.value = this.convert ? this.enrichTemplate(this.template) : this.template;
-			this.exportValue(this.value);
 		},
 		watch: {
 			template: {
 				handler: function (template) {
 					this.value = this.convert ? this.enrichTemplate(template) : JSON.parse(JSON.stringify(template));
-					this.exportValue(this.value);
 				},
 				deep: true
 			},

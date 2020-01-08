@@ -1,5 +1,9 @@
 body {
-	font-family: "Ubuntu", sans-serif;
+	font-family: "Source Sans Pro", sans-serif;
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+	font-weight: bold;
 }
 
 pre, code, kbd, samp, textarea {
@@ -112,4 +116,8 @@ pre, code {
 .difference-plus {
 	background: yellow;
 	text-decoration: underline;
+}
+
+.small, small {
+	font-size: 90%;
 }
