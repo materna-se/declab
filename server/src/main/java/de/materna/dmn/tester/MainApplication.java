@@ -1,6 +1,8 @@
 package de.materna.dmn.tester;
 
 import de.materna.dmn.tester.servlets.filters.CSRFFilter;
+import de.materna.dmn.tester.servlets.filters.ReadAccessFilter;
+import de.materna.dmn.tester.servlets.filters.WriteAccessFilter;
 import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
 import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.dmn.tester.servlets.model.ModelServlet;
@@ -25,6 +27,8 @@ public class MainApplication extends Application {
 		singletons.add(new WorkspaceServlet());
 
 		classes.add(CSRFFilter.class);
+		classes.add(ReadAccessFilter.class);
+		classes.add(WriteAccessFilter.class);
 	}
 
 	@Override
