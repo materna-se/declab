@@ -15,6 +15,10 @@ public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);
 
 	private PersistenceFileManager modelManager;
+	private Configuration config;
+	private PersistenceFileManager configurationManager;
+	private AccessLog accessLog;
+	private PersistenceFileManager logManager;
 	private PersistenceDirectoryManager<PersistedInput> inputManager;
 	private PersistenceDirectoryManager<PersistedOutput> outputManager;
 	private PersistenceDirectoryManager<PersistedTest> testManager;
@@ -22,11 +26,28 @@ public class Workspace {
 
 	public Workspace(String name) throws IOException {
 		modelManager = new PersistenceFileManager(name, "model.dmn");
+		configurationManager = new PersistenceFileManager(name, "configuration.json");
+		config = new Configuration(name, configurationManager);
+		logManager = new PersistenceFileManager(name, "access.log");
+		accessLog = new AccessLog(name, logManager);
 		inputManager = new PersistenceDirectoryManager<>(name, "inputs", PersistedInput.class);
 		outputManager = new PersistenceDirectoryManager<>(name, "outputs", PersistedOutput.class);
 		testManager = new PersistenceDirectoryManager<>(name, "tests", PersistedTest.class);
 		decisionSession = new DecisionSession();
 
+		if(!configurationManager.fileExists()) {
+			//Write default configuration
+			config.setCreatedDate(System.currentTimeMillis());
+			config.setModifiedDate(config.getCreatedDate());
+			configurationManager.persistFile(config.printAsJson());
+		} else {
+			//Import configuration
+			if(!config.deserializeFromJson(configurationManager.getFile())) {
+				System.out.println("Failed to load configuration.json");
+				//TODO Shut down?
+			}
+		}
+		
 		try {
 			decisionSession.importModel("main", "main", modelManager.getFile());
 		}
@@ -53,5 +74,13 @@ public class Workspace {
 
 	public DecisionSession getDecisionSession() {
 		return decisionSession;
+	}
+	
+	public Configuration getConfig() {
+		return config;
+	}
+	
+	public AccessLog getAccessLog() {
+		return accessLog;
 	}
 }
