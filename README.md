@@ -52,7 +52,7 @@ In order to build a web archive, the following commands should be executed:
 cd ./server
 mvn clean package
 ```
-Afterwards, the generated web archive can be found at `./server/target/ROOT.war`.
+Afterwards, the generated web archive can be found at `./server/target/declab-version.war`.
 If the test framework should be directly executed on an application server, the generated
 web archive can be copied into the specified directory (for example `./standalone/deployments`).
 

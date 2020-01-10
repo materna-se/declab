@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import de.materna.dmn.tester.drools.DroolsExecutor;
 import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.dmn.tester.servlets.filters.ReadAccess;
+import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.Decision;
 import de.materna.dmn.tester.servlets.model.beans.Model;
 import de.materna.dmn.tester.servlets.model.beans.ModelResult;
@@ -32,6 +34,7 @@ public class ModelServlet {
 	private static final Logger log = Logger.getLogger(ModelServlet.class);
 
 	@GET
+	@ReadAccess
 	@Path("/model")
 	@Produces("application/json")
 	public Response getModel(@PathParam("workspace") String workspaceName) {
@@ -41,6 +44,9 @@ public class ModelServlet {
 			DMNModel dmnModel = DroolsHelper.getModel(workspace.getDecisionSession());
 
 			Model model = new Model(dmnModel.getName(), dmnModel.getDecisions(), dmnModel.getBusinessKnowledgeModels(), dmnModel.getDecisionServices());
+			
+			workspace.getAccessLog().writeMessage("Accessed model " + model.getName(), System.currentTimeMillis());
+			
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(model)).build();
 		}
 		catch (IOException exception) {
@@ -49,6 +55,7 @@ public class ModelServlet {
 	}
 
 	@PUT
+	@WriteAccess
 	@Path("/model")
 	@Consumes("text/xml")
 	public Response importModel(@PathParam("workspace") String workspaceName, String body) {
@@ -58,6 +65,8 @@ public class ModelServlet {
 			ImportResult importResult = workspace.getDecisionSession().importModel("main", "main", body);
 
 			workspace.getModelManager().persistFile(body);
+			
+			workspace.getAccessLog().writeMessage("Imported model", System.currentTimeMillis());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(importResult)).build();
 
@@ -71,13 +80,17 @@ public class ModelServlet {
 	}
 
 	@GET
+	@ReadAccess
 	@Path("/model/inputs")
 	@Produces("application/json")
 	public Response getInputs(@PathParam("workspace") String workspaceName) {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			
 			DMNModel model = workspace.getDecisionSession().getRuntime().getModels().get(0);
 
+			workspace.getAccessLog().writeMessage("Accessed list of inputs for model " + model.getName(), System.currentTimeMillis());
+			
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getInputs(model))).build();
 		}
 		catch (IOException exception) {
@@ -88,6 +101,7 @@ public class ModelServlet {
 	}
 
 	@POST
+	@WriteAccess
 	@Path("/model/inputs")
 	@Consumes("application/json")
 	@Produces("application/json")
@@ -104,6 +118,9 @@ public class ModelServlet {
 			debugger.start();
 			Map<String, Output> outputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), dmnModel, inputs);
 			debugger.stop();
+			
+			//TODO Get model name from body?
+			workspace.getAccessLog().writeMessage("Calculated result for model", System.currentTimeMillis());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, debugger.getDecisions(), debugger.getMessages()))).build();
 		}
@@ -115,6 +132,7 @@ public class ModelServlet {
 	}
 
 	@POST
+	@WriteAccess
 	@Path("/model/inputs/raw")
 	@Consumes("application/json")
 	@Produces("text/plain")
