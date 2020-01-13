@@ -3,7 +3,7 @@
 	"version": "1.5.8",
 	"private": true,
 	"scripts": {
-		"dev": "cross-env DECLAB_HOST=http://127.0.0.1:8080/declab-$npm_package_version/api webpack-dev-server --open --hot",
+		"dev": "webpack-dev-server --open --hot",
 		"build": "webpack --progress",
 		"bump-patch": "npm version patch"
 	},
@@ -31,7 +31,6 @@
 		"vue-loader": "^15.8.3",
 		"vue-template-compiler": "^2.6.11",
 		"css-loader": "^3.4.1",
-		"file-loader": "^5.0.2",
-		"cross-env": "^6.0.3"
+		"file-loader": "^5.0.2"
 	}
 }
