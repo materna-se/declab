@@ -41,9 +41,13 @@ module.exports = {
 	},
 	plugins: [
 		new WebPackDefinePlugin({
-			'process.env.DECLAB_HOST': JSON.stringify(process.env.DECLAB_HOST),
+			'process.env.DECLAB_HOST': JSON.stringify((() => {
+				return process.env.DECLAB_HOST === undefined ? "http://127.0.0.1:8080/declab-" + process.env.npm_package_version + "/api" : process.env.DECLAB_HOST;
+			})()),
 			'process.env.DECLAB_VERSION': JSON.stringify(process.env.npm_package_version),
-			'process.env.DECLAB_TIME': JSON.stringify(ChildProcess.execSync("git log -1 --format=%ci", {cwd: Path.resolve(__dirname, "..")}).toString().split(" ", 2).join(", ")),
+			'process.env.DECLAB_TIME': JSON.stringify((() => {
+				return ChildProcess.execSync("git log -1 --format=%ci", {cwd: Path.resolve(__dirname, "..")}).toString().split(" ", 2).join(", ");
+			})()),
 		}),
 		new VueLoaderPlugin(),
 		new WebPackHTMLPlugin({
