@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.NullNode;
 import de.materna.dmn.tester.servlets.output.beans.EnrichedOutput;
 import de.materna.dmn.tester.servlets.output.beans.Output;
-import de.materna.dmn.tester.servlets.test.TestServlet;
 import org.apache.log4j.Logger;
 
 public class TestResultOutput {
