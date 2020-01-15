@@ -1,5 +1,4 @@
 const Path = require("path");
-const ChildProcess = require("child_process");
 
 const WebPackDefinePlugin = require("webpack/lib/DefinePlugin");
 const VueLoaderPlugin = require('vue-loader').VueLoaderPlugin;
@@ -46,7 +45,7 @@ module.exports = {
 			})()),
 			'process.env.DECLAB_VERSION': JSON.stringify(process.env.npm_package_version),
 			'process.env.DECLAB_TIME': JSON.stringify((() => {
-				return ChildProcess.execSync("git log -1 --format=%ci", {cwd: Path.resolve(__dirname, "..")}).toString().split(" ", 2).join(", ");
+				return new Date().toISOString().split("Z")[0].split("T").join(", ");
 			})()),
 		}),
 		new VueLoaderPlugin(),
