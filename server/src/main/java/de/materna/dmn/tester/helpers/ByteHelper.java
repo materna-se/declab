@@ -1,23 +1,21 @@
 package de.materna.dmn.tester.helpers;
 
 public class ByteHelper {
-	public static String byteArrayToHexString(byte[] b) {
-		StringBuilder sb = new StringBuilder();
-		for(byte aa : b) {
-			sb.append(String.format("%02X", aa));
+	public static String byteArrayToHexString(byte[] byteArray) {
+		StringBuilder stringBuilder = new StringBuilder();
+		for (byte bxte : byteArray) {
+			stringBuilder.append(String.format("%02X", bxte));
 		}
-		String ret = sb.toString();
-		sb.setLength(0);
-		return ret;
+		return stringBuilder.toString();
 	}
-	
-	public static byte[] hexStringToByteArray(String s) {
-	    int len = s.length();
-	    byte[] ret = new byte[len / 2];
-	    for (int i = 0; i < len; i += 2) {
-	        ret[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-								+ Character.digit(s.charAt(i+1), 16));
-	    }
-	    return ret;
+
+	public static byte[] hexStringToByteArray(String hexString) {
+		int hexStringLength = hexString.length();
+
+		byte[] byteArray = new byte[hexStringLength / 2];
+		for (int i = 0; i < hexStringLength; i += 2) {
+			byteArray[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) + Character.digit(hexString.charAt(i + 1), 16));
+		}
+		return byteArray;
 	}
 }

@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 public class PersistenceFileManager {
 	private Path file;
 
-	public PersistenceFileManager(String workspace, String entity) throws IOException {
+	public PersistenceFileManager(String workspace, String entity) {
 		file = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", workspace, entity);
 	}
 
