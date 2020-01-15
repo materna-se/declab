@@ -15,39 +15,43 @@ public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);
 
 	private PersistenceFileManager modelManager;
-	private Configuration config;
-	private PersistenceFileManager configurationManager;
-	private AccessLog accessLog;
-	private PersistenceFileManager logManager;
+
 	private PersistenceDirectoryManager<PersistedInput> inputManager;
 	private PersistenceDirectoryManager<PersistedOutput> outputManager;
 	private PersistenceDirectoryManager<PersistedTest> testManager;
+
+	private Configuration configuration;
+	private AccessLog accessLog;
+
 	private DecisionSession decisionSession;
 
 	public Workspace(String name) throws IOException {
 		modelManager = new PersistenceFileManager(name, "model.dmn");
-		configurationManager = new PersistenceFileManager(name, "configuration.json");
-		config = new Configuration(name, configurationManager);
-		logManager = new PersistenceFileManager(name, "access.log");
-		accessLog = new AccessLog(name, logManager);
+
 		inputManager = new PersistenceDirectoryManager<>(name, "inputs", PersistedInput.class);
 		outputManager = new PersistenceDirectoryManager<>(name, "outputs", PersistedOutput.class);
 		testManager = new PersistenceDirectoryManager<>(name, "tests", PersistedTest.class);
+
+		PersistenceFileManager configurationManager = new PersistenceFileManager(name, "configuration.json");
+		configuration = new Configuration(name, configurationManager);
+		PersistenceFileManager accessLogManager = new PersistenceFileManager(name, "access.log");
+		accessLog = new AccessLog(accessLogManager);
+
 		decisionSession = new DecisionSession();
 
-		if(!configurationManager.fileExists()) {
-			//Write default configuration
-			config.setCreatedDate(System.currentTimeMillis());
-			config.setModifiedDate(config.getCreatedDate());
-			configurationManager.persistFile(config.printAsJson());
-		} else {
-			//Import configuration
-			if(!config.deserializeFromJson(configurationManager.getFile())) {
-				System.out.println("Failed to load configuration.json");
-				//TODO Shut down?
+		if (!configurationManager.fileExists()) {
+			// If the configuration file doesn't exist yet, we'll create it with default values.
+			configuration.setCreatedDate(System.currentTimeMillis());
+			configuration.setModifiedDate(configuration.getCreatedDate());
+			configuration.serialize();
+		}
+		else {
+			// If the configuration file exists, we'll open it.
+			if (!configuration.deserialize(configurationManager.getFile())) {
+				throw new RuntimeException("The configuration file can't be opened.");
 			}
 		}
-		
+
 		try {
 			decisionSession.importModel("main", "main", modelManager.getFile());
 		}
@@ -77,7 +81,7 @@ public class Workspace {
 	}
 	
 	public Configuration getConfig() {
-		return config;
+		return configuration;
 	}
 	
 	public AccessLog getAccessLog() {
