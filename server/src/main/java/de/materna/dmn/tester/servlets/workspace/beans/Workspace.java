@@ -33,7 +33,7 @@ public class Workspace {
 		testManager = new PersistenceDirectoryManager<>(name, "tests", PersistedTest.class);
 
 		PersistenceFileManager configurationManager = new PersistenceFileManager(name, "configuration.json");
-		configuration = new Configuration(name, configurationManager);
+		configuration = new Configuration(configurationManager);
 		PersistenceFileManager accessLogManager = new PersistenceFileManager(name, "access.log");
 		accessLog = new AccessLog(accessLogManager);
 
@@ -47,9 +47,7 @@ public class Workspace {
 		}
 		else {
 			// If the configuration file exists, we'll open it.
-			if (!configuration.deserialize(configurationManager.getFile())) {
-				throw new RuntimeException("The configuration file can't be opened.");
-			}
+			configuration.deserialize(configurationManager.getFile());
 		}
 
 		try {
