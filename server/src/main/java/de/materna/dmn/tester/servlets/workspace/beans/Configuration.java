@@ -52,10 +52,6 @@ public class Configuration extends PublicConfiguration {
 		pubconfig.setAccess(this.access);
 		return pubconfig;
 	}
-	
-	public String printPublic() {
-		return getPublicConfig().printAsJson();
-	}
 
 	public String getToken() {
 		return token;

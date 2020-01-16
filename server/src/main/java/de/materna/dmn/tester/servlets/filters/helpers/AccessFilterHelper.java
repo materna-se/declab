@@ -2,7 +2,6 @@ package de.materna.dmn.tester.servlets.filters.helpers;
 
 import de.materna.dmn.tester.helpers.ByteHelper;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
-import jdk.internal.org.jline.utils.Log;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import java.net.MalformedURLException;
