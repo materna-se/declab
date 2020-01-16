@@ -27,8 +27,12 @@ public class WriteAccessFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
         try {
-            Workspace workspace = workspaceManager.get(AccessFilterHelper.matchPath(requestContext));
             if (workspace.getConfig().getMode() != Access.PRIVATE && workspace.getConfig().getMode() != Access.PROTECTED) {
+            Workspace workspace = workspaceManager.getByUUID(AccessFilterHelper.matchPath(requestContext));
+            if(workspace == null) {
+            	requestContext.abortWith(Response.status(Response.Status.NOT_FOUND).build());
+            	return;
+            }
                 return;
             }
 

@@ -37,9 +37,9 @@ public class ModelServlet {
 	@ReadAccess
 	@Path("/model")
 	@Produces("application/json")
-	public Response getModel(@PathParam("workspace") String workspaceName) {
+	public Response getModel(@PathParam("workspace") String workspaceUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 
 			DMNModel dmnModel = DroolsHelper.getModel(workspace.getDecisionSession());
 
@@ -58,9 +58,9 @@ public class ModelServlet {
 	@WriteAccess
 	@Path("/model")
 	@Consumes("text/xml")
-	public Response importModel(@PathParam("workspace") String workspaceName, String body) {
+	public Response importModel(@PathParam("workspace") String workspaceUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 
 			ImportResult importResult = workspace.getDecisionSession().importModel("main", "main", body);
 
@@ -83,9 +83,9 @@ public class ModelServlet {
 	@ReadAccess
 	@Path("/model/inputs")
 	@Produces("application/json")
-	public Response getInputs(@PathParam("workspace") String workspaceName) {
+	public Response getInputs(@PathParam("workspace") String workspaceUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			
 			DMNModel model = workspace.getDecisionSession().getRuntime().getModels().get(0);
 
@@ -105,9 +105,9 @@ public class ModelServlet {
 	@Path("/model/inputs")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public Response calculateModelResult(@PathParam("workspace") String workspaceName, String body) {
+	public Response calculateModelResult(@PathParam("workspace") String workspaceUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 
 			DMNModel dmnModel = DroolsHelper.getModel(workspace.getDecisionSession());
 

@@ -25,16 +25,16 @@ public class Workspace {
 
 	private DecisionSession decisionSession;
 
-	public Workspace(String name) throws IOException {
-		modelManager = new PersistenceFileManager(name, "model.dmn");
+	public Workspace(String workspaceUUID) throws IOException {
+		modelManager = new PersistenceFileManager(workspaceUUID, "model.dmn");
 
-		inputManager = new PersistenceDirectoryManager<>(name, "inputs", PersistedInput.class);
-		outputManager = new PersistenceDirectoryManager<>(name, "outputs", PersistedOutput.class);
-		testManager = new PersistenceDirectoryManager<>(name, "tests", PersistedTest.class);
+		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class);
+		outputManager = new PersistenceDirectoryManager<>(workspaceUUID, "outputs", PersistedOutput.class);
+		testManager = new PersistenceDirectoryManager<>(workspaceUUID, "tests", PersistedTest.class);
 
-		PersistenceFileManager configurationManager = new PersistenceFileManager(name, "configuration.json");
+		PersistenceFileManager configurationManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
 		configuration = new Configuration(configurationManager);
-		PersistenceFileManager accessLogManager = new PersistenceFileManager(name, "access.log");
+		PersistenceFileManager accessLogManager = new PersistenceFileManager(workspaceUUID, "access.log");
 		accessLog = new AccessLog(accessLogManager);
 
 		decisionSession = new DecisionSession();
