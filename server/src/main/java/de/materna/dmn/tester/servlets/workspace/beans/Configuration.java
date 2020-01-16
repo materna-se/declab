@@ -1,23 +1,18 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.jdec.serialization.SerializationHelper;
 
 import java.io.IOException;
 
-public class Configuration {
+public class Configuration extends PublicConfiguration {
 	private PersistenceFileManager fileManager;
 
-	private String version;
-	private String name;
-	private String description;
-
+	private String token = null;
 	private long createdDate = Long.MIN_VALUE;
 	private long modifiedDate = Long.MIN_VALUE;
-
-	private Access mode = Access.PUBLIC;
-	private String token = "";
 
 	public Configuration() {
 	}
@@ -44,41 +39,22 @@ public class Configuration {
 		description = configuration.getDescription();
 		createdDate = configuration.getCreatedDate();
 		modifiedDate = configuration.getModifiedDate();
-		mode = configuration.getMode();
+		access = configuration.getAccess();
 		token = configuration.getToken();
 	}
-
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
+	
+	@JsonIgnore
+	public PublicConfiguration getPublicConfig() {
+		PublicConfiguration pubconfig = new PublicConfiguration();
+		pubconfig.setVersion(this.version);
+		pubconfig.setName(this.name);
+		pubconfig.setDescription(this.description);
+		pubconfig.setAccess(this.access);
+		return pubconfig;
 	}
 	
-	public Access getMode() {
-		return mode;
-	}
-
-	public void setMode(Access mode) {
-		this.mode = mode;
+	public String printPublic() {
+		return getPublicConfig().printAsJson();
 	}
 
 	public String getToken() {
@@ -90,26 +66,22 @@ public class Configuration {
 	}
 
 	@JsonProperty
-	protected long getCreatedDate() {
+	public long getCreatedDate() {
 		return createdDate;
 	}
 
 	@JsonProperty
-	protected void setCreatedDate(long createdDate) {
+	public void setCreatedDate(long createdDate) {
 		this.createdDate = createdDate;
 	}
 
 	@JsonProperty
-	protected long getModifiedDate() {
+	public long getModifiedDate() {
 		return modifiedDate;
 	}
 
 	@JsonProperty
-	protected void setModifiedDate(long modifiedDate) {
+	public void setModifiedDate(long modifiedDate) {
 		this.modifiedDate = modifiedDate;
-	}
-
-	public enum Access {
-		PUBLIC, PROTECTED, PRIVATE;
 	}
 }

@@ -5,6 +5,7 @@ import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
+import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
 import de.materna.jdec.DecisionSession;
 import de.materna.jdec.model.ModelImportException;
 import org.apache.log4j.Logger;
@@ -41,6 +42,8 @@ public class Workspace {
 
 		if (!configurationManager.fileExists()) {
 			// If the configuration file doesn't exist yet, we'll create it with default values.
+			configuration.setVersion(1);
+			configuration.setAccess(Access.PUBLIC);
 			configuration.setCreatedDate(System.currentTimeMillis());
 			configuration.setModifiedDate(configuration.getCreatedDate());
 			configuration.serialize();

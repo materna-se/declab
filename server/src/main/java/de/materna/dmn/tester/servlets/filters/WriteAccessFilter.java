@@ -3,7 +3,7 @@ package de.materna.dmn.tester.servlets.filters;
 import de.materna.dmn.tester.helpers.ByteHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.helpers.AccessFilterHelper;
-import de.materna.dmn.tester.servlets.workspace.beans.Configuration.Access;
+import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import org.apache.log4j.Logger;
 
@@ -27,12 +27,12 @@ public class WriteAccessFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
         try {
-            if (workspace.getConfig().getMode() != Access.PRIVATE && workspace.getConfig().getMode() != Access.PROTECTED) {
             Workspace workspace = workspaceManager.getByUUID(AccessFilterHelper.matchPath(requestContext));
             if(workspace == null) {
             	requestContext.abortWith(Response.status(Response.Status.NOT_FOUND).build());
             	return;
             }
+            if (workspace.getConfig().getAccess() != Access.PRIVATE && workspace.getConfig().getAccess() != Access.PROTECTED) {
                 return;
             }
 
