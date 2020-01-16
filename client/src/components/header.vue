@@ -22,7 +22,7 @@
 	</nav>
 </template>
 
-<style>
+<style scoped>
 	.navbar,
 	.navbar .dropdown-item:active {
 		background: #7aade1;
@@ -53,6 +53,20 @@
 			return {
 				routes: [
 					{
+						name: "Education",
+						visible: false,
+						routes: [
+							{
+								name: "Playground",
+								path: "playground"
+							},
+							{
+								name: "Challenges",
+								path: "challenges"
+							}
+						]
+					},
+					{
 						name: "Execution",
 						visible: false,
 						routes: [
@@ -63,10 +77,6 @@
 							{
 								name: "Builder",
 								path: "builder"
-							},
-							{
-								name: "Playground",
-								path: "playground"
 							},
 							{
 								name: "Publisher",
