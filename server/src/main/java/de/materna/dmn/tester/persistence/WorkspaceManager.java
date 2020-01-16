@@ -21,24 +21,19 @@ public class WorkspaceManager {
 	private Map<String, Workspace> workspaces = new HashMap<>();
 
 	private WorkspaceManager() {
-		try {
-			indexAllWorkspaces();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	public Workspace getByUUID(String workspaceUUID) throws IOException {
 		Workspace workspace = workspaces.get(workspaceUUID);
 		
-		if (workspace == null && workspaceExists(workspaceUUID)) {
+		if (workspace == null && exists(workspaceUUID)) {
 			workspace = new Workspace(workspaceUUID);
 		}
 		return workspace;
 	}
 	
-	public Map<String, Workspace> getByName(String workspaceName) throws IOException {
-		Map<String, Workspace> matches = new HashMap<String, Workspace>();
+	public Map<String, Workspace> getByName(String workspaceName) {
+		Map<String, Workspace> matches = new HashMap<>();
 		for (Entry<String, Workspace> entry : workspaces.entrySet()) {
 			if(entry.getValue().getConfig().getName().equalsIgnoreCase(workspaceName)) {
 				matches.put(entry.getKey(), entry.getValue());
@@ -46,12 +41,8 @@ public class WorkspaceManager {
 		}
 		return matches;
 	}
-	
-	public Map<String, Workspace> getWorkspaces() {
-		return workspaces;
-	}
-	
-	public void indexAllWorkspaces() throws IOException {
+
+	public void index() throws IOException {
 		File dir = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces").toFile();
 		for(File subdir : dir.listFiles()) {
 			Workspace workspace = new Workspace(subdir.getName());
@@ -59,7 +50,7 @@ public class WorkspaceManager {
 		}
 	}
 	
-	public boolean workspaceExists(String workspaceUUID) throws IOException {
+	public boolean exists(String workspaceUUID) {
 		File dir = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces").toFile();
 		for(File subdir : dir.listFiles()) {
 			if(subdir.getName().equals(workspaceUUID)) {
@@ -83,5 +74,9 @@ public class WorkspaceManager {
 			instance = new WorkspaceManager();
 		}
 		return instance;
+	}
+
+	public Map<String, Workspace> getWorkspaces() {
+		return workspaces;
 	}
 }
