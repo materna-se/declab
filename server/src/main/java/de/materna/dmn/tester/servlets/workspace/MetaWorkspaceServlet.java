@@ -1,25 +1,25 @@
 package de.materna.dmn.tester.servlets.workspace;
 
-import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
-import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration;
-import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
-import de.materna.jdec.serialization.SerializationHelper;
-import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
-import de.materna.dmn.tester.helpers.ByteHelper;
-import de.materna.dmn.tester.persistence.WorkspaceManager;
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import de.materna.dmn.tester.helpers.ByteHelper;
+import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
+import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration;
+import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.jdec.serialization.SerializationHelper;
+import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,25 +32,14 @@ public class MetaWorkspaceServlet {
 	@Produces("application/json")
 	public Response getWorkspaces(@QueryParam("query") String query) {
 		try {
-			Map<String, Workspace> workspaces = new HashMap<String, Workspace>();
-			
-			if(query == null || query.length() == 0) {
-				workspaces = WorkspaceManager.getInstance().getWorkspaces();
-			} else {
-				workspaces = WorkspaceManager.getInstance().getByName(query);
-			}
-			
-			Map<String, PublicConfiguration> pubconfigs = new HashMap<String, PublicConfiguration>();
-			
-			//Get public configurations
+			Map<String, PublicConfiguration> configurations = new LinkedHashMap<>();
+
+			Map<String, Workspace> workspaces = query == null ? WorkspaceManager.getInstance().getWorkspaces() : WorkspaceManager.getInstance().getByName(query);
 			for (Map.Entry<String, Workspace> entry : workspaces.entrySet()) {
-				Configuration config = entry.getValue().getConfig();
-				pubconfigs.put(entry.getKey(), config.getPublicConfig());
+				configurations.put(entry.getKey(), entry.getValue().getConfig().getPublicConfig());
 			}
-			
-			String ret = SerializationHelper.getInstance().toJSON(pubconfigs);
-			
-			return Response.status(Response.Status.OK).entity(ret).build();
+
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(configurations)).build();
 		} catch (StringIndexOutOfBoundsException e) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		} catch (Exception e) {
@@ -66,10 +55,11 @@ public class MetaWorkspaceServlet {
 	@Produces("application/json")
 	public Response createWorkspace(String body) {
 		try {
-			HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, String>>() {});
+			HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, String>>() {
+			});
 
-			if(params == null || params.size() == 0 || !params.containsKey("name") || params.get("name").length() == 0
-					|| !params.containsKey("description") || !params.containsKey("access") || !params.containsKey("token")) {
+			// If required fields are not set, we will reject it.
+			if (!params.containsKey("name") || !params.containsKey("description") || !params.containsKey("access") || !params.containsKey("token")) {
 				return Response.status(Response.Status.BAD_REQUEST).build();
 			}
 
@@ -77,42 +67,39 @@ public class MetaWorkspaceServlet {
 			String description = params.get("description");
 			Access access = Access.valueOf(params.get("access"));
 			String token = params.get("token");
-
-			if(name == null || description == null || access == null || (token != null && token.length() == 0)) {
+			if(name == null || description == null) {
+				throw new BadRequestException();
+			}
+			// If the access mode does not match the token value, we will reject it.
+			if ((access == Access.PROTECTED && token == null) || (access == Access.PRIVATE && token == null) || (access == Access.PUBLIC && token != null)) {
 				return Response.status(Response.Status.BAD_REQUEST).build();
 			}
-			
-			if((access == Access.PROTECTED && token == null) || (access == Access.PRIVATE && token == null) || (access == Access.PUBLIC && token != null)) {
-				return Response.status(Response.Status.BAD_REQUEST).build();
-			}
-
-			if(token != null) {
+			// If the token is set, we need to hash it.
+			if (token != null) {
 				MessageDigest md = MessageDigest.getInstance("SHA3-512");
-				token = ByteHelper.byteArrayToHexString(md.digest(token.getBytes("UTF-8")));
+				token = ByteHelper.byteArrayToHexString(md.digest(token.getBytes(StandardCharsets.UTF_8)));
 			}
 
-			//Assign UUID
-			String workspaceUUID = UUID.randomUUID().toString();
+			String uuid = UUID.randomUUID().toString();
 
-			//Create workspace
-			Workspace newWorkspace = new Workspace(workspaceUUID);
-			Configuration newConfiguration = newWorkspace.getConfig();
-			newConfiguration.setName(name);
-			newConfiguration.setDescription(description);
-			newConfiguration.setAccess(access);
-			newConfiguration.setToken(token);
-			newConfiguration.setCreatedDate(System.currentTimeMillis());
-			newConfiguration.setModifiedDate(newWorkspace.getConfig().getCreatedDate());
-			newConfiguration.serialize();
+			Workspace workspace = new Workspace(uuid);
+			Configuration configuration = workspace.getConfig();
+			configuration.setName(name);
+			configuration.setDescription(description);
+			configuration.setAccess(access);
+			configuration.setToken(token);
+			configuration.setCreatedDate(System.currentTimeMillis());
+			configuration.setModifiedDate(configuration.getCreatedDate());
+			configuration.serialize();
 
-			//Index workspace
-			WorkspaceManager.getInstance().getWorkspaces().put(workspaceUUID, newWorkspace);
+			WorkspaceManager.getInstance().index();
 
-			//Return UUID
-			return Response.status(Response.Status.OK).entity(workspaceUUID).build();
-		} catch (JsonParseException  | JsonMappingException | IllegalArgumentException e) {
+			return Response.status(Response.Status.OK).entity(uuid).build();
+		}
+		catch (JsonParseException | JsonMappingException | IllegalArgumentException | BadRequestException e) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
-		} catch (IOException  | NoSuchAlgorithmException e) {
+		}
+		catch (IOException | NoSuchAlgorithmException e) {
 			log.error(e);
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
