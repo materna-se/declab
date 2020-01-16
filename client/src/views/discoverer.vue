@@ -124,7 +124,7 @@
 				this.options.results.length = 0;
 
 				const response = await Network.getRawResult(this.options.expression, {});
-				const elements = await response.json();
+				const elements = (await response.json()).outputs.main.value;
 
 				/**
 				 * Possible feel expressions:
