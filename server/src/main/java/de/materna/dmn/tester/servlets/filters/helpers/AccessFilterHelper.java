@@ -2,6 +2,7 @@ package de.materna.dmn.tester.servlets.filters.helpers;
 
 import de.materna.dmn.tester.helpers.ByteHelper;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import jdk.internal.org.jline.utils.Log;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import java.net.MalformedURLException;
@@ -41,7 +42,7 @@ public class AccessFilterHelper {
 			throw new RuntimeException("The authorization header doesn't include a bearer token.");
 		}
 
-		MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
+		MessageDigest messageDigest = MessageDigest.getInstance("SHA3-512");
 
 		String authorizationToken = authorizationHeader.substring(AUTHENTICATION_SCHEME.length() + 1);
 		String tokenHash = ByteHelper.byteArrayToHexString(messageDigest.digest(authorizationToken.getBytes(StandardCharsets.UTF_8)));
