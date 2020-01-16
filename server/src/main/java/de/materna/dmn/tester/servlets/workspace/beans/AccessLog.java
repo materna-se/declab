@@ -67,6 +67,10 @@ public class AccessLog {
 		}
 	}
 	
+	public String print() {
+		return SerializationHelper.getInstance().toJSON(this);
+	}
+	
 	public ArrayList<AccessLogEntry> getLog() {
 		return log;
 	}
