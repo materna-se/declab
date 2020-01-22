@@ -49,6 +49,7 @@
 	}
 
 	.dmn-decision {
+		background: #fdeb7a;
 		padding-top: 0.75rem;
 		padding-bottom: 0.75rem;
 
@@ -56,10 +57,12 @@
 	}
 
 	.dmn-bkm {
+		background: #9aeb9b;
 		border-radius: 15px 3px 15px 3px;
 	}
 
 	.dmn-input {
+		background: #92c0ff;
 		border-radius: 15px;
 	}
 </style>
