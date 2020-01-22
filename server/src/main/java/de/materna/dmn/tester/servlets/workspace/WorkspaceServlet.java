@@ -164,17 +164,19 @@ public class WorkspaceServlet {
 	@DELETE
 	@WriteAccess
 	@Path("")
-	public Response deleteWorkspace(@PathParam("workspace") String workspaceUUID) throws IOException {
+	public Response deleteWorkspace(@PathParam("workspace") String workspaceUUID) {
 		try {
 			WorkspaceManager wm = WorkspaceManager.getInstance();
-			if(wm.workspaceExists(workspaceUUID)) {
+			if (wm.exists(workspaceUUID)) {
 				wm.remove(workspaceUUID);
 				return Response.status(Response.Status.NO_CONTENT).build();
-			} else {
+			}
+			else {
 				return Response.status(Response.Status.NOT_FOUND).build();
 			}
 			
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error(e);
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
