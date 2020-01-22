@@ -66,15 +66,11 @@ public class WorkspaceServlet {
 	public Response getWorkspaceConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Configuration configuration = workspace.getConfig();
 			
-			Configuration config = workspace.getConfig();
-
-			String ret = config.printAsJson();
-			
-			workspace.getAccessLog().writeMessage("Accessed configuration", System.currentTimeMillis());
-			
-			return Response.status(Response.Status.OK).entity(ret).build();
-		} catch (Exception e) {
+			return Response.status(Response.Status.OK).entity(configuration.printAsJson()).build();
+		}
+		catch (Exception e) {
 			log.error(e);
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
