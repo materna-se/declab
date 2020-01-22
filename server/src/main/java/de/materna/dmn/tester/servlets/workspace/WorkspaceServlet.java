@@ -1,40 +1,34 @@
 package de.materna.dmn.tester.servlets.workspace;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import de.materna.dmn.tester.helpers.ByteHelper;
+import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
-import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.model.ModelImportException;
 import de.materna.jdec.serialization.SerializationHelper;
-import de.materna.dmn.tester.helpers.ByteHelper;
-import de.materna.dmn.tester.persistence.WorkspaceManager;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.UUID;
-import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -42,7 +36,7 @@ import java.util.zip.ZipOutputStream;
 @Path("/workspaces/{workspace}")
 public class WorkspaceServlet {
 	private static final Logger log = Logger.getLogger(WorkspaceServlet.class);
-	
+
 	@GET
 	@Path("/public")
 	@Produces("application/json")
@@ -50,7 +44,7 @@ public class WorkspaceServlet {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
-			
+
 			return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().printAsJson()).build();
 		}
 		catch (Exception e) {
@@ -58,7 +52,7 @@ public class WorkspaceServlet {
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
 	}
-	
+
 	@GET
 	@WriteAccess
 	@Path("/config")
@@ -67,7 +61,7 @@ public class WorkspaceServlet {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
-			
+
 			return Response.status(Response.Status.OK).entity(configuration.printAsJson()).build();
 		}
 		catch (Exception e) {
@@ -75,73 +69,76 @@ public class WorkspaceServlet {
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
 	}
-	
+
 	@POST
 	@WriteAccess
 	@Path("/config")
 	@Consumes("application/json")
 	public Response editWorkspaceConfig(@PathParam("workspace") String workspaceUUID, String body) throws RuntimeException, IOException {
 		try {
-			HashMap<String,String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, String>>() {});
-			
-			//Reject request if no changes are requested
-			if(params == null || params.size() == 0) {
-				return Response.status(Response.Status.BAD_REQUEST).build();
-			}
-			
+			HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, String>>() {
+			});
+
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
-			
-			Configuration config = workspace.getConfig();
-			
-			if(params.containsKey("name") && params.get("name") != null && params.get("name").length() > 0) {
-				config.setName(params.get("name"));
+			Configuration configuration = workspace.getConfig();
+
+			if (params.containsKey("name") && params.get("name") != null && params.get("name").length() > 0) {
+				configuration.setName(params.get("name"));
 			}
-			if(params.containsKey("description") && params.get("description") != null) {
-				config.setDescription(params.get("description"));
+
+			if (params.containsKey("description") && params.get("description") != null) {
+				configuration.setDescription(params.get("description"));
 			}
-			
-			//Do not allow invalid combinations of access and token
-			//If one parameter is passed, the other must be passed too
-			Access accessTemp = null;
-			String tokenTemp = null;
-			
-			if(params.containsKey("access")) {
-				accessTemp = Access.valueOf(params.get("access"));
-			}
-			
-			if(params.containsKey("token")) {
-				if(params.get("token") != null && params.get("token").length() > 0) {
-					MessageDigest md = MessageDigest.getInstance("SHA3-512");
-					tokenTemp = ByteHelper.byteArrayToHexString(md.digest(params.get("token").getBytes("UTF-8")));
-				} else {
-					config.setModifiedDate(System.currentTimeMillis());
-					config.serialize();
+
+			// Invalid combinations of access mode and token are not allowed.
+			// If one parameter is set, the other must be set too.
+			{
+				Access access = null;
+				String token = null;
+
+				if (params.containsKey("access")) {
+					access = Access.valueOf(params.get("access"));
+				}
+
+				if (params.containsKey("token")) {
+					if (params.get("token") != null && params.get("token").length() > 0) {
+						// TODO: Create a class (for instance HashHelper) that creates a MessageDigest and handles the hashing at one place.
+						MessageDigest md = MessageDigest.getInstance("SHA3-512");
+						token = ByteHelper.byteArrayToHexString(md.digest(params.get("token").getBytes(StandardCharsets.UTF_8)));
+					}
+					else {
+						configuration.setModifiedDate(System.currentTimeMillis());
+						configuration.serialize();
+						return Response.status(Response.Status.BAD_REQUEST).build();
+					}
+				}
+
+				if ((access == null && token != null) || (access != Access.PUBLIC && token == null)) {
+					configuration.setModifiedDate(System.currentTimeMillis());
+					configuration.serialize();
 					return Response.status(Response.Status.BAD_REQUEST).build();
 				}
+
+				configuration.setAccess(access);
+				configuration.setToken(token);
 			}
-			
-			if((accessTemp == null && tokenTemp != null) || (accessTemp != Access.PUBLIC && tokenTemp == null)) {
-				config.setModifiedDate(System.currentTimeMillis());
-				config.serialize();
-				return Response.status(Response.Status.BAD_REQUEST).build();
-			}
-			
-			config.setAccess(accessTemp);
-			config.setToken(tokenTemp);
-			config.setModifiedDate(System.currentTimeMillis());
-			config.serialize();
-			
+
+			configuration.setModifiedDate(System.currentTimeMillis());
+			configuration.serialize();
+
 			workspace.getAccessLog().writeMessage("Edited configuration", System.currentTimeMillis());
-			
+
 			return Response.status(Response.Status.OK).build();
-		} catch (IllegalArgumentException | JsonParseException | JsonMappingException e) {
+		}
+		catch (IllegalArgumentException | JsonParseException | JsonMappingException e) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error(e);
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
 	}
-	
+
 	@GET
 	@WriteAccess
 	@Path("/log")
@@ -149,18 +146,17 @@ public class WorkspaceServlet {
 	public Response getWorkspaceAccessLog(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
-			
-			String ret = workspace.getAccessLog().print();
-			
+
 			workspace.getAccessLog().writeMessage("Accessed log", System.currentTimeMillis());
-			
-			return Response.status(Response.Status.OK).entity(ret).build();
-		} catch (Exception e) {
+
+			return Response.status(Response.Status.OK).entity(workspace.getAccessLog().print()).build();
+		}
+		catch (Exception e) {
 			log.error(e);
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
 	}
-	
+
 	@DELETE
 	@WriteAccess
 	@Path("")
@@ -174,14 +170,13 @@ public class WorkspaceServlet {
 			else {
 				return Response.status(Response.Status.NOT_FOUND).build();
 			}
-			
 		}
 		catch (Exception e) {
 			log.error(e);
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
 	}
-	
+
 	@GET
 	@ReadAccess
 	@Path("/backup")
@@ -249,7 +244,7 @@ public class WorkspaceServlet {
 		}
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
-	
+
 	private String getRelativePath(java.nio.file.Path path, String workspaceName) {
 		String pathName = path.getFileName().toString();
 		String parentPathName = path.getParent().getFileName().toString();
