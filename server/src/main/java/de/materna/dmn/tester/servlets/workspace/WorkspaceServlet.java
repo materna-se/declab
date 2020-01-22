@@ -44,17 +44,16 @@ public class WorkspaceServlet {
 	private static final Logger log = Logger.getLogger(WorkspaceServlet.class);
 	
 	@GET
-	@Path("/publicconfig")
+	@Path("/public")
 	@Produces("application/json")
 	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Configuration configuration = workspace.getConfig();
 			
-			Configuration config = workspace.getConfig();
-
-			String ret = config.printPublic();
-			return Response.status(Response.Status.OK).entity(ret).build();
-		} catch (Exception e) {
+			return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().printAsJson()).build();
+		}
+		catch (Exception e) {
 			log.error(e);
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
