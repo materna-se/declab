@@ -16,6 +16,17 @@ export default {
 		});
 	},
 
+	getWorkspace() {
+		return fetch(this._endpoint + "/config").then(function (response) {
+			return response.json();
+		});
+	},
+
+	async getWorkspaceLog() {
+		const response = await fetch(this._endpoint + "/log");
+		return (await response.json()).log;
+	},
+
 	//
 	// Model
 	//
