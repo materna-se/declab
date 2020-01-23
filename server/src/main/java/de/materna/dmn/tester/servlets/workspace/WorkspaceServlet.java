@@ -3,7 +3,7 @@ package de.materna.dmn.tester.servlets.workspace;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import de.materna.dmn.tester.helpers.ByteHelper;
+import de.materna.dmn.tester.helpers.HashingHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
@@ -24,10 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -82,11 +80,19 @@ public class WorkspaceServlet {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
 
-			if (params.containsKey("name") && params.get("name") != null && params.get("name").length() > 0) {
+			if (params.containsKey("name")) {
+				if (params.get("name") != null && params.get("name").length() > 0) {
+					throw new BadRequestException();
+				}
+
 				configuration.setName(params.get("name"));
 			}
 
-			if (params.containsKey("description") && params.get("description") != null) {
+			if (params.containsKey("description")) {
+				if (params.get("description") != null) {
+					throw new BadRequestException();
+				}
+
 				configuration.setDescription(params.get("description"));
 			}
 
@@ -101,22 +107,15 @@ public class WorkspaceServlet {
 				}
 
 				if (params.containsKey("token")) {
-					if (params.get("token") != null && params.get("token").length() > 0) {
-						// TODO: Create a class (for instance HashHelper) that creates a MessageDigest and handles the hashing at one place.
-						MessageDigest md = MessageDigest.getInstance("SHA3-512");
-						token = ByteHelper.byteArrayToHexString(md.digest(params.get("token").getBytes(StandardCharsets.UTF_8)));
+					if (params.get("token") == null || params.get("token").length() <= 0) {
+						throw new BadRequestException();
 					}
-					else {
-						configuration.setModifiedDate(System.currentTimeMillis());
-						configuration.serialize();
-						return Response.status(Response.Status.BAD_REQUEST).build();
-					}
+
+					token = HashingHelper.getInstance().getHash(params.get("token"));
 				}
 
 				if ((access == null && token != null) || (access != Access.PUBLIC && token == null)) {
-					configuration.setModifiedDate(System.currentTimeMillis());
-					configuration.serialize();
-					return Response.status(Response.Status.BAD_REQUEST).build();
+					throw new BadRequestException();
 				}
 
 				configuration.setAccess(access);
@@ -130,7 +129,7 @@ public class WorkspaceServlet {
 
 			return Response.status(Response.Status.OK).build();
 		}
-		catch (IllegalArgumentException | JsonParseException | JsonMappingException e) {
+		catch (IllegalArgumentException | JsonParseException | JsonMappingException | BadRequestException e) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 		catch (Exception e) {
