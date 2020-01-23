@@ -43,6 +43,7 @@ public class Workspace {
 		if (!configurationManager.fileExists()) {
 			// If the configuration file doesn't exist yet, we'll create it with default values.
 			configuration.setVersion(1);
+			configuration.setName(workspaceUUID);
 			configuration.setAccess(Access.PUBLIC);
 			configuration.setCreatedDate(System.currentTimeMillis());
 			configuration.setModifiedDate(configuration.getCreatedDate());

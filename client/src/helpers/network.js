@@ -1,8 +1,19 @@
 export default {
+	_host: null,
 	_endpoint: null,
 
 	setEndpoint(host, workspace) {
+		this._host = host;
 		this._endpoint = host + (workspace !== undefined ? "/workspaces/" + workspace : "");
+	},
+
+	//
+	// Workspace
+	//
+	getWorkspaces() {
+		return fetch(this._host + "/workspaces").then(function (response) {
+			return response.json();
+		});
 	},
 
 	//

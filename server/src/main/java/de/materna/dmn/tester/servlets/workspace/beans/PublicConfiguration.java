@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class PublicConfiguration {
 
 	public int version;
-	public String name = "";
-	public String description = "";
+	public String name;
+	public String description;
 	public Access access = Access.PUBLIC;
 	
 	public PublicConfiguration() {
@@ -16,8 +16,7 @@ public class PublicConfiguration {
 	}
 	
 	public String printAsJson() {
-		String json = (String) SerializationHelper.getInstance().toJSON(this);
-		return json;
+		return SerializationHelper.getInstance().toJSON(this);
 	}
 	
 	@JsonProperty
