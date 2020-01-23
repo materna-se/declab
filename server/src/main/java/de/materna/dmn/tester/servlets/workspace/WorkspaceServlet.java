@@ -81,23 +81,30 @@ public class WorkspaceServlet {
 			Configuration configuration = workspace.getConfig();
 
 			if (params.containsKey("name")) {
-				if (params.get("name") != null && params.get("name").length() > 0) {
+				String name = params.get("name");
+				if (name == null || name.length() == 0) {
 					throw new BadRequestException();
 				}
-
-				configuration.setName(params.get("name"));
+				configuration.setName(name);
 			}
 
 			if (params.containsKey("description")) {
-				if (params.get("description") != null) {
+				String description = params.get("description");
+				if (description == null) {
 					throw new BadRequestException();
 				}
+				configuration.setDescription(description);
+			}
 
-				configuration.setDescription(params.get("description"));
+			if (params.containsKey("description")) {
+				String description = params.get("description");
+				if (description == null) {
+					throw new BadRequestException();
+				}
+				configuration.setDescription(description);
 			}
 
 			// Invalid combinations of access mode and token are not allowed.
-			// If one parameter is set, the other must be set too.
 			{
 				Access access = null;
 				String token = null;
@@ -107,19 +114,23 @@ public class WorkspaceServlet {
 				}
 
 				if (params.containsKey("token")) {
-					if (params.get("token") == null || params.get("token").length() <= 0) {
+					token = params.get("token");
+					if (token == null || token.length() == 0) {
 						throw new BadRequestException();
 					}
-
-					token = HashingHelper.getInstance().getHash(params.get("token"));
 				}
 
-				if ((access == null && token != null) || (access != Access.PUBLIC && token == null)) {
+				// If the access mode does not match the token value, we will reject it.
+				if ((access == null && token != null) || ((access == Access.PROTECTED || access == Access.PRIVATE) && token == null)) {
 					throw new BadRequestException();
 				}
 
-				configuration.setAccess(access);
-				configuration.setToken(token);
+				if (access != null) {
+					configuration.setAccess(access);
+				}
+				if (token != null) {
+					configuration.setToken(HashingHelper.getInstance().getHash(token));
+				}
 			}
 
 			configuration.setModifiedDate(System.currentTimeMillis());
