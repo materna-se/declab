@@ -81,6 +81,7 @@ public class WorkspaceServlet {
 			Configuration configuration = workspace.getConfig();
 
 			if (params.containsKey("name")) {
+				// The name is required, we will the reject the request if the value is not valid.
 				String name = params.get("name");
 				if (name == null || name.length() == 0) {
 					throw new BadRequestException();
@@ -88,6 +89,7 @@ public class WorkspaceServlet {
 				configuration.setName(name);
 			}
 
+			// The description is optional, we will set it if the value is valid.
 			if (params.containsKey("description")) {
 				String description = params.get("description");
 				if (description == null) {
@@ -96,15 +98,7 @@ public class WorkspaceServlet {
 				configuration.setDescription(description);
 			}
 
-			if (params.containsKey("description")) {
-				String description = params.get("description");
-				if (description == null) {
-					throw new BadRequestException();
-				}
-				configuration.setDescription(description);
-			}
-
-			// Invalid combinations of access mode and token are not allowed.
+			// The access mode and token are optional, we will set them if the combination is valid.
 			{
 				Access access = null;
 				String token = null;
@@ -121,7 +115,7 @@ public class WorkspaceServlet {
 				}
 
 				// If the access mode does not match the token value, we will reject it.
-				if ((access == null && token != null) || ((access == Access.PROTECTED || access == Access.PRIVATE) && token == null)) {
+				if (access != Access.PUBLIC && token == null) {
 					throw new BadRequestException();
 				}
 

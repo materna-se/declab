@@ -63,27 +63,28 @@ public class MetaWorkspaceServlet {
 			Workspace workspace = new Workspace(uuid);
 			Configuration configuration = workspace.getConfig();
 
-			// If required fields are not set, we will reject it.
+			// The name is required, we will the reject the request if the value is not valid.
 			String name = params.get("name");
 			if (name == null || name.length() == 0) {
 				throw new BadRequestException();
 			}
 			configuration.setName(name);
 
-			String description = params.get("description");
-			if (description == null || description.length() == 0) {
-				throw new BadRequestException();
-			}
-			configuration.setDescription(description);
-
-			// Invalid combinations of access mode and token are not allowed.
-			{
-				Access access = null;
-				String token = null;
-
-				if (params.containsKey("access")) {
-					access = Access.valueOf(params.get("access"));
+			// The description is optional, we will set it if the value is valid.
+			if (params.containsKey("description")) {
+				String description = params.get("description");
+				if (description == null) {
+					throw new BadRequestException();
 				}
+				configuration.setDescription(description);
+			}
+
+			// The access mode and token are optional, we will set them if the combination is valid.
+			{
+				Access access = Access.valueOf(params.get("access"));
+				configuration.setAccess(access);
+
+				String token = null;
 
 				if (params.containsKey("token")) {
 					token = params.get("token");
@@ -93,12 +94,8 @@ public class MetaWorkspaceServlet {
 				}
 
 				// If the access mode does not match the token value, we will reject it.
-				if ((access == null && token != null) || ((access == Access.PROTECTED || access == Access.PRIVATE) && token == null)) {
+				if (access != Access.PUBLIC && token == null) {
 					throw new BadRequestException();
-				}
-
-				if (access != null) {
-					configuration.setAccess(access);
 				}
 				if (token != null) {
 					configuration.setToken(HashingHelper.getInstance().getHash(token));
@@ -109,11 +106,13 @@ public class MetaWorkspaceServlet {
 			configuration.setModifiedDate(configuration.getCreatedDate());
 			configuration.serialize();
 
+			// Load the new workspace into the index.
 			WorkspaceManager.getInstance().index();
 
-			return Response.status(Response.Status.OK).entity(uuid).build();
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(uuid)).build();
 		}
 		catch (JsonParseException | JsonMappingException | IllegalArgumentException | BadRequestException e) {
+			log.error(e);
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 		catch (IOException | NoSuchAlgorithmException e) {
