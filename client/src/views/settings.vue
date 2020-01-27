@@ -54,6 +54,7 @@
 			</div>
 		</div>
 		<div class="col-12">
+			<h4 class="mb-2">Access Log</h4>
 			<div class="list-group mb-4">
 				<div class="list-group-item" v-for="entry of log">
 					<p class="mb-0"><b>{{entry.timestamp}}:</b> {{entry.message}}</p>
@@ -104,6 +105,8 @@
 				}).reverse();
 			},
 			async editWorkspace() {
+				this.$root.displayAlert(null, null);
+
 				const name = this.serverConfiguration.name;
 				if (name === null || name === "") {
 					this.$root.displayAlert("You need to enter a name.", "danger");

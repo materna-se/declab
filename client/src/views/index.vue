@@ -64,23 +64,23 @@
 				this.workspaces = await Network.getWorkspaces();
 			},
 			async createWorkspace() {
-				const name = this.configuration.name;
+				const name = this.workspace.name;
 				if (name === null || name === "") {
 					this.$root.displayAlert("You need to enter a name.", "danger");
 					return;
 				}
 
-				let description = this.configuration.description;
+				let description = this.workspace.description;
 				if (description === null || description === "") {
 					description = undefined;
 				}
 
-				let token = this.configuration.token;
+				let token = this.workspace.token;
 				if (token === null || token === "") {
 					token = undefined;
 				}
 
-				let access = this.configuration.access;
+				let access = this.workspace.access;
 				if (access !== "PUBLIC" && token === undefined) {
 					this.$root.displayAlert("You need to enter a password when you set the access mode to " + access.toLowerCase() + ".", "danger");
 				}

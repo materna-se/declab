@@ -5,5 +5,12 @@ export default {
 	},
 	setDeveloperMode(value) {
 		return localStorage.setItem("developerMode", JSON.stringify(value));
+	},
+	getToken() {
+		const value = localStorage.getItem("token");
+		return value === null ? undefined : JSON.parse(value);
+	},
+	setToken(value) {
+		return localStorage.setItem("token", JSON.stringify(value));
 	}
 }
