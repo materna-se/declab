@@ -66,7 +66,32 @@
 					return;
 				}
 
-				await this.$router.push('/' + workspace + '/model');
+				let description = this.configuration.description;
+				if (description === null || description === "") {
+					description = undefined;
+				}
+
+				let token = this.configuration.token;
+				if (token === null || token === "") {
+					token = undefined;
+				}
+
+				let access = this.configuration.access;
+				if (access !== "PUBLIC" && token === undefined) {
+					this.$root.displayAlert("You need to enter a password when you set the access mode to " + access.toLowerCase() + ".", "danger");
+				}
+
+				const id = await Network.createWorkspace({
+					name: name,
+					description: description,
+					access: access,
+					token: token
+				});
+
+				await this.enterWorkspace(id);
+			},
+			async enterWorkspace(id) {
+				await this.$router.push('/' + id + '/model');
 			}
 		},
 		async mounted() {

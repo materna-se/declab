@@ -22,6 +22,16 @@ export default {
 		});
 	},
 
+	createWorkspace(input) {
+		return fetch(this._host + "/workspaces", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(input)
+		}).then(function (response) {
+			return response.json();
+		});
+	},
+
 	async getWorkspaceLog() {
 		const response = await fetch(this._endpoint + "/log");
 		return (await response.json()).log;
