@@ -10,6 +10,16 @@ export default {
 	//
 	// Workspace
 	//
+	createWorkspace(input) {
+		return fetch(this._host + "/workspaces", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(input)
+		}).then(function (response) {
+			return response.json();
+		});
+	},
+
 	getWorkspaces() {
 		return fetch(this._host + "/workspaces").then(function (response) {
 			return response.json();
@@ -22,13 +32,11 @@ export default {
 		});
 	},
 
-	createWorkspace(input) {
-		return fetch(this._host + "/workspaces", {
+	async editWorkspace(input) {
+		 await fetch(this._endpoint + "/config", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
-		}).then(function (response) {
-			return response.json();
 		});
 	},
 

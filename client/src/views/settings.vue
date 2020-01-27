@@ -6,12 +6,12 @@
 					<h4 class="mb-0">Configuration</h4>
 				</div>
 				<div class="card-body">
-					<configurator class="mb-2" v-bind:configuration="workspace"></configurator>
-					<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="() => {}">Save Configuration</button>
+					<configurator class="mb-2" v-bind:configuration="serverConfiguration"></configurator>
+					<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="editWorkspace">Save Configuration</button>
 
 					<h5 class="mb-2">Developer Mode</h5>
 					<p class="mb-2">The developer mode enables features like using raw JSON in the builder. It is intended for developers and should be used with caution.</p>
-					<input type="checkbox" v-model="configuration.developerMode" v-on:change="updateDeveloperMode">
+					<input type="checkbox" v-model="clientConfiguration.developerMode" v-on:change="updateDeveloperMode">
 				</div>
 			</div>
 		</div>
@@ -36,7 +36,7 @@
 							<h4 class="mb-0">Export</h4>
 						</div>
 						<div class="card-body">
-							<a v-bind:href="configuration.endpoint">
+							<a v-bind:href="clientConfiguration.endpoint">
 								<button class="btn btn-block btn-outline-secondary">Export</button>
 							</a>
 						</div>
@@ -80,23 +80,57 @@
 		},
 		data() {
 			return {
-				workspace: null,
-				log: [],
-				configuration: {
+				serverConfiguration: {
+					name: null,
+					description: null,
+					access: "PUBLIC",
+					token: null,
+				},
+				clientConfiguration: {
 					endpoint: Network._endpoint,
 					developerMode: Configuration.getDeveloperMode(),
-				}
+				},
+				log: []
 			};
 		},
 		methods: {
 			async getWorkspace() {
-				this.workspace = await Network.getWorkspace();
+				this.serverConfiguration = await Network.getWorkspace();
 			},
 			async getWorkspaceLog() {
 				this.log = (await Network.getWorkspaceLog()).map(value => {
 					value.timestamp = format(value.timestamp);
 					return value;
 				}).reverse();
+			},
+			async editWorkspace() {
+				const name = this.serverConfiguration.name;
+				if (name === null || name === "") {
+					this.$root.displayAlert("You need to enter a name.", "danger");
+					return;
+				}
+
+				let description = this.serverConfiguration.description;
+				if (description === null || description === "") {
+					description = undefined;
+				}
+
+				let token = this.serverConfiguration.token;
+				if (token === null || token === "") {
+					token = undefined;
+				}
+
+				let access = this.serverConfiguration.access;
+				if (access !== "PUBLIC" && token === undefined) {
+					this.$root.displayAlert("You need to enter a password when you set the access mode to " + access.toLowerCase() + ".", "danger");
+				}
+
+				await Network.editWorkspace({
+					name: name,
+					description: description,
+					access: access,
+					token: token
+				});
 			},
 			async importWorkspace(event) {
 				this.$root.loading = true;
@@ -122,7 +156,7 @@
 
 			// Helpers
 			updateDeveloperMode() {
-				Configuration.setDeveloperMode(this.configuration.developerMode);
+				Configuration.setDeveloperMode(this.clientConfiguration.developerMode);
 			}
 		},
 		async mounted() {
