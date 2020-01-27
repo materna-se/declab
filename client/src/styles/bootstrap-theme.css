@@ -1,5 +1,6 @@
 body {
-	font-family: "Source Sans Pro", sans-serif;
+	font-family: "Noto Sans", sans-serif;
+	font-size: 0.95rem;
 }
 
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
@@ -30,6 +31,10 @@ pre, code {
 
 .btn-outline-secondary {
 	border-color: rgba(0, 0, 0, .125);
+}
+
+.bg-primary {
+	background-color: #7aade1 !important;
 }
 
 .bg-success {
@@ -118,6 +123,10 @@ pre, code {
 	text-decoration: underline;
 }
 
-.small, small {
-	font-size: 90%;
+code {
+	font-size: 0.85rem;
+}
+
+small {
+	font-size: 0.75rem;
 }

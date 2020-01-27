@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>com.github.materna-se</groupId>
 			<artifactId>jdec</artifactId>
-			<version>1.5.14-SNAPSHOT</version>
+			<version>1.5.17-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: circleci/node:12.10.0-stretch
     environment:
-      API_HOST: ./api
+      DECLAB_HOST: ./api
     steps:
       - attach_workspace:
           at: ~/project
