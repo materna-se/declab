@@ -7,13 +7,9 @@
 				<h4 class="mb-2">Workspaces</h4>
 
 				<div class="list-group mb-2">
-					<div class="list-group-item d-flex">
-						<input placeholder="Enter Workspace Name..." class="form-control flex-fill mr-2" v-model="workspace" v-on:keydown.enter="enterWorkspace(workspace)">
-						<button class="btn btn-outline-secondary" v-on:click="enterWorkspace(workspace)">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
-								<path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z" fill="currentColor"/>
-							</svg>
-						</button>
+					<div class="list-group-item">
+						<configurator class="mb-2" v-bind:configuration="workspace"></configurator>
+						<button class="btn btn-block btn-outline-secondary" v-on:click="createWorkspace">Enter Workspace</button>
 					</div>
 				</div>
 
@@ -44,15 +40,22 @@
 
 <script>
 	import EmptyCollectionComponent from "../components/empty-collection.vue";
+	import ConfiguratorComponent from "../components/configurator.vue";
 	import Network from "../helpers/network";
 
 	export default {
 		components: {
-			"empty-collection": EmptyCollectionComponent
+			"empty-collection": EmptyCollectionComponent,
+			"configurator": ConfiguratorComponent,
 		},
 		data() {
 			return {
-				workspace: null,
+				workspace: {
+					name: null,
+					description: null,
+					access: "PUBLIC",
+					token: null
+				},
 				workspaces: []
 			}
 		},
@@ -60,9 +63,10 @@
 			async getWorkspaces() {
 				this.workspaces = await Network.getWorkspaces();
 			},
-			async enterWorkspace(workspace) {
-				if (workspace === null || workspace === "") {
-					this.$root.displayAlert("The workspace name is not valid.", "danger");
+			async createWorkspace() {
+				const name = this.configuration.name;
+				if (name === null || name === "") {
+					this.$root.displayAlert("You need to enter a name.", "danger");
 					return;
 				}
 
