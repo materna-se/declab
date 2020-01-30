@@ -2,7 +2,10 @@ package de.materna.dmn.tester.servlets.test.beans;
 
 import java.util.Map;
 
-public class TestResult {
+import de.materna.dmn.tester.helpers.Serializable;
+import de.materna.jdec.serialization.SerializationHelper;
+
+public class TestResult extends Serializable {
 	private Map<String, TestResultOutput> outputs;
 
 	public TestResult(Map<String, TestResultOutput> outputs) {
@@ -21,5 +24,10 @@ public class TestResult {
 		}
 
 		return true;
+	}
+	
+	public void fromJson(String json) {
+		TestResult temp = (TestResult) SerializationHelper.getInstance().toClass(json, TestResult.class);
+		this.outputs = temp.getOutputs();
 	}
 }

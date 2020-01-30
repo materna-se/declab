@@ -31,17 +31,6 @@ public class Configuration extends PublicConfiguration {
 		}
 	}
 
-	public void deserialize(String body) {
-		Configuration configuration = (Configuration) SerializationHelper.getInstance().toClass(body, Configuration.class);
-
-		version = configuration.getVersion();
-		name = configuration.getName();
-		description = configuration.getDescription();
-		createdDate = configuration.getCreatedDate();
-		modifiedDate = configuration.getModifiedDate();
-		access = configuration.getAccess();
-		token = configuration.getToken();
-	}
 	
 	@JsonIgnore
 	public PublicConfiguration getPublicConfig() {
@@ -79,5 +68,17 @@ public class Configuration extends PublicConfiguration {
 	@JsonProperty
 	public void setModifiedDate(long modifiedDate) {
 		this.modifiedDate = modifiedDate;
+	}
+	
+	@Override
+	public void fromJson(String body) {
+		Configuration temp = (Configuration) SerializationHelper.getInstance().toClass(body, Configuration.class);
+		this.version = temp.getVersion();
+		this.name = temp.getName();
+		this.description = temp.getDescription();
+		this.createdDate = temp.getCreatedDate();
+		this.modifiedDate = temp.getModifiedDate();
+		this.access = temp.getAccess();
+		this.token = temp.getToken();
 	}
 }

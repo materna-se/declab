@@ -1,12 +1,13 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.jdec.serialization.SerializationHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AccessLog {
+public class AccessLog extends Serializable {
 	private PersistenceFileManager fileManager;
 	private ArrayList<AccessLogEntry> log = new ArrayList<>();
 	private final int logLength = 1000;
@@ -77,6 +78,11 @@ public class AccessLog {
 
 	public void setLog(ArrayList<AccessLogEntry> log) {
 		this.log = log;
+	}
+	
+	public void fromJson(String json) {
+		AccessLog temp = (AccessLog) SerializationHelper.getInstance().toClass(json, AccessLog.class);
+		this.log = temp.getLog();
 	}
 
 	public static class AccessLogEntry {

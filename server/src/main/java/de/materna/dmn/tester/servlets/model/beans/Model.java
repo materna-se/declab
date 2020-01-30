@@ -4,12 +4,15 @@ import org.kie.dmn.api.core.ast.BusinessKnowledgeModelNode;
 import org.kie.dmn.api.core.ast.DecisionNode;
 import org.kie.dmn.api.core.ast.DecisionServiceNode;
 
+import de.materna.dmn.tester.helpers.Serializable;
+import de.materna.jdec.serialization.SerializationHelper;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class Model {
+public class Model extends Serializable {
 	private String name;
 	private List<String> decisions;
 	private List<String> knowledgeModels;
@@ -54,5 +57,13 @@ public class Model {
 
 	public List<String> getDecisionServices() {
 		return decisionServices;
+	}
+	
+	public void fromJson(String json) {
+		Model temp = (Model) SerializationHelper.getInstance().toClass(json, Model.class);
+		this.name = temp.getName();
+		this.decisions = temp.getDecisions();
+		this.knowledgeModels = temp.getKnowledgeModels();
+		this.decisionServices = temp.getDecisionServices();
 	}
 }

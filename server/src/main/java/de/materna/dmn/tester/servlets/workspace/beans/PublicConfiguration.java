@@ -1,10 +1,11 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class PublicConfiguration {
+public class PublicConfiguration extends Serializable {
 
 	public int version;
 	public String name;
@@ -15,9 +16,6 @@ public class PublicConfiguration {
 		
 	}
 	
-	public String printAsJson() {
-		return SerializationHelper.getInstance().toJSON(this);
-	}
 	
 	@JsonProperty
 	public int getVersion() {
@@ -57,6 +55,14 @@ public class PublicConfiguration {
 	@JsonProperty
 	public void setAccess(Access mode) {
 		this.access = mode;
+	}
+	
+	public void fromJson(String json) {
+		PublicConfiguration temp = (PublicConfiguration) SerializationHelper.getInstance().toClass(json, PublicConfiguration.class); 
+		this.version = temp.getVersion();
+		this.name = temp.getName();
+		this.description = temp.getDescription();
+		this.access = temp.getAccess();
 	}
 	
 	public enum Access {

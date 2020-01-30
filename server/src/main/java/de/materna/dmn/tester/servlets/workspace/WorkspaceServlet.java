@@ -43,7 +43,7 @@ public class WorkspaceServlet {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
 
-			return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().printAsJson()).build();
+			return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJson()).build();
 		}
 		catch (Exception e) {
 			log.error(e);
@@ -60,7 +60,7 @@ public class WorkspaceServlet {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
 
-			return Response.status(Response.Status.OK).entity(configuration.printAsJson()).build();
+			return Response.status(Response.Status.OK).entity(configuration.toJson()).build();
 		}
 		catch (Exception e) {
 			log.error(e);
