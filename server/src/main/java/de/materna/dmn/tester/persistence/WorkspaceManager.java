@@ -59,6 +59,10 @@ public class WorkspaceManager {
 		}
 		return false;
 	}
+	
+	public void add(String uuid, Workspace workspace) {
+		workspaces.put(uuid, workspace);
+	}
 
 	public void remove(String uuid) throws IOException {
 		FileUtils.deleteDirectory(Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", uuid).toFile());
