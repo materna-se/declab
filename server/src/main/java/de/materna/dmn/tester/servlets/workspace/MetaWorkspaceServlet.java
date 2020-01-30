@@ -107,7 +107,7 @@ public class MetaWorkspaceServlet {
 			configuration.serialize();
 
 			// Load the new workspace into the index.
-			WorkspaceManager.getInstance().index();
+			WorkspaceManager.getInstance().add(uuid, workspace);
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(uuid)).build();
 		}

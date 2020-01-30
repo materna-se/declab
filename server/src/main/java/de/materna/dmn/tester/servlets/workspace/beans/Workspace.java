@@ -51,7 +51,7 @@ public class Workspace {
 		}
 		else {
 			// If the configuration file exists, we'll open it.
-			configuration.deserialize(configurationManager.getFile());
+			configuration.fromJson(configurationManager.getFile());
 		}
 
 		try {

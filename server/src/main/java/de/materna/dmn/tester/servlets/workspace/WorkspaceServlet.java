@@ -43,7 +43,7 @@ public class WorkspaceServlet {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
 
-			return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().printAsJson()).build();
+			return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJson()).build();
 		}
 		catch (Exception e) {
 			log.error(e);
@@ -60,7 +60,7 @@ public class WorkspaceServlet {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
 
-			return Response.status(Response.Status.OK).entity(configuration.printAsJson()).build();
+			return Response.status(Response.Status.OK).entity(configuration.toJson()).build();
 		}
 		catch (Exception e) {
 			log.error(e);
@@ -79,6 +79,10 @@ public class WorkspaceServlet {
 
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
+			
+			//Store changes in temporary configuration to avoid situations where a change to the configuration object
+			//has been made but not logged or serialized
+			Configuration tempConfig = new Configuration();
 
 			if (params.containsKey("name")) {
 				// The name is required, we will the reject the request if the value is not valid.
@@ -86,7 +90,7 @@ public class WorkspaceServlet {
 				if (name == null || name.length() == 0) {
 					throw new BadRequestException();
 				}
-				configuration.setName(name);
+				tempConfig.setName(name);
 			}
 
 			// The description is optional, we will set it if the value is valid.
@@ -95,7 +99,7 @@ public class WorkspaceServlet {
 				if (description == null) {
 					throw new BadRequestException();
 				}
-				configuration.setDescription(description);
+				tempConfig.setDescription(description);
 			}
 
 			// The access mode and token are optional, we will set them if the combination is valid.
@@ -120,12 +124,17 @@ public class WorkspaceServlet {
 				}
 
 				if (access != null) {
-					configuration.setAccess(access);
+					tempConfig.setAccess(access);
 				}
 				if (token != null) {
-					configuration.setToken(HashingHelper.getInstance().getHash(token));
+					tempConfig.setToken(HashingHelper.getInstance().getHash(token));
 				}
 			}
+
+			configuration.setName(tempConfig.getName());
+			configuration.setDescription(tempConfig.getDescription());
+			configuration.setAccess(tempConfig.getAccess());
+			configuration.setToken(tempConfig.getToken());
 
 			configuration.setModifiedDate(System.currentTimeMillis());
 			configuration.serialize();
