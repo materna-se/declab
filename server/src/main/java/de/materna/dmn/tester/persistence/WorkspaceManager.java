@@ -60,13 +60,13 @@ public class WorkspaceManager {
 		return false;
 	}
 
-	public void remove(String name) throws IOException {
-		FileUtils.deleteDirectory(Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", name).toFile());
-		invalidate(name);
+	public void remove(String uuid) throws IOException {
+		FileUtils.deleteDirectory(Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", uuid).toFile());
+		invalidate(uuid);
 	}
 
-	public void invalidate(String name) {
-		workspaces.remove(name);
+	public void invalidate(String uuid) {
+		workspaces.remove(uuid);
 	}
 
 	public static synchronized WorkspaceManager getInstance() {
