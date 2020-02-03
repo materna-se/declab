@@ -4,14 +4,10 @@
 		<div class="modal fade show" style="display: block">
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Authentication Failed</h5>
-					</div>
 					<div class="modal-body">
-						<input placeholder="Enter Password..." class="form-control" v-on:keyup="updateToken($event.target.value)">
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-primary" v-on:click="reload">Save Password</button>
+						<p class="mb-2">To perform this action, this workspace requires a password.</p>
+						<input placeholder="Enter Password..." class="form-control mb-2" v-on:keyup="updateToken($event.target.value)" v-on:keyup.enter="reload">
+						<button type="button" class="btn btn-primary w-100" v-on:click="reload">Save Password</button>
 					</div>
 				</div>
 			</div>
