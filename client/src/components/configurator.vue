@@ -1,10 +1,10 @@
 <template>
 	<div>
 		<h5 class="mb-2">Name</h5>
-		<input placeholder="Enter Name..." class="form-control mb-2" v-model="configuration.name">
+		<input placeholder="Enter Name..." class="form-control mb-4" v-model="configuration.name">
 
 		<h5 class="mb-2">Description</h5>
-		<input placeholder="Enter Description..." class="form-control mb-2" v-model="configuration.description">
+		<input placeholder="Enter Description..." class="form-control mb-4" v-model="configuration.description">
 
 		<h5 class="mb-2">Protection</h5>
 		<!--
