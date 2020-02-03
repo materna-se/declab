@@ -8,7 +8,7 @@
 
 				<div class="list-group mb-2">
 					<div class="list-group-item">
-						<configurator class="mb-2" v-bind:configuration="workspace"></configurator>
+						<configurator class="mb-4" v-bind:configuration="workspace"></configurator>
 						<button class="btn btn-block btn-outline-secondary" v-on:click="createWorkspace">Enter Workspace</button>
 					</div>
 				</div>

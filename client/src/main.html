@@ -10,9 +10,10 @@
 	<loading-indicator v-bind:loading="loading"></loading-indicator>
 	<dmn-header></dmn-header>
 	<div class="container-fluid">
+		<authenticator v-if="authentication"></authenticator>
 		<div class="row mb-4" v-if="alert.message !== null">
 			<div class="col-12">
-				<alert v-bind:alert="alert"/>
+				<alert v-bind:alert="alert"></alert>
 			</div>
 		</div>
 		<router-view></router-view>
