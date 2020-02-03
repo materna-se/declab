@@ -6,7 +6,7 @@
 					<h4 class="mb-0">Configuration</h4>
 				</div>
 				<div class="card-body">
-					<configurator class="mb-2" v-bind:configuration="serverConfiguration"></configurator>
+					<configurator class="mb-2" v-model="serverConfiguration"></configurator>
 					<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="editWorkspace">Save Configuration</button>
 
 					<h5 class="mb-2">Developer Mode</h5>
@@ -96,7 +96,10 @@
 		},
 		methods: {
 			async getWorkspace() {
-				this.serverConfiguration = await Network.getWorkspace();
+				const serverConfiguration = await Network.getWorkspace();
+				this.serverConfiguration.name = serverConfiguration.name;
+				this.serverConfiguration.description = serverConfiguration.description;
+				this.serverConfiguration.access = serverConfiguration.access;
 			},
 			async getWorkspaceLog() {
 				this.log = (await Network.getWorkspaceLog()).map(value => {
@@ -108,18 +111,18 @@
 				this.$root.displayAlert(null, null);
 
 				const name = this.serverConfiguration.name;
-				if (name === null || name === "") {
+				if (name === null) {
 					this.$root.displayAlert("You need to enter a name.", "danger");
 					return;
 				}
 
 				let description = this.serverConfiguration.description;
-				if (description === null || description === "") {
+				if (description === null) {
 					description = undefined;
 				}
 
 				let token = this.serverConfiguration.token;
-				if (token === null || token === "") {
+				if (token === null) {
 					token = undefined;
 				}
 

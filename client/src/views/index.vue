@@ -8,7 +8,7 @@
 
 				<div class="list-group mb-2">
 					<div class="list-group-item">
-						<configurator class="mb-4" v-bind:configuration="workspace"></configurator>
+						<configurator class="mb-4" v-model="workspace"></configurator>
 						<button class="btn btn-block btn-outline-secondary" v-on:click="createWorkspace">Enter Workspace</button>
 					</div>
 				</div>
@@ -65,21 +65,12 @@
 			},
 			async createWorkspace() {
 				const name = this.workspace.name;
-				if (name === null || name === "") {
+				if (name === undefined) {
 					this.$root.displayAlert("You need to enter a name.", "danger");
 					return;
 				}
-
 				let description = this.workspace.description;
-				if (description === null || description === "") {
-					description = undefined;
-				}
-
 				let token = this.workspace.token;
-				if (token === null || token === "") {
-					token = undefined;
-				}
-
 				let access = this.workspace.access;
 				if (access !== "PUBLIC" && token === undefined) {
 					this.$root.displayAlert("You need to enter a password when you set the access mode to " + access.toLowerCase() + ".", "danger");
