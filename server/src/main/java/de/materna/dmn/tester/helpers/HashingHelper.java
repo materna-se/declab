@@ -3,6 +3,7 @@ package de.materna.dmn.tester.helpers;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -19,6 +20,12 @@ public class HashingHelper {
 			instance = new HashingHelper();
 		}
 		return instance;
+	}
+
+	public String generateSalt() throws NoSuchAlgorithmException {
+		byte[] saltBytes = new byte[64];
+		SecureRandom.getInstanceStrong().nextBytes(saltBytes);
+		return byteArrayToHexString(saltBytes);
 	}
 
 	public String getSaltedHash(String token, String salt) {
