@@ -61,6 +61,8 @@ public class WorkspaceManager {
 			// Check for version 0 workspaces and upgrade them.
 			PersistenceFileManager configurationManager = new PersistenceFileManager(workspaceName, "configuration.json");
 			if (!configurationManager.fileExists()) {
+				log.info("Workspace " + workspaceName + " needs to be upgraded from version 0 to 1.");
+
 				// Create configuration.json
 				Configuration configuration = new Configuration();
 				configuration.setVersion(1);
@@ -75,11 +77,6 @@ public class WorkspaceManager {
 				configuration.setCreatedDate(System.currentTimeMillis());
 				configuration.setModifiedDate(configuration.getCreatedDate());
 				configurationManager.persistFile(configuration.toJson());
-
-				// Create access.log
-				PersistenceFileManager accessLogManager = new PersistenceFileManager(workspaceName, "access.log");
-				AccessLog accessLog = new AccessLog();
-				accessLogManager.persistFile(accessLog.toJson());
 
 				// Move the workspace to a new directory because version 1 directories should only be named after a uuid.
 				String workspaceUUID = UUID.randomUUID().toString();
