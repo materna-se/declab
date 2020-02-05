@@ -2,6 +2,7 @@ package de.materna.dmn.tester.persistence;
 
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
 import de.materna.jdec.serialization.SerializationHelper;
 
 import org.apache.commons.io.FileUtils;
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 
 public class WorkspaceManager {
@@ -45,8 +47,22 @@ public class WorkspaceManager {
 	public void index() throws IOException {
 		File dir = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces").toFile();
 		for(File subdir : dir.listFiles()) {
-			Workspace workspace = new Workspace(subdir.getName());
-			workspaces.put(subdir.getName(), workspace);
+			//Check for V0 workspaces and upgrade them if any are found
+			File subdirConfig = new File(subdir.getAbsolutePath() + File.separator + "configuration.json");
+			if(!subdirConfig.exists() && subdir.listFiles().length > 0) {
+				String workspaceName = subdir.getName();
+				String uuid = UUID.randomUUID().toString();
+				Files.move(subdir.toPath(), new File(dir.getAbsolutePath() + File.separator + uuid).toPath());
+				
+				Workspace workspace = new Workspace(uuid);
+				workspaces.put(subdir.getName(), workspace);
+
+				workspace.getConfig().setName(workspaceName);
+				workspace.getConfig().serialize();
+			} else {
+				Workspace workspace = new Workspace(subdir.getName());
+				workspaces.put(subdir.getName(), workspace);
+			}
 		}
 	}
 	
