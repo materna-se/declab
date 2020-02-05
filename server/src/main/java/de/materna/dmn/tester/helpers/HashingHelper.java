@@ -22,9 +22,9 @@ public class HashingHelper {
 		return instance;
 	}
 
-	public String generateSalt() throws NoSuchAlgorithmException {
+	public String generateSalt() {
 		byte[] saltBytes = new byte[64];
-		SecureRandom.getInstanceStrong().nextBytes(saltBytes);
+		new SecureRandom().nextBytes(saltBytes);
 		return byteArrayToHexString(saltBytes);
 	}
 
