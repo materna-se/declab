@@ -25,13 +25,14 @@ public class Configuration extends PublicConfiguration {
 	public Configuration(PersistenceFileManager fileManager) throws IOException {
 		this.fileManager = fileManager;
 
-		fromJson(fileManager.getFile());
+		if(fileManager.fileExists()) {
+			fromJson(fileManager.getFile());
+		}
 	}
 
 	public void serialize() {
 		try {
-			fileManager.persistFile(SerializationHelper.getInstance().toJSON(this));
-			modifiedDate = System.currentTimeMillis();
+			fileManager.persistFile(toJson());
 		}
 		catch (IOException exception) {
 			exception.printStackTrace();

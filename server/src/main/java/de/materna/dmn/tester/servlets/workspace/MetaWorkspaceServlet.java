@@ -62,6 +62,7 @@ public class MetaWorkspaceServlet {
 
 			Workspace workspace = new Workspace(uuid);
 			Configuration configuration = workspace.getConfig();
+			configuration.setSalt(HashingHelper.getInstance().generateSalt());
 
 			// The name is required, we will the reject the request if the value is not valid.
 			String name = params.get("name");

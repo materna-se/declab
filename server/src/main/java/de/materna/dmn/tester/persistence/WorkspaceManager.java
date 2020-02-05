@@ -46,7 +46,7 @@ public class WorkspaceManager {
 	public Map<String, Workspace> getByName(String workspaceName) {
 		Map<String, Workspace> matches = new HashMap<>();
 		for (Entry<String, Workspace> entry : workspaces.entrySet()) {
-			if (entry.getValue().getConfig().getName().equalsIgnoreCase(workspaceName)) {
+			if (entry.getValue().getConfig().getName().toLowerCase().contains(workspaceName.toLowerCase())) {
 				matches.put(entry.getKey(), entry.getValue());
 			}
 		}

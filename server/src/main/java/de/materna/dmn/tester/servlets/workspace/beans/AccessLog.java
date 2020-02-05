@@ -20,7 +20,9 @@ public class AccessLog extends Serializable {
 	public AccessLog(PersistenceFileManager fileManager) throws IOException {
 		this.fileManager = fileManager;
 
-		fromJson(fileManager.getFile());
+		if(fileManager.fileExists()) {
+			fromJson(fileManager.getFile());
+		}
 	}
 
 	public void writeMessage(String message, long timestamp) {
@@ -44,7 +46,7 @@ public class AccessLog extends Serializable {
 
 	public void serialize() {
 		try {
-			fileManager.persistFile(SerializationHelper.getInstance().toJSON(this));
+			fileManager.persistFile(toJson());
 		}
 		catch (IOException e) {
 			e.printStackTrace();
