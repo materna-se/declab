@@ -38,33 +38,11 @@ public class Workspace {
 
 		PersistenceFileManager configurationManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
 		configuration = new Configuration(configurationManager);
+
 		PersistenceFileManager accessLogManager = new PersistenceFileManager(workspaceUUID, "access.log");
 		accessLog = new AccessLog(accessLogManager);
 
 		decisionSession = new DecisionSession();
-
-		if (!configurationManager.fileExists()) {
-			// If the configuration file doesn't exist yet, we'll create it with default values.
-			configuration.setVersion(1);
-			configuration.setName(workspaceUUID);
-			configuration.setAccess(Access.PUBLIC);
-			configuration.setCreatedDate(System.currentTimeMillis());
-			configuration.setModifiedDate(configuration.getCreatedDate());
-
-			try {
-				byte[] saltBytes = new byte[64];
-				SecureRandom.getInstanceStrong().nextBytes(saltBytes);
-				configuration.setSalt(HashingHelper.getInstance().byteArrayToHexString(saltBytes));
-			} catch (NoSuchAlgorithmException e) {
-				log.warn("Could not instantiate SecureRandom, salt is null");
-			}
-
-			configuration.serialize();
-		}
-		else {
-			// If the configuration file exists, we'll open it.
-			configuration.fromJson(configurationManager.getFile());
-		}
 
 		try {
 			decisionSession.importModel("main", "main", modelManager.getFile());
