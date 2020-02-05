@@ -22,8 +22,10 @@ public class Configuration extends PublicConfiguration {
 	public Configuration() {
 	}
 
-	public Configuration(PersistenceFileManager fileManager) {
+	public Configuration(PersistenceFileManager fileManager) throws IOException {
 		this.fileManager = fileManager;
+
+		fromJson(fileManager.getFile());
 	}
 
 	public void serialize() {

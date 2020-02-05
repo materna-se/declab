@@ -1,11 +1,13 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.jdec.serialization.SerializationHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class AccessLog extends Serializable {
 	private PersistenceFileManager fileManager;
@@ -18,10 +20,7 @@ public class AccessLog extends Serializable {
 	public AccessLog(PersistenceFileManager fileManager) throws IOException {
 		this.fileManager = fileManager;
 
-		// Import previous access log if it exists.
-		if (fileManager.fileExists()) {
-			deserialize(fileManager.getFile());
-		}
+		fromJson(fileManager.getFile());
 	}
 
 	public void writeMessage(String message, long timestamp) {
@@ -51,26 +50,6 @@ public class AccessLog extends Serializable {
 			e.printStackTrace();
 		}
 	}
-
-	public void deserialize(String body) {
-		AccessLog input = (AccessLog) SerializationHelper.getInstance().toClass(body, AccessLog.class);
-
-		ArrayList<AccessLogEntry> logTemp = input.getLog();
-		if (logTemp == null) {
-			throw new RuntimeException();
-		}
-		else {
-			//If previous log is bigger than currently allowed size, trim it down
-			if (logTemp.size() > logLength) {
-				trim(logTemp);
-			}
-			this.setLog(logTemp);
-		}
-	}
-	
-	public String print() {
-		return SerializationHelper.getInstance().toJSON(this);
-	}
 	
 	public ArrayList<AccessLogEntry> getLog() {
 		return log;
@@ -79,10 +58,16 @@ public class AccessLog extends Serializable {
 	public void setLog(ArrayList<AccessLogEntry> log) {
 		this.log = log;
 	}
-	
+
+	@Override
+	public String toJson() {
+		return SerializationHelper.getInstance().toJSON(log);
+	}
+
+	@Override
 	public void fromJson(String json) {
-		AccessLog temp = (AccessLog) SerializationHelper.getInstance().toClass(json, AccessLog.class);
-		this.log = temp.getLog();
+		this.log = SerializationHelper.getInstance().toClass(json, new TypeReference<ArrayList<AccessLogEntry>>() {
+		});
 	}
 
 	public static class AccessLogEntry {
