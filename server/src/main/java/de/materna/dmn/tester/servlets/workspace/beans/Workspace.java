@@ -1,5 +1,6 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import de.materna.dmn.tester.helpers.HashingHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
@@ -11,6 +12,8 @@ import de.materna.jdec.model.ModelImportException;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);
@@ -47,6 +50,15 @@ public class Workspace {
 			configuration.setAccess(Access.PUBLIC);
 			configuration.setCreatedDate(System.currentTimeMillis());
 			configuration.setModifiedDate(configuration.getCreatedDate());
+
+			try {
+				byte[] saltBytes = new byte[64];
+				SecureRandom.getInstanceStrong().nextBytes(saltBytes);
+				configuration.setSalt(HashingHelper.getInstance().byteArrayToHexString(saltBytes));
+			} catch (NoSuchAlgorithmException e) {
+				log.warn("Could not instantiate SecureRandom, salt is null");
+			}
+
 			configuration.serialize();
 		}
 		else {
@@ -81,11 +93,11 @@ public class Workspace {
 	public DecisionSession getDecisionSession() {
 		return decisionSession;
 	}
-	
+
 	public Configuration getConfig() {
 		return configuration;
 	}
-	
+
 	public AccessLog getAccessLog() {
 		return accessLog;
 	}

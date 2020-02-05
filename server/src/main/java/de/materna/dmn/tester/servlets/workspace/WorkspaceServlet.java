@@ -127,7 +127,7 @@ public class WorkspaceServlet {
 					tempConfig.setAccess(access);
 				}
 				if (token != null) {
-					tempConfig.setToken(HashingHelper.getInstance().getHash(token));
+					tempConfig.setToken(HashingHelper.getInstance().getSaltedHash(token, configuration.getSalt()));
 				}
 			}
 

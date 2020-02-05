@@ -40,7 +40,8 @@ public class AccessFilterHelper {
 		}
 
 		String authorizationToken = authorizationHeader.substring(AUTHENTICATION_SCHEME.length() + 1);
-		String tokenHash = HashingHelper.getInstance().getHash(authorizationToken);
+		String salt = workspace.getConfig().getSalt();
+		String tokenHash = HashingHelper.getInstance().getSaltedHash(authorizationToken, salt);
 		if (!tokenHash.equals(workspace.getConfig().getToken())) {
 			throw new RuntimeException("The authorization token is not valid.");
 		}

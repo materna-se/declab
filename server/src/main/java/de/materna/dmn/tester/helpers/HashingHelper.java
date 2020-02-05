@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 public class HashingHelper {
 	private static HashingHelper instance;
 	private MessageDigest messageDigest;
@@ -19,11 +21,11 @@ public class HashingHelper {
 		return instance;
 	}
 
-	public String getHash(String token) {
-		return byteArrayToHexString(messageDigest.digest(token.getBytes(StandardCharsets.UTF_8)));
+	public String getSaltedHash(String token, String salt) {
+		return byteArrayToHexString(messageDigest.digest(ArrayUtils.addAll(token.getBytes(StandardCharsets.UTF_8), hexStringToByteArray(salt))));
 	}
 
-	private String byteArrayToHexString(byte[] byteArray) {
+	public String byteArrayToHexString(byte[] byteArray) {
 		StringBuilder stringBuilder = new StringBuilder();
 		for (byte bxte : byteArray) {
 			stringBuilder.append(String.format("%02X", bxte));
@@ -31,7 +33,7 @@ public class HashingHelper {
 		return stringBuilder.toString();
 	}
 
-	private byte[] hexStringToByteArray(String hexString) {
+	public byte[] hexStringToByteArray(String hexString) {
 		int hexStringLength = hexString.length();
 
 		byte[] byteArray = new byte[hexStringLength / 2];

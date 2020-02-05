@@ -98,12 +98,13 @@ public class MetaWorkspaceServlet {
 					throw new BadRequestException();
 				}
 				if (token != null) {
-					configuration.setToken(HashingHelper.getInstance().getHash(token));
+					configuration.setToken(HashingHelper.getInstance().getSaltedHash(token, configuration.getSalt()));
 				}
 			}
 
 			configuration.setCreatedDate(System.currentTimeMillis());
 			configuration.setModifiedDate(configuration.getCreatedDate());
+			
 			configuration.serialize();
 
 			// Load the new workspace into the index.
