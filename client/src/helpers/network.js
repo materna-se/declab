@@ -23,8 +23,12 @@ export default {
 		return await response.json();
 	},
 
-	async getWorkspaces() {
-		const response = await this._authorizedFetch(this._host + "/workspaces", {});
+	async getWorkspaces(query) {
+		if (query == null || query === "") {
+			query = undefined;
+		}
+
+		const response = await this._authorizedFetch(this._host + "/workspaces" + (query === undefined ? "" : ("?query=" + query)), {});
 		return await response.json();
 	},
 
