@@ -80,17 +80,17 @@ public class WorkspaceServlet {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
 			
-			//Store changes in temporary configuration to avoid situations where a change to the configuration object
-			//has been made but not logged or serialized
-			Configuration tempConfig = new Configuration();
+			// Store changes in temporary configuration to avoid situations where a change
+			// to the configuration object has been made but not logged or serialized.
+			Configuration tempConfiguration = new Configuration();
 
+			// The name is optional, we will set it if the value is valid.
 			if (params.containsKey("name")) {
-				// The name is required, we will the reject the request if the value is not valid.
 				String name = params.get("name");
 				if (name == null || name.length() == 0) {
 					throw new BadRequestException();
 				}
-				tempConfig.setName(name);
+				tempConfiguration.setName(name);
 			}
 
 			// The description is optional, we will set it if the value is valid.
@@ -99,42 +99,48 @@ public class WorkspaceServlet {
 				if (description == null) {
 					throw new BadRequestException();
 				}
-				tempConfig.setDescription(description);
+				tempConfiguration.setDescription(description);
 			}
 
-			// The access mode and token are optional, we will set them if the combination is valid.
-			{
-				Access access = null;
-				String token = null;
-
-				if (params.containsKey("access")) {
-					access = Access.valueOf(params.get("access"));
-				}
-
-				if (params.containsKey("token")) {
-					token = params.get("token");
-					if (token == null || token.length() == 0) {
-						throw new BadRequestException();
-					}
-				}
-
-				// If the access mode does not match the token value, we will reject it.
-				if (access != Access.PUBLIC && token == null) {
+			// The description is optional, we will set it if the value is valid.
+			if (params.containsKey("description")) {
+				String description = params.get("description");
+				if (description == null) {
 					throw new BadRequestException();
 				}
-
-				if (access != null) {
-					tempConfig.setAccess(access);
-				}
-				if (token != null) {
-					tempConfig.setToken(HashingHelper.getInstance().getSaltedHash(token, configuration.getSalt()));
-				}
+				tempConfiguration.setDescription(description);
 			}
 
-			configuration.setName(tempConfig.getName());
-			configuration.setDescription(tempConfig.getDescription());
-			configuration.setAccess(tempConfig.getAccess());
-			configuration.setToken(tempConfig.getToken());
+			// The token is optional if the access mode is set to public.
+			if (params.containsKey("token")) {
+				String token = params.get("token");
+				if (token == null || token.length() == 0) {
+					throw new BadRequestException();
+				}
+				tempConfiguration.setToken(HashingHelper.getInstance().getSaltedHash(token, configuration.getSalt()));
+			}
+
+			// The access mode is optional, we will set it if the value is valid.
+			if (params.containsKey("access")) {
+				Access access = Access.valueOf(params.get("access"));
+				if(access != Access.PUBLIC && (tempConfiguration.getToken() == null && configuration.getToken() == null)) {
+					throw new BadRequestException();
+				}
+				tempConfiguration.setAccess(access);
+			}
+
+			if(tempConfiguration.getName() != null) {
+				configuration.setName(tempConfiguration.getName());
+			}
+			if(tempConfiguration.getDescription() != null) {
+				configuration.setDescription(tempConfiguration.getDescription());
+			}
+			if(tempConfiguration.getToken() != null) {
+				configuration.setToken(tempConfiguration.getToken());
+			}
+			if(tempConfiguration.getAccess() != null) {
+				configuration.setAccess(tempConfiguration.getAccess());
+			}
 
 			configuration.setModifiedDate(System.currentTimeMillis());
 			configuration.serialize();
@@ -162,7 +168,7 @@ public class WorkspaceServlet {
 
 			workspace.getAccessLog().writeMessage("Accessed log", System.currentTimeMillis());
 
-			return Response.status(Response.Status.OK).entity(workspace.getAccessLog().print()).build();
+			return Response.status(Response.Status.OK).entity(workspace.getAccessLog().toJson()).build();
 		}
 		catch (Exception e) {
 			log.error(e);

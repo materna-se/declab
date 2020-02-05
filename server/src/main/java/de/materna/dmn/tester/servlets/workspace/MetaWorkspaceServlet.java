@@ -79,32 +79,24 @@ public class MetaWorkspaceServlet {
 				configuration.setDescription(description);
 			}
 
-			// The access mode and token are optional, we will set them if the combination is valid.
-			{
-				Access access = Access.valueOf(params.get("access"));
-				configuration.setAccess(access);
-
-				String token = null;
-
-				if (params.containsKey("token")) {
-					token = params.get("token");
-					if (token == null || token.length() == 0) {
-						throw new BadRequestException();
-					}
-				}
-
-				// If the access mode does not match the token value, we will reject it.
-				if (access != Access.PUBLIC && token == null) {
+			// The token is optional if the access mode is set to public.
+			if (params.containsKey("token")) {
+				String token = params.get("token");
+				if (token == null || token.length() == 0) {
 					throw new BadRequestException();
 				}
-				if (token != null) {
-					configuration.setToken(HashingHelper.getInstance().getSaltedHash(token, configuration.getSalt()));
-				}
+				configuration.setToken(HashingHelper.getInstance().getSaltedHash(token, configuration.getSalt()));
 			}
+
+			// The access mode is required, we will the reject the request if the value is not valid.
+			Access access = Access.valueOf(params.get("access"));
+			if (access != Access.PUBLIC && configuration.getToken() == null) {
+				throw new BadRequestException();
+			}
+			configuration.setAccess(access);
 
 			configuration.setCreatedDate(System.currentTimeMillis());
 			configuration.setModifiedDate(configuration.getCreatedDate());
-			
 			configuration.serialize();
 
 			// Load the new workspace into the index.
