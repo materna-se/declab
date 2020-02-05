@@ -41,7 +41,7 @@ public class ModelServlet {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 
-			DMNModel dmnModel = DroolsHelper.getModel(workspace.getDecisionSession());
+			DMNModel dmnModel = DroolsHelper.getModel(workspace);
 
 			Model model = new Model(dmnModel.getName(), dmnModel.getDecisions(), dmnModel.getBusinessKnowledgeModels(), dmnModel.getDecisionServices());
 			
@@ -109,7 +109,7 @@ public class ModelServlet {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 
-			DMNModel dmnModel = DroolsHelper.getModel(workspace.getDecisionSession());
+			DMNModel dmnModel = DroolsHelper.getModel(workspace);
 
 			Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 			});

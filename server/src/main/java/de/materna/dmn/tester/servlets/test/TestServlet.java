@@ -106,7 +106,7 @@ public class TestServlet {
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
-			DMNModel dmnModel = DroolsHelper.getModel(workspace.getDecisionSession());
+			DMNModel dmnModel = DroolsHelper.getModel(workspace);
 
 			PersistedTest test = testManager.getFiles().get(testUUID);
 			if (test == null) {

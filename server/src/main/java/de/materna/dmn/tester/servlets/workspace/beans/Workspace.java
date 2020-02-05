@@ -43,13 +43,6 @@ public class Workspace {
 		accessLog = new AccessLog(accessLogManager);
 
 		decisionSession = new DecisionSession();
-
-		try {
-			decisionSession.importModel("main", "main", modelManager.getFile());
-		}
-		catch (IOException | ModelImportException e) {
-			log.warn("No valid model was found, import process is stopped.");
-		}
 	}
 
 	public PersistenceFileManager getModelManager() {
