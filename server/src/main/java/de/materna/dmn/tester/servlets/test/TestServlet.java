@@ -22,7 +22,8 @@ import org.kie.dmn.api.core.DMNModel;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,10 +38,15 @@ public class TestServlet {
 	public Response getTests(@PathParam("workspace") String workspaceUUID) {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			
+
+			Map<String, PersistedTest> unsortedTests = workspace.getTestManager().getFiles();
+
+			Map<String, PersistedTest> sortedTests = new LinkedHashMap<>();
+			unsortedTests.entrySet().stream().sorted(Comparator.comparing(entry -> entry.getValue().getName())).forEach(entry -> sortedTests.put(entry.getKey(), entry.getValue()));
+
 			workspace.getAccessLog().writeMessage("Accessed list of tests", System.currentTimeMillis());
-			
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getTestManager().getFiles())).build();
+
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(sortedTests)).build();
 		}
 		catch (IOException exception) {
 			log.error(exception);
@@ -62,7 +68,7 @@ public class TestServlet {
 			if (test == null) {
 				throw new NotFoundException();
 			}
-			
+
 			workspace.getAccessLog().writeMessage("Accessed test " + testUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(test)).build();
@@ -84,7 +90,7 @@ public class TestServlet {
 			String uuid = UUID.randomUUID().toString();
 
 			workspace.getTestManager().persistFile(uuid, (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class));
-			
+
 			workspace.getAccessLog().writeMessage("Created test " + uuid, System.currentTimeMillis());
 
 			return Response.status(Response.Status.CREATED).entity(uuid).build();
@@ -117,7 +123,7 @@ public class TestServlet {
 			// Drools will execute the persisted input, the result is in the format <Decision, Output>.
 			Map<String, Output> calculatedOutputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), dmnModel, InputServlet.enrichInput(inputManager, inputManager.getFiles().get(test.getInput())).getValue());
 
-			Map<String, TestResultOutput> comparedOutputs = new HashMap<>();
+			Map<String, TestResultOutput> comparedOutputs = new LinkedHashMap<>();
 
 			for (String output : test.getOutputs()) {
 				PersistedOutput expectedOutput = expectedOutputs.get(output);
@@ -125,7 +131,7 @@ public class TestServlet {
 
 				comparedOutputs.put(expectedOutput.getDecision(), new TestResultOutput(new EnrichedOutput(output, expectedOutput), calculatedOutput));
 			}
-			
+
 			workspace.getAccessLog().writeMessage("Ran test " + testUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.OK).entity(new TestResult(comparedOutputs)).build();
@@ -152,7 +158,7 @@ public class TestServlet {
 			}
 
 			testManager.persistFile(testUUID, (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class));
-			
+
 			workspace.getAccessLog().writeMessage("Edited test " + testUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.NO_CONTENT).build();
@@ -177,7 +183,7 @@ public class TestServlet {
 			}
 
 			testManager.removeFile(testUUID);
-			
+
 			workspace.getAccessLog().writeMessage("Deleted test " + testUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.NO_CONTENT).build();

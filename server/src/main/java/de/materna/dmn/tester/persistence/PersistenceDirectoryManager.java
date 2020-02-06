@@ -8,9 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class PersistenceDirectoryManager<T> {
@@ -30,7 +28,7 @@ public class PersistenceDirectoryManager<T> {
 	 * @todo Sort map by name.
 	 */
 	public Map<String, T> getFiles() throws IOException {
-		Map<String, T> values = new HashMap<>();
+		Map<String, T> files = new HashMap<>();
 
 		if (Files.exists(directory)) {
 			try (Stream<Path> stream = Files.list(directory)) {
@@ -42,12 +40,12 @@ public class PersistenceDirectoryManager<T> {
 					String key = path.getFileName().toString().split("\\.")[0];
 					T value = (T) SerializationHelper.getInstance().toClass(new String(Files.readAllBytes(path), StandardCharsets.UTF_8), entityClass);
 
-					values.put(key, value);
+					files.put(key, value);
 				}
 			}
 		}
 
-		return values;
+		return files;
 	}
 
 	public void persistFile(String key, T value) throws IOException {

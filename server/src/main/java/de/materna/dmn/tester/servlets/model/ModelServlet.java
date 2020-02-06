@@ -145,14 +145,9 @@ public class ModelServlet {
 			FEEL feel = FEEL.newInstance(profiles);
 
 			List<String> messages = new LinkedList<>();
-			feel.addListener(new FEELEventListener() {
-				@Override
-				public void onEvent(FEELEvent feelEvent) {
-					messages.add(feelEvent.getMessage());
-				}
-			});
+			feel.addListener(feelEvent -> messages.add(feelEvent.getMessage()));
 
-			HashMap<String, Output> decisions = new HashMap<>();
+			HashMap<String, Output> decisions = new LinkedHashMap<>();
 			decisions.put("main", new Output(SerializationHelper.getInstance().getJSONMapper().valueToTree(feel.evaluate(decision.getExpression(), decision.getContext()))));
 
 			ModelResult modelResult = new ModelResult(decisions, null, messages);

@@ -1,13 +1,13 @@
 package de.materna.dmn.tester.servlets.input.beans;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
 
 public class Input extends Serializable {
-	protected Map<String, ?> value = new HashMap<>();
+	protected Map<String, ?> value = new LinkedHashMap<>();
 
 	public Input() {
 	}

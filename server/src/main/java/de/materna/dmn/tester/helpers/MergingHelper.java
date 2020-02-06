@@ -8,7 +8,7 @@ public class MergingHelper {
 			Map<String, Object> existingMap = (Map<String, Object>) existing;
 			Map<String, Object> templateMap = (Map<String, Object>) template;
 
-			Map<String, Object> mergedMap = new HashMap<>(existingMap);
+			Map<String, Object> mergedMap = new LinkedHashMap<>(existingMap);
 			for (String key : templateMap.keySet()) {
 				mergedMap.put(key, merge(mergedMap.get(key), templateMap.get(key)));
 			}

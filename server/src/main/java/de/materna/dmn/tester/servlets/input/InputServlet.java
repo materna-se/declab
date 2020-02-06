@@ -6,6 +6,7 @@ import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
+import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
@@ -13,7 +14,8 @@ import org.apache.log4j.Logger;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -29,13 +31,15 @@ public class InputServlet {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
-			Map<String, PersistedInput> workspaceInputs = inputManager.getFiles();
 
-			Map<String, PersistedInput> enrichedInputs = merge ? enrichInputMap(inputManager, workspaceInputs) : workspaceInputs;
-			
+			Map<String, PersistedInput> unsortedInputs = merge ? enrichInputMap(inputManager, inputManager.getFiles()) : inputManager.getFiles();
+
+			Map<String, PersistedInput> sortedInputs = new LinkedHashMap<>();
+			unsortedInputs.entrySet().stream().sorted(Comparator.comparing(entry -> entry.getValue().getName())).forEach(entry -> sortedInputs.put(entry.getKey(), entry.getValue()));
+
 			workspace.getAccessLog().writeMessage("Accessed input list", System.currentTimeMillis());
-			
-			return Response.status(Response.Status.OK).entity(enrichedInputs).build();
+
+			return Response.status(Response.Status.OK).entity(sortedInputs).build();
 		}
 		catch (IOException exception) {
 			log.error(exception);
@@ -59,9 +63,9 @@ public class InputServlet {
 			}
 
 			PersistedInput enrichedInput = merge ? enrichInput(inputManager, input) : input;
-			
+
 			workspace.getAccessLog().writeMessage("Accessed input " + inputUUID, System.currentTimeMillis());
-			
+
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(enrichedInput)).build();
 		}
 		catch (IOException exception) {
@@ -83,7 +87,7 @@ public class InputServlet {
 			workspace.getInputManager().persistFile(uuid, (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class));
 
 			workspace.getAccessLog().writeMessage("Created input" + uuid, System.currentTimeMillis());
-			
+
 			return Response.status(Response.Status.CREATED).entity(uuid).build();
 		}
 		catch (IOException exception) {
@@ -111,7 +115,7 @@ public class InputServlet {
 				throw new BadRequestException(String.format("Input with uuid %s can't reference itself.", inputUUID));
 			}
 			inputManager.persistFile(inputUUID, input);
-			
+
 			workspace.getAccessLog().writeMessage("Edited input " + inputUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.NO_CONTENT).build();
@@ -140,7 +144,7 @@ public class InputServlet {
 			}
 
 			inputManager.removeFile(inputUUID);
-			
+
 			workspace.getAccessLog().writeMessage("Deleted input " + inputUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.NO_CONTENT).build();
@@ -163,6 +167,19 @@ public class InputServlet {
 	}
 
 	/**
+	 * Resolves the entire inheritance of multiple inputs to return a deep merged result.
+	 */
+	public static Map<String, PersistedInput> enrichInputMap(PersistenceDirectoryManager<PersistedInput> inputManager, Map<String, PersistedInput> input) throws IOException {
+		Map<String, PersistedInput> enrichedInput = new LinkedHashMap<>();
+
+		for (Map.Entry<String, PersistedInput> entry : input.entrySet()) {
+			enrichedInput.put(entry.getKey(), enrichInput(inputManager, entry.getValue()));
+		}
+
+		return enrichedInput;
+	}
+
+	/**
 	 * Resolves the entire inheritance of an input to return a deep merged result.
 	 */
 	public static PersistedInput enrichInput(PersistenceDirectoryManager<PersistedInput> inputManager, PersistedInput input) throws IOException {
@@ -173,18 +190,5 @@ public class InputServlet {
 		PersistedInput parentInput = enrichInput(inputManager, inputManager.getFiles().get(input.getParent()));
 
 		return new PersistedInput(input.getName(), input.getParent(), (Map<String, ?>) MergingHelper.merge(parentInput.getValue(), input.getValue()));
-	}
-
-	/**
-	 * Resolves the entire inheritance of multiple inputs to return a deep merged result.
-	 */
-	public static Map<String, PersistedInput> enrichInputMap(PersistenceDirectoryManager<PersistedInput> inputManager, Map<String, PersistedInput> input) throws IOException {
-		Map<String, PersistedInput> enrichedInput = new HashMap<>();
-
-		for (Map.Entry<String, PersistedInput> entry : input.entrySet()) {
-			enrichedInput.put(entry.getKey(), enrichInput(inputManager, entry.getValue()));
-		}
-
-		return enrichedInput;
 	}
 }

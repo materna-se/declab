@@ -4,6 +4,7 @@ import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
+import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
@@ -12,6 +13,9 @@ import org.apache.log4j.Logger;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Path("/workspaces/{workspace}")
@@ -25,10 +29,15 @@ public class OutputServlet {
 	public Response getOutputs(@PathParam("workspace") String workspaceUUID) {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			
+
+			Map<String, PersistedOutput> unsortedOutputs = workspace.getOutputManager().getFiles();
+
+			Map<String, PersistedOutput> sortedOutputs = new LinkedHashMap<>();
+			unsortedOutputs.entrySet().stream().sorted(Comparator.comparing(entry -> entry.getValue().getName())).forEach(entry -> sortedOutputs.put(entry.getKey(), entry.getValue()));
+
 			workspace.getAccessLog().writeMessage("Accessed list of outputs", System.currentTimeMillis());
 
-			return Response.status(Response.Status.OK).entity(workspace.getOutputManager().getFiles()).build();
+			return Response.status(Response.Status.OK).entity(sortedOutputs).build();
 		}
 		catch (IOException exception) {
 			log.error(exception);

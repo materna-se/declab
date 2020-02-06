@@ -27,11 +27,12 @@ public class MetaWorkspaceServlet {
 	@Produces("application/json")
 	public Response getWorkspaces(@QueryParam("query") String query) {
 		try {
-			Map<String, Workspace> workspaces = query == null ? WorkspaceManager.getInstance().getAll() : WorkspaceManager.getInstance().search(query);
+			Map<String, Workspace> unsortedWorkspaces = query == null ? WorkspaceManager.getInstance().getAll() : WorkspaceManager.getInstance().search(query);
 
-			Map<String, PublicConfiguration> publicWorkspaces = new LinkedHashMap<>();
-			workspaces.entrySet().stream().sorted(Comparator.comparing(entry -> entry.getValue().getConfig().getName())).forEach(entry -> publicWorkspaces.put(entry.getKey(), entry.getValue().getConfig().getPublicConfig()));
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(publicWorkspaces)).build();
+			Map<String, PublicConfiguration> sortedWorkspaces = new LinkedHashMap<>();
+			unsortedWorkspaces.entrySet().stream().sorted(Comparator.comparing(entry -> entry.getValue().getConfig().getName())).forEach(entry -> sortedWorkspaces.put(entry.getKey(), entry.getValue().getConfig().getPublicConfig()));
+
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(sortedWorkspaces)).build();
 		}
 		catch (StringIndexOutOfBoundsException e) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
