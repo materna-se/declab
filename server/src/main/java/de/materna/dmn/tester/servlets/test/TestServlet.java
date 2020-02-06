@@ -36,7 +36,7 @@ public class TestServlet {
 	@Produces("application/json")
 	public Response getTests(@PathParam("workspace") String workspaceUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			
 			workspace.getAccessLog().writeMessage("Accessed list of tests", System.currentTimeMillis());
 			
@@ -55,7 +55,7 @@ public class TestServlet {
 	@Produces("application/json")
 	public Response getTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
 			PersistedTest test = testManager.getFiles().get(testUUID);
@@ -80,7 +80,7 @@ public class TestServlet {
 	@Consumes("application/json")
 	public Response createTest(@PathParam("workspace") String workspaceUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			String uuid = UUID.randomUUID().toString();
 
 			workspace.getTestManager().persistFile(uuid, (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class));
@@ -102,7 +102,7 @@ public class TestServlet {
 	@Produces("application/json")
 	public Response runTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
@@ -144,7 +144,7 @@ public class TestServlet {
 	@Produces("application/json")
 	public Response editTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
 			if (!testManager.getFiles().containsKey(testUUID)) {
@@ -169,7 +169,7 @@ public class TestServlet {
 	@Path("/tests/{uuid}")
 	public Response deleteTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
 			if (!testManager.getFiles().containsKey(testUUID)) {

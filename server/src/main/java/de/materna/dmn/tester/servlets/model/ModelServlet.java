@@ -39,7 +39,7 @@ public class ModelServlet {
 	@Produces("application/json")
 	public Response getModel(@PathParam("workspace") String workspaceUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 			DMNModel dmnModel = DroolsHelper.getModel(workspace);
 
@@ -60,7 +60,7 @@ public class ModelServlet {
 	@Consumes("text/xml")
 	public Response importModel(@PathParam("workspace") String workspaceUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 			ImportResult importResult = workspace.getDecisionSession().importModel("main", "main", body);
 
@@ -85,7 +85,7 @@ public class ModelServlet {
 	@Produces("application/json")
 	public Response getInputs(@PathParam("workspace") String workspaceUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			
 			DMNModel model = workspace.getDecisionSession().getRuntime().getModels().get(0);
 
@@ -107,7 +107,7 @@ public class ModelServlet {
 	@Produces("application/json")
 	public Response calculateModelResult(@PathParam("workspace") String workspaceUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 			DMNModel dmnModel = DroolsHelper.getModel(workspace);
 

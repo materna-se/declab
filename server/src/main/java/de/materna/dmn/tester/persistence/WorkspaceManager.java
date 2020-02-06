@@ -8,12 +8,14 @@ import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import javax.ws.rs.NotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -34,23 +36,17 @@ public class WorkspaceManager {
 		return instance;
 	}
 
-	public Workspace getByUUID(String workspaceUUID) throws IOException {
-		Workspace workspace = workspaces.get(workspaceUUID);
-
-		if (workspace == null && exists(workspaceUUID)) {
-			workspace = new Workspace(workspaceUUID);
-		}
-		return workspace;
+	public Map<String, Workspace> getAll() {
+		return workspaces;
 	}
 
-	public Map<String, Workspace> getByName(String workspaceName) {
-		Map<String, Workspace> matches = new HashMap<>();
-		for (Entry<String, Workspace> entry : workspaces.entrySet()) {
-			if (entry.getValue().getConfig().getName().toLowerCase().contains(workspaceName.toLowerCase())) {
-				matches.put(entry.getKey(), entry.getValue());
-			}
+	public Workspace get(String workspaceUUID) throws IOException {
+		Workspace workspace = workspaces.get(workspaceUUID);
+		if (workspace == null) {
+			throw new IOException("Workspace " + workspaceUUID + " can't be found.");
 		}
-		return matches;
+
+		return workspace;
 	}
 
 	public void index() throws IOException {
@@ -92,6 +88,16 @@ public class WorkspaceManager {
 		}
 	}
 
+	public Map<String, Workspace> search(String workspaceName) {
+		Map<String, Workspace> matches = new LinkedHashMap<>();
+		for (Entry<String, Workspace> entry : workspaces.entrySet()) {
+			if (entry.getValue().getConfig().getName().toLowerCase().contains(workspaceName.toLowerCase())) {
+				matches.put(entry.getKey(), entry.getValue());
+			}
+		}
+		return matches;
+	}
+
 	public boolean exists(String workspaceUUID) {
 		File dir = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces").toFile();
 		for (File subdir : dir.listFiles()) {
@@ -113,9 +119,5 @@ public class WorkspaceManager {
 
 	public void invalidate(String uuid) {
 		workspaces.remove(uuid);
-	}
-
-	public Map<String, Workspace> getWorkspaces() {
-		return workspaces;
 	}
 }

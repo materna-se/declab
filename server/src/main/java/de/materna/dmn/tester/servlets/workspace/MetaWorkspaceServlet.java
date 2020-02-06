@@ -16,10 +16,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Path("/workspaces")
 public class MetaWorkspaceServlet {
@@ -30,20 +27,16 @@ public class MetaWorkspaceServlet {
 	@Produces("application/json")
 	public Response getWorkspaces(@QueryParam("query") String query) {
 		try {
-			Map<String, PublicConfiguration> configurations = new LinkedHashMap<>();
+			Map<String, Workspace> workspaces = query == null ? WorkspaceManager.getInstance().getAll() : WorkspaceManager.getInstance().search(query);
 
-			Map<String, Workspace> workspaces = query == null ? WorkspaceManager.getInstance().getWorkspaces() : WorkspaceManager.getInstance().getByName(query);
-			for (Map.Entry<String, Workspace> entry : workspaces.entrySet()) {
-				configurations.put(entry.getKey(), entry.getValue().getConfig().getPublicConfig());
-			}
-
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(configurations)).build();
+			Map<String, PublicConfiguration> publicWorkspaces = new LinkedHashMap<>();
+			workspaces.entrySet().stream().sorted(Comparator.comparing(entry -> entry.getValue().getConfig().getName())).forEach(entry -> publicWorkspaces.put(entry.getKey(), entry.getValue().getConfig().getPublicConfig()));
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(publicWorkspaces)).build();
 		}
 		catch (StringIndexOutOfBoundsException e) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			log.error(e);
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}

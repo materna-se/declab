@@ -24,7 +24,7 @@ public class OutputServlet {
 	@Produces("application/json")
 	public Response getOutputs(@PathParam("workspace") String workspaceUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			
 			workspace.getAccessLog().writeMessage("Accessed list of outputs", System.currentTimeMillis());
 
@@ -43,7 +43,7 @@ public class OutputServlet {
 	@Produces("application/json")
 	public Response getOutput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String outputUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedOutput> outputManager = workspace.getOutputManager();
 
 			PersistedOutput output = outputManager.getFiles().get(outputUUID);
@@ -68,7 +68,7 @@ public class OutputServlet {
 	@Consumes("application/json")
 	public Response createOutput(@PathParam("workspace") String workspaceUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			String uuid = UUID.randomUUID().toString();
 
 			workspace.getOutputManager().persistFile(uuid, (PersistedOutput) SerializationHelper.getInstance().toClass(body, PersistedOutput.class));
@@ -91,7 +91,7 @@ public class OutputServlet {
 	@Produces("application/json")
 	public Response editOutput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String outputUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedOutput> outputManager = workspace.getOutputManager();
 			if (!outputManager.getFiles().containsKey(outputUUID)) {
 				throw new NotFoundException();
@@ -115,7 +115,7 @@ public class OutputServlet {
 	@Path("/outputs/{uuid}")
 	public Response deleteOutput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String outputUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedOutput> outputManager = workspace.getOutputManager();
 			if (!outputManager.getFiles().containsKey(outputUUID)) {
 				throw new NotFoundException();

@@ -40,7 +40,7 @@ public class WorkspaceServlet {
 	@Produces("application/json")
 	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
 
 			return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJson()).build();
@@ -57,7 +57,7 @@ public class WorkspaceServlet {
 	@Produces("application/json")
 	public Response getWorkspaceConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
 
 			return Response.status(Response.Status.OK).entity(configuration.toJson()).build();
@@ -77,7 +77,7 @@ public class WorkspaceServlet {
 			HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, String>>() {
 			});
 
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
 			
 			// Store changes in temporary configuration to avoid situations where a change
@@ -164,7 +164,7 @@ public class WorkspaceServlet {
 	@Produces("application/json")
 	public Response getWorkspaceAccessLog(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 			workspace.getAccessLog().writeMessage("Accessed log", System.currentTimeMillis());
 
@@ -181,14 +181,13 @@ public class WorkspaceServlet {
 	@Path("")
 	public Response deleteWorkspace(@PathParam("workspace") String workspaceUUID) {
 		try {
-			WorkspaceManager wm = WorkspaceManager.getInstance();
-			if (wm.exists(workspaceUUID)) {
-				wm.remove(workspaceUUID);
-				return Response.status(Response.Status.NO_CONTENT).build();
-			}
-			else {
+			WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
+			if (!workspaceManager.exists(workspaceUUID)) {
 				return Response.status(Response.Status.NOT_FOUND).build();
 			}
+
+			workspaceManager.remove(workspaceUUID);
+			return Response.status(Response.Status.NO_CONTENT).build();
 		}
 		catch (Exception e) {
 			log.error(e);
@@ -203,7 +202,7 @@ public class WorkspaceServlet {
 	public Response exportWorkspace(@PathParam("workspace") String workspaceUUID) {
 		StreamingOutput streamingOutput = (OutputStream outputStream) -> {
 			try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
-				Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+				Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).filter(path -> !Files.isDirectory(path)).forEach(path -> {
 					try {
@@ -227,7 +226,7 @@ public class WorkspaceServlet {
 	@Consumes("multipart/form-data")
 	public Response importWorkspace(@PathParam("workspace") String workspaceUUID, MultipartFormDataInput multipartFormDataInput) throws IOException {
 		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
-		Workspace workspace = workspaceManager.getByUUID(workspaceUUID);
+		Workspace workspace = workspaceManager.get(workspaceUUID);
 
 		// If the workspace does not exist yet, it will be created.
 		java.nio.file.Path path = workspace.getTestManager().getDirectory().getParent();
