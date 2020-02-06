@@ -8,6 +8,7 @@ import "./styles/bootstrap-theme.css"
 // Vue
 import Vue from "vue";
 import VueRouter from "vue-router";
+import VueTooltip from 'v-tooltip'
 // Components
 import LoadingIndicator from "./components/loading-indicator.vue";
 import Authenticator from "./components/authenticator.vue";
@@ -30,6 +31,7 @@ const Discoverer = () => import('./views/discoverer.vue');
 const Settings = () => import('./views/settings.vue');
 
 Vue.use(VueRouter);
+Vue.use(VueTooltip);
 
 const router = new VueRouter({
 	routes: [

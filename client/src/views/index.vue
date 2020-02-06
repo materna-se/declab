@@ -6,8 +6,8 @@
 			<div class="col-4 mb-4">
 				<h4 class="mb-2">Workspaces</h4>
 
-				<div class="list-group mb-4">
-					<div class="list-group-item">
+				<div class="card mb-4">
+					<div class="card-body">
 						<configurator class="mb-4" v-model="workspace"></configurator>
 						<button class="btn btn-block btn-outline-secondary" v-on:click="createWorkspace">Enter Workspace</button>
 					</div>
@@ -21,7 +21,7 @@
 							</svg>
 						</span>
 					</div>
-					<input placeholder="Enter Query..." class="form-control" v-bind:value="query" v-on:keyup="query = $event.target.value; getWorkspaces()">
+					<input placeholder="Search Workspace..." class="form-control" v-bind:value="query" v-on:keyup="query = $event.target.value; getWorkspaces()">
 				</div>
 
 				<div class="list-group">
@@ -53,6 +53,7 @@
 	import EmptyCollectionComponent from "../components/empty-collection.vue";
 	import ConfiguratorComponent from "../components/configurator.vue";
 	import Network from "../helpers/network";
+	// import deburr from "lodash/deburr";
 
 	export default {
 		components: {
@@ -99,7 +100,29 @@
 			},
 			async enterWorkspace(id) {
 				await this.$router.push('/' + id + '/model');
+			},
+
+			//
+			// Helpers
+			//
+			/*
+			transformName(name) {
+				if (name === undefined || name === null) {
+					return name;
+				}
+
+				// The name should only contain lower case characters.
+				name = name.toLowerCase();
+				// The name should only contain basic latin characters.
+				name = deburr(name);
+				// The name should only contain a-z and 0-9. We'll replace other with dashes.
+				name = name.replace(/[^a-z0-9]+/g, "-");
+				// The name should not contain dashes at the beginning or end of the name or two dashes in a row.
+				name = name.replace(/^-|-$/g, '').replace(/-{2,}/g, "");
+
+				return name;
 			}
+			*/
 		},
 		async mounted() {
 			await this.getWorkspaces();
