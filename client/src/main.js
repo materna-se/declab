@@ -87,7 +87,11 @@ router.beforeEach((to, from, next) => {
 	next();
 });
 router.afterEach(async (to, from) => {
-	vue.alert.message = null;
+	vue.authentication = false;
+	vue.alert = {
+		message: null,
+		state: null
+	};
 
 	Network.setEndpoint(vue, process.env.DECLAB_HOST, to.params.workspace);
 
