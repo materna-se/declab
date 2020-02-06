@@ -40,11 +40,6 @@
 	.navbar .navbar-brand .navbar-brand-secondary {
 		color: #c9def3;
 	}
-
-	/* We can't select a dropdown item if there is a margin-top property. */
-	.dropdown-menu {
-		margin-top: 0;
-	}
 </style>
 
 <script>

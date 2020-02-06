@@ -112,6 +112,11 @@ pre, code {
 	border-radius: 0;
 }
 
+/* We can't select a dropdown item if there is a margin-top property. */
+.dropdown-menu {
+	margin-top: 0;
+}
+
 /* Styling for diff-match-patch */
 .difference-minus {
 	background: yellow;
