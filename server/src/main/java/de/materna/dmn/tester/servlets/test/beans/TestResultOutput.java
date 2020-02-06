@@ -2,13 +2,15 @@ package de.materna.dmn.tester.servlets.test.beans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.NullNode;
+
+import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.dmn.tester.servlets.output.beans.EnrichedOutput;
 import de.materna.dmn.tester.servlets.output.beans.Output;
-import de.materna.dmn.tester.servlets.test.TestServlet;
+import de.materna.jdec.serialization.SerializationHelper;
+
 import org.apache.log4j.Logger;
 
-public class TestResultOutput {
-	private static final Logger log = Logger.getLogger(TestResultOutput.class);
+public class TestResultOutput extends Serializable {
 	private EnrichedOutput expected;
 	private Output calculated;
 
@@ -55,5 +57,11 @@ public class TestResultOutput {
 
 			return expected.equals(calculated) ? 0 : 1;
 		}, calculated.getValue());
+	}
+	
+	public void fromJson(String json) {
+		TestResultOutput temp = (TestResultOutput) SerializationHelper.getInstance().toClass(json, TestResultOutput.class);
+		this.expected = (EnrichedOutput) temp.getExpected();
+		this.calculated = temp.getCalculated();
 	}
 }

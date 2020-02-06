@@ -1,21 +1,65 @@
+import configuration from "./configuration";
+
 export default {
+	_vue: null,
+	_host: null,
 	_endpoint: null,
 
-	setEndpoint(host, workspace) {
+	setEndpoint(vue, host, workspace) {
+		this._vue = vue;
+		this._host = host;
 		this._endpoint = host + (workspace !== undefined ? "/workspaces/" + workspace : "");
+	},
+
+	//
+	// Workspace
+	//
+	async createWorkspace(input) {
+		const response = await this._authorizedFetch(this._host + "/workspaces", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(input)
+		});
+		return await response.json();
+	},
+
+	async getWorkspaces(query) {
+		if (query == null || query === "") {
+			query = undefined;
+		}
+
+		const response = await this._authorizedFetch(this._host + "/workspaces" + (query === undefined ? "" : ("?query=" + query)), {});
+		return await response.json();
+	},
+
+	async getWorkspace() {
+		const response = await this._authorizedFetch(this._endpoint + "/config", {});
+		return await response.json();
+	},
+
+	async editWorkspace(input) {
+		await this._authorizedFetch(this._endpoint + "/config", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(input)
+		});
+	},
+
+	async getWorkspaceLog() {
+		const response = await this._authorizedFetch(this._endpoint + "/log", {});
+		return (await response.json()).log;
 	},
 
 	//
 	// Model
 	//
-	getModel() {
-		return fetch(this._endpoint + "/model").then(function (response) {
-			return response.json();
-		});
+	async getModel() {
+		const response = await this._authorizedFetch(this._endpoint + "/model", {});
+		return await response.json();
 	},
 
-	importModel: async function (model) {
-		const response = await fetch(this._endpoint + "/model", {
+	async importModel(model) {
+		const response = await this._authorizedFetch(this._endpoint + "/model", {
 			method: "PUT",
 			headers: {"Content-Type": "text/xml"},
 			body: model
@@ -27,24 +71,22 @@ export default {
 		};
 	},
 
-	getModelInputs() {
-		return fetch(this._endpoint + "/model/inputs").then(function (response) {
-			return response.json();
-		});
+	async getModelInputs() {
+		const response = await this._authorizedFetch(this._endpoint + "/model/inputs", {});
+		return await response.json();
 	},
 
-	getModelResult(input) {
-		return fetch(this._endpoint + "/model/inputs", {
+	async getModelResult(input) {
+		const response = await this._authorizedFetch(this._endpoint + "/model/inputs", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
-		}).then(function (response) {
-			return response.json();
 		});
+		return await response.json();
 	},
 
-	getRawResult(expression, context) {
-		return fetch(this._endpoint + "/model/inputs/raw", {
+	async getRawResult(expression, context) {
+		return await this._authorizedFetch(this._endpoint + "/model/inputs/raw", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify({
@@ -57,44 +99,42 @@ export default {
 	//
 	// Inputs
 	//
-	getInputs(merge) {
+	async getInputs(merge) {
 		if (merge === undefined) {
 			merge = false;
 		}
 
-		return fetch(this._endpoint + "/inputs" + (merge ? "?merge=true" : "")).then(function (response) {
-			return response.json();
-		});
+		const response = await this._authorizedFetch(this._endpoint + "/inputs" + (merge ? "?merge=true" : ""), {});
+		return await response.json();
 	},
 
-	getInput(uuid, merge) {
+	async getInput(uuid, merge) {
 		if (merge === undefined) {
 			merge = false;
 		}
 
-		return fetch(this._endpoint + "/inputs/" + uuid + (merge ? "?merge=true" : "")).then(function (response) {
-			return response.json();
-		});
+		const response = await this._authorizedFetch(this._endpoint + "/inputs/" + uuid + (merge ? "?merge=true" : ""), {});
+		return await response.json();
 	},
 
-	addInput(input) {
-		return fetch(this._endpoint + "/inputs", {
+	async addInput(input) {
+		await this._authorizedFetch(this._endpoint + "/inputs", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
 		});
 	},
 
-	editInput(uuid, input) {
-		return fetch(this._endpoint + "/inputs/" + uuid, {
+	async editInput(uuid, input) {
+		await this._authorizedFetch(this._endpoint + "/inputs/" + uuid, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
 		});
 	},
 
-	deleteInput(uuid) {
-		return fetch(this._endpoint + "/inputs/" + uuid, {
+	async deleteInput(uuid) {
+		await this._authorizedFetch(this._endpoint + "/inputs/" + uuid, {
 			method: "DELETE"
 		});
 	},
@@ -102,30 +142,29 @@ export default {
 	//
 	// Outputs
 	//
-	getOutputs() {
-		return fetch(this._endpoint + "/outputs").then(function (response) {
-			return response.json();
-		});
+	async getOutputs() {
+		const response = await this._authorizedFetch(this._endpoint + "/outputs", {});
+		return await response.json();
 	},
 
-	addOutput(output) {
-		return fetch(this._endpoint + "/outputs", {
+	async addOutput(output) {
+		await this._authorizedFetch(this._endpoint + "/outputs", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(output)
 		});
 	},
 
-	editOutput(uuid, output) {
-		return fetch(this._endpoint + "/outputs/" + uuid, {
+	async editOutput(uuid, output) {
+		await this._authorizedFetch(this._endpoint + "/outputs/" + uuid, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(output)
 		});
 	},
 
-	deleteOutput(uuid) {
-		return fetch(this._endpoint + "/outputs/" + uuid, {
+	async deleteOutput(uuid) {
+		await this._authorizedFetch(this._endpoint + "/outputs/" + uuid, {
 			method: "DELETE"
 		});
 	},
@@ -133,35 +172,38 @@ export default {
 	//
 	// Tests
 	//
-	getTests() {
-		return fetch(this._endpoint + "/tests").then(function (response) {
-			return response.json();
-		});
+	async getTests() {
+		const response = await this._authorizedFetch(this._endpoint + "/tests", {});
+		return await response.json();
 	},
 
-	addTest(test) {
-		return fetch(this._endpoint + "/tests", {
+	async addTest(test) {
+		await this._authorizedFetch(this._endpoint + "/tests", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(test)
 		});
 	},
 
-	editTest(uuid, test) {
-		return fetch(this._endpoint + "/tests/" + uuid, {
+	async editTest(uuid, test) {
+		await this._authorizedFetch(this._endpoint + "/tests/" + uuid, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(test)
 		});
 	},
 
-	deleteTest(uuid) {
-		return fetch(this._endpoint + "/tests/" + uuid, {method: "DELETE"});
+	async deleteTest(uuid) {
+		await this._authorizedFetch(this._endpoint + "/tests/" + uuid, {
+			method: "DELETE"
+		});
 	},
 
 	async executeTest(uuid) {
 		const start = new Date().getTime();
-		const response = await fetch(this._endpoint + "/tests/" + uuid, {method: "POST"});
+		const response = await this._authorizedFetch(this._endpoint + "/tests/" + uuid, {
+			method: "POST"
+		});
 		const end = new Date().getTime();
 
 		const test = await response.json();
@@ -173,7 +215,7 @@ export default {
 		const formData = new FormData();
 		formData.append("backup", backup);
 
-		const response = await fetch(this._endpoint, {
+		const response = await this._authorizedFetch(this._endpoint, {
 			method: "PUT",
 			body: formData
 		});
@@ -183,9 +225,32 @@ export default {
 			messages: (await response.json()).messages
 		};
 	},
-	deleteWorkspace() {
-		return fetch(this._endpoint, {
+	async deleteWorkspace() {
+		await this._authorizedFetch(this._endpoint, {
 			method: "DELETE"
 		});
+	},
+
+
+	async _authorizedFetch(path, options) {
+		const token = configuration.getToken();
+		if (token !== undefined) {
+			if (options === undefined) {
+				options = {};
+			}
+			if (options.headers === undefined) {
+				options.headers = {};
+			}
+
+			options.headers.Authorization = "Bearer " + token
+		}
+
+		const response = await fetch(path, options);
+		if (response.status === 401) {
+			this._vue.authentication = true;
+			throw new Error();
+		}
+
+		return response;
 	}
 }

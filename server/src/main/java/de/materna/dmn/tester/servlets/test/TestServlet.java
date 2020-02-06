@@ -4,6 +4,8 @@ import de.materna.dmn.tester.drools.DroolsExecutor;
 import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.dmn.tester.servlets.filters.ReadAccess;
+import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.EnrichedOutput;
@@ -29,11 +31,15 @@ public class TestServlet {
 	private static final Logger log = Logger.getLogger(TestServlet.class);
 
 	@GET
+	@ReadAccess
 	@Path("/tests")
 	@Produces("application/json")
-	public Response getTests(@PathParam("workspace") String workspaceName) {
+	public Response getTests(@PathParam("workspace") String workspaceUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
+			
+			workspace.getAccessLog().writeMessage("Accessed list of tests", System.currentTimeMillis());
+			
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getTestManager().getFiles())).build();
 		}
 		catch (IOException exception) {
@@ -44,17 +50,20 @@ public class TestServlet {
 	}
 
 	@GET
+	@ReadAccess
 	@Path("/tests/{uuid}")
 	@Produces("application/json")
-	public Response getTest(@PathParam("workspace") String workspaceName, @PathParam("uuid") String testUUID) {
+	public Response getTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
 			PersistedTest test = testManager.getFiles().get(testUUID);
 			if (test == null) {
 				throw new NotFoundException();
 			}
+			
+			workspace.getAccessLog().writeMessage("Accessed test " + testUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(test)).build();
 		}
@@ -66,14 +75,17 @@ public class TestServlet {
 	}
 
 	@POST
+	@WriteAccess
 	@Path("/tests")
 	@Consumes("application/json")
-	public Response createTest(@PathParam("workspace") String workspaceName, String body) {
+	public Response createTest(@PathParam("workspace") String workspaceUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			String uuid = UUID.randomUUID().toString();
 
 			workspace.getTestManager().persistFile(uuid, (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class));
+			
+			workspace.getAccessLog().writeMessage("Created test " + uuid, System.currentTimeMillis());
 
 			return Response.status(Response.Status.CREATED).entity(uuid).build();
 		}
@@ -85,15 +97,16 @@ public class TestServlet {
 	}
 
 	@POST
+	@WriteAccess
 	@Path("/tests/{uuid}")
 	@Produces("application/json")
-	public Response runTest(@PathParam("workspace") String workspaceName, @PathParam("uuid") String testUUID) {
+	public Response runTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
-			DMNModel dmnModel = DroolsHelper.getModel(workspace.getDecisionSession());
+			DMNModel dmnModel = DroolsHelper.getModel(workspace);
 
 			PersistedTest test = testManager.getFiles().get(testUUID);
 			if (test == null) {
@@ -112,6 +125,8 @@ public class TestServlet {
 
 				comparedOutputs.put(expectedOutput.getDecision(), new TestResultOutput(new EnrichedOutput(output, expectedOutput), calculatedOutput));
 			}
+			
+			workspace.getAccessLog().writeMessage("Ran test " + testUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.OK).entity(new TestResult(comparedOutputs)).build();
 		}
@@ -123,12 +138,13 @@ public class TestServlet {
 	}
 
 	@PUT
+	@WriteAccess
 	@Path("/tests/{uuid}")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public Response editTest(@PathParam("workspace") String workspaceName, @PathParam("uuid") String testUUID, String body) {
+	public Response editTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
 			if (!testManager.getFiles().containsKey(testUUID)) {
@@ -136,6 +152,8 @@ public class TestServlet {
 			}
 
 			testManager.persistFile(testUUID, (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class));
+			
+			workspace.getAccessLog().writeMessage("Edited test " + testUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.NO_CONTENT).build();
 		}
@@ -147,10 +165,11 @@ public class TestServlet {
 	}
 
 	@DELETE
+	@WriteAccess
 	@Path("/tests/{uuid}")
-	public Response deleteTest(@PathParam("workspace") String workspaceName, @PathParam("uuid") String testUUID) {
+	public Response deleteTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
 			if (!testManager.getFiles().containsKey(testUUID)) {
@@ -158,6 +177,8 @@ public class TestServlet {
 			}
 
 			testManager.removeFile(testUUID);
+			
+			workspace.getAccessLog().writeMessage("Deleted test " + testUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.NO_CONTENT).build();
 		}

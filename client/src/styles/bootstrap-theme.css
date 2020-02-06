@@ -130,3 +130,56 @@ code {
 small {
 	font-size: 0.75rem;
 }
+
+/* Tooltips: Core */
+.tooltip {
+	display: block !important;
+	z-index: 10000;
+}
+
+.tooltip .tooltip-inner {
+	background: black;
+	color: white;
+	border-radius: 4px;
+	padding: 5px 10px;
+	max-width: 400px;
+}
+
+.tooltip .tooltip-arrow {
+	width: 0;
+	height: 0;
+	border-style: solid;
+	position: absolute;
+	margin: 5px;
+	border-color: black;
+	z-index: 1;
+}
+
+/* Tooltips: Top Placement */
+.tooltip {
+	margin-bottom: 5px;
+}
+
+.tooltip .tooltip-arrow {
+	border-width: 5px 5px 0 5px;
+	border-left-color: transparent !important;
+	border-right-color: transparent !important;
+	border-bottom-color: transparent !important;
+	bottom: -5px;
+	left: calc(50% - 5px);
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+/* Tooltips: Visibility */
+.tooltip[aria-hidden='true'] {
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity .15s, visibility .15s;
+}
+
+.tooltip[aria-hidden='false'] {
+	visibility: visible;
+	opacity: 1;
+	transition: opacity .15s;
+}

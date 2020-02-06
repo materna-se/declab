@@ -3,8 +3,11 @@ package de.materna.dmn.tester.servlets.input.beans;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Input {
-	private Map<String, ?> value = new HashMap<>();
+import de.materna.dmn.tester.helpers.Serializable;
+import de.materna.jdec.serialization.SerializationHelper;
+
+public class Input extends Serializable {
+	protected Map<String, ?> value = new HashMap<>();
 
 	public Input() {
 	}
@@ -19,5 +22,10 @@ public class Input {
 
 	public void setValue(Map<String, ?> value) {
 		this.value = value;
+	}
+	
+	public void fromJson(String json) {
+		Input temp = (Input) SerializationHelper.getInstance().toClass(json, Input.class);
+		this.value = temp.getValue();
 	}
 }

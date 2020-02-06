@@ -1,14 +1,19 @@
 package de.materna.dmn.tester;
 
+import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.CSRFFilter;
-import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
+import de.materna.dmn.tester.servlets.filters.ReadAccessFilter;
+import de.materna.dmn.tester.servlets.filters.WriteAccessFilter;
 import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.dmn.tester.servlets.model.ModelServlet;
 import de.materna.dmn.tester.servlets.output.OutputServlet;
 import de.materna.dmn.tester.servlets.test.TestServlet;
+import de.materna.dmn.tester.servlets.workspace.MetaWorkspaceServlet;
+import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,14 +22,20 @@ public class MainApplication extends Application {
 	private Set<Object> singletons = new HashSet<>();
 	private Set<Class<?>> classes = new HashSet<>();
 
-	public MainApplication() {
+	public MainApplication() throws IOException {
+		// Before we initialize the endpoints, we'll initialize all workspaces.
+		WorkspaceManager.getInstance().index();
+
 		singletons.add(new ModelServlet());
 		singletons.add(new InputServlet());
 		singletons.add(new OutputServlet());
 		singletons.add(new TestServlet());
+		singletons.add(new MetaWorkspaceServlet());
 		singletons.add(new WorkspaceServlet());
 
 		classes.add(CSRFFilter.class);
+		classes.add(ReadAccessFilter.class);
+		classes.add(WriteAccessFilter.class);
 	}
 
 	@Override

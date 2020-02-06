@@ -3,6 +3,8 @@ package de.materna.dmn.tester.servlets.input;
 import de.materna.dmn.tester.helpers.MergingHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.dmn.tester.servlets.filters.ReadAccess;
+import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
@@ -20,15 +22,19 @@ public class InputServlet {
 	private static final Logger log = Logger.getLogger(InputServlet.class);
 
 	@GET
+	@ReadAccess
 	@Path("/inputs")
 	@Produces("application/json")
-	public Response getInputs(@PathParam("workspace") String workspaceName, @QueryParam("merge") boolean merge) {
+	public Response getInputs(@PathParam("workspace") String workspaceUUID, @QueryParam("merge") boolean merge) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 			Map<String, PersistedInput> workspaceInputs = inputManager.getFiles();
 
 			Map<String, PersistedInput> enrichedInputs = merge ? enrichInputMap(inputManager, workspaceInputs) : workspaceInputs;
+			
+			workspace.getAccessLog().writeMessage("Accessed input list", System.currentTimeMillis());
+			
 			return Response.status(Response.Status.OK).entity(enrichedInputs).build();
 		}
 		catch (IOException exception) {
@@ -39,11 +45,12 @@ public class InputServlet {
 	}
 
 	@GET
+	@ReadAccess
 	@Path("/inputs/{uuid}")
 	@Produces("application/json")
-	public Response getInput(@PathParam("workspace") String workspaceName, @PathParam("uuid") String inputUUID, @QueryParam("merge") boolean merge) {
+	public Response getInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID, @QueryParam("merge") boolean merge) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 
 			PersistedInput input = inputManager.getFiles().get(inputUUID);
@@ -52,6 +59,9 @@ public class InputServlet {
 			}
 
 			PersistedInput enrichedInput = merge ? enrichInput(inputManager, input) : input;
+			
+			workspace.getAccessLog().writeMessage("Accessed input " + inputUUID, System.currentTimeMillis());
+			
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(enrichedInput)).build();
 		}
 		catch (IOException exception) {
@@ -62,15 +72,18 @@ public class InputServlet {
 	}
 
 	@POST
+	@WriteAccess
 	@Path("/inputs")
 	@Consumes("application/json")
-	public Response createInput(@PathParam("workspace") String workspaceName, String body) {
+	public Response createInput(@PathParam("workspace") String workspaceUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			String uuid = UUID.randomUUID().toString();
 
 			workspace.getInputManager().persistFile(uuid, (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class));
 
+			workspace.getAccessLog().writeMessage("Created input" + uuid, System.currentTimeMillis());
+			
 			return Response.status(Response.Status.CREATED).entity(uuid).build();
 		}
 		catch (IOException exception) {
@@ -81,12 +94,13 @@ public class InputServlet {
 	}
 
 	@PUT
+	@WriteAccess
 	@Path("/inputs/{uuid}")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public Response editInput(@PathParam("workspace") String workspaceName, @PathParam("uuid") String inputUUID, String body) {
+	public Response editInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID, String body) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 			if (!inputManager.getFiles().containsKey(inputUUID)) {
 				throw new NotFoundException();
@@ -97,6 +111,8 @@ public class InputServlet {
 				throw new BadRequestException(String.format("Input with uuid %s can't reference itself.", inputUUID));
 			}
 			inputManager.persistFile(inputUUID, input);
+			
+			workspace.getAccessLog().writeMessage("Edited input " + inputUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.NO_CONTENT).build();
 		}
@@ -108,10 +124,11 @@ public class InputServlet {
 	}
 
 	@DELETE
+	@WriteAccess
 	@Path("/inputs/{uuid}")
-	public Response deleteInput(@PathParam("workspace") String workspaceName, @PathParam("uuid") String inputUUID) {
+	public Response deleteInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID) {
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceName);
+			Workspace workspace = WorkspaceManager.getInstance().getByUUID(workspaceUUID);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 
 			PersistedInput input = inputManager.getFiles().get(inputUUID);
@@ -123,6 +140,8 @@ public class InputServlet {
 			}
 
 			inputManager.removeFile(inputUUID);
+			
+			workspace.getAccessLog().writeMessage("Deleted input " + inputUUID, System.currentTimeMillis());
 
 			return Response.status(Response.Status.NO_CONTENT).build();
 		}

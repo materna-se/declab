@@ -1,38 +1,48 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import de.materna.dmn.tester.helpers.HashingHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
+import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
 import de.materna.jdec.DecisionSession;
 import de.materna.jdec.model.ModelImportException;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);
 
 	private PersistenceFileManager modelManager;
+
 	private PersistenceDirectoryManager<PersistedInput> inputManager;
 	private PersistenceDirectoryManager<PersistedOutput> outputManager;
 	private PersistenceDirectoryManager<PersistedTest> testManager;
+
+	private Configuration configuration;
+	private AccessLog accessLog;
+
 	private DecisionSession decisionSession;
 
-	public Workspace(String name) throws IOException {
-		modelManager = new PersistenceFileManager(name, "model.dmn");
-		inputManager = new PersistenceDirectoryManager<>(name, "inputs", PersistedInput.class);
-		outputManager = new PersistenceDirectoryManager<>(name, "outputs", PersistedOutput.class);
-		testManager = new PersistenceDirectoryManager<>(name, "tests", PersistedTest.class);
-		decisionSession = new DecisionSession();
+	public Workspace(String workspaceUUID) throws IOException {
+		modelManager = new PersistenceFileManager(workspaceUUID, "model.dmn");
 
-		try {
-			decisionSession.importModel("main", "main", modelManager.getFile());
-		}
-		catch (IOException | ModelImportException e) {
-			log.warn("No valid model was found, import process is stopped.");
-		}
+		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class);
+		outputManager = new PersistenceDirectoryManager<>(workspaceUUID, "outputs", PersistedOutput.class);
+		testManager = new PersistenceDirectoryManager<>(workspaceUUID, "tests", PersistedTest.class);
+
+		PersistenceFileManager configurationManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
+		configuration = new Configuration(configurationManager);
+
+		PersistenceFileManager accessLogManager = new PersistenceFileManager(workspaceUUID, "access.log");
+		accessLog = new AccessLog(accessLogManager);
+
+		decisionSession = new DecisionSession();
 	}
 
 	public PersistenceFileManager getModelManager() {
@@ -53,5 +63,13 @@ public class Workspace {
 
 	public DecisionSession getDecisionSession() {
 		return decisionSession;
+	}
+
+	public Configuration getConfig() {
+		return configuration;
+	}
+
+	public AccessLog getAccessLog() {
+		return accessLog;
 	}
 }

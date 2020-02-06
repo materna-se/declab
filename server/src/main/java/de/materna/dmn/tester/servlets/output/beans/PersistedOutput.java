@@ -2,9 +2,11 @@ package de.materna.dmn.tester.servlets.output.beans;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import de.materna.jdec.serialization.SerializationHelper;
+
 public class PersistedOutput extends Output {
-	private String name;
-	private String decision;
+	protected String name;
+	protected String decision;
 
 	public PersistedOutput() {
 		super();
@@ -31,5 +33,13 @@ public class PersistedOutput extends Output {
 
 	public void setDecision(String decision) {
 		this.decision = decision;
+	}
+	
+	@Override
+	public void fromJson(String json) {
+		PersistedOutput temp = (PersistedOutput) SerializationHelper.getInstance().toClass(json, PersistedOutput.class);
+		this.value = temp.getValue();
+		this.name = temp.getName();
+		this.decision = temp.getDecision();
 	}
 }

@@ -8,8 +8,10 @@ import "./styles/bootstrap-theme.css"
 // Vue
 import Vue from "vue";
 import VueRouter from "vue-router";
+import VueTooltip from 'v-tooltip'
 // Components
 import LoadingIndicator from "./components/loading-indicator.vue";
+import Authenticator from "./components/authenticator.vue";
 import Header from "./components/header.vue";
 import Alert from "./components/alert/alert.vue";
 import Footer from "./components/footer.vue";
@@ -29,6 +31,7 @@ const Discoverer = () => import('./views/discoverer.vue');
 const Settings = () => import('./views/settings.vue');
 
 Vue.use(VueRouter);
+Vue.use(VueTooltip);
 
 const router = new VueRouter({
 	routes: [
@@ -55,15 +58,18 @@ const vue = new Vue({
 		"dmn-header": Header,
 		"alert": Alert,
 		"dmn-footer": Footer,
+		"authenticator": Authenticator,
 	},
 	data: function () {
 		return {
+			authentication: false,
+
 			loading: false,
 
 			alert: {
 				message: null,
 				state: null
-			},
+			}
 		};
 	},
 	methods: {
@@ -72,7 +78,7 @@ const vue = new Vue({
 				message: message,
 				state: state
 			}
-		}
+		},
 	}
 });
 
@@ -83,7 +89,7 @@ router.beforeEach((to, from, next) => {
 router.afterEach(async (to, from) => {
 	vue.alert.message = null;
 
-	Network.setEndpoint(process.env.DECLAB_HOST, to.params.workspace);
+	Network.setEndpoint(vue, process.env.DECLAB_HOST, to.params.workspace);
 
 	setTimeout(() => vue.loading = false, 500);
 });
