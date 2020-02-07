@@ -1,19 +1,14 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
-import de.materna.dmn.tester.helpers.HashingHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
-import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
 import de.materna.jdec.DecisionSession;
-import de.materna.jdec.model.ModelImportException;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
 public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);

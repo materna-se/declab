@@ -101,8 +101,8 @@ public class ModelServlet {
 	}
 
 	@POST
-	@WriteAccess
-	@Path("/model/inputs")
+	@ReadAccess
+	@Path("/model/execute")
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response calculateModelResult(@PathParam("workspace") String workspaceUUID, String body) {
@@ -132,8 +132,8 @@ public class ModelServlet {
 	}
 
 	@POST
-	@WriteAccess
-	@Path("/model/inputs/raw")
+	@ReadAccess
+	@Path("/model/execute/raw")
 	@Consumes("application/json")
 	@Produces("text/plain")
 	public Response calculateRawResult(String body) {

@@ -24,7 +24,7 @@ public class MainApplication extends Application {
 
 	public MainApplication() throws IOException {
 		// Before we initialize the endpoints, we'll initialize all workspaces.
-		WorkspaceManager.getInstance().index();
+		WorkspaceManager.getInstance().indexAll();
 
 		singletons.add(new ModelServlet());
 		singletons.add(new InputServlet());

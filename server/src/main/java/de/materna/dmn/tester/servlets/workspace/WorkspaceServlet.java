@@ -182,7 +182,7 @@ public class WorkspaceServlet {
 	public Response deleteWorkspace(@PathParam("workspace") String workspaceUUID) {
 		try {
 			WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
-			if (!workspaceManager.exists(workspaceUUID)) {
+			if (!workspaceManager.has(workspaceUUID)) {
 				return Response.status(Response.Status.NOT_FOUND).build();
 			}
 
@@ -251,14 +251,14 @@ public class WorkspaceServlet {
 			}
 		}
 
-		// If the workspace is cached, we need to invalidate it.
-		workspaceManager.invalidate(workspaceUUID);
+		// If the workspace is cached, we need to overwrite it by indexing.
+		workspaceManager.index(workspaceUUID);
 
 		try {
 			workspace.getDecisionSession().importModel("main", "main", workspace.getModelManager().getFile());
 		}
 		catch (ModelImportException exception) {
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
+			return Response.status(Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
 		}
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
