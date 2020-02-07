@@ -111,11 +111,11 @@
 					const resultAlert = vue.getResultAlert(result);
 					vue.$root.displayAlert(AlertHelper.buildList(resultAlert.message, result.messages), resultAlert.state);
 
-					await vue.getModel();
-					await vue.getInputs();
-
 					// To allow another execution of the listener, we have to reset the value
 					event.target.value = null;
+
+					await vue.getModel();
+					await vue.getInputs();
 				});
 				fileReader.readAsText(event.target.files[0], "UTF-8");
 			},
