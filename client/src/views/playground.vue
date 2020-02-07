@@ -5,7 +5,7 @@
 				<h3 class="mb-2">Expression</h3>
 				<div class="card">
 					<div class="card-body">
-						<feel-editor v-on:update:value="expression = $event; getRawResult();"/>
+						<feel-editor v-on:update:value="expression = $event; executeRaw();"/>
 					</div>
 				</div>
 			</div>
@@ -28,7 +28,7 @@
 				<h3 class="mb-2">Context</h3>
 				<div class="card">
 					<div class="card-body">
-						<json-builder v-bind:template="model.input.template" v-on:update:value="model.input.value = $event; getRawResult();"/>
+						<json-builder v-bind:template="model.input.template" v-on:update:value="model.input.value = $event; executeRaw();"/>
 					</div>
 				</div>
 			</div>
@@ -52,7 +52,7 @@
 			"feel-editor": FEELEditor,
 		},
 		mounted() {
-			this.getRawResult();
+			this.executeRaw();
 		},
 		data() {
 			return {
@@ -79,8 +79,8 @@
 			//
 			// Model
 			//
-			async getRawResult() {
-				const response = await Network.getRawResult(this.expression, this.model.input.value);
+			async executeRaw() {
+				const response = await Network.executeRaw(this.expression, this.model.input.value);
 				if (response.status !== 200) {
 					this.model.output.outputs = null;
 					this.displayAlert("The output can't be calculated.", "danger");

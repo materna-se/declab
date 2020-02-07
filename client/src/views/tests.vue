@@ -215,6 +215,9 @@
 					input: this.test.input,
 					outputs: this.test.outputs
 				});
+
+				this.$root.displayAlert("The test was successfully created.", "success");
+
 				this.getTests();
 			},
 			async editTest(uuid) {
@@ -224,10 +227,16 @@
 					input: this.test.input,
 					outputs: this.test.outputs
 				});
+
+				this.$root.displayAlert("The test was successfully edited.", "success");
+
 				this.getTests();
 			},
 			async deleteTest(uuid) {
 				await Network.deleteTest(uuid);
+
+				this.$root.displayAlert("The test was successfully deleted.", "success");
+
 				this.getTests();
 			},
 			async executeTests() {

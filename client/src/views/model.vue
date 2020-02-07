@@ -99,7 +99,7 @@
 			async getInputs() {
 				this.model.inputs = await Network.getModelInputs();
 			},
-			importModel(inputEvent) {
+			importModel(event) {
 				const vue = this;
 
 				const fileReader = new FileReader();
@@ -108,16 +108,18 @@
 					vue.$root.loading = true;
 
 					const result = await Network.importModel(readerEvent.target.result);
+
 					const resultAlert = vue.getResultAlert(result);
 					vue.$root.displayAlert(AlertHelper.buildList(resultAlert.message, result.messages), resultAlert.state);
 					vue.$root.loading = false;
+
 					await vue.getModel();
 					await vue.getInputs();
 
 					// To allow another execution of the listener, we have to reset the value
-					inputEvent.target.value = null;
+					event.target.value = null;
 				});
-				fileReader.readAsText(inputEvent.target.files[0], "UTF-8");
+				fileReader.readAsText(event.target.files[0], "UTF-8");
 			},
 
 			//

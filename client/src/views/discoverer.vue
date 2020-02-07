@@ -123,7 +123,7 @@
 				// Remove all results before adding new ones
 				this.options.results.length = 0;
 
-				const response = await Network.getRawResult(this.options.expression, {});
+				const response = await Network.executeRaw(this.options.expression, {});
 				const elements = (await response.json()).outputs.main.value;
 
 				/**
@@ -147,7 +147,7 @@
 					else {
 						currentInput = element;
 					}
-					const currentOutput = (await Network.getModelResult(currentInput)).outputs;
+					const currentOutput = (await Network.executeModel(currentInput)).outputs;
 
 					// Get the last ouput. If this.options.results is empty, we'll create a new result set.
 					let lastResult = this.options.results[this.options.results.length - 1];

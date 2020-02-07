@@ -7,7 +7,7 @@
 
 				<div class="card">
 					<div class="card-body">
-						<feel-editor v-on:update:value="expression = $event; getRawResult();"/>
+						<feel-editor v-on:update:value="expression = $event; executeRaw();"/>
 					</div>
 				</div>
 			</div>
@@ -74,7 +74,7 @@
 			"feel-editor": FEELEditor,
 		},
 		mounted() {
-			this.getRawResult();
+			this.executeRaw();
 		},
 		data() {
 			return {
@@ -126,10 +126,10 @@
 			//
 			// Model
 			//
-			async getRawResult() {
+			async executeRaw() {
 				this.progress = 0;
 				for (const scenario of this.scenarios) {
-					const response = await Network.getRawResult(this.expression, scenario.input);
+					const response = await Network.executeRaw(this.expression, scenario.input);
 					if (response.status !== 200) {
 						scenario.output.calculated.value = null;
 						this.displayAlert(scenario, "The output can't be calculated.", "danger");

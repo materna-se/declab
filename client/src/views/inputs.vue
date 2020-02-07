@@ -121,6 +121,9 @@
 					parent: this.input.parent,
 					value: this.input.value
 				});
+
+				this.$root.displayAlert("The input was successfully created.", "success");
+
 				await this.getInputs();
 			},
 			async editInput() {
@@ -129,10 +132,16 @@
 					parent: this.input.parent,
 					value: this.input.value
 				});
+
+				this.$root.displayAlert("The input was successfully edited.", "success");
+
 				await this.getInputs();
 			},
 			async deleteInput(uuid) {
 				await Network.deleteInput(uuid);
+
+				this.$root.displayAlert("The input was successfully deleted.", "success");
+
 				await this.getInputs();
 			},
 

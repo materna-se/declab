@@ -125,6 +125,9 @@
 					decision: this.output.decision,
 					value: this.output.value
 				});
+
+				this.$root.displayAlert("The output was successfully created.", "success");
+
 				await this.getOutputs();
 			},
 			async editOutput() {
@@ -133,10 +136,16 @@
 					decision: this.output.decision,
 					value: this.output.value
 				});
+
+				this.$root.displayAlert("The output was successfully edited.", "success");
+
 				await this.getOutputs();
 			},
 			async deleteOutput(uuid) {
 				await Network.deleteOutput(uuid);
+
+				this.$root.displayAlert("The output was successfully deleted.", "success");
+
 				await this.getOutputs();
 			},
 

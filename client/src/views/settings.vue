@@ -36,7 +36,7 @@
 							<h4 class="mb-0">Export</h4>
 						</div>
 						<div class="card-body">
-							<a v-bind:href="clientConfiguration.endpoint">
+							<a v-bind:href="clientConfiguration.endpoint + '/backup'">
 								<button class="btn btn-block btn-outline-secondary">Export</button>
 							</a>
 						</div>
@@ -137,6 +137,8 @@
 					access: access,
 					token: token
 				});
+
+				this.$root.displayAlert('The workspace was successfully saved.', "success");
 			},
 			async importWorkspace(event) {
 				this.$root.loading = true;
@@ -153,6 +155,7 @@
 
 					return "The workspace could not be imported, the following errors have occurred:";
 				})(), result.messages), result.successful ? "success" : "danger");
+
 				this.$root.loading = false;
 			},
 			async deleteWorkspace() {

@@ -47,7 +47,7 @@ export default {
 
 	async getWorkspaceLog() {
 		const response = await this._authorizedFetch(this._endpoint + "/log", {});
-		return (await response.json()).log;
+		return await response.json();
 	},
 
 	//
@@ -76,8 +76,8 @@ export default {
 		return await response.json();
 	},
 
-	async getModelResult(input) {
-		const response = await this._authorizedFetch(this._endpoint + "/model/inputs", {
+	async executeModel(input) {
+		const response = await this._authorizedFetch(this._endpoint + "/model/execute", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
@@ -85,8 +85,8 @@ export default {
 		return await response.json();
 	},
 
-	async getRawResult(expression, context) {
-		return await this._authorizedFetch(this._endpoint + "/model/inputs/raw", {
+	async executeRaw(expression, context) {
+		return await this._authorizedFetch(this._endpoint + "/model/execute/raw", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify({
@@ -215,14 +215,14 @@ export default {
 		const formData = new FormData();
 		formData.append("backup", backup);
 
-		const response = await this._authorizedFetch(this._endpoint, {
+		const response = await this._authorizedFetch(this._endpoint + "/backup", {
 			method: "PUT",
 			body: formData
 		});
 
 		return {
-			successful: response.status !== 503,
-			messages: (await response.json()).messages
+			successful: response.status !== 400,
+			messages: response.status === 400 ? ((await response.json()).messages) : []
 		};
 	},
 	async deleteWorkspace() {

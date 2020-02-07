@@ -22,7 +22,7 @@
 					<div class="col-12">
 						<div class="card card-borderless mb-2">
 							<div class="card-body p-0">
-								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:value="model.input.value = $event; getModelResult();"/>
+								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:value="model.input.value = $event; executeModel();"/>
 							</div>
 							<div class="card-footer card-footer-border">
 								<div class="input-group">
@@ -153,10 +153,10 @@
 					}
 
 					switch (data.type) {
-						// getModelResult will be received when the inputs are updated.
-						case "getModelResult": {
+						// executeModel will be received when the inputs are updated.
+						case "executeModel": {
 							vue.model.input.value = data.data;
-							vue.getModelResult();
+							vue.executeModel();
 						}
 					}
 				});
@@ -178,18 +178,18 @@
 			async getModelInputs() {
 				this.model.input.template = await Network.getModelInputs();
 			},
-			async getModelResult() {
+			async executeModel() {
 				// If we have a detached worker, we don't want to calculate the results here.
 				if (this.mode === 1) {
 					this.worker.postMessage({
-						type: "getModelResult",
+						type: "executeModel",
 						data: this.model.input.value
 					}, "*");
 					return;
 				}
 
 				try {
-					const result = await Network.getModelResult(this.model.input.value);
+					const result = await Network.executeModel(this.model.input.value);
 					this.model.result.outputs = result.outputs;
 					this.model.result.context = result.context;
 					if (result.messages.length > 0) {
@@ -251,12 +251,12 @@
 				this.worker.addEventListener("aftermount", function () {
 					vue.mode = 1;
 					vue.displayAlert(null, null);
-					vue.getModelResult();
+					vue.executeModel();
 				});
 				// This event will be received when the opened window is closed or the user navigates away.
 				this.worker.addEventListener("beforeunload", function () {
 					vue.mode = 0;
-					vue.getModelResult();
+					vue.executeModel();
 				});
 			},
 			importInput(input) {
