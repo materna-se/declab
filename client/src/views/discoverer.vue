@@ -1,10 +1,6 @@
 <template>
 	<div>
-		<div class="row">
-			<div class="col-12">
-				<h3 class="mb-2">Discoverer</h3>
-			</div>
-		</div>
+		<h3 class="mb-2">Discoverer</h3>
 		<div class="row">
 			<div class="col-4 mb-4">
 				<h4 class="mb-2">Input</h4>
