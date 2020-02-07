@@ -105,13 +105,11 @@
 				const fileReader = new FileReader();
 				fileReader.addEventListener("load", async function (readerEvent) {
 					vue.$root.displayAlert(null, null);
-					vue.$root.loading = true;
 
 					const result = await Network.importModel(readerEvent.target.result);
 
 					const resultAlert = vue.getResultAlert(result);
 					vue.$root.displayAlert(AlertHelper.buildList(resultAlert.message, result.messages), resultAlert.state);
-					vue.$root.loading = false;
 
 					await vue.getModel();
 					await vue.getInputs();

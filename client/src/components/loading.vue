@@ -1,5 +1,5 @@
 <template>
-	<div class="loading-indicator" v-if="loading">
+	<div class="loading-indicator" v-if="!loading">
 	</div>
 </template>
 
@@ -31,7 +31,7 @@
 
 		width: 25%;
 
-		background-color: #d0e7ff;
+		background-color: #ffffff;
 		animation: loading-animation 2s infinite ease-out;
 	}
 

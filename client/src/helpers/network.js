@@ -235,6 +235,8 @@ export default {
 	async _authorizedFetch(url, options) {
 		const vue = this._vue;
 
+		vue.loading = true;
+
 		const token = configuration.getToken();
 		if (token !== undefined) {
 			if (options === undefined) {
@@ -255,6 +257,8 @@ export default {
 			});
 			return this._authorizedFetch(url, options);
 		}
+
+		vue.loading = false;
 
 		return response;
 	}

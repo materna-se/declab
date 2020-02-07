@@ -7,7 +7,7 @@
 </head>
 <body>
 <div id="mount">
-	<loading-indicator v-bind:loading="loading"></loading-indicator>
+	<loading v-bind:loading="loading"></loading>
 	<dmn-header></dmn-header>
 	<div class="container-fluid">
 		<authenticator v-if="authentication.visible"></authenticator>

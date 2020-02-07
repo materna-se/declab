@@ -10,7 +10,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import VueTooltip from 'v-tooltip'
 // Components
-import LoadingIndicator from "./components/loading-indicator.vue";
+import Loading from "./components/loading.vue";
 import Authenticator from "./components/authenticator.vue";
 import Header from "./components/header.vue";
 import Alert from "./components/alert/alert.vue";
@@ -54,7 +54,7 @@ const vue = new Vue({
 	el: '#mount',
 	router: router,
 	components: {
-		"loading-indicator": LoadingIndicator,
+		"loading": Loading,
 		"dmn-header": Header,
 		"alert": Alert,
 		"dmn-footer": Footer,

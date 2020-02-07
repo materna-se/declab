@@ -141,8 +141,6 @@
 				this.$root.displayAlert('The workspace was successfully saved.', "success");
 			},
 			async importWorkspace(event) {
-				this.$root.loading = true;
-
 				const result = await Network.importWorkspace(event.target.files[0]);
 				this.$root.displayAlert(AlertHelper.buildList((() => {
 					if (result.successful && result.messages.length === 0) {
@@ -155,8 +153,6 @@
 
 					return "The workspace could not be imported, the following errors have occurred:";
 				})(), result.messages), result.successful ? "success" : "danger");
-
-				this.$root.loading = false;
 			},
 			async deleteWorkspace() {
 				await Network.deleteWorkspace();
