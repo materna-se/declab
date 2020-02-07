@@ -25,7 +25,8 @@
 				Configuration.setToken(token);
 			},
 			async reload() {
-				await this.$router.go();
+				this.$root.authentication.visible = false;
+				await this.$root.authentication.promise();
 			}
 		}
 	}

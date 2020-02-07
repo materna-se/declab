@@ -232,7 +232,9 @@ export default {
 	},
 
 
-	async _authorizedFetch(path, options) {
+	async _authorizedFetch(url, options) {
+		const vue = this._vue;
+
 		const token = configuration.getToken();
 		if (token !== undefined) {
 			if (options === undefined) {
@@ -245,10 +247,13 @@ export default {
 			options.headers.Authorization = "Bearer " + token
 		}
 
-		const response = await fetch(path, options);
+		const response = await fetch(url, options);
 		if (response.status === 401) {
-			this._vue.authentication = true;
-			throw new Error();
+			vue.authentication.visible = true;
+			await new Promise(resolve => {
+				vue.authentication.promise = resolve;
+			});
+			return this._authorizedFetch(url, options);
 		}
 
 		return response;

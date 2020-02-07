@@ -62,7 +62,10 @@ const vue = new Vue({
 	},
 	data: function () {
 		return {
-			authentication: false,
+			authentication: {
+				visible: false,
+				promise: null
+			},
 
 			loading: false,
 
@@ -87,7 +90,7 @@ router.beforeEach((to, from, next) => {
 	next();
 });
 router.afterEach(async (to, from) => {
-	vue.authentication = false;
+	vue.authentication.visible = false;
 	vue.alert = {
 		message: null,
 		state: null
