@@ -36,9 +36,7 @@
 							<h4 class="mb-0">Export</h4>
 						</div>
 						<div class="card-body">
-							<a v-bind:href="clientConfiguration.endpoint + '/backup'">
-								<button class="btn btn-block btn-outline-secondary">Export</button>
-							</a>
+							<button class="btn btn-block btn-outline-secondary" v-on:click="exportWorkspace">Export</button>
 						</div>
 					</div>
 				</div>
@@ -153,6 +151,18 @@
 
 					return "The workspace could not be imported, the following errors have occurred:";
 				})(), result.messages), result.successful ? "success" : "danger");
+			},
+			async exportWorkspace() {
+				const response = await Network.exportWorkspace();
+				const blob = await response.blob();
+
+				const element = document.createElement('a');
+				element.href = URL.createObjectURL(blob);
+				element.download = this.serverConfiguration.name + ".dtar";
+
+				document.body.appendChild(element);
+				element.click();
+				element.remove();
 			},
 			async deleteWorkspace() {
 				await Network.deleteWorkspace();

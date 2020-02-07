@@ -225,6 +225,10 @@ export default {
 			messages: response.status === 400 ? ((await response.json()).messages) : []
 		};
 	},
+	async exportWorkspace() {
+		return this._authorizedFetch(this._endpoint + "/backup");
+	},
+
 	async deleteWorkspace() {
 		await this._authorizedFetch(this._endpoint, {
 			method: "DELETE"
