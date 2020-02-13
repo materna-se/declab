@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class AccessFilterHelper {
 	private static final String AUTHENTICATION_SCHEME = "Bearer";
 
-	private static Pattern pattern = Pattern.compile("/workspaces/(.*?)/");
+	private static Pattern pattern = Pattern.compile("/workspaces/([a-z0-9\\-]+)");
 
 	public static String matchPath(ContainerRequestContext requestContext) throws MalformedURLException {
 		Matcher matcher = pattern.matcher(requestContext.getUriInfo().getRequestUri().toURL().getPath());

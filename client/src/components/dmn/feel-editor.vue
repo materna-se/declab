@@ -117,7 +117,7 @@
 				}
 			});
 
-			// Initialize monaco theme
+			// Initialize theme
 			monaco.editor.defineTheme('feel-theme', {
 				base: 'vs',
 				inherit: false, // We don't want to inherit rules

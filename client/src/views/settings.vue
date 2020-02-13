@@ -151,6 +151,9 @@
 
 					return "The workspace could not be imported, the following errors have occurred:";
 				})(), result.messages), result.successful ? "success" : "danger");
+
+				// To allow another execution of the listener, we have to reset the value.
+				event.target.value = null;
 			},
 			async exportWorkspace() {
 				const response = await Network.exportWorkspace();

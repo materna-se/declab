@@ -111,7 +111,7 @@
 					const resultAlert = vue.getResultAlert(result);
 					vue.$root.displayAlert(AlertHelper.buildList(resultAlert.message, result.messages), resultAlert.state);
 
-					// To allow another execution of the listener, we have to reset the value
+					// To allow another execution of the listener, we have to reset the value.
 					event.target.value = null;
 
 					await vue.getModel();

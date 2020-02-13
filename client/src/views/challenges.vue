@@ -81,7 +81,7 @@
 <script>
 	import Network from "../helpers/network";
 
-	import FEELEditor from "../components/dmn/dmn-editor.vue";
+	import FEELEditor from "../components/dmn/feel-editor.vue";
 	import JSONBuilder from "../components/json/json-builder.vue";
 	import Alert from "../components/alert/alert.vue";
 	import AlertHelper from "../components/alert/alert-helper";
