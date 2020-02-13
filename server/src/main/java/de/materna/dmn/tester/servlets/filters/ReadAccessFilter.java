@@ -36,7 +36,7 @@ public class ReadAccessFilter implements ContainerRequestFilter {
 			AccessFilterHelper.validateAuthorizationHeader(workspace, requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
 		}
 		catch (Exception e) {
-			log.error(e.getMessage());
+			log.error(e);
 
 			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
 		}
