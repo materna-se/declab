@@ -13,6 +13,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import java.security.NoSuchAlgorithmException;
 
 @WriteAccess
 @Provider
@@ -35,10 +36,10 @@ public class WriteAccessFilter implements ContainerRequestFilter {
 
 			AccessFilterHelper.validateAuthorizationHeader(workspace, requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
 		}
-		catch (Exception e) {
+		catch (NoSuchAlgorithmException e) {
 			log.error(e);
 
-			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+			requestContext.abortWith(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
 		}
 	}
 }

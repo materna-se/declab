@@ -9,17 +9,22 @@ import java.io.IOException;
 import java.util.List;
 
 public class DroolsHelper {
-	public static DMNModel getModel(Workspace workspace) throws IOException {
-		List<DMNModel> dmnModels = workspace.getDecisionSession().getRuntime().getModels();
-		if (dmnModels.size() != 0) {
-			return dmnModels.get(0);
-		}
+	public static DMNModel getModel(Workspace workspace) throws ModelNotFoundException {
+		try {
+			List<DMNModel> dmnModels = workspace.getDecisionSession().getRuntime().getModels();
+			if (dmnModels.size() != 0) {
+				return dmnModels.get(0);
+			}
 
-		if(workspace.getModelManager().fileExists()) {
-			workspace.getDecisionSession().importModel("main", "main", workspace.getModelManager().getFile());
-			return workspace.getDecisionSession().getRuntime().getModels().get(0);
-		}
+			if (workspace.getModelManager().fileExists()) {
+				workspace.getDecisionSession().importModel("main", "main", workspace.getModelManager().getFile());
+				return workspace.getDecisionSession().getRuntime().getModels().get(0);
+			}
 
-		throw new ModelNotFoundException();
+			throw new ModelNotFoundException();
+		}
+		catch (IOException e) {
+			throw new ModelNotFoundException();
+		}
 	}
 }

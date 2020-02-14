@@ -7,12 +7,17 @@ import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Priority;
+import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.security.NoSuchAlgorithmException;
 
 @ReadAccess
 @Provider
@@ -35,10 +40,10 @@ public class ReadAccessFilter implements ContainerRequestFilter {
 
 			AccessFilterHelper.validateAuthorizationHeader(workspace, requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
 		}
-		catch (Exception e) {
+		catch (NoSuchAlgorithmException e) {
 			log.error(e);
 
-			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+			requestContext.abortWith(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
 		}
 	}
 }
