@@ -1,6 +1,7 @@
 package de.materna.dmn.tester.servlets.model;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.materna.dmn.tester.drools.DroolsExecutor;
 import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
@@ -113,7 +114,6 @@ public class ModelServlet {
 			Map<String, Output> outputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), dmnModel, inputs);
 			debugger.stop();
 
-			//TODO Get model name from body?
 			workspace.getAccessLog().writeMessage("Calculated result for model", System.currentTimeMillis());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, debugger.getDecisions(), debugger.getMessages()))).build();
@@ -142,7 +142,8 @@ public class ModelServlet {
 			feel.addListener(feelEvent -> messages.add(feelEvent.getMessage()));
 
 			HashMap<String, Output> decisions = new LinkedHashMap<>();
-			decisions.put("main", new Output(SerializationHelper.getInstance().getJSONMapper().valueToTree(feel.evaluate(decision.getExpression(), decision.getContext()))));
+			ObjectMapper objectMapper = SerializationHelper.getInstance().getJSONMapper();
+			decisions.put("main", new Output(objectMapper.valueToTree(de.materna.jdec.drools.DroolsHelper.cleanResult(feel.evaluate(decision.getExpression(), decision.getContext())))));
 
 			ModelResult modelResult = new ModelResult(decisions, null, messages);
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(modelResult)).build();
