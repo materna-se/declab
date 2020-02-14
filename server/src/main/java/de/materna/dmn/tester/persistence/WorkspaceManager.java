@@ -7,6 +7,7 @@ import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import javax.ws.rs.NotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,10 +43,10 @@ public class WorkspaceManager {
 		return workspaces;
 	}
 
-	public Workspace get(String workspaceUUID) throws IOException {
+	public Workspace get(String workspaceUUID) {
 		Workspace workspace = workspaces.get(workspaceUUID);
 		if (workspace == null) {
-			throw new IOException("Workspace " + workspaceUUID + " can't be found.");
+			throw new NotFoundException("Workspace " + workspaceUUID + " can't be found.");
 		}
 
 		return workspace;

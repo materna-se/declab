@@ -15,6 +15,7 @@ import de.materna.jdec.drools.DroolsAnalyzer;
 import de.materna.jdec.drools.DroolsDebugger;
 import de.materna.jdec.model.ImportResult;
 import de.materna.jdec.model.ModelImportException;
+import de.materna.jdec.model.ModelNotFoundException;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
 import org.kie.dmn.api.core.DMNModel;
@@ -44,13 +45,13 @@ public class ModelServlet {
 			DMNModel dmnModel = DroolsHelper.getModel(workspace);
 
 			Model model = new Model(dmnModel.getName(), dmnModel.getDecisions(), dmnModel.getBusinessKnowledgeModels(), dmnModel.getDecisionServices());
-			
+
 			workspace.getAccessLog().writeMessage("Accessed model " + model.getName(), System.currentTimeMillis());
-			
+
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(model)).build();
 		}
-		catch (IOException exception) {
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+		catch (ModelNotFoundException exception) {
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 	}
 
@@ -65,7 +66,7 @@ public class ModelServlet {
 			ImportResult importResult = workspace.getDecisionSession().importModel("main", "main", body);
 
 			workspace.getModelManager().persistFile(body);
-			
+
 			workspace.getAccessLog().writeMessage("Imported model", System.currentTimeMillis());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(importResult)).build();
@@ -84,20 +85,13 @@ public class ModelServlet {
 	@Path("/model/inputs")
 	@Produces("application/json")
 	public Response getInputs(@PathParam("workspace") String workspaceUUID) {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			
-			DMNModel model = workspace.getDecisionSession().getRuntime().getModels().get(0);
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-			workspace.getAccessLog().writeMessage("Accessed list of inputs for model " + model.getName(), System.currentTimeMillis());
-			
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getInputs(model))).build();
-		}
-		catch (IOException exception) {
-			log.error(exception);
+		DMNModel model = workspace.getDecisionSession().getRuntime().getModels().get(0);
 
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		workspace.getAccessLog().writeMessage("Accessed list of inputs for model " + model.getName(), System.currentTimeMillis());
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getInputs(model))).build();
 	}
 
 	@POST
@@ -118,7 +112,7 @@ public class ModelServlet {
 			debugger.start();
 			Map<String, Output> outputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), dmnModel, inputs);
 			debugger.stop();
-			
+
 			//TODO Get model name from body?
 			workspace.getAccessLog().writeMessage("Calculated result for model", System.currentTimeMillis());
 
