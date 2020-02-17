@@ -13,13 +13,18 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 
 @ReadAccess
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class ReadAccessFilter implements ContainerRequestFilter {
 	private static final Logger log = Logger.getLogger(ReadAccessFilter.class);
-	private static final WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
+	private static WorkspaceManager workspaceManager;
+
+	public ReadAccessFilter() throws IOException {
+		workspaceManager = WorkspaceManager.getInstance();
+	}
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) {

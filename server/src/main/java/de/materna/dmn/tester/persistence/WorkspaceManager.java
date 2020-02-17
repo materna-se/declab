@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -22,10 +24,14 @@ public class WorkspaceManager {
 
 	private Map<String, Workspace> workspaces = new HashMap<>();
 
-	private WorkspaceManager() {
+	private WorkspaceManager() throws IOException {
+		Path path = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces");
+		if(!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
 	}
 
-	public static synchronized WorkspaceManager getInstance() {
+	public static synchronized WorkspaceManager getInstance() throws IOException {
 		if (instance == null) {
 			instance = new WorkspaceManager();
 		}
