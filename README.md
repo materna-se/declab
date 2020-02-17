@@ -39,14 +39,41 @@ can be executed in real time using the playground.
 
 ![](./docs/playground.png)
 
-## Development
-### Server
+## Client
+The following applications are required for client development:
+- **Node.js**
+- **npm**
+
+### Initialization
+In order to initialize the project environment, the following commands should be executed:
+```
+cd ./client
+npm install
+```
+
+Optionally, the environment variable `DECLAB_HOST` can be set to change the server endpoint. It defaults to `http://127.0.0.1:8080/declab-{version}/api`.
+
+### Development
+In order to start the development server, the following command should be executed:
+```
+npm run dev
+```
+Afterwards, the web server can be accessed at `http://127.0.0.1`.
+
+### Production
+In order to start the production build, the following command should be executed:
+```
+npm run build
+```
+Afterwards, the generated files can be found at `./server/src/main/webapp`.
+
+## Server
 The following applications are required for server development:
 - **Java 11**
 - **Maven**
 - **WildFly or JBoss** (support for other application servers will be added in the future)
 
-#### Production
+### Production
 In order to build a web archive, the following commands should be executed:
 ```
 cd ./server
@@ -62,31 +89,3 @@ the project can be built and executed by using the included Dockerfile.
 docker build -t declab:1.0.0 .
 docker run -p 127.0.0.1:8080:8080 declab:1.0.0 
 ```
-
-### Client
-The following applications are required for client development:
-- **Node.js**
-- **npm**
-
-#### Initialization
-In order to initialize the project environment, the following commands should be executed:
-```
-cd ./client
-npm install
-```
-
-Optionally, the environment variable `DECLAB_HOST` can be set to change the server endpoint. It defaults to `http://127.0.0.1:8080/declab-{version}/api`.
-
-#### Development
-In order to start the development server, the following command should be executed:
-```
-npm run dev
-```
-Afterwards, the web server can be accessed at `http://127.0.0.1`.
-
-#### Production
-In order to start the production build, the following command should be executed:
-```
-npm run build
-```
-Afterwards, the generated files can be found at `./server/src/main/webapp`.
