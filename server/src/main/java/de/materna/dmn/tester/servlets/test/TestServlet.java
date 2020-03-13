@@ -143,6 +143,8 @@ public class TestServlet {
 		}
 	}
 
+	 */
+
 	@PUT
 	@WriteAccess
 	@Path("/tests/{uuid}")
