@@ -8,7 +8,7 @@ import org.kie.dmn.api.core.DMNModel;
 import java.io.IOException;
 import java.util.List;
 
-public class DroolsHelper {
+public class DroolsHelper extends de.materna.jdec.drools.DroolsHelper {
 	public static DMNModel getModel(Workspace workspace) throws ModelNotFoundException {
 		try {
 			List<DMNModel> dmnModels = workspace.getDecisionSession().getRuntime().getModels();

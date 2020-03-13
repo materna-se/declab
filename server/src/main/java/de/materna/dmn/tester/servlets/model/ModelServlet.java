@@ -20,8 +20,6 @@ import de.materna.jdec.model.ModelNotFoundException;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
 import org.kie.dmn.api.core.DMNModel;
-import org.kie.dmn.api.feel.runtime.events.FEELEvent;
-import org.kie.dmn.api.feel.runtime.events.FEELEventListener;
 import org.kie.dmn.feel.FEEL;
 import org.kie.dmn.feel.lang.FEELProfile;
 import org.kie.dmn.feel.parser.feel11.profiles.KieExtendedFEELProfile;
@@ -143,7 +141,7 @@ public class ModelServlet {
 
 			HashMap<String, Output> decisions = new LinkedHashMap<>();
 			ObjectMapper objectMapper = SerializationHelper.getInstance().getJSONMapper();
-			decisions.put("main", new Output(objectMapper.valueToTree(de.materna.jdec.drools.DroolsHelper.cleanResult(feel.evaluate(decision.getExpression(), decision.getContext())))));
+			decisions.put("main", new Output(objectMapper.valueToTree(DroolsHelper.cleanResult(feel.evaluate(decision.getExpression(), decision.getContext())))));
 
 			ModelResult modelResult = new ModelResult(decisions, null, messages);
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(modelResult)).build();
