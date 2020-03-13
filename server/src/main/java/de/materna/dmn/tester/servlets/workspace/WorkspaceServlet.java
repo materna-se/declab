@@ -38,7 +38,7 @@ public class WorkspaceServlet {
 	@GET
 	@Path("/public")
 	@Produces("application/json")
-	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
+	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
@@ -55,7 +55,7 @@ public class WorkspaceServlet {
 	@WriteAccess
 	@Path("/config")
 	@Produces("application/json")
-	public Response getWorkspaceConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
+	public Response getWorkspaceConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
