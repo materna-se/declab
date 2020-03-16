@@ -9,6 +9,7 @@ import de.materna.dmn.tester.servlets.input.beans.Decision;
 import de.materna.dmn.tester.servlets.model.beans.Model;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.HybridDecisionSession;
+import de.materna.jdec.dmn.DroolsAnalyzer;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.model.ImportResult;
 import de.materna.jdec.model.ModelImportException;
@@ -70,8 +71,6 @@ public class ModelServlet {
 		}
 	}
 
-	/*
-	TODO-JAVA-SUPPORT: Wait for decisionSession.getModels()
 	@GET
 	@ReadAccess
 	@Path("/model/inputs")
@@ -79,13 +78,13 @@ public class ModelServlet {
 	public Response getInputs(@PathParam("workspace") String workspaceUUID) {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		DMNModel model = workspace.getDecisionSession().getRuntime().getModels().get(0);
+		// TODO-JAVA-SUPPORT: Wait for decisionSession.getModels()
+		DMNModel model = workspace.getDecisionSession().getDMNDecisionSession().getRuntime().getModels().get(0);
 
 		workspace.getAccessLog().writeMessage("Accessed list of inputs for model " + model.getName(), System.currentTimeMillis());
 
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getInputs(model))).build();
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getComplexInputStructure(model))).build();
 	}
-	 */
 
 	@POST
 	@ReadAccess
