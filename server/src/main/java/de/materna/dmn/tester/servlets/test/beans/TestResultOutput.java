@@ -1,6 +1,7 @@
 package de.materna.dmn.tester.servlets.test.beans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 
 import de.materna.dmn.tester.helpers.Serializable;
@@ -11,44 +12,36 @@ import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
 
 public class TestResultOutput extends Serializable {
-	private EnrichedOutput expected;
-	private Output calculated;
+	private JsonNode expected;
+	private JsonNode calculated;
 
 	public TestResultOutput() {
 	}
 
-	public TestResultOutput(EnrichedOutput expected, Output calculated) {
+	public TestResultOutput(JsonNode expected, JsonNode calculated) {
 		this.expected = expected;
 		this.calculated = calculated;
 	}
 
-	public Output getExpected() {
+	public JsonNode getExpected() {
 		return expected;
 	}
 
-	public void setExpected(EnrichedOutput expected) {
+	public void setExpected(JsonNode expected) {
 		this.expected = expected;
 	}
 
-	public Output getCalculated() {
+	public JsonNode getCalculated() {
 		return calculated;
 	}
 
-	public void setCalculated(Output calculated) {
+	public void setCalculated(JsonNode calculated) {
 		this.calculated = calculated;
 	}
 
 	@JsonProperty
 	public boolean isEqual() {
-		if (calculated == null) { // "expected" can't be null, so we can skip the check.
-			return false;
-		}
-
-		if (expected.getValue() instanceof NullNode || calculated.getValue() == null) {
-			return expected.getValue() instanceof NullNode && calculated.getValue() == null;
-		}
-
-		return expected.getValue().equals((expected, calculated) -> {
+		return expected.equals((expected, calculated) -> {
 			// JSON has only one data type for numbers.
 			// Because of this, we need to make sure that 1 and 1.0 are equal.
 			if (expected.isNumber() && calculated.isNumber()) {
@@ -56,12 +49,12 @@ public class TestResultOutput extends Serializable {
 			}
 
 			return expected.equals(calculated) ? 0 : 1;
-		}, calculated.getValue());
+		}, calculated);
 	}
-	
+
 	public void fromJson(String json) {
 		TestResultOutput temp = (TestResultOutput) SerializationHelper.getInstance().toClass(json, TestResultOutput.class);
-		this.expected = (EnrichedOutput) temp.getExpected();
+		this.expected = temp.getExpected();
 		this.calculated = temp.getCalculated();
 	}
 }
