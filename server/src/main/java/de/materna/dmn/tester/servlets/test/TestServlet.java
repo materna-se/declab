@@ -1,23 +1,13 @@
 package de.materna.dmn.tester.servlets.test;
 
-import de.materna.dmn.tester.drools.DroolsExecutor;
-import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
-import de.materna.dmn.tester.servlets.input.InputServlet;
-import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
-import de.materna.dmn.tester.servlets.output.beans.EnrichedOutput;
-import de.materna.dmn.tester.servlets.output.beans.Output;
-import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
-import de.materna.dmn.tester.servlets.test.beans.TestResult;
-import de.materna.dmn.tester.servlets.test.beans.TestResultOutput;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
-import org.kie.dmn.api.core.DMNModel;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -102,6 +92,7 @@ public class TestServlet {
 		}
 	}
 
+	/*
 	@POST
 	@WriteAccess
 	@Path("/tests/{uuid}")

@@ -46,14 +46,14 @@ public class WorkspaceManager {
 		return workspace;
 	}
 
-	public void indexAll() throws IOException {
+	public void indexAll() throws Exception {
 		File dir = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces").toFile();
 		for (File subdir : dir.listFiles()) {
 			index(subdir.getName());
 		}
 	}
 
-	public void index(String workspaceUUID) throws IOException {
+	public void index(String workspaceUUID) throws Exception {
 		// Check for version 0 workspaces and upgrade them.
 		PersistenceFileManager configurationManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
 		if (!configurationManager.fileExists()) {

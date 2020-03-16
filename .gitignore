@@ -1,6 +1,7 @@
 ##### IntelliJ #####
-.idea
+/.idea/
 *.iml
+/server/target/
 
 ##### Eclipse #####
 *.project

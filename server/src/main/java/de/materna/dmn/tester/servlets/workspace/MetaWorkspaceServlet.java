@@ -104,7 +104,7 @@ public class MetaWorkspaceServlet {
 			log.error(e);
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
-		catch (IOException | NoSuchAlgorithmException e) {
+		catch (Exception e) {
 			log.error(e);
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}

@@ -22,14 +22,16 @@ public class MainApplication extends Application {
 	private Set<Object> singletons = new HashSet<>();
 	private Set<Class<?>> classes = new HashSet<>();
 
-	public MainApplication() throws IOException {
+	public MainApplication() throws Exception {
 		// Before we initialize the endpoints, we'll initialize all workspaces.
 		WorkspaceManager.getInstance().indexAll();
 
 		singletons.add(new ModelServlet());
+		/*
 		singletons.add(new InputServlet());
 		singletons.add(new OutputServlet());
 		singletons.add(new TestServlet());
+		 */
 		singletons.add(new MetaWorkspaceServlet());
 		singletons.add(new WorkspaceServlet());
 

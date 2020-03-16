@@ -6,6 +6,7 @@ import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.jdec.DecisionSession;
+import de.materna.jdec.HybridDecisionSession;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -22,9 +23,9 @@ public class Workspace {
 	private Configuration configuration;
 	private AccessLog accessLog;
 
-	private DecisionSession decisionSession;
+	private HybridDecisionSession decisionSession;
 
-	public Workspace(String workspaceUUID) throws IOException {
+	public Workspace(String workspaceUUID) throws Exception {
 		modelManager = new PersistenceFileManager(workspaceUUID, "model.dmn");
 
 		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class);
@@ -37,7 +38,7 @@ public class Workspace {
 		PersistenceFileManager accessLogManager = new PersistenceFileManager(workspaceUUID, "access.log");
 		accessLog = new AccessLog(accessLogManager);
 
-		decisionSession = new DecisionSession();
+		decisionSession = new HybridDecisionSession();
 	}
 
 	public PersistenceFileManager getModelManager() {
@@ -56,7 +57,7 @@ public class Workspace {
 		return testManager;
 	}
 
-	public DecisionSession getDecisionSession() {
+	public HybridDecisionSession getDecisionSession() {
 		return decisionSession;
 	}
 
