@@ -37,36 +37,69 @@ public class ModelServlet {
 	@ReadAccess
 	@Path("/model")
 	@Produces("application/json")
-	public Response getModel(@PathParam("workspace") String workspaceUUID) {
+	public Response getModels(@PathParam("workspace") String workspaceUUID) {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-
-			DMNModel dmnModel = DroolsHelper.getModel(workspace);
-
-			Model model = new Model(dmnModel.getName(), dmnModel.getDecisions(), dmnModel.getBusinessKnowledgeModels(), dmnModel.getDecisionServices());
 			
-			workspace.getAccessLog().writeMessage("Accessed model " + model.getName(), System.currentTimeMillis());
+			List<DMNModel> dmnModels = DroolsHelper.getModels(workspace);
+			HashMap<String, Model> modelsMap = new HashMap<String, Model>();
+			LinkedList<HashMap<String, String>> models = workspace.getConfig().getModels();
 			
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(model)).build();
+			for(int i = 0; i < dmnModels.size(); i++) {
+				DMNModel dmnModel = dmnModels.get(i);
+				Model model = new Model(dmnModel.getNamespace(), dmnModel.getName(), dmnModel.getDecisions(), dmnModel.getBusinessKnowledgeModels(), dmnModel.getDecisionServices(), workspace.getDecisionSession().getModel(models.get(i).get("namespace"), models.get(i).get("name")));
+				modelsMap.put(models.get(i).get("uuid"), model);
+			}
+			
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(modelsMap)).build();
 		}
 		catch (IOException exception) {
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+			return Response.status(Response.Status.OK).entity("{}").build();
+		}
+		catch (IndexOutOfBoundsException exception) {
+			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Workspace is corrupted.").build();
 		}
 	}
 
 	@PUT
 	@WriteAccess
 	@Path("/model")
-	@Consumes("text/xml")
-	public Response importModel(@PathParam("workspace") String workspaceUUID, String body) {
+	@Consumes("application/json")
+	public Response importModels(@PathParam("workspace") String workspaceUUID, String body) {
 		try {
+			//Initialize
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-
-			ImportResult importResult = workspace.getDecisionSession().importModel("main", "main", body);
-
-			workspace.getModelManager().persistFile(body);
 			
-			workspace.getAccessLog().writeMessage("Imported model", System.currentTimeMillis());
+			HashMap<String, String>[] params = SerializationHelper.getInstance().toClass(body, new TypeReference<LinkedHashMap<String, String>[]>() {});
+			ImportResult importResult = null;
+			LinkedList<HashMap<String, String>> modelImportOrder = new LinkedList<HashMap<String, String>>();
+			
+			//Clear decision session
+			workspace.clearDecisionSession();
+			
+			//Clear model directory
+			workspace.getModelManager().removeAllFiles();
+
+			//Import models, update configuration
+			for(int i = 0; i < params.length; i++) {
+				HashMap<String, String> modelMap = params[i];
+				
+				importResult = workspace.getDecisionSession().importModel(modelMap.get("namespace"), modelMap.get("name"), modelMap.get("source"));
+				
+				String modelUUID = UUID.randomUUID().toString();
+				
+				workspace.getModelManager().persistFileRaw(modelUUID, modelMap.get("source"));
+				modelMap.put("uuid", modelUUID);
+				modelMap.remove("source");
+				modelImportOrder.add(modelMap);
+			}
+			
+			workspace.getConfig().setModels(modelImportOrder);
+			
+			//Update configuration and access log
+			workspace.getConfig().setModifiedDate(System.currentTimeMillis());
+			workspace.getConfig().serialize();
+			workspace.getAccessLog().writeMessage("Imported models", workspace.getConfig().getModifiedDate());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(importResult)).build();
 
@@ -119,8 +152,7 @@ public class ModelServlet {
 			Map<String, Output> outputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), dmnModel, inputs);
 			debugger.stop();
 			
-			//TODO Get model name from body?
-			workspace.getAccessLog().writeMessage("Calculated result for model", System.currentTimeMillis());
+			workspace.getAccessLog().writeMessage("Calculated result for main model", System.currentTimeMillis());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, debugger.getDecisions(), debugger.getMessages()))).build();
 		}
