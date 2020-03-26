@@ -35,17 +35,14 @@ public class ModelServlet {
 	public Response getModels(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		// TODO: Refactor?
-		List<DMNModel> dmnModels = DroolsHelper.getModels(workspace);
-		List<Map<String, String>> models = workspace.getConfig().getModels();
+		List<Model> models = new LinkedList<>();
 
-		HashMap<String, Model> modelsMap = new HashMap<>();
-		for (int i = 0; i < dmnModels.size(); i++) {
-			DMNModel dmnModel = dmnModels.get(i);
-			Model model = new Model(dmnModel.getNamespace(), dmnModel.getName(), dmnModel.getDecisions(), dmnModel.getBusinessKnowledgeModels(), dmnModel.getDecisionServices(), workspace.getDecisionSession().getModel(models.get(i).get("namespace"), models.get(i).get("name")));
-			modelsMap.put(models.get(i).get("uuid"), model);
+		List<DMNModel> dmnModels = DroolsHelper.getModels(workspace);
+		for (DMNModel dmnModel : dmnModels) {
+			models.add(new Model(dmnModel.getNamespace(), dmnModel.getName(), dmnModel.getDecisions(), dmnModel.getBusinessKnowledgeModels(), dmnModel.getDecisionServices(), workspace.getDecisionSession().getModel(dmnModel.getNamespace(), dmnModel.getName())));
 		}
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(modelsMap)).build();
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(models)).build();
 	}
 
 	@PUT
@@ -53,16 +50,19 @@ public class ModelServlet {
 	@Path("/model")
 	@Consumes("application/json")
 	public Response importModels(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+
+		List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<List<Map<String, String>>>() {
+		});
+
+		// Save current decision models so we can rollback if the import fails.
+		Map<String, String> currentFiles = workspace.getModelManager().getFiles();
+
+		// Clear decision session and the corresponding directory.
+		workspace.getModelManager().removeAllFiles();
+		workspace.clearDecisionSession();
+
 		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-
-			List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<List<Map<String, String>>>() {
-			});
-
-			// Clear decision session and the corresponding directory.
-			workspace.clearDecisionSession();
-			workspace.getModelManager().removeAllFiles();
-
 			ImportResult importResult = new ImportResult();
 
 			LinkedList<Map<String, String>> importedModels = new LinkedList<>();
@@ -88,6 +88,11 @@ public class ModelServlet {
 
 		}
 		catch (ModelImportException exception) {
+			for (Map.Entry<String, String> entry : currentFiles.entrySet()) {
+				workspace.getModelManager().persistFile(entry.getKey(), entry.getValue());
+			}
+			DroolsHelper.initModels(workspace);
+
 			return Response.status(Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
 		}
 	}
