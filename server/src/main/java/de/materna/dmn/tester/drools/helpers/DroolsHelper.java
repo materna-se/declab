@@ -23,9 +23,10 @@ public class DroolsHelper extends de.materna.jdec.dmn.DroolsHelper {
 
 	public static DMNModel getModel(Workspace workspace) throws IOException {
 		if(workspace.getConfig().getModels().size() > 0) {
-			LinkedList<HashMap<String, String>> models = workspace.getConfig().getModels();
+			List<Map<String, String>> models = workspace.getConfig().getModels();
 
-			return workspace.getDecisionSession().getRuntime().getModel(models.getLast().get("namespace"), models.getLast().get("name"));
+			Map<String, String> mainModel = models.get(models.size() - 1); // TODO: The main model should be marked explicitly!
+			return workspace.getDecisionSession().getRuntime().getModel(mainModel.get("namespace"), mainModel.get("name"));
 		}
 		throw new ModelNotFoundException();
 	}
@@ -33,9 +34,9 @@ public class DroolsHelper extends de.materna.jdec.dmn.DroolsHelper {
 	public static void initModels(Workspace workspace) throws IOException {
 		//Respect model import order if applicable
 		Map<String, String> modelFiles = workspace.getModelManager().getFiles();
-		LinkedList<HashMap<String, String>> models = workspace.getConfig().getModels();
+		List<Map<String, String>> models = workspace.getConfig().getModels();
 		if(modelFiles != null && modelFiles.size() > 0 && models != null && models.size() > 0) {
-			for(HashMap<String, String> model : models) {
+			for(Map<String, String> model : models) {
 				workspace.getDecisionSession().importModel(model.get("namespace"), model.get("name"), modelFiles.get(model.get("uuid")));
 			}
 		}
