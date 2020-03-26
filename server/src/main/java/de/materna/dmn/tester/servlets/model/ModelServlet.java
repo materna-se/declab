@@ -119,10 +119,7 @@ public class ModelServlet {
 	public Response getInputs(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		DMNModel model = workspace.getDecisionSession().getRuntime().getModels().get(0);
-
-		workspace.getAccessLog().writeMessage("Accessed list of inputs for model " + model.getName(), System.currentTimeMillis());
-
+		DMNModel model = DroolsHelper.getModel(workspace);
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getComplexInputStructure(model))).build();
 	}
 
@@ -135,12 +132,10 @@ public class ModelServlet {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-			DMNModel dmnModel = DroolsHelper.getModel(workspace);
-
 			Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 			});
 
-			ExecutionResult executionResult = workspace.getDecisionSession().executeModel(dmnModel, inputs);
+			ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getModel(workspace), inputs);
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(executionResult)).build();
 		}
 		catch (IOException exception) {
