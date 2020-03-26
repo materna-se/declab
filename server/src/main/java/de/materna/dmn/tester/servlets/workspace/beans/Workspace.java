@@ -13,7 +13,7 @@ import java.io.IOException;
 public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);
 
-	private PersistenceFileManager modelManager;
+	private PersistenceDirectoryManager<String> modelManager;
 
 	private PersistenceDirectoryManager<PersistedInput> inputManager;
 	private PersistenceDirectoryManager<PersistedOutput> outputManager;
@@ -25,11 +25,11 @@ public class Workspace {
 	private DecisionSession decisionSession;
 
 	public Workspace(String workspaceUUID) throws IOException {
-		modelManager = new PersistenceFileManager(workspaceUUID, "model.dmn");
+		modelManager = new PersistenceDirectoryManager<>(workspaceUUID, "models", String.class, "dmn");
 
-		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class);
-		outputManager = new PersistenceDirectoryManager<>(workspaceUUID, "outputs", PersistedOutput.class);
-		testManager = new PersistenceDirectoryManager<>(workspaceUUID, "tests", PersistedTest.class);
+		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class, "json");
+		outputManager = new PersistenceDirectoryManager<>(workspaceUUID, "outputs", PersistedOutput.class, "json");
+		testManager = new PersistenceDirectoryManager<>(workspaceUUID, "tests", PersistedTest.class, "json");
 
 		PersistenceFileManager configurationManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
 		configuration = new Configuration(configurationManager);
@@ -40,7 +40,7 @@ public class Workspace {
 		decisionSession = new DecisionSession();
 	}
 
-	public PersistenceFileManager getModelManager() {
+	public PersistenceDirectoryManager getModelManager() {
 		return modelManager;
 	}
 
