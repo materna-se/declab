@@ -64,6 +64,11 @@ public class Workspace {
 		return decisionSession;
 	}
 
+	public void clearDecisionSession() {
+		decisionSession.close();
+		decisionSession = new DMNDecisionSession();
+	}
+
 	public Configuration getConfig() {
 		return configuration;
 	}
