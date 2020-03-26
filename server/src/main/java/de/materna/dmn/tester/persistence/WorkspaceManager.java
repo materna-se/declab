@@ -4,8 +4,10 @@ import de.materna.dmn.tester.helpers.HashingHelper;
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.kie.dmn.api.core.DMNModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,8 +17,10 @@ import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 public class WorkspaceManager {
 	private static final Logger log = Logger.getLogger(WorkspaceManager.class);
@@ -54,18 +58,29 @@ public class WorkspaceManager {
 	public void indexAll() throws IOException {
 		File dir = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces").toFile();
 		for (File subdir : dir.listFiles()) {
-			index(subdir.getName());
+			try {
+				index(subdir.getName());
+			} catch(IOException e) {
+				log.error("Could not index workspace " + subdir.getName());
+				e.printStackTrace();
+			}
 		}
 	}
 
 	public void index(String workspaceUUID) throws IOException {
-		// Check for version 0 workspaces and upgrade them.
-		PersistenceFileManager configurationManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
-		if (!configurationManager.fileExists()) {
+		//Upgrade path from version 0 to 1
+		File dir = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", workspaceUUID).toFile();
+		File config = new File(dir + File.separator + "configuration.json");
+		if (!config.exists()) {
 			log.info("Workspace " + workspaceUUID + " needs to be upgraded from version 0 to 1.");
 
+			String generatedUUID = UUID.randomUUID().toString();
+			Files.move(Paths.get(dir.getAbsolutePath()), Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", generatedUUID));
+			dir = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", generatedUUID).toFile();
+			
 			// Create configuration.json
-			Configuration configuration = new Configuration();
+			PersistenceFileManager configManager = new PersistenceFileManager(generatedUUID, "configuration.json");
+			Configuration configuration = new Configuration(configManager);
 			configuration.setVersion(1);
 			configuration.setName(workspaceUUID);
 			configuration.setAccess(Access.PUBLIC);
@@ -77,14 +92,58 @@ public class WorkspaceManager {
 			}
 			configuration.setCreatedDate(System.currentTimeMillis());
 			configuration.setModifiedDate(configuration.getCreatedDate());
-			configurationManager.persistFile(configuration.toJson());
-
-			Workspace workspace = new Workspace(workspaceUUID);
-			workspaces.put(workspaceUUID, workspace);
-			return;
+			configuration.serialize();
+			
+			workspaceUUID = generatedUUID;
 		}
 
 		Workspace workspace = new Workspace(workspaceUUID);
+		
+		//Upgrade path from version 1 to 2
+		if(workspace.getConfig().getVersion() == 1) {
+			log.info("Workspace " + workspaceUUID + " needs to be upgraded from version 1 to 2.");
+			
+			//Check if workspace has any models
+			File file = new File(dir.getAbsolutePath() + File.separator + "model.dmn");
+			if(file.exists()) {
+				//Generate model UUID, move model file into models folder, rename model
+				String modelUUID = UUID.randomUUID().toString();
+				File modelDir = Paths.get(dir.getAbsolutePath(), "models").toFile();
+				if(!modelDir.exists()) {
+					modelDir.mkdir();
+				}
+				Path check = Files.move(Paths.get(file.getAbsolutePath()), Paths.get(modelDir.getAbsolutePath() + File.separator + modelUUID + ".dmn"));
+				if(check == null) {
+					throw new RuntimeException();
+				}
+				
+				//Update reference to model file
+				file = check.toFile();
+				
+				//Import model in order to obtain namespace and name
+				workspace.getDecisionSession().importModel("main", "main", new String(Files.readAllBytes(file.toPath())));
+				DMNModel importedModel = workspace.getDecisionSession().getRuntime().getModels().get(0);
+				
+				//Update the configuration with obtained information
+				LinkedList<HashMap<String, String>> models = new LinkedList<HashMap<String, String>>();
+				HashMap<String, String> modelMap = new HashMap<String, String>();
+				modelMap.put("namespace", importedModel.getNamespace());
+				modelMap.put("name", importedModel.getName());
+				modelMap.put("uuid", modelUUID);
+				models.add(modelMap);
+				workspace.getConfig().setModels(models);
+				
+				//Recreate decision session with correct information
+				workspace.clearDecisionSession();
+				workspace.getDecisionSession().importModel(importedModel.getNamespace(), importedModel.getName(), new String(Files.readAllBytes(file.toPath())));
+				
+				//GC
+				importedModel = null;
+			}
+			workspace.getConfig().setVersion(2);
+			workspace.getConfig().serialize();
+		}
+		
 		workspaces.put(workspaceUUID, workspace);
 	}
 
