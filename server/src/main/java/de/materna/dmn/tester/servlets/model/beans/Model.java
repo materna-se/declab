@@ -4,6 +4,8 @@ import org.kie.dmn.api.core.ast.BusinessKnowledgeModelNode;
 import org.kie.dmn.api.core.ast.DecisionNode;
 import org.kie.dmn.api.core.ast.DecisionServiceNode;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
 
@@ -13,12 +15,20 @@ import java.util.List;
 import java.util.Set;
 
 public class Model extends Serializable {
+	private String namespace;
 	private String name;
 	private List<String> decisions;
 	private List<String> knowledgeModels;
 	private List<String> decisionServices;
+	private String source;
 
-	public Model(String name, Set<DecisionNode> decisionNodes, Set<BusinessKnowledgeModelNode> businessKnowledgeModelNodes, Collection<DecisionServiceNode> decisionServiceNodes) {
+	public Model() {
+		
+	}
+	
+	public Model(String namespace, String name, Set<DecisionNode> decisionNodes, Set<BusinessKnowledgeModelNode> businessKnowledgeModelNodes, Collection<DecisionServiceNode> decisionServiceNodes, String source) {
+		this.namespace = namespace;
+		
 		this.name = name;
 
 		// At this moment, the name of the component is sufficient for us.
@@ -41,6 +51,8 @@ public class Model extends Serializable {
 			decisionServices.add(node.getName());
 		}
 		this.decisionServices = decisionServices;
+		
+		this.source = source;
 	}
 
 	public String getName() {
@@ -59,11 +71,21 @@ public class Model extends Serializable {
 		return decisionServices;
 	}
 	
+	public String getNamespace() {
+		return namespace;
+	}
+
+	public String getSource() {
+		return source;
+	}
+	
 	public void fromJson(String json) {
 		Model temp = (Model) SerializationHelper.getInstance().toClass(json, Model.class);
+		this.namespace = temp.getNamespace();
 		this.name = temp.getName();
 		this.decisions = temp.getDecisions();
 		this.knowledgeModels = temp.getKnowledgeModels();
 		this.decisionServices = temp.getDecisionServices();
+		this.source = temp.getSource();
 	}
 }
