@@ -69,13 +69,14 @@ public class PersistenceDirectoryManager<T> {
 	}
 
 	public void persistFile(String key, T value) throws IOException {
-		Files.createDirectories(directory);
-		Files.write(Paths.get(directory.toString(), key + "." + extension), SerializationHelper.getInstance().toJSON(value).getBytes(StandardCharsets.UTF_8));
-	}
-	
-	public void persistFileRaw(String key, String value) throws IOException {
-		Files.createDirectories(directory);
-		Files.write(Paths.get(directory.toString(), key + "." + extension), value.getBytes(StandardCharsets.UTF_8));
+		if(entityClass == String.class) {
+			Files.createDirectories(directory);
+			Files.write(Paths.get(directory.toString(), key + "." + extension), ((String) value).getBytes(StandardCharsets.UTF_8));
+		}
+		else {
+			Files.createDirectories(directory);
+			Files.write(Paths.get(directory.toString(), key + "." + extension), SerializationHelper.getInstance().toJSON(value).getBytes(StandardCharsets.UTF_8));
+		}
 	}
 
 	public void removeFile(String key) throws IOException {
