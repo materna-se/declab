@@ -1,6 +1,6 @@
 package de.materna.dmn.tester.servlets.test;
 
-import de.materna.dmn.tester.drools.DroolsExecutor;
+import com.fasterxml.jackson.databind.JsonNode;
 import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
@@ -8,13 +8,12 @@ import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
-import de.materna.dmn.tester.servlets.output.beans.EnrichedOutput;
-import de.materna.dmn.tester.servlets.output.beans.Output;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.dmn.tester.servlets.test.beans.TestResult;
 import de.materna.dmn.tester.servlets.test.beans.TestResultOutput;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
 import org.kie.dmn.api.core.DMNModel;
@@ -112,28 +111,23 @@ public class TestServlet {
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
-			DMNModel dmnModel = DroolsHelper.getModel(workspace);
-
 			PersistedTest test = testManager.getFiles().get(testUUID);
 			if (test == null) {
 				throw new NotFoundException();
 			}
 
 			Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
-			// Drools will execute the persisted input, the result is in the format <Decision, Output>.
-			Map<String, Output> calculatedOutputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), dmnModel, InputServlet.enrichInput(inputManager, inputManager.getFiles().get(test.getInput())).getValue());
+
+			ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getModel(workspace), InputServlet.enrichInput(inputManager, inputManager.getFiles().get(test.getInput())).getValue());
+			Map<String, Object> calculatedOutputs = executionResult.getOutputs();
 
 			Map<String, TestResultOutput> comparedOutputs = new LinkedHashMap<>();
-
 			for (String output : test.getOutputs()) {
 				PersistedOutput expectedOutput = expectedOutputs.get(output);
-				Output calculatedOutput = calculatedOutputs.get(expectedOutput.getDecision());
+				JsonNode calculatedOutputValue = SerializationHelper.getInstance().getJSONMapper().valueToTree(calculatedOutputs.get(expectedOutput.getDecision()));
 
-				comparedOutputs.put(expectedOutput.getDecision(), new TestResultOutput(new EnrichedOutput(output, expectedOutput), calculatedOutput));
+				comparedOutputs.put(expectedOutput.getDecision(), new TestResultOutput(expectedOutput.getValue(), calculatedOutputValue));
 			}
-
-			workspace.getAccessLog().writeMessage("Ran test " + testUUID, System.currentTimeMillis());
-
 			return Response.status(Response.Status.OK).entity(new TestResult(comparedOutputs)).build();
 		}
 		catch (IOException exception) {
