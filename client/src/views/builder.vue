@@ -71,7 +71,7 @@
 					<template v-if="model.result.visible[key]">
 						<div class="card-body">
 							<h5 class="mb-2">Output</h5>
-							<json-builder class="mb-0" v-bind:template="output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
+							<json-builder class="mb-0" v-bind:template="output" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 
 							<div class="mt-4" v-if="Object.keys(model.result.context[key]).length !== 0">
 								<h5 class="mb-2">Context</h5>
@@ -80,9 +80,9 @@
 						</div>
 						<div class="card-footer">
 							<div class="input-group">
-								<input type="text" class="form-control" placeholder="Enter Name..." v-model="output.name">
+								<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.result.name[key]">
 								<div class="input-group-append">
-									<button class="btn btn-outline-secondary" v-on:click="addOutput(key, output)">Save Output</button>
+									<button class="btn btn-outline-secondary" v-on:click="addOutput(key)">Save Output</button>
 								</div>
 							</div>
 						</div>
@@ -125,7 +125,8 @@
 					result: {
 						outputs: {},
 						context: {},
-						visible: {}
+						visible: {},
+						name: {}
 					}
 				},
 
@@ -223,11 +224,11 @@
 			//
 			// Outputs
 			//
-			async addOutput(decision, output) {
+			async addOutput(decision) {
 				await Network.addOutput({
-					name: output.name,
+					name: this.model.result.name[decision],
 					decision: decision,
-					value: output.value
+					value: this.model.result.outputs[decision]
 				});
 
 				this.$root.displayAlert("The output was successfully saved.", "success");
