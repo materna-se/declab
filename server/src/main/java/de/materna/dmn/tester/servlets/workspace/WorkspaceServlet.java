@@ -151,7 +151,7 @@ public class WorkspaceServlet {
 
 			return Response.status(Response.Status.OK).build();
 		}
-		catch (IllegalArgumentException | JsonParseException | JsonMappingException | BadRequestException e) {
+		catch (IllegalArgumentException | BadRequestException e) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 		catch (Exception e) {

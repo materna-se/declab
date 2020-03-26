@@ -24,12 +24,12 @@ public class DroolsHelper {
 	public static DMNModel getModel(Workspace workspace) throws IOException {
 		if(workspace.getConfig().getModels().size() > 0) {
 			LinkedList<HashMap<String, String>> models = workspace.getConfig().getModels();
-			
+
 			return workspace.getDecisionSession().getRuntime().getModel(models.getLast().get("namespace"), models.getLast().get("name"));
 		}
 		throw new ModelNotFoundException();
 	}
-	
+
 	public static void initModels(Workspace workspace) throws IOException {
 		//Respect model import order if applicable
 		Map<String, String> modelFiles = workspace.getModelManager().getFiles();

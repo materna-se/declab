@@ -317,7 +317,7 @@
 			// Helper
 			//
 			getDifference(expected, calculated) {
-				return new DiffMatchPatch().diff_main(expected !== null ? JSON.stringify(expected.value, null, 3) : '', calculated !== null ? JSON.stringify(calculated.value, null, 3) : '');
+				return new DiffMatchPatch().diff_main(expected !== null ? JSON.stringify(expected, null, 3) : '', calculated !== null ? JSON.stringify(calculated, null, 3) : '');
 			}
 		}
 	};

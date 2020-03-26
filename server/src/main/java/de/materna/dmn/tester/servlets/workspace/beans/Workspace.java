@@ -39,7 +39,7 @@ public class Workspace {
 		accessLog = new AccessLog(accessLogManager);
 
 		decisionSession = new DecisionSession();
-		
+
 		DroolsHelper.initModels(this);
 
 	}
@@ -70,11 +70,5 @@ public class Workspace {
 
 	public AccessLog getAccessLog() {
 		return accessLog;
-	}
-	
-	public void clearDecisionSession() throws IOException {
-		decisionSession.close();
-		decisionSession = null;
-		decisionSession = new DecisionSession();
 	}
 }

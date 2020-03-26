@@ -66,7 +66,7 @@
 	import Network from "../helpers/network";
 	import JSONPath from "jsonpath";
 	import debounce from "lodash/debounce";
-	import FEELEditor from "../components/dmn/dmn-editor.vue";
+	import FEELEditor from "../components/dmn/feel-editor.vue";
 	import JSONBuilder from "../components/json/json-builder.vue";
 
 	export default {

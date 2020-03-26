@@ -40,17 +40,17 @@ public class ModelServlet {
 	public Response getModels(@PathParam("workspace") String workspaceUUID) {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			
+
 			List<DMNModel> dmnModels = DroolsHelper.getModels(workspace);
 			HashMap<String, Model> modelsMap = new HashMap<String, Model>();
 			LinkedList<HashMap<String, String>> models = workspace.getConfig().getModels();
-			
+
 			for(int i = 0; i < dmnModels.size(); i++) {
 				DMNModel dmnModel = dmnModels.get(i);
 				Model model = new Model(dmnModel.getNamespace(), dmnModel.getName(), dmnModel.getDecisions(), dmnModel.getBusinessKnowledgeModels(), dmnModel.getDecisionServices(), workspace.getDecisionSession().getModel(models.get(i).get("namespace"), models.get(i).get("name")));
 				modelsMap.put(models.get(i).get("uuid"), model);
 			}
-			
+
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(modelsMap)).build();
 		}
 		catch (IOException exception) {
@@ -69,33 +69,33 @@ public class ModelServlet {
 		try {
 			//Initialize
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			
+
 			HashMap<String, String>[] params = SerializationHelper.getInstance().toClass(body, new TypeReference<LinkedHashMap<String, String>[]>() {});
 			ImportResult importResult = null;
 			LinkedList<HashMap<String, String>> modelImportOrder = new LinkedList<HashMap<String, String>>();
-			
+
 			//Clear decision session
 			workspace.clearDecisionSession();
-			
+
 			//Clear model directory
 			workspace.getModelManager().removeAllFiles();
 
 			//Import models, update configuration
 			for(int i = 0; i < params.length; i++) {
 				HashMap<String, String> modelMap = params[i];
-				
+
 				importResult = workspace.getDecisionSession().importModel(modelMap.get("namespace"), modelMap.get("name"), modelMap.get("source"));
-				
+
 				String modelUUID = UUID.randomUUID().toString();
-				
+
 				workspace.getModelManager().persistFileRaw(modelUUID, modelMap.get("source"));
 				modelMap.put("uuid", modelUUID);
 				modelMap.remove("source");
 				modelImportOrder.add(modelMap);
 			}
-			
+
 			workspace.getConfig().setModels(modelImportOrder);
-			
+
 			//Update configuration and access log
 			workspace.getConfig().setModifiedDate(System.currentTimeMillis());
 			workspace.getConfig().serialize();
@@ -116,21 +116,14 @@ public class ModelServlet {
 	@ReadAccess
 	@Path("/model/inputs")
 	@Produces("application/json")
-	public Response getInputs(@PathParam("workspace") String workspaceUUID) {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			
-			DMNModel model = workspace.getDecisionSession().getRuntime().getModels().get(0);
+	public Response getInputs(@PathParam("workspace") String workspaceUUID) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-			workspace.getAccessLog().writeMessage("Accessed list of inputs for model " + model.getName(), System.currentTimeMillis());
-			
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getInputs(model))).build();
-		}
-		catch (IOException exception) {
-			log.error(exception);
+		DMNModel model = workspace.getDecisionSession().getRuntime().getModels().get(0);
 
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		workspace.getAccessLog().writeMessage("Accessed list of inputs for model " + model.getName(), System.currentTimeMillis());
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getComplexInputStructure(model))).build();
 	}
 
 	@POST
@@ -147,14 +140,8 @@ public class ModelServlet {
 			Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 			});
 
-			DroolsDebugger debugger = new DroolsDebugger(workspace.getDecisionSession());
-			debugger.start();
-			Map<String, Output> outputs = DroolsExecutor.getOutputs(workspace.getDecisionSession(), dmnModel, inputs);
-			debugger.stop();
-			
-			workspace.getAccessLog().writeMessage("Calculated result for main model", System.currentTimeMillis());
-
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(new ModelResult(outputs, debugger.getDecisions(), debugger.getMessages()))).build();
+			ExecutionResult executionResult = workspace.getDecisionSession().executeModel(dmnModel, inputs);
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(executionResult)).build();
 		}
 		catch (IOException exception) {
 			log.error(exception);
@@ -180,7 +167,8 @@ public class ModelServlet {
 			feel.addListener(feelEvent -> messages.add(feelEvent.getMessage()));
 
 			HashMap<String, Output> decisions = new LinkedHashMap<>();
-			decisions.put("main", new Output(SerializationHelper.getInstance().getJSONMapper().valueToTree(feel.evaluate(decision.getExpression(), decision.getContext()))));
+			ObjectMapper objectMapper = SerializationHelper.getInstance().getJSONMapper();
+			decisions.put("main", new Output(objectMapper.valueToTree(DroolsHelper.cleanResult(feel.evaluate(decision.getExpression(), decision.getContext())))));
 
 			ModelResult modelResult = new ModelResult(decisions, null, messages);
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(modelResult)).build();
