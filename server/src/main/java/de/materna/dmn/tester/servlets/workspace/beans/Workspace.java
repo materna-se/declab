@@ -67,4 +67,10 @@ public class Workspace {
 	public AccessLog getAccessLog() {
 		return accessLog;
 	}
+	
+	public void clearDecisionSession() throws IOException {
+		decisionSession.close();
+		decisionSession = null;
+		decisionSession = new DecisionSession();
+	}
 }
