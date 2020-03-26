@@ -1,5 +1,6 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
@@ -38,6 +39,9 @@ public class Workspace {
 		accessLog = new AccessLog(accessLogManager);
 
 		decisionSession = new DecisionSession();
+		
+		DroolsHelper.initModels(this);
+
 	}
 
 	public PersistenceDirectoryManager getModelManager() {
