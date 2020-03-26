@@ -6,7 +6,7 @@ import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
-import de.materna.jdec.DecisionSession;
+import de.materna.jdec.DMNDecisionSession;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ public class Workspace {
 	private Configuration configuration;
 	private AccessLog accessLog;
 
-	private DecisionSession decisionSession;
+	private DMNDecisionSession decisionSession;
 
 	public Workspace(String workspaceUUID) throws IOException {
 		modelManager = new PersistenceDirectoryManager<>(workspaceUUID, "models", String.class, "dmn");
@@ -38,13 +38,13 @@ public class Workspace {
 		PersistenceFileManager accessLogManager = new PersistenceFileManager(workspaceUUID, "access.log");
 		accessLog = new AccessLog(accessLogManager);
 
-		decisionSession = new DecisionSession();
+		decisionSession = new DMNDecisionSession();
 
 		DroolsHelper.initModels(this);
 
 	}
 
-	public PersistenceDirectoryManager getModelManager() {
+	public PersistenceDirectoryManager<String> getModelManager() {
 		return modelManager;
 	}
 
@@ -60,7 +60,7 @@ public class Workspace {
 		return testManager;
 	}
 
-	public DecisionSession getDecisionSession() {
+	public DMNDecisionSession getDecisionSession() {
 		return decisionSession;
 	}
 
