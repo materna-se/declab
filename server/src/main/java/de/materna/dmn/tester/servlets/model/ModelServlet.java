@@ -166,11 +166,10 @@ public class ModelServlet {
 			List<String> messages = new LinkedList<>();
 			feel.addListener(feelEvent -> messages.add(feelEvent.getMessage()));
 
-			HashMap<String, Output> decisions = new LinkedHashMap<>();
-			ObjectMapper objectMapper = SerializationHelper.getInstance().getJSONMapper();
-			decisions.put("main", new Output(objectMapper.valueToTree(DroolsHelper.cleanResult(feel.evaluate(decision.getExpression(), decision.getContext())))));
+			HashMap<String, Object> outputs = new LinkedHashMap<>();
+			outputs.put("main", DroolsHelper.cleanResult(feel.evaluate(decision.getExpression(), decision.getContext())));
 
-			ModelResult modelResult = new ModelResult(decisions, null, messages);
+			ExecutionResult modelResult = new ExecutionResult(outputs, null, messages);
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(modelResult)).build();
 		}
 		catch (Exception exception) {

@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class DroolsHelper {
+public class DroolsHelper extends de.materna.jdec.dmn.DroolsHelper {
 	public static List<DMNModel> getModels(Workspace workspace) throws IOException {
 		List<DMNModel> dmnModels = workspace.getDecisionSession().getRuntime().getModels();
 		if (dmnModels.size() != 0) {
