@@ -16,12 +16,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 public class WorkspaceManager {
 	private static final Logger log = Logger.getLogger(WorkspaceManager.class);
@@ -113,12 +109,9 @@ public class WorkspaceManager {
 				if(!modelDir.exists()) {
 					modelDir.mkdir();
 				}
-				Path check = Files.move(Paths.get(file.getAbsolutePath()), Paths.get(modelDir.getAbsolutePath() + File.separator + modelUUID + ".dmn"));
-				if(check == null) {
-					throw new RuntimeException();
-				}
-				
+
 				//Update reference to model file
+				Path check = Files.move(Paths.get(file.getAbsolutePath()), Paths.get(modelDir.getAbsolutePath() + File.separator + modelUUID + ".dmn"));
 				file = check.toFile();
 				
 				//Import model in order to obtain namespace and name
@@ -126,8 +119,8 @@ public class WorkspaceManager {
 				DMNModel importedModel = workspace.getDecisionSession().getRuntime().getModels().get(0);
 				
 				//Update the configuration with obtained information
-				LinkedList<HashMap<String, String>> models = new LinkedList<HashMap<String, String>>();
-				HashMap<String, String> modelMap = new HashMap<String, String>();
+				List<Map<String, String>> models = new LinkedList<>();
+				HashMap<String, String> modelMap = new HashMap<>();
 				modelMap.put("namespace", importedModel.getNamespace());
 				modelMap.put("name", importedModel.getName());
 				modelMap.put("uuid", modelUUID);
@@ -137,9 +130,6 @@ public class WorkspaceManager {
 				//Recreate decision session with correct information
 				workspace.clearDecisionSession();
 				workspace.getDecisionSession().importModel(importedModel.getNamespace(), importedModel.getName(), new String(Files.readAllBytes(file.toPath())));
-				
-				//GC
-				importedModel = null;
 			}
 			workspace.getConfig().setVersion(2);
 			workspace.getConfig().serialize();
