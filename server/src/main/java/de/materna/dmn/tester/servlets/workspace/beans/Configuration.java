@@ -10,6 +10,8 @@ import de.materna.jdec.serialization.SerializationHelper;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class Configuration extends PublicConfiguration {
 	private PersistenceFileManager fileManager;
@@ -18,6 +20,7 @@ public class Configuration extends PublicConfiguration {
 	private String salt = null;
 	private long createdDate = Long.MIN_VALUE;
 	private long modifiedDate = Long.MIN_VALUE;
+	private LinkedList<HashMap<String, String>> models = new LinkedList<HashMap<String, String>>();
 
 	public Configuration() {
 	}
@@ -88,6 +91,16 @@ public class Configuration extends PublicConfiguration {
 		this.modifiedDate = modifiedDate;
 	}
 	
+	@JsonProperty
+	public LinkedList<HashMap<String, String>> getModels() {
+		return models;
+	}
+
+	@JsonProperty
+	public void setModels(LinkedList<HashMap<String, String>> modelImportOrder) {
+		this.models = modelImportOrder;
+	}
+	
 	@Override
 	public void fromJson(String body) {
 		Configuration temp = (Configuration) SerializationHelper.getInstance().toClass(body, Configuration.class);
@@ -99,5 +112,6 @@ public class Configuration extends PublicConfiguration {
 		this.access = temp.getAccess();
 		this.token = temp.getToken();
 		this.salt = temp.getSalt();
+		this.models = temp.getModels();
 	}
 }
