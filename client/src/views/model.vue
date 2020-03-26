@@ -1,41 +1,46 @@
 <template>
 	<div>
-		<div class="row mb-4">
-			<div class="col-12">
+		<draggable class="row mb-4" v-model="importedModels" animation="150" draggable=".draggable" v-on:update="orderModels">
+			<div class="col-4 mb-4 draggable" v-for="(importedModel, index) of importedModels">
 				<div class="card">
-					<div class="card-header">
-						<div class="float-left">
-							<h4 class="mb-0" style="line-height: 38px">{{model.name}}</h4>
-						</div>
-						<div class="float-right">
-							<div class="input-group">
-								<label for="file" class="custom-file-label">Select DMN File...</label>
-								<input id="file" type="file" name="file" class="custom-file-input" v-on:change="importModel">
-							</div>
-						</div>
+					<div class="card-header d-flex align-items-center">
+						<h4 class="mb-0 mr-auto">{{importedModel.name}}</h4>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" v-on:click="deleteModel(index)">
+							<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
+						</svg>
 					</div>
 					<div class="card-body">
-						<div v-if="model.name !== null">
-							<h5 class="mb-2" style="clear: both">Decisions</h5>
-							<div class="dmn dmn-decision mr-2 mb-2" v-for="decision of model.decisions">
-								{{decision}}
-							</div>
-							<div style="clear: both"></div>
-							<h5 class="mt-2 mb-2" style="clear: both">Inputs</h5>
-							<div class="dmn dmn-input mr-2 mb-2" v-for="(input, key) in model.inputs.value">
-								{{key}}
-							</div>
-							<div style="clear: both"></div>
-							<h5 class="mt-2 mb-2">Business Knowledge Models</h5>
-							<div class="dmn dmn-bkm mr-2 mb-2" v-for="knowledgeModel in model.knowledgeModels">
-								{{knowledgeModel}}
-							</div>
+						<h5 class="mb-2" style="clear: both">Decisions</h5>
+						<div class="dmn dmn-decision mr-2 mb-2" v-for="decision of importedModel.decisions">
+							{{decision}}
 						</div>
-						<p class="my-2 text-center text-muted" v-else>Please select a model!</p>
+						<div style="clear: both"></div>
+						<h5 class="mt-2 mb-2" style="clear: both">Inputs</h5>
+						<div class="dmn dmn-input mr-2 mb-2" v-for="(input, key) in importedModel.inputs.value">
+							{{key}}
+						</div>
+						<div style="clear: both"></div>
+						<h5 class="mt-2 mb-2">Business Knowledge Models</h5>
+						<div class="dmn dmn-bkm mr-2 mb-2" v-for="knowledgeModel in importedModel.knowledgeModels">
+							{{knowledgeModel}}
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+
+			<div class="col-4 mb-4" v-on:drop="onDrop" v-on:dragover="onDragOver" v-on:dragenter="onDragOver">
+				<div class="card" style="height: 100%; min-height: 191px"> <!-- 191 is the height of a model without decisions, inputs and knowledge models -->
+					<div class="card-body text-muted d-flex justify-content-center align-items-center">
+						<div class="d-flex flex-column align-items-center">
+							<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" class="mb-2">
+								<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+							</svg>
+							<p>Drag and drop models here!</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</draggable>
 	</div>
 </template>
 
@@ -69,55 +74,93 @@
 
 <script>
 	import Network from "../helpers/network";
+	import draggable from 'vuedraggable'
 	import AlertHelper from "../components/alert/alert-helper";
 
 	export default {
+		components: {
+			"draggable": draggable,
+		},
 		async mounted() {
 			await this.getModel();
-			await this.getInputs();
 		},
 		data() {
 			return {
-				model: {
-					name: null,
-					decisions: [],
-					inputs: {
-						type: "object",
-						value: {}
-					},
-					knowledgeModels: []
-				}
+				models: [], // Only the raw models, contains only the information needed for the import.
+				importedModels: [] // Only the imported models, contains the information needed for the view.
 			}
 		},
 		methods: {
 			async getModel() {
-				const model = await Network.getModel();
-				this.model.name = model.name;
-				this.model.decisions = model.decisions;
-				this.model.knowledgeModels = model.knowledgeModels;
+				const models = [];
+				const importedModels = [];
+				for (const model of await Network.getModel()) {
+					models.push({
+						namespace: model.namespace,
+						name: model.name,
+						source: model.source
+					});
+					importedModels.push({
+						name: model.name,
+						inputs: await Network.getModelInputs(),
+						decisions: model.decisions,
+						knowledgeModels: model.knowledgeModels
+					});
+				}
+				this.models = models;
+				this.importedModels = importedModels;
 			},
-			async getInputs() {
-				this.model.inputs = await Network.getModelInputs();
+			async onDrop(e) {
+				e.preventDefault();
+				if (e.dataTransfer.files.length === 0) {
+					return;
+				}
+
+				this.addModels(e);
 			},
-			importModel(event) {
-				const vue = this;
+			async onDragOver(e) {
+				e.preventDefault(); // See https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#droptargets.
+			},
+			async addModels(event) {
+				for (const file of event.dataTransfer.files) {
+					this.models.push(await ((file) => {
+						return new Promise(resolve => {
+							const fileReader = new FileReader();
+							fileReader.addEventListener("load", async function (readerEvent) {
+								const xml = readerEvent.target.result;
+								resolve({
+									name: xml.match(/name="(.+?)"/)[1],
+									namespace: xml.match(/namespace="(.+?)"/)[1],
+									source: xml
+								});
+							});
+							fileReader.readAsText(file, "UTF-8");
+						});
+					})(file));
+				}
 
-				const fileReader = new FileReader();
-				fileReader.addEventListener("load", async function (readerEvent) {
-					vue.$root.displayAlert(null, null);
+				this.importModels();
+			},
+			async importModels() {
+				this.$root.displayAlert(null, null);
 
-					const result = await Network.importModel(readerEvent.target.result);
+				const result = await Network.importModels(this.models);
 
-					const resultAlert = vue.getResultAlert(result);
-					vue.$root.displayAlert(AlertHelper.buildList(resultAlert.message, result.messages), resultAlert.state);
+				const resultAlert = this.getResultAlert(result);
+				this.$root.displayAlert(AlertHelper.buildList(resultAlert.message, result.messages), resultAlert.state);
 
-					// To allow another execution of the listener, we have to reset the value.
-					event.target.value = null;
-
-					await vue.getModel();
-					await vue.getInputs();
-				});
-				fileReader.readAsText(event.target.files[0], "UTF-8");
+				await this.getModel();
+			},
+			deleteModel(index) {
+				this.$delete(this.models, index);
+				this.$delete(this.importedModels, index);
+				this.importModels();
+			},
+			orderModels(e) {
+				const old = this.models[e.oldIndex];
+				this.models[e.oldIndex] = this.models[e.newIndex];
+				this.models[e.newIndex] = old;
+				this.importModels();
 			},
 
 			//

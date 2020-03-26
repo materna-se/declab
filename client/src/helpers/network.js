@@ -58,11 +58,11 @@ export default {
 		return await response.json();
 	},
 
-	async importModel(model) {
+	async importModels(models) {
 		const response = await this._authorizedFetch(this._endpoint + "/model", {
 			method: "PUT",
-			headers: {"Content-Type": "text/xml"},
-			body: model
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(models)
 		});
 
 		return {
