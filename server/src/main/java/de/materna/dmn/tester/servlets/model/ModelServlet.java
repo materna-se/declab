@@ -23,6 +23,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Path("/workspaces/{workspace}")
 public class ModelServlet {
@@ -39,7 +40,16 @@ public class ModelServlet {
 
 		List<DMNModel> dmnModels = DroolsHelper.getModels(workspace);
 		for (DMNModel dmnModel : dmnModels) {
-			models.add(new Model(dmnModel.getNamespace(), dmnModel.getName(), dmnModel.getDecisions(), dmnModel.getBusinessKnowledgeModels(), dmnModel.getDecisionServices(), workspace.getDecisionSession().getModel(dmnModel.getNamespace(), dmnModel.getName())));
+			// At this moment, the name of the component is sufficient for us.
+			// All other fields are filtered out.
+			models.add(new Model(
+					dmnModel.getNamespace(),
+					dmnModel.getName(),
+					workspace.getDecisionSession().getModel(dmnModel.getNamespace(), dmnModel.getName()),
+					dmnModel.getDecisions().stream().map(decisionNode -> decisionNode.getName()).collect(Collectors.toSet()),
+					dmnModel.getInputs().stream().map(inputDataNode -> inputDataNode.getName()).collect(Collectors.toSet()),
+					dmnModel.getBusinessKnowledgeModels().stream().map(businessKnowledgeModelNode -> businessKnowledgeModelNode.getName()).collect(Collectors.toSet())
+			));
 		}
 
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(models)).build();
