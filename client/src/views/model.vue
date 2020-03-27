@@ -1,6 +1,5 @@
 <template>
 	<div>
-		{{models.map(value => value.name)}}
 		<draggable class="row mb-4" v-model="importedModels" animation="150" draggable=".draggable" v-on:update="orderModels">
 			<div class="col-4 mb-4 draggable" v-on:drop="onReplaceModelDrop($event, index)" v-on:dragover="onModelDragOver" v-on:dragenter="onModelDragOver" v-for="(importedModel, index) of importedModels">
 				<div class="card">
