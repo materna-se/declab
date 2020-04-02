@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<template v-if="developerMode === true">
-			<textarea class="form-control w-100 mb-1" v-bind:value="JSON.stringify(cleanedValue)" v-on:input="editedValue = $event.target.value"/>
+			<textarea class="form-control w-100 mb-1" v-model="editedValue"/>
 			<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="applyValue">Apply</button>
 		</template>
 		<json-builder-table v-if="value !== null" v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues"/>
@@ -78,6 +78,8 @@
 			exportValue(value) {
 				this.cleanedValue = this.cleanValue(value);
 				this.$emit('update:value', this.cleanedValue);
+
+				this.editedValue = JSON.stringify(this.cleanedValue);
 			},
 			applyValue() {
 				this.value = this.enrichTemplate(JSON.parse(this.editedValue));
