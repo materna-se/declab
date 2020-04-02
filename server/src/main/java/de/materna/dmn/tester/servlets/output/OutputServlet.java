@@ -26,16 +26,14 @@ public class OutputServlet {
 	@ReadAccess
 	@Path("/outputs")
 	@Produces("application/json")
-	public Response getOutputs(@PathParam("workspace") String workspaceUUID) {
+	public Response getOutputs(@PathParam("workspace") String workspaceUUID, @QueryParam("order") boolean order) {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 			Map<String, PersistedOutput> unsortedOutputs = workspace.getOutputManager().getFiles();
 
 			Map<String, PersistedOutput> sortedOutputs = new LinkedHashMap<>();
-			unsortedOutputs.entrySet().stream().sorted(Comparator.comparing(entry -> entry.getValue().getName())).forEach(entry -> sortedOutputs.put(entry.getKey(), entry.getValue()));
-
-			workspace.getAccessLog().writeMessage("Accessed list of outputs", System.currentTimeMillis());
+			unsortedOutputs.entrySet().stream().sorted(Map.Entry.comparingByValue((o1, o2) -> (order ? -1 : 1) * o1.getName().compareTo(o2.getName()))).forEach(entry -> sortedOutputs.put(entry.getKey(), entry.getValue()));
 
 			return Response.status(Response.Status.OK).entity(sortedOutputs).build();
 		}
