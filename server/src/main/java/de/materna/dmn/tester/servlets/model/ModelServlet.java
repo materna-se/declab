@@ -37,21 +37,18 @@ public class ModelServlet {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 		List<Model> models = new LinkedList<>();
-
-		List<DMNModel> dmnModels = DroolsHelper.getModels(workspace);
-		for (DMNModel dmnModel : dmnModels) {
+		for (DMNModel model : DroolsHelper.getModels(workspace)) {
 			// At this moment, the name of the component is sufficient for us.
 			// All other fields are filtered out.
 			models.add(new Model(
-					dmnModel.getNamespace(),
-					dmnModel.getName(),
-					workspace.getDecisionSession().getModel(dmnModel.getNamespace(), dmnModel.getName()),
-					dmnModel.getDecisions().stream().map(decisionNode -> decisionNode.getName()).collect(Collectors.toSet()),
-					dmnModel.getInputs().stream().map(inputDataNode -> inputDataNode.getName()).collect(Collectors.toSet()),
-					dmnModel.getBusinessKnowledgeModels().stream().map(businessKnowledgeModelNode -> businessKnowledgeModelNode.getName()).collect(Collectors.toSet())
+					model.getNamespace(),
+					model.getName(),
+					workspace.getDecisionSession().getModel(model.getNamespace(), model.getName()),
+					model.getDecisions().stream().filter(decisionNode -> decisionNode.getModelNamespace().equals(model.getNamespace())).map(decisionNode -> decisionNode.getName()).collect(Collectors.toSet()),
+					model.getInputs().stream().filter(inputDataNode -> inputDataNode.getModelNamespace().equals(model.getNamespace())).map(inputDataNode -> inputDataNode.getName()).collect(Collectors.toSet()),
+					model.getBusinessKnowledgeModels().stream().filter(businessKnowledgeModelNode -> businessKnowledgeModelNode.getModelNamespace().equals(model.getNamespace())).map(businessKnowledgeModelNode -> businessKnowledgeModelNode.getName()).collect(Collectors.toSet())
 			));
 		}
-
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(models)).build();
 	}
 
@@ -114,8 +111,7 @@ public class ModelServlet {
 	public Response getInputs(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		DMNModel model = DroolsHelper.getModel(workspace);
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getComplexInputStructure(model))).build();
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getComplexInputStructure(workspace.getDecisionSession().getRuntime(), DroolsHelper.getModel(workspace).getNamespace()))).build();
 	}
 
 	@POST
