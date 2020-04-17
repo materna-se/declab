@@ -10,20 +10,26 @@
 						</svg>
 					</div>
 					<div class="card-body">
-						<h5 class="mb-2" style="clear: both">Decisions</h5>
-						<div class="dmn dmn-decision mr-2 mb-2" v-for="decision of importedModel.decisions">
-							{{decision}}
-						</div>
-						<div style="clear: both"></div>
-						<h5 class="mt-2 mb-2" style="clear: both">Inputs</h5>
-						<div class="dmn dmn-input mr-2 mb-2" v-for="input in importedModel.inputs">
-							{{input}}
-						</div>
-						<div style="clear: both"></div>
-						<h5 class="mt-2 mb-2">Business Knowledge Models</h5>
-						<div class="dmn dmn-bkm mr-2 mb-2" v-for="knowledgeModel in importedModel.knowledgeModels">t
-							{{knowledgeModel}}
-						</div>
+						<template v-if="importedModel.decisions.length > 0">
+							<h5 class="mb-2" style="clear: both">Decisions</h5>
+							<div class="dmn dmn-decision mr-2 mb-2" v-for="decision of importedModel.decisions">
+								{{decision}}
+							</div>
+							<div style="clear: both"></div>
+						</template>
+						<template v-if="importedModel.inputs.length > 0">
+							<h5 class="mb-2" style="clear: both">Inputs</h5>
+							<div class="dmn dmn-input mr-2 mb-2" v-for="input in importedModel.inputs">
+								{{input}}
+							</div>
+							<div style="clear: both"></div>
+						</template>
+						<template v-if="importedModel.knowledgeModels.length > 0">
+							<h5 class="mb-2">Business Knowledge Models</h5>
+							<div class="dmn dmn-bkm mr-2 mb-2" v-for="knowledgeModel in importedModel.knowledgeModels">
+								{{knowledgeModel}}
+							</div>
+						</template>
 					</div>
 				</div>
 			</div>
