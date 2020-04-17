@@ -306,7 +306,7 @@ public class WorkspaceServlet {
 		
 		workspace.getAccessLog().writeMessage("Imported workspace", System.currentTimeMillis());
 
-		// If the workspace is cached, we need to overwrite it by indexing.
+		// If the workspace is cached, we need to flush it by indexing.
 		workspaceManager.index(workspaceUUID);
 		
 		return Response.status(Response.Status.NO_CONTENT).build();
