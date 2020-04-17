@@ -30,6 +30,12 @@
 								{{knowledgeModel}}
 							</div>
 						</template>
+						<template v-if="importedModel.decisionServices.length > 0">
+							<h5 class="mb-2">Decision Services</h5>
+							<div class="dmn dmn-ds mr-2 mb-2" v-for="decisionService in importedModel.decisionServices">
+								<span>{{decisionService}}</span>
+							</div>
+						</template>
 					</div>
 				</div>
 			</div>
@@ -61,10 +67,13 @@
 
 	.dmn-decision {
 		background: #fdeb7a;
-		padding-top: 0.75rem;
-		padding-bottom: 0.75rem;
 
 		border-radius: 3px;
+	}
+
+	.dmn-input {
+		background: #92c0ff;
+		border-radius: 15px;
 	}
 
 	.dmn-bkm {
@@ -72,9 +81,27 @@
 		border-radius: 15px 3px 15px 3px;
 	}
 
-	.dmn-input {
-		background: #92c0ff;
-		border-radius: 15px;
+	.dmn-ds {
+		background: #fdeb7a;
+		border-radius: 3px;
+		position: relative;
+	}
+
+	.dmn-ds span {
+		background: #fdeb7a;
+		position: relative;
+		z-index: 1;
+	}
+
+	.dmn-ds::after {
+		display: block;
+		content: '';
+		border-bottom: 1px solid #00000021;
+		position: absolute;
+		width: 100%;
+		height: 1px;
+		top: 50%;
+		left: 0;
 	}
 </style>
 
@@ -110,7 +137,8 @@
 						name: model.name,
 						inputs: model.inputs,
 						decisions: model.decisions,
-						knowledgeModels: model.knowledgeModels
+						knowledgeModels: model.knowledgeModels,
+						decisionServices: model.decisionServices,
 					});
 				}
 				this.models = models;

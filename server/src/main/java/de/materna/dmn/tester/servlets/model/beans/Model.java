@@ -12,17 +12,19 @@ public class Model extends Serializable {
 	private Set<String> decisions;
 	private Set<String> inputs;
 	private Set<String> knowledgeModels;
+	private Set<String> decisionServices;
 
 	public Model() {
 	}
 
-	public Model(String namespace, String name, String source, Set<String> decisions, Set<String> inputs, Set<String> knowledgeModels) {
+	public Model(String namespace, String name, String source, Set<String> decisions, Set<String> inputs, Set<String> knowledgeModels, Set<String> decisionServices) {
 		this.namespace = namespace;
 		this.name = name;
 		this.source = source;
 		this.decisions = decisions;
 		this.inputs = inputs;
 		this.knowledgeModels = knowledgeModels;
+		this.decisionServices = decisionServices;
 	}
 
 	public String getNamespace() {
@@ -47,6 +49,10 @@ public class Model extends Serializable {
 
 	public Set<String> getKnowledgeModels() {
 		return knowledgeModels;
+	}
+
+	public Set<String> getDecisionServices() {
+		return decisionServices;
 	}
 
 	public void fromJson(String json) {

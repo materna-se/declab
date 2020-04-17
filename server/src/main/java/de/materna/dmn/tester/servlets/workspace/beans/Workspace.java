@@ -41,7 +41,6 @@ public class Workspace {
 		decisionSession = new DMNDecisionSession();
 
 		DroolsHelper.initModels(this);
-
 	}
 
 	public PersistenceDirectoryManager<String> getModelManager() {
