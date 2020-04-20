@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -81,12 +80,7 @@ public class WorkspaceManager {
 			configuration.setVersion(1);
 			configuration.setName(workspaceUUID);
 			configuration.setAccess(Access.PUBLIC);
-			try {
-				configuration.setSalt(HashingHelper.getInstance().generateSalt());
-			}
-			catch (NoSuchAlgorithmException exception) {
-				throw new IOException("Could not instantiate SecureRandom, salt is null");
-			}
+			configuration.setSalt(HashingHelper.getInstance().generateSalt());
 			configuration.setCreatedDate(System.currentTimeMillis());
 			configuration.setModifiedDate(configuration.getCreatedDate());
 			configuration.serialize();

@@ -4,13 +4,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.security.NoSuchAlgorithmException;
-
 class HashingHelperTest {
 	private static HashingHelper hashingHelper;
 
 	@BeforeAll
-	static void beforeAll() throws NoSuchAlgorithmException {
+	static void beforeAll() {
 		hashingHelper = HashingHelper.getInstance();
 	}
 

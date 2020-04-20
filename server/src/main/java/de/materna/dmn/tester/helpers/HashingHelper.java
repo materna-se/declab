@@ -4,7 +4,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 public class HashingHelper {
@@ -15,7 +14,7 @@ public class HashingHelper {
 		messageDigest = new SHA3.Digest512();
 	}
 
-	public static synchronized HashingHelper getInstance() throws NoSuchAlgorithmException {
+	public static synchronized HashingHelper getInstance() {
 		if (instance == null) {
 			instance = new HashingHelper();
 		}

@@ -7,7 +7,6 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.container.ContainerRequestContext;
 import java.net.MalformedURLException;
-import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +35,7 @@ public class AccessFilterHelper {
 	 *
 	 * @param authorizationHeader Authorization Header
 	 */
-	public static void validateAuthorizationHeader(Workspace workspace, String authorizationHeader) throws NoSuchAlgorithmException {
+	public static void validateAuthorizationHeader(Workspace workspace, String authorizationHeader) {
 		if (authorizationHeader == null) {
 			throw new NotAuthorizedException("The authorization header is not set.");
 		}
