@@ -82,13 +82,13 @@
 	}
 
 	.dmn-ds {
-		background: #fdeb7a;
+		background: #fdbc7a;
 		border-radius: 3px;
 		position: relative;
 	}
 
 	.dmn-ds span {
-		background: #fdeb7a;
+		background: #fdbc7a;
 		position: relative;
 		z-index: 1;
 	}
@@ -96,7 +96,7 @@
 	.dmn-ds::after {
 		display: block;
 		content: '';
-		border-bottom: 1px solid #00000021;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 		position: absolute;
 		width: 100%;
 		height: 1px;
