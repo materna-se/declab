@@ -73,8 +73,7 @@ public class WorkspaceManager {
 			log.info("Workspace " + workspaceUUID + " needs to be upgraded from version 0 to 1.");
 
 			String generatedUUID = UUID.randomUUID().toString();
-			Files.move(Paths.get(workspaceDirectory.getAbsolutePath()), Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", generatedUUID));
-			workspaceDirectory = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", generatedUUID).toFile();
+			workspaceDirectory = Files.move(Paths.get(workspaceDirectory.getAbsolutePath()), Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", generatedUUID)).toFile();
 
 			// Create configuration.json
 			PersistenceFileManager configManager = new PersistenceFileManager(generatedUUID, "configuration.json");
