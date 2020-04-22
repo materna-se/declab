@@ -7,6 +7,7 @@ import de.materna.dmn.tester.servlets.filters.WriteAccessFilter;
 import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.dmn.tester.servlets.model.ModelServlet;
 import de.materna.dmn.tester.servlets.output.OutputServlet;
+import de.materna.dmn.tester.servlets.playground.PlaygroundServlet;
 import de.materna.dmn.tester.servlets.test.TestServlet;
 import de.materna.dmn.tester.servlets.workspace.MetaWorkspaceServlet;
 import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
@@ -27,6 +28,7 @@ public class MainApplication extends Application {
 		WorkspaceManager.getInstance().indexAll();
 
 		singletons.add(new ModelServlet());
+		singletons.add(new PlaygroundServlet());
 		singletons.add(new InputServlet());
 		singletons.add(new OutputServlet());
 		singletons.add(new TestServlet());
