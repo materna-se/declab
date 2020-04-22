@@ -1,5 +1,6 @@
 package de.materna.dmn.tester.persistence;
 
+import de.materna.dmn.tester.TestHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ class PersistenceFileManagerTest {
 
 	@BeforeAll
 	static void beforeAll() throws URISyntaxException {
-		System.setProperty("jboss.server.data.dir", new File(Thread.currentThread().getContextClassLoader().getResource("log4j.properties").toURI()).getParent());
+		System.setProperty("jboss.server.data.dir", TestHelper.getRootPath().toString());
 
 		persistenceFileManager = new PersistenceFileManager("test", "test.json");
 	}
