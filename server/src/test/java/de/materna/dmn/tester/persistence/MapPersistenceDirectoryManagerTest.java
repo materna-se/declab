@@ -1,23 +1,24 @@
 package de.materna.dmn.tester.persistence;
 
-import de.materna.dmn.tester.TestExtension;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.NoSuchFileException;
 import java.util.HashMap;
 import java.util.Map;
 
-@ExtendWith({TestExtension.class})
 class MapPersistenceDirectoryManagerTest {
 	private static PersistenceDirectoryManager<Object> persistenceDirectoryManager;
 	private static Map<String, String> content;
 
 	@BeforeAll
-	static void beforeAll() throws IOException {
+	static void beforeAll() throws IOException, URISyntaxException {
+		System.setProperty("jboss.server.data.dir", new File(Thread.currentThread().getContextClassLoader().getResource("log4j.properties").toURI()).getParent());
+
 		persistenceDirectoryManager = new PersistenceDirectoryManager<>("test", "test", Object.class, "json");
 		content = new HashMap<>();
 		content.put("test", "test");

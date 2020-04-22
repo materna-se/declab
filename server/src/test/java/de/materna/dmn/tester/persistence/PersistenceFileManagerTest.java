@@ -1,16 +1,23 @@
 package de.materna.dmn.tester.persistence;
 
-import de.materna.dmn.tester.TestExtension;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.NoSuchFileException;
 
-@ExtendWith({TestExtension.class})
 class PersistenceFileManagerTest {
-	private PersistenceFileManager persistenceFileManager = new PersistenceFileManager("test", "test.json");
+	private static PersistenceFileManager persistenceFileManager;
+
+	@BeforeAll
+	static void beforeAll() throws URISyntaxException {
+		System.setProperty("jboss.server.data.dir", new File(Thread.currentThread().getContextClassLoader().getResource("log4j.properties").toURI()).getParent());
+
+		persistenceFileManager = new PersistenceFileManager("test", "test.json");
+	}
 
 	@Test
 	void fileExistsWithoutFile() {
