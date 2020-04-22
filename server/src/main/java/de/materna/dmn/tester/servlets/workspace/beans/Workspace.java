@@ -4,6 +4,7 @@ import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
+import de.materna.dmn.tester.servlets.playground.beans.Playground;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.jdec.DMNDecisionSession;
 import org.apache.log4j.Logger;
@@ -14,6 +15,7 @@ public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);
 
 	private PersistenceFileManager modelManager;
+	private PersistenceDirectoryManager<Playground> playgroundManager;
 
 	private PersistenceDirectoryManager<PersistedInput> inputManager;
 	private PersistenceDirectoryManager<PersistedOutput> outputManager;
@@ -26,10 +28,11 @@ public class Workspace {
 
 	public Workspace(String workspaceUUID) throws IOException {
 		modelManager = new PersistenceFileManager(workspaceUUID, "model.dmn");
+		playgroundManager = new PersistenceDirectoryManager<>(workspaceUUID, "playgrounds", Playground.class, "json");
 
-		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class);
-		outputManager = new PersistenceDirectoryManager<>(workspaceUUID, "outputs", PersistedOutput.class);
-		testManager = new PersistenceDirectoryManager<>(workspaceUUID, "tests", PersistedTest.class);
+		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class, "json");
+		outputManager = new PersistenceDirectoryManager<>(workspaceUUID, "outputs", PersistedOutput.class, "json");
+		testManager = new PersistenceDirectoryManager<>(workspaceUUID, "tests", PersistedTest.class, "json");
 
 		PersistenceFileManager configurationManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
 		configuration = new Configuration(configurationManager);
@@ -42,6 +45,10 @@ public class Workspace {
 
 	public PersistenceFileManager getModelManager() {
 		return modelManager;
+	}
+	
+	public PersistenceDirectoryManager<Playground> getPlaygroundManager() {
+		return playgroundManager;
 	}
 
 	public PersistenceDirectoryManager<PersistedInput> getInputManager() {
