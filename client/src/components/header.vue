@@ -88,6 +88,10 @@
 						visible: false,
 						routes: [
 							{
+								name: "Playgrounds",
+								path: "playgrounds"
+							},
+							{
 								name: "Inputs",
 								path: "inputs"
 							},
