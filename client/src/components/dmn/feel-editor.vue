@@ -19,6 +19,11 @@
 				default: null
 			}
 		},
+		data() {
+			return {
+				editor: null
+			}
+		},
 		mounted() {
 			const vue = this;
 
@@ -154,6 +159,9 @@
 
 				value: this.value
 			});
+
+			this.editor = editor;
+
 			editor.onKeyUp(function () {
 				vue.$emit('update:value', editor.getValue());
 			});
