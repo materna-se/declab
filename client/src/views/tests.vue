@@ -23,9 +23,10 @@
 						</button>
 					</div>
 					<div class="col-6">
-						<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="filterTests">
+						<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="order = !order; getTests()">
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
-								<path d="M15 19.88c.04.3-.06.62-.29.83a.996.996 0 0 1-1.41 0L9.29 16.7a.989.989 0 0 1-.29-.83v-5.12L4.21 4.62a1 1 0 0 1 .17-1.4c.19-.14.4-.22.62-.22h14c.22 0 .43.08.62.22a1 1 0 0 1 .17 1.4L15 10.75v9.13M7.04 5L11 10.06v5.52l2 2v-7.53L16.96 5H7.04z" fill="currentColor"/>
+								<path d="M9.25 5l3.25-3.25L15.75 5h-6.5m-.36 9.3H6L5.28 17H2.91L6 7h3l3.13 10H9.67l-.78-2.7m-2.56-1.62h2.23l-.63-2.12-.26-.97-.25-.96h-.03l-.22.97-.24.98-.6 2.1M13.05 17v-1.26l4.75-6.77v-.06h-4.3V7h7.23v1.34L16.09 15v.08h4.71V17h-7.75z" fill="currentColor" v-if="order"/>
+								<path d="M15.75 19l-3.25 3.25L9.25 19h6.5m-6.86-4.7H6L5.28 17H2.91L6 7h3l3.13 10H9.67l-.78-2.7m-2.56-1.62h2.23l-.63-2.12-.26-.97-.25-.96h-.03l-.22.97-.24.98-.6 2.1M13.05 17v-1.26l4.75-6.77v-.06h-4.3V7h7.23v1.34L16.09 15v.08h4.71V17h-7.75z" fill="currentColor" v-else/>
 							</svg>
 						</button>
 					</div>
@@ -160,11 +161,11 @@
 				mode: "SELECT",
 
 				model: {},
-
 				inputs: {},
 				outputs: {},
-				tests: {},
 
+				order: false,
+				tests: {},
 				test: {
 					uuid: null,
 					name: null,
@@ -205,7 +206,7 @@
 			// Tests
 			//
 			async getTests() {
-				this.tests = await Network.getTests();
+				this.tests = await Network.getTests(this.order);
 				this.mode = "SELECT";
 			},
 			async addTest() {

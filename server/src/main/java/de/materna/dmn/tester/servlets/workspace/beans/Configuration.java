@@ -2,14 +2,13 @@ package de.materna.dmn.tester.servlets.workspace.beans;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import de.materna.dmn.tester.helpers.HashingHelper;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.jdec.serialization.SerializationHelper;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class Configuration extends PublicConfiguration {
 	private PersistenceFileManager fileManager;
@@ -18,6 +17,7 @@ public class Configuration extends PublicConfiguration {
 	private String salt = null;
 	private long createdDate = Long.MIN_VALUE;
 	private long modifiedDate = Long.MIN_VALUE;
+	private List<Map<String, String>> models = new LinkedList<>();
 
 	public Configuration() {
 	}
@@ -25,7 +25,7 @@ public class Configuration extends PublicConfiguration {
 	public Configuration(PersistenceFileManager fileManager) throws IOException {
 		this.fileManager = fileManager;
 
-		if(fileManager.fileExists()) {
+		if (fileManager.fileExists()) {
 			fromJson(fileManager.getFile());
 		}
 	}
@@ -39,7 +39,7 @@ public class Configuration extends PublicConfiguration {
 		}
 	}
 
-	
+
 	@JsonIgnore
 	public PublicConfiguration getPublicConfig() {
 		PublicConfiguration pubconfig = new PublicConfiguration();
@@ -57,7 +57,7 @@ public class Configuration extends PublicConfiguration {
 	public void setToken(String token) {
 		this.token = token;
 	}
-	
+
 	@JsonProperty
 	public String getSalt() {
 		return salt;
@@ -87,7 +87,17 @@ public class Configuration extends PublicConfiguration {
 	public void setModifiedDate(long modifiedDate) {
 		this.modifiedDate = modifiedDate;
 	}
-	
+
+	@JsonProperty
+	public List<Map<String, String>> getModels() {
+		return models;
+	}
+
+	@JsonProperty
+	public void setModels(List<Map<String, String>> models) {
+		this.models = models;
+	}
+
 	@Override
 	public void fromJson(String body) {
 		Configuration temp = (Configuration) SerializationHelper.getInstance().toClass(body, Configuration.class);
@@ -99,5 +109,6 @@ public class Configuration extends PublicConfiguration {
 		this.access = temp.getAccess();
 		this.token = temp.getToken();
 		this.salt = temp.getSalt();
+		this.models = temp.getModels();
 	}
 }

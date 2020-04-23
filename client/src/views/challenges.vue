@@ -181,7 +181,7 @@
 					}
 
 					const result = await response.json();
-					scenario.output.calculated = result.outputs.main.value;
+					scenario.output.calculated = result.outputs.main;
 					if (result.messages.length > 0) {
 						this.displayAlert(scenario, AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "warning");
 						return;

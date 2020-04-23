@@ -46,7 +46,6 @@ const router = new VueRouter({
 		{path: '/:workspace/publisher', component: Publisher},
 		{path: '/:workspace/discoverer', component: Discoverer},
 		{path: '/:workspace/settings', component: Settings},
-		// TODO: Route for "Not Found"
 	]
 });
 

@@ -1,6 +1,5 @@
 package de.materna.dmn.tester.servlets.workspace;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import de.materna.dmn.tester.helpers.HashingHelper;
@@ -10,11 +9,9 @@ import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
-import de.materna.jdec.model.ModelImportException;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import javax.ws.rs.*;
@@ -24,8 +21,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -79,7 +78,7 @@ public class WorkspaceServlet {
 
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
-			
+
 			// Store changes in temporary configuration to avoid situations where a change
 			// to the configuration object has been made but not logged or serialized.
 			Configuration tempConfiguration = new Configuration();
@@ -123,22 +122,22 @@ public class WorkspaceServlet {
 			// The access mode is optional, we will set it if the value is valid.
 			if (params.containsKey("access")) {
 				Access access = Access.valueOf(params.get("access"));
-				if(access != Access.PUBLIC && (tempConfiguration.getToken() == null && configuration.getToken() == null)) {
+				if (access != Access.PUBLIC && (tempConfiguration.getToken() == null && configuration.getToken() == null)) {
 					throw new BadRequestException();
 				}
 				tempConfiguration.setAccess(access);
 			}
 
-			if(tempConfiguration.getName() != null) {
+			if (tempConfiguration.getName() != null) {
 				configuration.setName(tempConfiguration.getName());
 			}
-			if(tempConfiguration.getDescription() != null) {
+			if (tempConfiguration.getDescription() != null) {
 				configuration.setDescription(tempConfiguration.getDescription());
 			}
-			if(tempConfiguration.getToken() != null) {
+			if (tempConfiguration.getToken() != null) {
 				configuration.setToken(tempConfiguration.getToken());
 			}
-			if(tempConfiguration.getAccess() != null) {
+			if (tempConfiguration.getAccess() != null) {
 				configuration.setAccess(tempConfiguration.getAccess());
 			}
 
@@ -206,6 +205,26 @@ public class WorkspaceServlet {
 
 				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).filter(path -> !Files.isDirectory(path)).forEach(path -> {
 					try {
+						if (path.endsWith("access.log")) {
+							return;
+						}
+
+						if (path.endsWith("configuration.json")) {
+							Configuration clonedConfiguration = (Configuration) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(workspace.getConfig()), Configuration.class);
+							// Trim cloned configuration.
+							clonedConfiguration.setAccess(Access.PUBLIC);
+							clonedConfiguration.setToken(null);
+							clonedConfiguration.setSalt(null);
+							clonedConfiguration.setCreatedDate(0L);
+							clonedConfiguration.setModifiedDate(0L);
+
+							// Write trimmed copy of configuration
+							zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
+							zipOutputStream.write(SerializationHelper.getInstance().toJSON(clonedConfiguration).getBytes(StandardCharsets.UTF_8));
+							zipOutputStream.closeEntry();
+							return;
+						}
+
 						zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
 						zipOutputStream.write(Files.readAllBytes(path));
 						zipOutputStream.closeEntry();
@@ -228,14 +247,14 @@ public class WorkspaceServlet {
 		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
 		Workspace workspace = workspaceManager.get(workspaceUUID);
 
-		// If the workspace does not exist yet, it will be created.
-		java.nio.file.Path path = workspace.getTestManager().getDirectory().getParent();
-		Files.createDirectories(path);
+		java.nio.file.Path rootPath = workspace.getTestManager().getDirectory().getParent();
 
-		InputPart inputPart = multipartFormDataInput.getFormDataMap().get("backup").get(0);
-		try (InputStream inputStream = inputPart.getBody(InputStream.class, null)) {
+		// Recursively delete all files in workspace folder except for the configuration file and the access log.
+		Files.walk(Paths.get(rootPath.toString())).sorted(Comparator.reverseOrder()).filter(path -> !path.endsWith("configuration.json") && !path.endsWith("access.log")).map(java.nio.file.Path::toFile).forEach(File::delete);
+
+		// Iterate over all entries in the .zip archive and add them to the workspace.
+		try (InputStream inputStream = multipartFormDataInput.getFormDataMap().get("backup").get(0).getBody(InputStream.class, null)) {
 			try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
-
 				while (true) {
 					ZipEntry zipEntry = zipInputStream.getNextEntry();
 					if (zipEntry == null) {
@@ -243,23 +262,34 @@ public class WorkspaceServlet {
 					}
 
 					// If the directory for the entity does not exist yet, it will be created.
-					java.nio.file.Path path1 = Paths.get(path.toString(), zipEntry.getName());
-					Files.createDirectories(path1.getParent());
+					java.nio.file.Path entityPath = rootPath.resolve(zipEntry.getName());
+					Files.createDirectories(entityPath.getParent());
 
-					Files.write(path1, IOUtils.toByteArray(zipInputStream));
+					if (zipEntry.getName().endsWith("configuration.json")) {
+						Configuration currentConfiguration = workspace.getConfig();
+						Configuration importConfiguration = (Configuration) SerializationHelper.getInstance().toClass(new String(IOUtils.toByteArray(zipInputStream), StandardCharsets.UTF_8), Configuration.class);
+						// Model import order needs to be merged with the current configuration.
+						if (importConfiguration.getVersion() == 2) {
+							currentConfiguration.setModels(importConfiguration.getModels());
+							currentConfiguration.setModifiedDate(System.currentTimeMillis());
+							currentConfiguration.serialize();
+						}
+						continue;
+					}
+
+					Files.write(entityPath, IOUtils.toByteArray(zipInputStream));
 				}
+			}
+			catch (JsonMappingException e) {
+				return Response.status(Response.Status.BAD_REQUEST).build();
 			}
 		}
 
-		// If the workspace is cached, we need to overwrite it by indexing.
+		workspace.getAccessLog().writeMessage("Imported workspace", System.currentTimeMillis());
+
+		// If the workspace is cached, we need to flush it by indexing.
 		workspaceManager.index(workspaceUUID);
 
-		try {
-			workspace.getDecisionSession().importModel("main", "main", workspace.getModelManager().getFile());
-		}
-		catch (ModelImportException exception) {
-			return Response.status(Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
-		}
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 

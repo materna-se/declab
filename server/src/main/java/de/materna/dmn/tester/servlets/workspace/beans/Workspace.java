@@ -1,5 +1,6 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
@@ -13,7 +14,7 @@ import java.io.IOException;
 public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);
 
-	private PersistenceFileManager modelManager;
+	private PersistenceDirectoryManager<String> modelManager;
 
 	private PersistenceDirectoryManager<PersistedInput> inputManager;
 	private PersistenceDirectoryManager<PersistedOutput> outputManager;
@@ -25,11 +26,11 @@ public class Workspace {
 	private DMNDecisionSession decisionSession;
 
 	public Workspace(String workspaceUUID) throws IOException {
-		modelManager = new PersistenceFileManager(workspaceUUID, "model.dmn");
+		modelManager = new PersistenceDirectoryManager<>(workspaceUUID, "models", String.class, "dmn");
 
-		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class);
-		outputManager = new PersistenceDirectoryManager<>(workspaceUUID, "outputs", PersistedOutput.class);
-		testManager = new PersistenceDirectoryManager<>(workspaceUUID, "tests", PersistedTest.class);
+		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class, "json");
+		outputManager = new PersistenceDirectoryManager<>(workspaceUUID, "outputs", PersistedOutput.class, "json");
+		testManager = new PersistenceDirectoryManager<>(workspaceUUID, "tests", PersistedTest.class, "json");
 
 		PersistenceFileManager configurationManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
 		configuration = new Configuration(configurationManager);
@@ -38,9 +39,11 @@ public class Workspace {
 		accessLog = new AccessLog(accessLogManager);
 
 		decisionSession = new DMNDecisionSession();
+
+		DroolsHelper.initModels(this);
 	}
 
-	public PersistenceFileManager getModelManager() {
+	public PersistenceDirectoryManager<String> getModelManager() {
 		return modelManager;
 	}
 
@@ -58,6 +61,11 @@ public class Workspace {
 
 	public DMNDecisionSession getDecisionSession() {
 		return decisionSession;
+	}
+
+	public void clearDecisionSession() {
+		decisionSession.close();
+		decisionSession = new DMNDecisionSession();
 	}
 
 	public Configuration getConfig() {
