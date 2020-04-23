@@ -8,7 +8,7 @@ import "./styles/bootstrap-theme.css"
 // Vue
 import Vue from "vue";
 import VueRouter from "vue-router";
-import VueTooltip from 'v-tooltip'
+import VueTooltip from 'v-tooltip';
 // Components
 import Loading from "./components/loading.vue";
 import Authenticator from "./components/authenticator.vue";
@@ -21,6 +21,7 @@ import Network from "./helpers/network";
 const Index = () => import('./views/index.vue');
 const Model = () => import('./views/model.vue');
 const Builder = () => import('./views/builder.vue');
+const Playgrounds = () => import('./views/playgrounds.vue');
 const Inputs = () => import('./views/inputs.vue');
 const Outputs = () => import('./views/outputs.vue');
 const Tests = () => import('./views/tests.vue');
@@ -38,6 +39,7 @@ const router = new VueRouter({
 		{path: '/', component: Index},
 		{path: '/:workspace/model', component: Model},
 		{path: '/:workspace/builder', component: Builder},
+		{path: '/:workspace/playgrounds', component: Playgrounds},
 		{path: '/:workspace/inputs', component: Inputs},
 		{path: '/:workspace/outputs', component: Outputs},
 		{path: '/:workspace/tests', component: Tests},

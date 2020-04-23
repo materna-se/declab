@@ -98,6 +98,10 @@
 							{
 								name: "Tests",
 								path: "tests"
+							},
+							{
+								name: "Playgrounds",
+								path: "playgrounds"
 							}
 						]
 					}

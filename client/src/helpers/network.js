@@ -95,6 +95,46 @@ export default {
 			})
 		});
 	},
+	
+	//
+	// Playgrounds
+	//
+	
+	async getPlaygrounds(order) {
+		const queryString = new URLSearchParams();
+		queryString.append("order", String(order === undefined ? false : order));
+		
+		const response = await this._authorizedFetch(this._endpoint + "/playgrounds?" + queryString.toString(), {});
+		return await response.json();
+	},
+	
+	async getPlayground(uuid) {
+		const response = await this._authorizedFetch(this._endpoint + "/playgrounds/" + uuid, {});
+		return await response.json();
+	},
+
+	async addPlayground(playground) {
+		const response = await this._authorizedFetch(this._endpoint + "/playgrounds", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(playground)
+		});
+		return await response.json();
+	},
+
+	async editPlayground(uuid, playground) {
+		await this._authorizedFetch(this._endpoint + "/playgrounds/" + uuid, {
+			method: "PUT",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(playground)
+		});
+	},
+
+	async deletePlayground(uuid) {
+		await this._authorizedFetch(this._endpoint + "/playgrounds/" + uuid, {
+			method: "DELETE"
+		});
+	},
 
 	//
 	// Inputs
