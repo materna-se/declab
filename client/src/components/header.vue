@@ -88,10 +88,6 @@
 						visible: false,
 						routes: [
 							{
-								name: "Playgrounds",
-								path: "playgrounds"
-							},
-							{
 								name: "Inputs",
 								path: "inputs"
 							},
@@ -102,6 +98,10 @@
 							{
 								name: "Tests",
 								path: "tests"
+							},
+							{
+								name: "Playgrounds",
+								path: "playgrounds"
 							}
 						]
 					}
