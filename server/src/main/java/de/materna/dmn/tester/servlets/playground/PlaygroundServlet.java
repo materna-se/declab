@@ -47,14 +47,9 @@ public class PlaygroundServlet {
 	public Response getPlayground(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String playgroundUUID) {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			
-			String playground = workspace.getPlaygroundManager().getFile(playgroundUUID);
-			
-			if(playground == null) {
-				return Response.status(Response.Status.NOT_FOUND).build();
-			}
-			
-			return Response.status(Response.Status.OK).entity(playground).build();
+
+			Playground playground = workspace.getPlaygroundManager().getFile(playgroundUUID);
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(playground)).build();
 		}
 		catch (IOException exception) {
 			log.error(exception);
