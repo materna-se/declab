@@ -6,7 +6,6 @@ import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
-import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
@@ -14,7 +13,6 @@ import org.apache.log4j.Logger;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -27,7 +25,7 @@ public class InputServlet {
 	@ReadAccess
 	@Path("/inputs")
 	@Produces("application/json")
-	public Response getInputs(@PathParam("workspace") String workspaceUUID, @QueryParam("merge") boolean merge) {
+	public Response getInputs(@PathParam("workspace") String workspaceUUID, @QueryParam("merge") boolean merge, @QueryParam("order") boolean order) {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
@@ -35,9 +33,7 @@ public class InputServlet {
 			Map<String, PersistedInput> unsortedInputs = merge ? enrichInputMap(inputManager, inputManager.getFiles()) : inputManager.getFiles();
 
 			Map<String, PersistedInput> sortedInputs = new LinkedHashMap<>();
-			unsortedInputs.entrySet().stream().sorted(Comparator.comparing(entry -> entry.getValue().getName())).forEach(entry -> sortedInputs.put(entry.getKey(), entry.getValue()));
-
-			workspace.getAccessLog().writeMessage("Accessed input list", System.currentTimeMillis());
+			unsortedInputs.entrySet().stream().sorted(Map.Entry.comparingByValue((o1, o2) -> (order ? -1 : 1) * o1.getName().compareTo(o2.getName()))).forEach(entry -> sortedInputs.put(entry.getKey(), entry.getValue()));
 
 			return Response.status(Response.Status.OK).entity(sortedInputs).build();
 		}

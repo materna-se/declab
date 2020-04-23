@@ -25,7 +25,7 @@
 <style scoped>
 	.navbar,
 	.navbar .dropdown-item:active {
-		background: #7aade1;
+		background: #75ca88;
 	}
 
 	.navbar .navbar-brand,
@@ -38,7 +38,7 @@
 	}
 
 	.navbar .navbar-brand .navbar-brand-secondary {
-		color: #c9def3;
+		color: #c8eacf;
 	}
 </style>
 

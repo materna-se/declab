@@ -34,16 +34,14 @@ public class TestServlet {
 	@ReadAccess
 	@Path("/tests")
 	@Produces("application/json")
-	public Response getTests(@PathParam("workspace") String workspaceUUID) {
+	public Response getTests(@PathParam("workspace") String workspaceUUID, @QueryParam("order") boolean order) {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 			Map<String, PersistedTest> unsortedTests = workspace.getTestManager().getFiles();
 
 			Map<String, PersistedTest> sortedTests = new LinkedHashMap<>();
-			unsortedTests.entrySet().stream().sorted(Comparator.comparing(entry -> entry.getValue().getName())).forEach(entry -> sortedTests.put(entry.getKey(), entry.getValue()));
-
-			workspace.getAccessLog().writeMessage("Accessed list of tests", System.currentTimeMillis());
+			unsortedTests.entrySet().stream().sorted(Map.Entry.comparingByValue((o1, o2) -> (order ? -1 : 1) * o1.getName().compareTo(o2.getName()))).forEach(entry -> sortedTests.put(entry.getKey(), entry.getValue()));
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(sortedTests)).build();
 		}

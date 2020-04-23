@@ -1,6 +1,9 @@
 <template>
 	<div>
-		<textarea class="form-control w-100 mb-1" v-if="developerMode === true" v-bind:value="JSON.stringify(cleanedValue)" v-on:input="importValue($event.target.value)"/>
+		<template v-if="developerMode === true">
+			<textarea class="form-control w-100 mb-1" v-model="editedValue"/>
+			<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="applyValue">Apply</button>
+		</template>
 		<json-builder-table v-if="value !== null" v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues"/>
 		<json-builder-selector v-if="!fixed && !fixedRoot" v-bind:value="value" v-bind:mode="'edit'"/>
 	</div>
@@ -41,6 +44,7 @@
 		data: function () {
 			return {
 				developerMode: Configuration.getDeveloperMode(),
+				editedValue: null,
 
 				value: null,
 				cleanedValue: null,
@@ -71,13 +75,15 @@
 				const cleanedObject = Converter.clean(value);
 				return cleanedObject === undefined ? {} : cleanedObject;
 			},
-			importValue(value) {
-				this.value = Converter.merge(this.value, this.enrichTemplate(JSON.parse(value)));
-				this.exportValue(this.value);
-			},
 			exportValue(value) {
 				this.cleanedValue = this.cleanValue(value);
 				this.$emit('update:value', this.cleanedValue);
+
+				this.editedValue = JSON.stringify(this.cleanedValue);
+			},
+			applyValue() {
+				this.value = this.enrichTemplate(JSON.parse(this.editedValue));
+				this.exportValue(this.value);
 			}
 		}
 	};

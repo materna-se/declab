@@ -1,9 +1,11 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
+import de.materna.dmn.tester.servlets.playground.beans.Playground;
 import de.materna.dmn.tester.servlets.playground.beans.Playground;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.jdec.DMNDecisionSession;
@@ -14,7 +16,7 @@ import java.io.IOException;
 public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);
 
-	private PersistenceFileManager modelManager;
+	private PersistenceDirectoryManager<String> modelManager;
 	private PersistenceDirectoryManager<Playground> playgroundManager;
 
 	private PersistenceDirectoryManager<PersistedInput> inputManager;
@@ -27,7 +29,7 @@ public class Workspace {
 	private DMNDecisionSession decisionSession;
 
 	public Workspace(String workspaceUUID) throws IOException {
-		modelManager = new PersistenceFileManager(workspaceUUID, "model.dmn");
+		modelManager = new PersistenceDirectoryManager<>(workspaceUUID, "models", String.class, "dmn");
 		playgroundManager = new PersistenceDirectoryManager<>(workspaceUUID, "playgrounds", Playground.class, "json");
 
 		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class, "json");
@@ -41,12 +43,14 @@ public class Workspace {
 		accessLog = new AccessLog(accessLogManager);
 
 		decisionSession = new DMNDecisionSession();
+
+		DroolsHelper.initModels(this);
 	}
 
-	public PersistenceFileManager getModelManager() {
+	public PersistenceDirectoryManager<String> getModelManager() {
 		return modelManager;
 	}
-	
+
 	public PersistenceDirectoryManager<Playground> getPlaygroundManager() {
 		return playgroundManager;
 	}
@@ -65,6 +69,11 @@ public class Workspace {
 
 	public DMNDecisionSession getDecisionSession() {
 		return decisionSession;
+	}
+
+	public void clearDecisionSession() {
+		decisionSession.close();
+		decisionSession = new DMNDecisionSession();
 	}
 
 	public Configuration getConfig() {

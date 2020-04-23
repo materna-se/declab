@@ -23,9 +23,11 @@ public class PersistenceFileManager {
 	}
 
 	public void removeFile() throws IOException {
-		Files.delete(file);
+		if (fileExists()) {
+			Files.delete(file);
+		}
 	}
-	
+
 	public boolean fileExists() {
 		return Files.exists(file);
 	}

@@ -21,7 +21,7 @@
 							</svg>
 						</span>
 					</div>
-					<input placeholder="Search Workspace..." class="form-control" v-bind:value="query" v-on:keyup="query = $event.target.value; getWorkspaces()">
+					<input placeholder="Search Workspace..." class="form-control" v-model="query" v-on:keyup="getWorkspaces">
 				</div>
 
 				<div class="list-group">
@@ -53,7 +53,6 @@
 	import EmptyCollectionComponent from "../components/empty-collection.vue";
 	import ConfiguratorComponent from "../components/configurator.vue";
 	import Network from "../helpers/network";
-	// import deburr from "lodash/deburr";
 
 	export default {
 		components: {
@@ -63,13 +62,14 @@
 		data() {
 			return {
 				query: null,
+
+				workspaces: [],
 				workspace: {
 					name: null,
 					description: null,
 					access: "PUBLIC",
 					token: null
-				},
-				workspaces: []
+				}
 			}
 		},
 		methods: {

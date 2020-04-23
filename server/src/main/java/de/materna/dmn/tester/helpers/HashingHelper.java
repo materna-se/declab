@@ -1,21 +1,20 @@
 package de.materna.dmn.tester.helpers;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-
 import org.apache.commons.lang3.ArrayUtils;
+import org.bouncycastle.jcajce.provider.digest.SHA3;
+
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 
 public class HashingHelper {
 	private static HashingHelper instance;
-	private MessageDigest messageDigest;
+	private SHA3.Digest512 messageDigest;
 
-	private HashingHelper() throws NoSuchAlgorithmException {
-		messageDigest = MessageDigest.getInstance("SHA3-512");
+	private HashingHelper() {
+		messageDigest = new SHA3.Digest512();
 	}
 
-	public static synchronized HashingHelper getInstance() throws NoSuchAlgorithmException {
+	public static synchronized HashingHelper getInstance() {
 		if (instance == null) {
 			instance = new HashingHelper();
 		}
@@ -32,7 +31,7 @@ public class HashingHelper {
 		return byteArrayToHexString(messageDigest.digest(ArrayUtils.addAll(token.getBytes(StandardCharsets.UTF_8), hexStringToByteArray(salt))));
 	}
 
-	public String byteArrayToHexString(byte[] byteArray) {
+	private String byteArrayToHexString(byte[] byteArray) {
 		StringBuilder stringBuilder = new StringBuilder();
 		for (byte bxte : byteArray) {
 			stringBuilder.append(String.format("%02X", bxte));
@@ -40,7 +39,7 @@ public class HashingHelper {
 		return stringBuilder.toString();
 	}
 
-	public byte[] hexStringToByteArray(String hexString) {
+	private byte[] hexStringToByteArray(String hexString) {
 		int hexStringLength = hexString.length();
 
 		byte[] byteArray = new byte[hexStringLength / 2];

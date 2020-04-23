@@ -1,6 +1,5 @@
-package de.materna.dmn.tester;
+package de.materna.dmn.tester.helpers;
 
-import de.materna.dmn.tester.helpers.MergingHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +7,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class MergingHelperTest {
 	@Test

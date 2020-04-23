@@ -15,7 +15,6 @@ import org.apache.log4j.Logger;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Path("/workspaces")
@@ -56,7 +55,7 @@ public class MetaWorkspaceServlet {
 
 			Workspace workspace = new Workspace(uuid);
 			Configuration configuration = workspace.getConfig();
-			configuration.setVersion(1);
+			configuration.setVersion(2);
 			configuration.setSalt(HashingHelper.getInstance().generateSalt());
 
 			// The name is required, we will the reject the request if the value is not valid.
@@ -104,7 +103,7 @@ public class MetaWorkspaceServlet {
 			log.error(e);
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
-		catch (IOException | NoSuchAlgorithmException e) {
+		catch (IOException e) {
 			log.error(e);
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}

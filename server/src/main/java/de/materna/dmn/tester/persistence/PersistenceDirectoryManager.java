@@ -9,7 +9,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class PersistenceDirectoryManager<T> {
@@ -27,11 +29,8 @@ public class PersistenceDirectoryManager<T> {
 		this.extension = extension;
 	}
 
-	/**
-	 * @todo Sort map by name.
-	 */
 	public Map<String, T> getFiles() throws IOException {
-		Map<String, T> files = new HashMap<>();
+		Map<String, T> files = new LinkedHashMap<>();
 
 		if (Files.exists(directory)) {
 			try (Stream<Path> stream = Files.list(directory)) {
@@ -41,10 +40,11 @@ public class PersistenceDirectoryManager<T> {
 
 					// We need to remove the file extension.
 					String key = path.getFileName().toString().split("\\.")[0];
-					if(entityClass == String.class) {
+					if (entityClass == String.class) {
 						String value = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
 						files.put(key, (T) value);
-					} else {
+					}
+					else {
 						T value = (T) SerializationHelper.getInstance().toClass(new String(Files.readAllBytes(path), StandardCharsets.UTF_8), entityClass);
 						files.put(key, value);
 					}
@@ -54,46 +54,47 @@ public class PersistenceDirectoryManager<T> {
 
 		return files;
 	}
-	
-	public String getFile(String key) throws IOException {
-		Path file = Paths.get(directory.toString(), key + "." + extension);
-		return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
-	}
-	
-	public boolean fileExists(String key) throws IOException {
-		if(Files.exists(Paths.get(directory.toString(), key + "." + extension))) {
-			return true;
-		} else {
-			return false;
+
+	public T getFile(String key) throws IOException {
+		String content = new String(Files.readAllBytes(Paths.get(directory.toString(), key + "." + extension)), StandardCharsets.UTF_8);
+		if (entityClass == String.class) {
+			return (T) content;
+		}
+		else {
+			return (T) SerializationHelper.getInstance().toClass(content, entityClass);
 		}
 	}
 
+	public boolean fileExists(String key) {
+		return Files.exists(Paths.get(directory.toString(), key + "." + extension));
+	}
+
 	public void persistFile(String key, T value) throws IOException {
-		if(entityClass == String.class) {
-			Files.createDirectories(directory);
+		Files.createDirectories(directory);
+		if (entityClass == String.class) {
 			Files.write(Paths.get(directory.toString(), key + "." + extension), ((String) value).getBytes(StandardCharsets.UTF_8));
 		}
 		else {
-			Files.createDirectories(directory);
 			Files.write(Paths.get(directory.toString(), key + "." + extension), SerializationHelper.getInstance().toJSON(value).getBytes(StandardCharsets.UTF_8));
 		}
 	}
 
 	public void removeFile(String key) throws IOException {
-		if(Files.exists(Paths.get(directory.toString(), key + "." + extension))) {
+		if (Files.exists(Paths.get(directory.toString(), key + "." + extension))) {
 			Files.delete(Paths.get(directory.toString(), key + "." + extension));
 		}
 	}
-	
-	public void removeAllFiles() throws IOException {
-		if(!Files.exists(directory)) {
+
+	public void removeAllFiles() {
+		if (!Files.exists(directory)) {
 			return;
 		}
+
 		File dir = directory.toFile();
-		for(File file: dir.listFiles()) {
-		    if (!file.isDirectory()) {
-		        file.delete();
-		    }
+		for (File file : dir.listFiles()) {
+			if (!file.isDirectory()) {
+				file.delete();
+			}
 		}
 	}
 

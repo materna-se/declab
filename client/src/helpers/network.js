@@ -58,11 +58,11 @@ export default {
 		return await response.json();
 	},
 
-	async importModel(model) {
+	async importModels(models) {
 		const response = await this._authorizedFetch(this._endpoint + "/model", {
 			method: "PUT",
-			headers: {"Content-Type": "text/xml"},
-			body: model
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(models)
 		});
 
 		return {
@@ -139,21 +139,20 @@ export default {
 	//
 	// Inputs
 	//
-	async getInputs(merge) {
-		if (merge === undefined) {
-			merge = false;
-		}
+	async getInputs(merge, order) {
+		const queryString = new URLSearchParams();
+		queryString.append("merge", String(merge === undefined ? false : merge));
+		queryString.append("order", String(order === undefined ? false : order));
 
-		const response = await this._authorizedFetch(this._endpoint + "/inputs" + (merge ? "?merge=true" : ""), {});
+		const response = await this._authorizedFetch(this._endpoint + "/inputs?" + queryString.toString(), {});
 		return await response.json();
 	},
 
 	async getInput(uuid, merge) {
-		if (merge === undefined) {
-			merge = false;
-		}
+		const queryString = new URLSearchParams();
+		queryString.append("merge", String(merge === undefined ? false : merge));
 
-		const response = await this._authorizedFetch(this._endpoint + "/inputs/" + uuid + (merge ? "?merge=true" : ""), {});
+		const response = await this._authorizedFetch(this._endpoint + "/inputs/" + uuid + "?" + queryString.toString(), {});
 		return await response.json();
 	},
 
@@ -182,8 +181,11 @@ export default {
 	//
 	// Outputs
 	//
-	async getOutputs() {
-		const response = await this._authorizedFetch(this._endpoint + "/outputs", {});
+	async getOutputs(order) {
+		const queryString = new URLSearchParams();
+		queryString.append("order", String(order === undefined ? false : order));
+
+		const response = await this._authorizedFetch(this._endpoint + "/outputs?" + queryString.toString(), {});
 		return await response.json();
 	},
 
@@ -212,8 +214,11 @@ export default {
 	//
 	// Tests
 	//
-	async getTests() {
-		const response = await this._authorizedFetch(this._endpoint + "/tests", {});
+	async getTests(order) {
+		const queryString = new URLSearchParams();
+		queryString.append("order", String(order === undefined ? false : order));
+
+		const response = await this._authorizedFetch(this._endpoint + "/tests?" + queryString.toString(), {});
 		return await response.json();
 	},
 
