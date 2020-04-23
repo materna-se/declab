@@ -71,8 +71,9 @@ public class PlaygroundServlet {
 			Playground playground = (Playground) SerializationHelper.getInstance().toClass(body, Playground.class);
 
 			//Validate
-			if(playground.name == null || playground.name.length() == 0)
+			if (playground.name == null || playground.name.length() == 0) {
 				return Response.status(Response.Status.BAD_REQUEST).build();
+			}
 
 			workspace.getPlaygroundManager().persistFile(playgroundUUID, playground);
 
@@ -97,11 +98,13 @@ public class PlaygroundServlet {
 
 			Playground playground = (Playground) SerializationHelper.getInstance().toClass(body, Playground.class);
 
-			if(!workspace.getPlaygroundManager().getFiles().containsKey(playgroundUUID))
+			if (!workspace.getPlaygroundManager().fileExists(playgroundUUID)) {
 				return Response.status(Response.Status.NOT_FOUND).build();
+			}
 
-			if(playground.name == null || playground.name.length() == 0)
+			if (playground.name == null || playground.name.length() == 0) {
 				return Response.status(Response.Status.BAD_REQUEST).build();
+			}
 
 			workspace.getPlaygroundManager().persistFile(playgroundUUID, playground);
 
@@ -123,7 +126,7 @@ public class PlaygroundServlet {
 		try {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-			if(!workspace.getPlaygroundManager().fileExists(playgroundUUID)) {
+			if (!workspace.getPlaygroundManager().fileExists(playgroundUUID)) {
 				return Response.status(Response.Status.NOT_FOUND).build();
 			}
 
