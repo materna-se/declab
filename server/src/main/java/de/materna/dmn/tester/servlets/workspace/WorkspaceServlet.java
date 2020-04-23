@@ -12,7 +12,6 @@ import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import javax.ws.rs.*;
@@ -25,6 +24,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -247,26 +247,14 @@ public class WorkspaceServlet {
 		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
 		Workspace workspace = workspaceManager.get(workspaceUUID);
 
-		// If the workspace does not exist yet, it will be created.
-		java.nio.file.Path path = workspace.getTestManager().getDirectory().getParent();
-		Files.createDirectories(path);
+		java.nio.file.Path rootPath = workspace.getTestManager().getDirectory().getParent();
 
-		//Recursively delete all files in workspace folder except for configuration and access log
-		Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).filter(filePath -> !Files.isDirectory(filePath)).forEach(filePath -> {
-			try {
-				if (!filePath.endsWith("access.log") && !filePath.endsWith("configuration.json")) {
-					Files.delete(filePath);
-				}
-			}
-			catch (IOException e) {
+		// Recursively delete all files in workspace folder except for the configuration file and the access log.
+		Files.walk(Paths.get(rootPath.toString())).sorted(Comparator.reverseOrder()).filter(path -> !path.endsWith("configuration.json") && !path.endsWith("access.log")).map(java.nio.file.Path::toFile).forEach(File::delete);
 
-			}
-		});
-
-		InputPart inputPart = multipartFormDataInput.getFormDataMap().get("backup").get(0);
-		try (InputStream inputStream = inputPart.getBody(InputStream.class, null)) {
+		// Iterate over all entries in the .zip archive and add them to the workspace.
+		try (InputStream inputStream = multipartFormDataInput.getFormDataMap().get("backup").get(0).getBody(InputStream.class, null)) {
 			try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
-
 				while (true) {
 					ZipEntry zipEntry = zipInputStream.getNextEntry();
 					if (zipEntry == null) {
@@ -274,25 +262,22 @@ public class WorkspaceServlet {
 					}
 
 					// If the directory for the entity does not exist yet, it will be created.
-					java.nio.file.Path path1 = Paths.get(path.toString(), zipEntry.getName());
-					Files.createDirectories(path1.getParent());
+					java.nio.file.Path entityPath = rootPath.resolve(zipEntry.getName());
+					Files.createDirectories(entityPath.getParent());
 
 					if (zipEntry.getName().endsWith("configuration.json")) {
-						//Merge configuration with workspace's existing configuration
-						Configuration wsConfiguration = workspace.getConfig();
-						Configuration importConfiguration = (Configuration) SerializationHelper.getInstance().toClass(new String(IOUtils.toByteArray(zipInputStream)), Configuration.class);
-						if (importConfiguration.getVersion() != 2) {
-							//TODO Do not allow importing outdated configurations?
+						Configuration currentConfiguration = workspace.getConfig();
+						Configuration importConfiguration = (Configuration) SerializationHelper.getInstance().toClass(new String(IOUtils.toByteArray(zipInputStream), StandardCharsets.UTF_8), Configuration.class);
+						// Model import order needs to be merged with the current configuration.
+						if (importConfiguration.getVersion() == 2) {
+							currentConfiguration.setModels(importConfiguration.getModels());
+							currentConfiguration.setModifiedDate(System.currentTimeMillis());
+							currentConfiguration.serialize();
 						}
-						else {
-							wsConfiguration.setModels(importConfiguration.getModels());
-							wsConfiguration.setModifiedDate(System.currentTimeMillis());
-							wsConfiguration.serialize();
-						}
+						continue;
 					}
-					else {
-						Files.write(path1, IOUtils.toByteArray(zipInputStream));
-					}
+
+					Files.write(entityPath, IOUtils.toByteArray(zipInputStream));
 				}
 			}
 			catch (JsonMappingException e) {
