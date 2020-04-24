@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 
 public class TestHelper {
@@ -19,7 +18,9 @@ public class TestHelper {
 		Path rootPath = getRootPath();
 
 		Path scenarioPath = rootPath.resolve("scenario");
-		flushScenario(scenarioPath);
+		if(Files.exists(scenarioPath)) {
+			flushScenario(scenarioPath);
+		}
 
 		FileUtils.copyDirectory(
 				rootPath.resolve("scenarios").resolve(scenario).toFile(),
