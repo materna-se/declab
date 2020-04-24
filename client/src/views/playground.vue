@@ -48,7 +48,7 @@
 				<h3 class="mb-2">Expression</h3>
 				<div class="card">
 					<div class="card-body">
-						<feel-editor v-bind:value="playground.expression" v-on:update:value="playground.expression = $event; executeRaw();"/>
+						<feel-editor v-model="playground.expression" v-on:input="executeRaw"/>
 					</div>
 				</div>
 			</div>

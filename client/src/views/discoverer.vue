@@ -16,7 +16,7 @@
 				<h5 class="mb-2">Values</h5>
 				<div class="card mb-4">
 					<div class="card-body">
-						<feel-editor v-bind:value="options.expression" v-on:update:value="options.expression = $event; startDebouncedDiscovery()"/>
+						<feel-editor v-model="options.expression" v-on:input="startDebouncedDiscovery"/>
 					</div>
 				</div>
 

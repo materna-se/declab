@@ -22,7 +22,7 @@
 
 						<div class="card">
 							<div class="card-body">
-								<feel-editor v-on:update:value="expression = $event; executeRaw();"/>
+								<feel-editor v-model="expression" v-on:input="executeRaw"/>
 							</div>
 						</div>
 					</div>
