@@ -3,7 +3,9 @@ package de.materna.dmn.tester.servlets.workspace.beans;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
+import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.jdec.serialization.SerializationHelper;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -11,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Configuration extends PublicConfiguration {
+	private static final Logger log = Logger.getLogger(Configuration.class);
+
 	private PersistenceFileManager fileManager;
 
 	private String token = null;
@@ -30,13 +34,8 @@ public class Configuration extends PublicConfiguration {
 		}
 	}
 
-	public void serialize() {
-		try {
-			fileManager.persistFile(toJson());
-		}
-		catch (IOException exception) {
-			exception.printStackTrace();
-		}
+	public void serialize() throws IOException {
+		fileManager.persistFile(toJson());
 	}
 
 

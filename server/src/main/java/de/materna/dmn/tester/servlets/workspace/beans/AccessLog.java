@@ -4,15 +4,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.jdec.serialization.SerializationHelper;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class AccessLog extends Serializable {
+	private static final Logger logger = Logger.getLogger(AccessLog.class);
+
+	private final int logLength = 1000;
 	private PersistenceFileManager fileManager;
 	private ArrayList<AccessLogEntry> log = new ArrayList<>();
-	private final int logLength = 1000;
 
 	public AccessLog() {
 	}
@@ -20,7 +22,7 @@ public class AccessLog extends Serializable {
 	public AccessLog(PersistenceFileManager fileManager) throws IOException {
 		this.fileManager = fileManager;
 
-		if(fileManager.fileExists()) {
+		if (fileManager.fileExists()) {
 			fromJson(fileManager.getFile());
 		}
 	}
@@ -45,14 +47,15 @@ public class AccessLog extends Serializable {
 	}
 
 	public void serialize() {
+		// Serializing the access log is not so important, we'll catch io exceptions.
 		try {
 			fileManager.persistFile(toJson());
 		}
-		catch (IOException e) {
-			e.printStackTrace();
+		catch (IOException exception) {
+			logger.error("Serialization failed: ", exception);
 		}
 	}
-	
+
 	public ArrayList<AccessLogEntry> getLog() {
 		return log;
 	}
@@ -88,15 +91,15 @@ public class AccessLog extends Serializable {
 		public long getTimestamp() {
 			return timestamp;
 		}
-		
+
 		public void setTimestamp(long timestamp) {
 			this.timestamp = timestamp;
 		}
-		
+
 		public String getMessage() {
 			return message;
 		}
-		
+
 		public void setMessage(String message) {
 			this.message = message;
 		}

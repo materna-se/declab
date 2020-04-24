@@ -51,15 +51,14 @@ public class WorkspaceManager {
 		return workspace;
 	}
 
-	public void indexAll() throws IOException {
+	public void indexAll() {
 		File dir = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces").toFile();
 		for (File subdir : dir.listFiles()) {
 			try {
 				index(subdir.getName());
 			}
 			catch (IOException e) {
-				log.error("Could not index workspace " + subdir.getName());
-				e.printStackTrace();
+				log.error("Could not index workspace " + subdir.getName(), e);
 			}
 		}
 	}
@@ -128,6 +127,7 @@ public class WorkspaceManager {
 				workspace.clearDecisionSession();
 				workspace.getDecisionSession().importModel(importedModel.getNamespace(), importedModel.getName(), new String(Files.readAllBytes(modelFile.toPath()), StandardCharsets.UTF_8));
 			}
+
 			workspace.getConfig().setVersion(2);
 			workspace.getConfig().serialize();
 		}
