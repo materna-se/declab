@@ -64,7 +64,23 @@ class WorkspaceManagerTest {
 		Assertions.assertEquals("0003-input-data-string-allowed-values", configurationModel.get("name"));
 		Assertions.assertEquals("https://github.com/kiegroup/kie-dmn", configurationModel.get("namespace"));
 		Assertions.assertEquals(workspace.getModelManager().getFiles().keySet().iterator().next(), configurationModel.get("uuid"));
+	}
 
-		TestHelper.flushScenario();
+	@Test
+	void migrateWorkspaceWithInvalidModel() throws IOException, URISyntaxException {
+		TestHelper.applyScenario("migration-test-2");
+
+		// Should throw the log message "Could not index workspace 0003-input-data-string-allowed-values": ModelImportException
+		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
+		workspaceManager.indexAll();
+	}
+
+	@Test
+	void migrateWorkspaceWithInvalidEntity() throws IOException, URISyntaxException {
+		TestHelper.applyScenario("migration-test-3");
+
+		// Should throw the log message "Could not index workspace 0003-input-data-string-allowed-values": IOException
+		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
+		workspaceManager.indexAll();
 	}
 }
