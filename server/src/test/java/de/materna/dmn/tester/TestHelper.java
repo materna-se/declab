@@ -19,6 +19,7 @@ public class TestHelper {
 		Path rootPath = getRootPath();
 
 		Path scenarioPath = rootPath.resolve("scenario");
+		flushScenario(scenarioPath);
 
 		FileUtils.copyDirectory(
 				rootPath.resolve("scenarios").resolve(scenario).toFile(),
@@ -28,7 +29,7 @@ public class TestHelper {
 		System.setProperty("jboss.server.data.dir", scenarioPath.toString());
 	}
 
-	public static void flushScenario() throws IOException {
-		Files.walk(Paths.get(System.getProperty("jboss.server.data.dir"))).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+	public static void flushScenario(Path scenarioPath) throws IOException {
+		Files.walk(scenarioPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
 	}
 }

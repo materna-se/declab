@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.NoSuchFileException;
@@ -35,14 +34,14 @@ class PersistenceFileManagerTest {
 	@Test
 	void getFileWithoutFile() {
 		Assertions.assertThrows(NoSuchFileException.class, () -> {
-			persistenceFileManager.getFile();
+			persistenceFileManager.getContent();
 		});
 	}
 
 	@Test
 	void getFileWithFile() throws IOException {
 		persistenceFileManager.persistFile("{}");
-		Assertions.assertEquals("{}", persistenceFileManager.getFile());
+		Assertions.assertEquals("{}", persistenceFileManager.getContent());
 		persistenceFileManager.removeFile();
 	}
 
