@@ -6,7 +6,6 @@ import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.playground.beans.Playground;
-import de.materna.dmn.tester.servlets.playground.beans.Playground;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.jdec.DMNDecisionSession;
 import org.apache.log4j.Logger;
@@ -82,5 +81,14 @@ public class Workspace {
 
 	public AccessLog getAccessLog() {
 		return accessLog;
+	}
+
+	public void verify() throws IOException {
+		// TODO: verify for PersistenceFileManager
+		modelManager.verifyAllFiles();
+		playgroundManager.verifyAllFiles();
+		inputManager.verifyAllFiles();
+		outputManager.verifyAllFiles();
+		testManager.verifyAllFiles();
 	}
 }

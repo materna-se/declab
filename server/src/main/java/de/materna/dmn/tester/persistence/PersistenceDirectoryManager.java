@@ -3,7 +3,6 @@ package de.materna.dmn.tester.persistence;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -33,23 +32,16 @@ public class PersistenceDirectoryManager<T> {
 		Map<String, T> files = new LinkedHashMap<>();
 
 		if (Files.exists(directory)) {
-			try (Stream<Path> stream = Files.list(directory)) {
-				Iterator<Path> iterator = stream.iterator();
-				while (iterator.hasNext()) {
-					Path path = iterator.next();
-
-					// We need to remove the file extension.
-					String key = path.getFileName().toString().split("\\.")[0];
-					if (entityClass == String.class) {
-						String value = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-						files.put(key, (T) value);
-					}
-					else {
-						T value = (T) SerializationHelper.getInstance().toClass(new String(Files.readAllBytes(path), StandardCharsets.UTF_8), entityClass);
-						files.put(key, value);
-					}
+			Files.list(directory).forEach(path -> {
+				// We need to remove the file extension.
+				String key = path.getFileName().toString().split("\\.")[0];
+				try {
+					files.put(key, getFile(key));
 				}
-			}
+				catch (IOException e) {
+					log.error(path.getFileName() + " cannot be read: ", e);
+				}
+			});
 		}
 
 		return files;
@@ -85,15 +77,33 @@ public class PersistenceDirectoryManager<T> {
 		}
 	}
 
-	public void removeAllFiles() {
-		if (!Files.exists(directory)) {
-			return;
+	public void removeAllFiles() throws IOException {
+		if (Files.exists(directory)) {
+			Files.list(directory).forEach(path -> {
+				try {
+					// We need to remove the file extension.
+					removeFile(path.getFileName().toString().split("\\.")[0]);
+				}
+				catch (IOException e) {
+					log.error(path.getFileName() + " cannot be deleted: ", e);
+				}
+			});
 		}
+	}
 
-		File dir = directory.toFile();
-		for (File file : dir.listFiles()) {
-			if (!file.isDirectory()) {
-				file.delete();
+	public void verifyAllFiles() throws IOException {
+		if (Files.exists(directory)) {
+			try (Stream<Path> stream = Files.list(directory)) {
+				Iterator<Path> iterator = stream.iterator();
+				while (iterator.hasNext()) {
+					Path path = iterator.next();
+					try {
+						getFile(path.getFileName().toString().split("\\.")[0]);
+					}
+					catch (Exception e) {
+						throw new IOException(path.getFileName() + " cannot be verified: ", e);
+					}
+				}
 			}
 		}
 	}
