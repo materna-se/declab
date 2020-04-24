@@ -13,8 +13,8 @@ public class PersistenceFileManager {
 		file = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", workspace, entity);
 	}
 
-	public String getFile() throws IOException {
-		return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+	public String getContent() throws IOException {
+		return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
 	}
 
 	public void persistFile(String value) throws IOException {

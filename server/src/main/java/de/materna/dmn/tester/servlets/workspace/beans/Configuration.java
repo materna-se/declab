@@ -3,7 +3,6 @@ package de.materna.dmn.tester.servlets.workspace.beans;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
-import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
 
@@ -30,7 +29,7 @@ public class Configuration extends PublicConfiguration {
 		this.fileManager = fileManager;
 
 		if (fileManager.fileExists()) {
-			fromJson(fileManager.getFile());
+			fromJson(fileManager.getContent());
 		}
 	}
 
