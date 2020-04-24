@@ -7,10 +7,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class PersistenceFileManager {
-	private Path file;
+	private Path path;
 
 	public PersistenceFileManager(String workspace, String entity) {
-		file = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", workspace, entity);
+		path = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", workspace, entity);
 	}
 
 	public String getContent() throws IOException {
@@ -18,17 +18,21 @@ public class PersistenceFileManager {
 	}
 
 	public void persistFile(String value) throws IOException {
-		Files.createDirectories(file.getParent());
-		Files.write(file, value.getBytes(StandardCharsets.UTF_8));
+		Files.createDirectories(path.getParent());
+		Files.write(path, value.getBytes(StandardCharsets.UTF_8));
 	}
 
 	public void removeFile() throws IOException {
 		if (fileExists()) {
-			Files.delete(file);
+			Files.delete(path);
 		}
 	}
 
 	public boolean fileExists() {
-		return Files.exists(file);
+		return Files.exists(path);
+	}
+
+	public Path getPath() {
+		return path;
 	}
 }
