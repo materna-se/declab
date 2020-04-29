@@ -53,7 +53,7 @@ public class OutputServlet {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedOutput> outputManager = workspace.getOutputManager();
 
-			PersistedOutput output = outputManager.getFiles().get(outputUUID);
+			PersistedOutput output = outputManager.getFile(outputUUID);
 			if (output == null) {
 				throw new NotFoundException();
 			}

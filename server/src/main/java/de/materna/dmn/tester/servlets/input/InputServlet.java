@@ -53,7 +53,7 @@ public class InputServlet {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 
-			PersistedInput input = inputManager.getFiles().get(inputUUID);
+			PersistedInput input = inputManager.getFile(inputUUID);
 			if (input == null) {
 				throw new NotFoundException();
 			}
@@ -131,7 +131,7 @@ public class InputServlet {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 
-			PersistedInput input = inputManager.getFiles().get(inputUUID);
+			PersistedInput input = inputManager.getFile(inputUUID);
 			if (input == null) {
 				throw new NotFoundException(String.format("Can't find input with uuid %s.", inputUUID));
 			}
@@ -183,7 +183,7 @@ public class InputServlet {
 			return input;
 		}
 
-		PersistedInput parentInput = enrichInput(inputManager, inputManager.getFiles().get(input.getParent()));
+		PersistedInput parentInput = enrichInput(inputManager, inputManager.getFile(input.getParent()));
 
 		return new PersistedInput(input.getName(), input.getParent(), (Map<String, ?>) MergingHelper.merge(parentInput.getValue(), input.getValue()));
 	}

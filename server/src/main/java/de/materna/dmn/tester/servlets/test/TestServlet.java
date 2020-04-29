@@ -61,7 +61,7 @@ public class TestServlet {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
-			PersistedTest test = testManager.getFiles().get(testUUID);
+			PersistedTest test = testManager.getFile(testUUID);
 			if (test == null) {
 				throw new NotFoundException();
 			}
@@ -109,14 +109,14 @@ public class TestServlet {
 			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
-			PersistedTest test = testManager.getFiles().get(testUUID);
+			PersistedTest test = testManager.getFile(testUUID);
 			if (test == null) {
 				throw new NotFoundException();
 			}
 
 			Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
 
-			ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getModel(workspace), InputServlet.enrichInput(inputManager, inputManager.getFiles().get(test.getInput())).getValue());
+			ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getModel(workspace), InputServlet.enrichInput(inputManager, inputManager.getFile(test.getInput())).getValue());
 			Map<String, Object> calculatedOutputs = executionResult.getOutputs();
 
 			Map<String, TestResultOutput> comparedOutputs = new LinkedHashMap<>();
