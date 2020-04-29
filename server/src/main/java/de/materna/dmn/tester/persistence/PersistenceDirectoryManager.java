@@ -32,16 +32,18 @@ public class PersistenceDirectoryManager<T> {
 		Map<String, T> files = new LinkedHashMap<>();
 
 		if (Files.exists(directory)) {
-			Files.list(directory).forEach(path -> {
-				// We need to remove the file extension.
-				String key = path.getFileName().toString().split("\\.")[0];
-				try {
-					files.put(key, getFile(key));
-				}
-				catch (IOException e) {
-					log.error(path.getFileName() + " cannot be read: ", e);
-				}
-			});
+			try (Stream<Path> stream = Files.list(directory)) {
+				stream.forEach(path -> {
+					// We need to remove the file extension.
+					String key = path.getFileName().toString().split("\\.")[0];
+					try {
+						files.put(key, getFile(key));
+					}
+					catch (IOException e) {
+						log.error(path.getFileName() + " cannot be read: ", e);
+					}
+				});
+			}
 		}
 
 		return files;
@@ -79,15 +81,17 @@ public class PersistenceDirectoryManager<T> {
 
 	public void removeAllFiles() throws IOException {
 		if (Files.exists(directory)) {
-			Files.list(directory).forEach(path -> {
-				try {
-					// We need to remove the file extension.
-					removeFile(path.getFileName().toString().split("\\.")[0]);
-				}
-				catch (IOException e) {
-					log.error(path.getFileName() + " cannot be deleted: ", e);
-				}
-			});
+			try (Stream<Path> stream = Files.list(directory)) {
+				stream.forEach(path -> {
+					try {
+						// We need to remove the file extension.
+						removeFile(path.getFileName().toString().split("\\.")[0]);
+					}
+					catch (IOException e) {
+						log.error(path.getFileName() + " cannot be deleted: ", e);
+					}
+				});
+			}
 		}
 	}
 
