@@ -105,7 +105,7 @@ public class WorkspaceManager {
 
 				// Import model into a temporarily created decision session in order to obtain namespace and name.
 				DMNDecisionSession decisionSession = new DMNDecisionSession();
-				decisionSession.importModel("main", "main", modelFileManager.getContent());
+				decisionSession.importModel("main", modelFileManager.getContent());
 				DMNModel importedModel = decisionSession.getRuntime().getModels().get(0);
 
 				// The configuration needs to be updated with obtained information.

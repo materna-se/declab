@@ -35,7 +35,7 @@ class WorkspaceManagerTest {
 
 		Assertions.assertEquals(1, workspace.getModelManager().getFiles().size());
 
-		workspace.getDecisionSession().getModel("https://github.com/kiegroup/kie-dmn", "0003-input-data-string-allowed-values");
+		workspace.getDecisionSession().getModel("https://github.com/kiegroup/kie-dmn");
 
 		Assertions.assertEquals(1, workspace.getInputManager().getFiles().size());
 		PersistedInput persistedInput = workspace.getInputManager().getFile("62758f4a-57c5-4970-a655-ff945b835a89");

@@ -43,7 +43,7 @@ public class ModelServlet {
 			models.add(new Model(
 					model.getNamespace(),
 					model.getName(),
-					workspace.getDecisionSession().getModel(model.getNamespace(), model.getName()),
+					workspace.getDecisionSession().getModel(model.getNamespace()),
 					model.getDecisions().stream().filter(decisionNode -> decisionNode.getModelNamespace().equals(model.getNamespace())).map(decisionNode -> decisionNode.getName()).collect(Collectors.toSet()),
 					model.getInputs().stream().filter(inputDataNode -> inputDataNode.getModelNamespace().equals(model.getNamespace())).map(inputDataNode -> inputDataNode.getName()).collect(Collectors.toSet()),
 					model.getBusinessKnowledgeModels().stream().filter(businessKnowledgeModelNode -> businessKnowledgeModelNode.getModelNamespace().equals(model.getNamespace())).map(businessKnowledgeModelNode -> businessKnowledgeModelNode.getName()).collect(Collectors.toSet()),
@@ -76,7 +76,7 @@ public class ModelServlet {
 			LinkedList<Map<String, String>> importedModels = new LinkedList<>();
 			// Import the provided models, collect all import messages.
 			for (Map<String, String> model : models) {
-				importResult.getMessages().addAll(workspace.getDecisionSession().importModel(model.get("namespace"), model.get("name"), model.get("source")).getMessages());
+				importResult.getMessages().addAll(workspace.getDecisionSession().importModel(model.get("namespace"), model.get("source")).getMessages());
 
 				String uuid = UUID.randomUUID().toString();
 				workspace.getModelManager().persistFile(uuid, model.get("source"));
@@ -112,7 +112,7 @@ public class ModelServlet {
 	public Response getInputs(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getComplexInputStructure(DroolsHelper.getModel(workspace)))).build();
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getComplexInputStructure(workspace.getDecisionSession().getRuntime(), DroolsHelper.getModel(workspace).getNamespace()))).build();
 	}
 
 	@POST

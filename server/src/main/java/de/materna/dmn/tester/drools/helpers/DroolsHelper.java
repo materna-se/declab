@@ -39,7 +39,7 @@ public class DroolsHelper extends de.materna.jdec.dmn.DroolsHelper {
 
 		List<Map<String, String>> models = workspace.getConfig().getModels();
 		for (Map<String, String> model : models) {
-			workspace.getDecisionSession().importModel(model.get("namespace"), model.get("name"), modelFiles.get(model.get("uuid")));
+			workspace.getDecisionSession().importModel(model.get("namespace"), modelFiles.get(model.get("uuid")));
 		}
 	}
 }
