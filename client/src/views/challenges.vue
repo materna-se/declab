@@ -95,7 +95,7 @@
 			"empty-collection": EmptyCollectionComponent
 		},
 		mounted() {
-			this.executeRaw();
+
 		},
 		data() {
 			return {
@@ -165,6 +165,8 @@
 				this.challenge = this.challenges[uuid];
 
 				this.mode = "VIEW";
+
+				this.executeRaw();
 			},
 
 			//
@@ -172,10 +174,18 @@
 			//
 			async executeRaw() {
 				this.progress = 0;
+
 				for (const scenario of this.challenge.scenarios) {
-					const response = await Network.executeRaw(this.expression, scenario.input);
-					if (response.status !== 200) {
+					let response;
+					try {
+						response = await Network.executeRaw(this.expression, scenario.input);
+						if (response.status !== 200) {
+							throw new Error();
+						}
+					}
+					catch (e) {
 						scenario.output.calculated = null;
+						scenario.output.equal = false;
 						this.displayAlert(scenario, "The output can't be calculated.", "danger");
 						return;
 					}
@@ -183,15 +193,16 @@
 					const result = await response.json();
 					scenario.output.calculated = result.outputs.main;
 					if (result.messages.length > 0) {
+						scenario.output.equal = false;
 						this.displayAlert(scenario, AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "warning");
 						return;
 					}
-					this.displayAlert(scenario, null, null);
 
 					scenario.output.equal = JSON.stringify(scenario.output.expected) === JSON.stringify(scenario.output.calculated);
 					if (scenario.output.equal) {
 						this.progress += 1 / this.challenge.scenarios.length;
 					}
+					this.displayAlert(scenario, null, null);
 				}
 			},
 
