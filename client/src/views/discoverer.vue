@@ -52,7 +52,7 @@
 						<template v-else>
 							<div v-for="(output, decision) in result.output" class="mt-2">
 								<h6 class="mb-2">{{decision}}</h6>
-								<json-builder class="mb-0" v-bind:template="output.value" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"/>
+								<json-builder class="mb-0" v-bind:template="output" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true"/>
 							</div>
 						</template>
 					</div>
@@ -120,7 +120,7 @@
 				this.options.results.length = 0;
 
 				const response = await Network.executeRaw(this.options.expression, {});
-				const elements = (await response.json()).outputs.main.value;
+				const elements = (await response.json()).outputs.main;
 
 				/**
 				 * Possible feel expressions:
@@ -155,7 +155,7 @@
 
 					// If a result decision is set, select it.
 					if (this.options.resultDecision !== null && this.options.resultDecision !== "") {
-						currentOutputSelection = currentOutputSelection[this.options.resultDecision].value;
+						currentOutputSelection = currentOutputSelection[this.options.resultDecision];
 
 						// If the result selector is not $, select it with JSONPath.
 						if (this.options.resultSelector !== "$") {
