@@ -206,6 +206,7 @@
 					description: playground.description,
 					expression: playground.expression,
 					context: playground.context,
+					template: Converter.enrich(playground.context)
 				};
 
 				this.mode = "ADD";
