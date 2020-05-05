@@ -82,12 +82,12 @@
 						<div class="row">
 							<div class="col-12">
 								<h4 class="mb-0">Output</h4>
-								<div class="card mt-2 border-lg" v-for="(output, decision) in test.result.outputs" v-bind:key="test.uuid + '-' + decision" v-bind:class="[output.equal ? 'border-success' : 'border-danger']">
+								<div class="card mt-2 border-lg" v-for="output in test.result.outputs" v-bind:key="test.uuid + '-' + output.decision" v-bind:class="[output.equal ? 'border-success' : 'border-danger']">
 									<div class="card-body">
 										<h5 class="mb-2">Name</h5>
-										<p class="mb-4">{{output.expected.name}}</p>
+										<p class="mb-4">{{output.name}}</p>
 										<h5 class="mb-2">Decision</h5>
-										<p class="mb-4">{{decision}}</p>
+										<p class="mb-4">{{output.decision}}</p>
 										<h5 class="mb-2">Output</h5>
 										<div style="white-space: pre">
 											<span v-for="difference of getDifference(output.expected, output.calculated)">
@@ -97,7 +97,7 @@
 											</span>
 										</div>
 										<div v-if="!output.equal">
-											<button class="btn btn-block btn-outline-secondary mt-4" v-on:click="amendOutput(output.expected, output.calculated)">Save as Correct</button>
+											<button class="btn btn-block btn-outline-secondary mt-4" v-on:click="amendOutput(output)">Save as Correct</button>
 										</div>
 									</div>
 								</div>
@@ -193,11 +193,11 @@
 			async getOutputs() {
 				this.outputs = await Network.getOutputs();
 			},
-			async amendOutput(expected, calculated) {
-				await Network.editOutput(expected.uuid, {
-					name: expected.name,
-					decision: expected.decision,
-					value: calculated.value
+			async amendOutput(output) {
+				await Network.editOutput(output.uuid, {
+					name: output.name,
+					decision: output.decision,
+					value: output.calculated
 				});
 				await this.setViewMode(this.test.uuid);
 			},
