@@ -12,31 +12,41 @@ import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
 
 public class TestResultOutput extends Serializable {
+	private String uuid;
+	private String name;
+	private String decision;
 	private JsonNode expected;
 	private JsonNode calculated;
 
 	public TestResultOutput() {
 	}
 
-	public TestResultOutput(JsonNode expected, JsonNode calculated) {
+	public TestResultOutput(String uuid, String name, String decision, JsonNode expected, JsonNode calculated) {
+		this.uuid = uuid;
+		this.name = name;
+		this.decision = decision;
 		this.expected = expected;
 		this.calculated = calculated;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getDecision() {
+		return decision;
 	}
 
 	public JsonNode getExpected() {
 		return expected;
 	}
 
-	public void setExpected(JsonNode expected) {
-		this.expected = expected;
-	}
-
 	public JsonNode getCalculated() {
 		return calculated;
-	}
-
-	public void setCalculated(JsonNode calculated) {
-		this.calculated = calculated;
 	}
 
 	@JsonProperty

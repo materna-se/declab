@@ -16,12 +16,10 @@ import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
-import org.kie.dmn.api.core.DMNModel;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -120,11 +118,11 @@ public class TestServlet {
 			Map<String, Object> calculatedOutputs = executionResult.getOutputs();
 
 			Map<String, TestResultOutput> comparedOutputs = new LinkedHashMap<>();
-			for (String output : test.getOutputs()) {
-				PersistedOutput expectedOutput = expectedOutputs.get(output);
+			for (String outputUUID : test.getOutputs()) {
+				PersistedOutput expectedOutput = expectedOutputs.get(outputUUID);
 				JsonNode calculatedOutputValue = SerializationHelper.getInstance().getJSONMapper().valueToTree(calculatedOutputs.get(expectedOutput.getDecision()));
 
-				comparedOutputs.put(expectedOutput.getDecision(), new TestResultOutput(expectedOutput.getValue(), calculatedOutputValue));
+				comparedOutputs.put(expectedOutput.getDecision(), new TestResultOutput(outputUUID, expectedOutput.getName(), expectedOutput.getDecision(), expectedOutput.getValue(), calculatedOutputValue));
 			}
 			return Response.status(Response.Status.OK).entity(new TestResult(comparedOutputs)).build();
 		}
