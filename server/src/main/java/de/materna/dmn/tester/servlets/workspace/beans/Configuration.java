@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -19,7 +18,7 @@ public class Configuration extends PublicConfiguration {
 	private long createdDate = Long.MIN_VALUE;
 	private long modifiedDate = Long.MIN_VALUE;
 	private List<Map<String, String>> models = new LinkedList<>();
-	private String decisionService = null;
+	private DecisionService decisionService = null;
 
 	public Configuration() {
 	}
@@ -84,6 +83,14 @@ public class Configuration extends PublicConfiguration {
 		this.models = models;
 	}
 
+	public DecisionService getDecisionService() {
+		return decisionService;
+	}
+
+	public void setDecisionService(DecisionService decisionService) {
+		this.decisionService = decisionService;
+	}
+
 	@JsonIgnore
 	public PublicConfiguration getPublicConfig() {
 		PublicConfiguration publicConfiguration = new PublicConfiguration();
@@ -106,5 +113,21 @@ public class Configuration extends PublicConfiguration {
 		this.token = temp.getToken();
 		this.salt = temp.getSalt();
 		this.models = temp.getModels();
+	}
+
+	public static class DecisionService {
+		private String name;
+		private String namespace;
+
+		public DecisionService() {
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getNamespace() {
+			return namespace;
+		}
 	}
 }
