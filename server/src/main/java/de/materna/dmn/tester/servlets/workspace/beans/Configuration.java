@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Configuration extends PublicConfiguration {
-	private static final Logger log = Logger.getLogger(Configuration.class);
-
 	private PersistenceFileManager fileManager;
 
 	private String token = null;
@@ -36,16 +34,6 @@ public class Configuration extends PublicConfiguration {
 
 	public void serialize() throws IOException {
 		fileManager.persistFile(toJSON());
-	}
-
-	@JsonIgnore
-	public PublicConfiguration getPublicConfig() {
-		PublicConfiguration pubconfig = new PublicConfiguration();
-		pubconfig.setVersion(this.version);
-		pubconfig.setName(this.name);
-		pubconfig.setDescription(this.description);
-		pubconfig.setAccess(this.access);
-		return pubconfig;
 	}
 
 	public String getToken() {
@@ -94,6 +82,16 @@ public class Configuration extends PublicConfiguration {
 	@JsonProperty
 	public void setModels(List<Map<String, String>> models) {
 		this.models = models;
+	}
+
+	@JsonIgnore
+	public PublicConfiguration getPublicConfig() {
+		PublicConfiguration publicConfiguration = new PublicConfiguration();
+		publicConfiguration.setVersion(this.version);
+		publicConfiguration.setName(this.name);
+		publicConfiguration.setDescription(this.description);
+		publicConfiguration.setAccess(this.access);
+		return publicConfiguration;
 	}
 
 	@Override

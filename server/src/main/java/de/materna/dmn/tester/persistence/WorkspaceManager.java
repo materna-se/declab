@@ -67,12 +67,11 @@ public class WorkspaceManager {
 	public void index(String workspaceUUID) throws IOException {
 		//Upgrade path from version 0 to 1
 		PersistenceFileManager configManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
-		Path workspaceDirectory = configManager.getPath().getParent();
 		if (!configManager.fileExists()) {
 			log.info("Workspace " + workspaceUUID + " needs to be upgraded from version 0 to 1.");
 
 			String generatedUUID = UUID.randomUUID().toString();
-			workspaceDirectory = Files.move(configManager.getPath().getParent(), Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", generatedUUID));
+			Files.move(configManager.getPath().getParent(), Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", generatedUUID));
 
 			// Create configuration.json
 			configManager = new PersistenceFileManager(generatedUUID, "configuration.json");
