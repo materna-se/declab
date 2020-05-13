@@ -42,7 +42,7 @@ public class WorkspaceServlet {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
 
-			return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJson()).build();
+			return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJSON()).build();
 		}
 		catch (Exception e) {
 			log.error(e);
@@ -59,7 +59,7 @@ public class WorkspaceServlet {
 			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 			Configuration configuration = workspace.getConfig();
 
-			return Response.status(Response.Status.OK).entity(configuration.toJson()).build();
+			return Response.status(Response.Status.OK).entity(configuration.toJSON()).build();
 		}
 		catch (Exception e) {
 			log.error(e);
@@ -167,7 +167,7 @@ public class WorkspaceServlet {
 
 			workspace.getAccessLog().writeMessage("Accessed log", System.currentTimeMillis());
 
-			return Response.status(Response.Status.OK).entity(workspace.getAccessLog().toJson()).build();
+			return Response.status(Response.Status.OK).entity(workspace.getAccessLog().toJSON()).build();
 		}
 		catch (Exception e) {
 			log.error(e);

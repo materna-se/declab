@@ -21,6 +21,7 @@ public class Configuration extends PublicConfiguration {
 	private long createdDate = Long.MIN_VALUE;
 	private long modifiedDate = Long.MIN_VALUE;
 	private List<Map<String, String>> models = new LinkedList<>();
+	private String decisionService = null;
 
 	public Configuration() {
 	}
@@ -29,14 +30,13 @@ public class Configuration extends PublicConfiguration {
 		this.fileManager = fileManager;
 
 		if (fileManager.fileExists()) {
-			fromJson(fileManager.getContent());
+			fromJSON(fileManager.getContent());
 		}
 	}
 
 	public void serialize() throws IOException {
-		fileManager.persistFile(toJson());
+		fileManager.persistFile(toJSON());
 	}
-
 
 	@JsonIgnore
 	public PublicConfiguration getPublicConfig() {
@@ -97,7 +97,7 @@ public class Configuration extends PublicConfiguration {
 	}
 
 	@Override
-	public void fromJson(String body) {
+	public void fromJSON(String body) {
 		Configuration temp = (Configuration) SerializationHelper.getInstance().toClass(body, Configuration.class);
 		this.version = temp.getVersion();
 		this.name = temp.getName();

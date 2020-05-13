@@ -62,7 +62,7 @@ public class TestResultOutput extends Serializable {
 		}, calculated);
 	}
 
-	public void fromJson(String json) {
+	public void fromJSON(String json) {
 		TestResultOutput temp = (TestResultOutput) SerializationHelper.getInstance().toClass(json, TestResultOutput.class);
 		this.expected = temp.getExpected();
 		this.calculated = temp.getCalculated();

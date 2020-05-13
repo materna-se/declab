@@ -36,7 +36,7 @@ public class PersistedOutput extends Output {
 	}
 	
 	@Override
-	public void fromJson(String json) {
+	public void fromJSON(String json) {
 		PersistedOutput temp = (PersistedOutput) SerializationHelper.getInstance().toClass(json, PersistedOutput.class);
 		this.value = temp.getValue();
 		this.name = temp.getName();
