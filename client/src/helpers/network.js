@@ -71,6 +71,19 @@ export default {
 		};
 	},
 
+	async getDecisionSession() {
+		const response = await this._authorizedFetch(this._endpoint + "/model/decision-session", {});
+		return await response.json();
+	},
+
+	async setDecisionSession(name) {
+		await this._authorizedFetch(this._endpoint + "/model/decision-session", {
+			method: "PUT",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(name)
+		});
+	},
+
 	async getModelInputs() {
 		const response = await this._authorizedFetch(this._endpoint + "/model/inputs", {});
 		return await response.json();
@@ -95,19 +108,19 @@ export default {
 			})
 		});
 	},
-	
+
 	//
 	// Playgrounds
 	//
-	
+
 	async getPlaygrounds(order) {
 		const queryString = new URLSearchParams();
 		queryString.append("order", String(order === undefined ? false : order));
-		
+
 		const response = await this._authorizedFetch(this._endpoint + "/playgrounds?" + queryString.toString(), {});
 		return await response.json();
 	},
-	
+
 	async getPlayground(uuid) {
 		const response = await this._authorizedFetch(this._endpoint + "/playgrounds/" + uuid, {});
 		return await response.json();
