@@ -66,7 +66,7 @@
 
 						<h5 class="mb-2">Decision</h5>
 						<select id="form-parent" class="form-control mb-4" v-model="output.decision">
-							<option v-for="model of model.decisions">{{model}}</option>
+							<option v-for="decision of decisions">{{decision}}</option>
 						</select>
 
 						<h5 class="mb-2">Output</h5>
@@ -103,6 +103,7 @@
 				mode: "SELECT",
 
 				model: {},
+				decisions: [],
 
 				order: false,
 				outputs: {},
@@ -120,7 +121,15 @@
 			// Model
 			//
 			async getModel() {
-				this.model = await Network.getModel();
+				const models = await Network.getModel();
+				const decisions = [];
+				for (let i = 0; i < models.length; i++) {
+					const model = models[i];
+					decisions.push(...model.decisions.map(decision => i === models.length -1 ? decision : model.namespace + "." + decision));
+				}
+
+				this.model = models;
+				this.decisions = decisions;
 			},
 
 			//
