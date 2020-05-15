@@ -82,13 +82,13 @@
 	}
 
 	.dmn-ds {
-		background: #fdbc7a;
+		background: #9a7afd;
 		border-radius: 3px;
 		position: relative;
 	}
 
 	.dmn-ds span {
-		background: #fdbc7a;
+		background: #9a7afd;
 		position: relative;
 		z-index: 1;
 	}
