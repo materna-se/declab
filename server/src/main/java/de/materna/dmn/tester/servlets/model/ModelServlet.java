@@ -87,12 +87,23 @@ public class ModelServlet {
 
 				importedModels.add(model);
 			}
-			workspace.getConfig().setModels(importedModels);
+			Configuration configuration = workspace.getConfig();
+			configuration.setModels(importedModels);
+
+			// Check if the configured decision service still exists.
+			Configuration.DecisionService decisionService = configuration.getDecisionService();
+			if (decisionService != null) {
+				if (configuration.getModels().size() == 0 || DroolsHelper.getModel(workspace).getDecisionServices().stream().noneMatch(importedDecisionServiceNode -> importedDecisionServiceNode.getDecisionService().getName().equals(decisionService.getName()) && importedDecisionServiceNode.getModelNamespace().equals(decisionService.getNamespace()))) {
+					// If the decision service does not exist anymore, we will remove the reference from the configuration.
+					configuration.setDecisionService(null);
+				}
+			}
 
 			// Update the configuration and add an access log entry.
-			workspace.getConfig().setModifiedDate(System.currentTimeMillis());
-			workspace.getConfig().serialize();
-			workspace.getAccessLog().writeMessage("Imported models", workspace.getConfig().getModifiedDate());
+			configuration.setModifiedDate(System.currentTimeMillis());
+			configuration.serialize();
+
+			workspace.getAccessLog().writeMessage("Imported models", configuration.getModifiedDate());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(importResult)).build();
 
