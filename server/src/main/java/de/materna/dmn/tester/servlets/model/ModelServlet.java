@@ -163,8 +163,13 @@ public class ModelServlet {
 		Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 		});
 
-		ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getModel(workspace), inputs);
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(executionResult)).build();
+		DMNDecisionSession decisionSession = workspace.getDecisionSession();
+		DMNModel model = DroolsHelper.getModel(workspace);
+
+		Configuration configuration = workspace.getConfig();
+		String decisionServiceName = configuration.getDecisionService() == null ? null : configuration.getDecisionService().getName();
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(decisionSession.executeModel(model, decisionServiceName, inputs))).build();
 	}
 
 	@POST
