@@ -15,10 +15,10 @@
 				</div>
 				<div class="d-flex justify-content-between mb-4">
 					<div>
-						<div><input placeholder="Name..." class="form-control" v-bind:value="playground.name" v-on:keyup="playground.name = $event.target.value"></div>
+						<input placeholder="Name..." class="form-control" v-bind:value="playground.name" v-on:keyup="playground.name = $event.target.value">
 					</div>
 					<div>
-						<div><input placeholder="Description..." class="form-control" v-bind:value="playground.description" v-on:keyup="playground.description = $event.target.value"></div>
+						<input placeholder="Description..." class="form-control" v-bind:value="playground.description" v-on:keyup="playground.description = $event.target.value">
 					</div>
 					<div>
 						<button class="btn btn-block btn-outline-secondary" v-on:click="savePlayground">
