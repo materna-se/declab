@@ -170,11 +170,12 @@ export default {
 	},
 
 	async addInput(input) {
-		await this._authorizedFetch(this._endpoint + "/inputs", {
+		const response = await this._authorizedFetch(this._endpoint + "/inputs", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
 		});
+		return await response.text();
 	},
 
 	async editInput(uuid, input) {
@@ -203,11 +204,12 @@ export default {
 	},
 
 	async addOutput(output) {
-		await this._authorizedFetch(this._endpoint + "/outputs", {
+		const response = await this._authorizedFetch(this._endpoint + "/outputs", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(output)
 		});
+		return await response.text();
 	},
 
 	async editOutput(uuid, output) {
@@ -236,11 +238,12 @@ export default {
 	},
 
 	async addTest(test) {
-		await this._authorizedFetch(this._endpoint + "/tests", {
+		const response = await this._authorizedFetch(this._endpoint + "/tests", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(test)
 		});
+		return await response.text();
 	},
 
 	async editTest(uuid, test) {
