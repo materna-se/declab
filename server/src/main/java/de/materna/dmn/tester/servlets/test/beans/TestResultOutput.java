@@ -51,6 +51,10 @@ public class TestResultOutput extends Serializable {
 
 	@JsonProperty
 	public boolean isEqual() {
+		if (expected instanceof NullNode || calculated == null) {
+			return true;
+		}
+
 		return expected.equals((expected, calculated) -> {
 			// JSON has only one data type for numbers.
 			// Because of this, we need to make sure that 1 and 1.0 are equal.
