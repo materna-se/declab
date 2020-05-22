@@ -3,7 +3,7 @@
 		<!--
 		Display value based on the data type.
 		-->
-		<div class="input-group" v-if="['string', 'date', 'time', 'dateTime'].includes(value.type)" v-bind:style="{'opacity': value.value === value.template ? '0.6' : '1'}">
+		<div class="input-group" v-if="['string', 'date', 'time', 'dateTime'].includes(value.type)" v-bind:class="[value.value === value.template ? 'input-disabled' : null]">
 			<div class="input-group-prepend">
 				<span class="input-group-text">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 11a2 2 0 0 1 2 2v4H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2m-2 2v2h2v-2H4m16 0v2h2v2h-2a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2v2h-2m-8-6v4h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V7h2m0 8h2v-2h-2v2z" fill="currentColor"/></svg>
@@ -11,7 +11,7 @@
 			</div>
 			<input type="text" placeholder="Enter Value..." class="form-control" v-bind:value="value.value" v-bind:disabled="fixedValues" v-on:input="$set(value, 'value', $event.target.value === '' ? undefined : $event.target.value)">
 		</div>
-		<div class="input-group" v-else-if="value.type === 'number'" v-bind:style="{'opacity': value.value === value.template ? '0.6' : '1'}">
+		<div class="input-group" v-else-if="value.type === 'number'" v-bind:class="[value.value === value.template ? 'input-disabled' : null]">
 			<div class="input-group-prepend">
 				<span class="input-group-text">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 17V9H2V7h4v10H4m18-2a2 2 0 0 1-2 2h-4v-2h4v-2h-2v-2h2V9h-4V7h4a2 2 0 0 1 2 2v1.5a1.5 1.5 0 0 1-1.5 1.5 1.5 1.5 0 0 1 1.5 1.5V15m-8 0v2H8v-4a2 2 0 0 1 2-2h2V9H8V7h4a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2v2h4z" fill="currentColor"/></svg>
@@ -19,7 +19,7 @@
 			</div>
 			<input type="number" placeholder="Enter Value..." class="form-control" v-bind:value="value.value" v-bind:disabled="fixedValues" v-on:input="$set(value, 'value', $event.target.value === '' ? undefined : Number($event.target.value))">
 		</div>
-		<div class="btn-group" v-else-if="value.type === 'boolean'" v-bind:style="{'opacity': value.value === value.template ? '0.6' : '1'}">
+		<div class="btn-group" v-else-if="value.type === 'boolean'" v-bind:class="[value.value === value.template ? 'input-disabled' : null]">
 			<button type="button" class="btn" v-bind:class="[value.value === undefined ? 'btn-secondary' : 'btn-white']" v-bind:disabled="fixedValues" v-on:click="$set(value, 'value', undefined)">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 					<path d="M19 3H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 2v14H5V5h14z" fill="currentColor"/>
@@ -36,7 +36,7 @@
 				</svg>
 			</button>
 		</div>
-		<div class="input-group" v-else-if="value.type === 'null'" v-bind:style="{'opacity': value.value === value.template ? '0.6' : '1'}">
+		<div class="input-group" v-else-if="value.type === 'null'" v-bind:class="[value.value === value.template ? 'input-disabled' : null]">
 			<span class="input-group-text">
 				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" style="margin: 2px 0"><path d="M15.354 1.354l-.707-.707-2.777 2.776A5.967 5.967 0 0 0 8 2C4.691 2 2 4.691 2 8c0 1.475.537 2.824 1.423 3.87L.647 14.646l.707.707 2.776-2.776A5.965 5.965 0 0 0 8 14c3.309 0 6-2.691 6-6a5.965 5.965 0 0 0-1.423-3.87l2.777-2.776zM3 8c0-2.757 2.243-5 5-5 1.198 0 2.284.441 3.146 1.146l-7 7C3.441 10.284 3 9.198 3 8zm10 0c0 2.757-2.243 5-5 5-1.198 0-2.284-.441-3.146-1.146l7-7C12.559 5.716 13 6.802 13 8z" fill="currentColor"/></svg>
 			</span>
@@ -135,5 +135,9 @@
 		background-color: #ffffff;
 		border-color: #cfd4d8;
 		color: #495057;
+	}
+
+	.input-disabled {
+		opacity: 0.6;
 	}
 </style>
