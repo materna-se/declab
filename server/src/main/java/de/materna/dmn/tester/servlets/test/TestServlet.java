@@ -32,105 +32,77 @@ public class TestServlet {
 	@ReadAccess
 	@Path("/tests")
 	@Produces("application/json")
-	public Response getTests(@PathParam("workspace") String workspaceUUID, @QueryParam("order") boolean order) {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+	public Response getTests(@PathParam("workspace") String workspaceUUID, @QueryParam("order") boolean order) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-			Map<String, PersistedTest> unsortedTests = workspace.getTestManager().getFiles();
+		Map<String, PersistedTest> unsortedTests = workspace.getTestManager().getFiles();
 
-			Map<String, PersistedTest> sortedTests = new LinkedHashMap<>();
-			unsortedTests.entrySet().stream().sorted(Map.Entry.comparingByValue((o1, o2) -> (order ? -1 : 1) * o1.getName().compareTo(o2.getName()))).forEach(entry -> sortedTests.put(entry.getKey(), entry.getValue()));
+		Map<String, PersistedTest> sortedTests = new LinkedHashMap<>();
+		unsortedTests.entrySet().stream().sorted(Map.Entry.comparingByValue((o1, o2) -> (order ? -1 : 1) * o1.getName().compareTo(o2.getName()))).forEach(entry -> sortedTests.put(entry.getKey(), entry.getValue()));
 
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(sortedTests)).build();
-		}
-		catch (IOException exception) {
-			log.error(exception);
-
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(sortedTests)).build();
 	}
 
 	@GET
 	@ReadAccess
 	@Path("/tests/{uuid}")
 	@Produces("application/json")
-	public Response getTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
+	public Response getTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
-			PersistedTest test = testManager.getFile(testUUID);
-			if (test == null) {
-				throw new NotFoundException();
-			}
-
-			workspace.getAccessLog().writeMessage("Accessed test " + testUUID, System.currentTimeMillis());
-
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(test)).build();
+		PersistedTest test = testManager.getFile(testUUID);
+		if (test == null) {
+			throw new NotFoundException();
 		}
-		catch (IOException exception) {
-			log.error(exception);
 
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		workspace.getAccessLog().writeMessage("Accessed test " + testUUID, System.currentTimeMillis());
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(test)).build();
 	}
 
 	@POST
 	@WriteAccess
 	@Path("/tests")
 	@Consumes("application/json")
-	public Response createTest(@PathParam("workspace") String workspaceUUID, String body) {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			String uuid = UUID.randomUUID().toString();
+	public Response createTest(@PathParam("workspace") String workspaceUUID, String body) throws IOException, RuntimeException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		String uuid = UUID.randomUUID().toString();
 
-			workspace.getTestManager().persistFile(uuid, (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class));
+		workspace.getTestManager().persistFile(uuid, (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class));
 
-			workspace.getAccessLog().writeMessage("Created test " + uuid, System.currentTimeMillis());
+		workspace.getAccessLog().writeMessage("Created test " + uuid, System.currentTimeMillis());
 
-			return Response.status(Response.Status.CREATED).entity(uuid).build();
-		}
-		catch (IOException exception) {
-			log.error(exception);
-
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		return Response.status(Response.Status.CREATED).entity(uuid).build();
 	}
 
 	@POST
 	@WriteAccess
 	@Path("/tests/{uuid}")
 	@Produces("application/json")
-	public Response runTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
-			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
+	public Response runTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
+		PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
-			PersistedTest test = testManager.getFile(testUUID);
-			if (test == null) {
-				throw new NotFoundException();
-			}
-
-			Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
-
-			ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getModel(workspace), InputServlet.enrichInput(inputManager, inputManager.getFile(test.getInput())).getValue());
-			Map<String, Object> calculatedOutputs = executionResult.getOutputs();
-
-			Map<String, TestResultOutput> comparedOutputs = new LinkedHashMap<>();
-			for (String outputUUID : test.getOutputs()) {
-				PersistedOutput expectedOutput = expectedOutputs.get(outputUUID);
-				JsonNode calculatedOutputValue = SerializationHelper.getInstance().getJSONMapper().valueToTree(calculatedOutputs.get(expectedOutput.getDecision()));
-
-				comparedOutputs.put(expectedOutput.getDecision(), new TestResultOutput(outputUUID, expectedOutput.getName(), expectedOutput.getDecision(), expectedOutput.getValue(), calculatedOutputValue));
-			}
-			return Response.status(Response.Status.OK).entity(new TestResult(comparedOutputs)).build();
+		PersistedTest test = testManager.getFile(testUUID);
+		if (test == null) {
+			throw new NotFoundException();
 		}
-		catch (IOException exception) {
-			log.error(exception);
 
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+		Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
+
+		ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getModel(workspace), InputServlet.enrichInput(inputManager, inputManager.getFile(test.getInput())).getValue());
+		Map<String, Object> calculatedOutputs = executionResult.getOutputs();
+
+		Map<String, TestResultOutput> comparedOutputs = new LinkedHashMap<>();
+		for (String outputUUID : test.getOutputs()) {
+			PersistedOutput expectedOutput = expectedOutputs.get(outputUUID);
+			JsonNode calculatedOutputValue = SerializationHelper.getInstance().getJSONMapper().valueToTree(calculatedOutputs.get(expectedOutput.getDecision()));
+
+			comparedOutputs.put(expectedOutput.getDecision(), new TestResultOutput(outputUUID, expectedOutput.getName(), expectedOutput.getDecision(), expectedOutput.getValue(), calculatedOutputValue));
 		}
+		return Response.status(Response.Status.OK).entity(new TestResult(comparedOutputs)).build();
 	}
 
 	@PUT
@@ -138,50 +110,36 @@ public class TestServlet {
 	@Path("/tests/{uuid}")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public Response editTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID, String body) {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
+	public Response editTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID, String body) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
-			if (!testManager.getFiles().containsKey(testUUID)) {
-				throw new NotFoundException();
-			}
-
-			testManager.persistFile(testUUID, (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class));
-
-			workspace.getAccessLog().writeMessage("Edited test " + testUUID, System.currentTimeMillis());
-
-			return Response.status(Response.Status.NO_CONTENT).build();
+		if (!testManager.getFiles().containsKey(testUUID)) {
+			throw new NotFoundException();
 		}
-		catch (IOException exception) {
-			log.error(exception);
 
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		testManager.persistFile(testUUID, (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class));
+
+		workspace.getAccessLog().writeMessage("Edited test " + testUUID, System.currentTimeMillis());
+
+		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 
 	@DELETE
 	@WriteAccess
 	@Path("/tests/{uuid}")
-	public Response deleteTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
+	public Response deleteTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
-			if (!testManager.getFiles().containsKey(testUUID)) {
-				throw new NotFoundException();
-			}
-
-			testManager.removeFile(testUUID);
-
-			workspace.getAccessLog().writeMessage("Deleted test " + testUUID, System.currentTimeMillis());
-
-			return Response.status(Response.Status.NO_CONTENT).build();
+		if (!testManager.getFiles().containsKey(testUUID)) {
+			throw new NotFoundException();
 		}
-		catch (IOException exception) {
-			log.error(exception);
 
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		testManager.removeFile(testUUID);
+
+		workspace.getAccessLog().writeMessage("Deleted test " + testUUID, System.currentTimeMillis());
+
+		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 }
