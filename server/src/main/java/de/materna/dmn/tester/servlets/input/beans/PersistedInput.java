@@ -22,8 +22,16 @@ public class PersistedInput extends Input {
 		return name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public String getParent() {
 		return parent;
+	}
+
+	public void setParent(String parent) {
+		this.parent = parent;
 	}
 	
 	@Override
