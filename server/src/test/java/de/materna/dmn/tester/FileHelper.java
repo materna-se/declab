@@ -3,6 +3,7 @@ package de.materna.dmn.tester;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -10,8 +11,7 @@ import org.junit.jupiter.api.Assertions;
 
 public class FileHelper {
 	public static String readFile(String ... args) throws URISyntaxException, IOException {
-		String ret = new String(readFileRaw(args), "UTF-8");
-		return ret;
+		return new String(readFileRaw(args), StandardCharsets.UTF_8);
 	}
 	
 	public static byte[] readFileRaw(String ... args) throws URISyntaxException, IOException {
