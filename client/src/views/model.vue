@@ -29,11 +29,12 @@
 							<div class="dmn dmn-bkm mr-2 mb-2" v-for="knowledgeModel in importedModel.knowledgeModels">
 								{{knowledgeModel}}
 							</div>
+							<div style="clear: both"></div>
 						</template>
 						<template v-if="importedModel.decisionServices.length > 0">
 							<h5 class="mb-2">Decision Services</h5>
-							<div class="dmn dmn-ds mr-2 mb-2" v-for="decisionService in importedModel.decisionServices">
-								<span>{{decisionService}}</span>
+							<div class="dmn dmn-ds mr-2 mb-2" v-for="decisionSessionName in importedModel.decisionServices">
+								<span v-on:click="toggleDecisionService(decisionSessionName, importedModel.namespace)" v-bind:class="[isCurrentDecisionService(decisionSessionName, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionSessionName}}</span>
 							</div>
 						</template>
 					</div>
@@ -82,13 +83,13 @@
 	}
 
 	.dmn-ds {
-		background: #fdbc7a;
+		background: #9a7afd;
 		border-radius: 3px;
 		position: relative;
 	}
 
 	.dmn-ds span {
-		background: #fdbc7a;
+		background: #9a7afd;
 		position: relative;
 		z-index: 1;
 	}
@@ -120,7 +121,9 @@
 		data() {
 			return {
 				models: [], // Only the raw models, contains only the information needed for the import.
-				importedModels: [] // Only the imported models, contains the information needed for the view.
+				importedModels: [], // Only the imported models, contains the information needed for the view.
+
+				decisionSession: null
 			}
 		},
 		methods: {
@@ -134,6 +137,7 @@
 						source: model.source
 					});
 					importedModels.push({
+						namespace: model.namespace,
 						name: model.name,
 						inputs: model.inputs,
 						decisions: model.decisions,
@@ -143,6 +147,8 @@
 				}
 				this.models = models;
 				this.importedModels = importedModels;
+
+				this.decisionSession = await Network.getDecisionSession();
 			},
 			async importModels() {
 				this.$root.displayAlert(null, null);
@@ -158,6 +164,21 @@
 				this.$delete(this.models, index);
 				this.$delete(this.importedModels, index);
 				this.importModels();
+			},
+
+			isCurrentDecisionService(name, namespace) {
+				if(this.decisionSession === null) {
+					return false;
+				}
+
+				return this.decisionSession.name === name && this.decisionSession.namespace === namespace;
+			},
+			async toggleDecisionService(name, namespace) {
+				this.decisionSession = this.isCurrentDecisionService(name, namespace) ? null : {name: name, namespace: namespace};
+				this.updateDecisionService();
+			},
+			async updateDecisionService() {
+				await Network.setDecisionSession(this.decisionSession);
 			},
 
 			//

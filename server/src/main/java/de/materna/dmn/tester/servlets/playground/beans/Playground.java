@@ -48,7 +48,7 @@ public class Playground extends Serializable {
 		this.context = context;
 	}
 	
-	public void fromJson(String json) {
+	public void fromJSON(String json) {
 		Playground temp = (Playground) SerializationHelper.getInstance().toClass(json, Playground.class);
 		this.name = temp.getName();
 		this.description = temp.getDescription();

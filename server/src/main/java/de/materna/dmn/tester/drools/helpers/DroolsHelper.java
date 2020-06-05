@@ -30,7 +30,7 @@ public class DroolsHelper extends de.materna.jdec.dmn.DroolsHelper {
 		}
 
 		List<Map<String, String>> importedModels = workspace.getConfig().getModels();
-		Map<String, String> mainImportedModel = importedModels.get(importedModels.size() - 1); // TODO: The main model should be marked explicitly!
+		Map<String, String> mainImportedModel = importedModels.get(importedModels.size() - 1);
 		return workspace.getDecisionSession().getRuntime().getModel(mainImportedModel.get("namespace"), mainImportedModel.get("name"));
 	}
 

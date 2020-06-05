@@ -23,7 +23,7 @@ public class AccessLog extends Serializable {
 		this.fileManager = fileManager;
 
 		if (fileManager.fileExists()) {
-			fromJson(fileManager.getContent());
+			fromJSON(fileManager.getContent());
 		}
 	}
 
@@ -49,7 +49,7 @@ public class AccessLog extends Serializable {
 	public void serialize() {
 		// Serializing the access log is not so important, we'll catch io exceptions.
 		try {
-			fileManager.persistFile(toJson());
+			fileManager.persistFile(toJSON());
 		}
 		catch (IOException exception) {
 			logger.error("Serialization failed: ", exception);
@@ -65,12 +65,12 @@ public class AccessLog extends Serializable {
 	}
 
 	@Override
-	public String toJson() {
+	public String toJSON() {
 		return SerializationHelper.getInstance().toJSON(log);
 	}
 
 	@Override
-	public void fromJson(String json) {
+	public void fromJSON(String json) {
 		this.log = SerializationHelper.getInstance().toClass(json, new TypeReference<ArrayList<AccessLogEntry>>() {
 		});
 	}

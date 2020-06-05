@@ -1,22 +1,18 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class PublicConfiguration extends Serializable {
-
 	public int version;
 	public String name;
 	public String description;
 	public Access access = Access.PUBLIC;
-	
+
 	public PublicConfiguration() {
-		
 	}
-	
-	
+
 	@JsonProperty
 	public int getVersion() {
 		return version;
@@ -46,7 +42,7 @@ public class PublicConfiguration extends Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 	@JsonProperty
 	public Access getAccess() {
 		return access;
@@ -56,15 +52,15 @@ public class PublicConfiguration extends Serializable {
 	public void setAccess(Access mode) {
 		this.access = mode;
 	}
-	
-	public void fromJson(String json) {
-		PublicConfiguration temp = (PublicConfiguration) SerializationHelper.getInstance().toClass(json, PublicConfiguration.class); 
-		this.version = temp.getVersion();
-		this.name = temp.getName();
-		this.description = temp.getDescription();
-		this.access = temp.getAccess();
+
+	public void fromJSON(String json) {
+		PublicConfiguration publicConfiguration = (PublicConfiguration) SerializationHelper.getInstance().toClass(json, PublicConfiguration.class);
+		this.version = publicConfiguration.getVersion();
+		this.name = publicConfiguration.getName();
+		this.description = publicConfiguration.getDescription();
+		this.access = publicConfiguration.getAccess();
 	}
-	
+
 	public enum Access {
 		PUBLIC, PROTECTED, PRIVATE;
 	}

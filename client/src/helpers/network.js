@@ -71,6 +71,19 @@ export default {
 		};
 	},
 
+	async getDecisionSession() {
+		const response = await this._authorizedFetch(this._endpoint + "/model/decision-session", {});
+		return await response.json();
+	},
+
+	async setDecisionSession(name) {
+		await this._authorizedFetch(this._endpoint + "/model/decision-session", {
+			method: "PUT",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(name)
+		});
+	},
+
 	async getModelInputs() {
 		const response = await this._authorizedFetch(this._endpoint + "/model/inputs", {});
 		return await response.json();
@@ -95,19 +108,19 @@ export default {
 			})
 		});
 	},
-	
+
 	//
 	// Playgrounds
 	//
-	
+
 	async getPlaygrounds(order) {
 		const queryString = new URLSearchParams();
 		queryString.append("order", String(order === undefined ? false : order));
-		
+
 		const response = await this._authorizedFetch(this._endpoint + "/playgrounds?" + queryString.toString(), {});
 		return await response.json();
 	},
-	
+
 	async getPlayground(uuid) {
 		const response = await this._authorizedFetch(this._endpoint + "/playgrounds/" + uuid, {});
 		return await response.json();
@@ -157,11 +170,12 @@ export default {
 	},
 
 	async addInput(input) {
-		await this._authorizedFetch(this._endpoint + "/inputs", {
+		const response = await this._authorizedFetch(this._endpoint + "/inputs", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
 		});
+		return await response.text();
 	},
 
 	async editInput(uuid, input) {
@@ -190,11 +204,12 @@ export default {
 	},
 
 	async addOutput(output) {
-		await this._authorizedFetch(this._endpoint + "/outputs", {
+		const response = await this._authorizedFetch(this._endpoint + "/outputs", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(output)
 		});
+		return await response.text();
 	},
 
 	async editOutput(uuid, output) {
@@ -223,11 +238,12 @@ export default {
 	},
 
 	async addTest(test) {
-		await this._authorizedFetch(this._endpoint + "/tests", {
+		const response = await this._authorizedFetch(this._endpoint + "/tests", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(test)
 		});
+		return await response.text();
 	},
 
 	async editTest(uuid, test) {

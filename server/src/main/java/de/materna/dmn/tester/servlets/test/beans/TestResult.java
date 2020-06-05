@@ -26,7 +26,7 @@ public class TestResult extends Serializable {
 		return true;
 	}
 	
-	public void fromJson(String json) {
+	public void fromJSON(String json) {
 		TestResult temp = (TestResult) SerializationHelper.getInstance().toClass(json, TestResult.class);
 		this.outputs = temp.getOutputs();
 	}

@@ -7,7 +7,9 @@ import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.Decision;
 import de.materna.dmn.tester.servlets.model.beans.Model;
+import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.jdec.DMNDecisionSession;
 import de.materna.jdec.dmn.DroolsAnalyzer;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.model.ImportResult;
@@ -85,12 +87,23 @@ public class ModelServlet {
 
 				importedModels.add(model);
 			}
-			workspace.getConfig().setModels(importedModels);
+			Configuration configuration = workspace.getConfig();
+			configuration.setModels(importedModels);
+
+			// Check if the configured decision service still exists.
+			Configuration.DecisionService decisionService = configuration.getDecisionService();
+			if (decisionService != null) {
+				if (configuration.getModels().size() == 0 || DroolsHelper.getModel(workspace).getDecisionServices().stream().noneMatch(importedDecisionServiceNode -> importedDecisionServiceNode.getDecisionService().getName().equals(decisionService.getName()) && importedDecisionServiceNode.getModelNamespace().equals(decisionService.getNamespace()))) {
+					// If the decision service does not exist anymore, we will remove the reference from the configuration.
+					configuration.setDecisionService(null);
+				}
+			}
 
 			// Update the configuration and add an access log entry.
-			workspace.getConfig().setModifiedDate(System.currentTimeMillis());
-			workspace.getConfig().serialize();
-			workspace.getAccessLog().writeMessage("Imported models", workspace.getConfig().getModifiedDate());
+			configuration.setModifiedDate(System.currentTimeMillis());
+			configuration.serialize();
+
+			workspace.getAccessLog().writeMessage("Imported models", configuration.getModifiedDate());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(importResult)).build();
 
@@ -103,6 +116,30 @@ public class ModelServlet {
 
 			return Response.status(Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
 		}
+	}
+
+	@GET
+	@ReadAccess
+	@Produces("application/json")
+	@Path("/model/decision-session")
+	public Response getDecisionSession(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getConfig().getDecisionService())).build();
+	}
+
+	@PUT
+	@WriteAccess
+	@Consumes("application/json")
+	@Path("/model/decision-session")
+	public Response setDecisionSession(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+
+		Configuration configuration = workspace.getConfig();
+		configuration.setDecisionService((Configuration.DecisionService) SerializationHelper.getInstance().toClass(body, Configuration.DecisionService.class));
+		configuration.serialize();
+
+		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 
 	@GET
@@ -126,8 +163,13 @@ public class ModelServlet {
 		Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 		});
 
-		ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getModel(workspace), inputs);
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(executionResult)).build();
+		DMNDecisionSession decisionSession = workspace.getDecisionSession();
+		DMNModel model = DroolsHelper.getModel(workspace);
+
+		Configuration configuration = workspace.getConfig();
+		String decisionServiceName = configuration.getDecisionService() == null ? null : configuration.getDecisionService().getName();
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(decisionSession.executeModel(model, decisionServiceName, inputs))).build();
 	}
 
 	@POST

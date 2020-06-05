@@ -55,7 +55,7 @@ public class Model extends Serializable {
 		return decisionServices;
 	}
 
-	public void fromJson(String json) {
+	public void fromJSON(String json) {
 		Model temp = (Model) SerializationHelper.getInstance().toClass(json, Model.class);
 		this.namespace = temp.getNamespace();
 		this.name = temp.getName();
