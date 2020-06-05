@@ -63,7 +63,7 @@
 				<h3 class="mb-2">Context</h3>
 				<div class="card">
 					<div class="card-body">
-						<json-builder v-bind:convert="true" v-bind:template="playground.context.template" v-on:update:value="playground.context.value = $event; executeRaw();"/>
+						<json-builder v-bind:convert="true" v-bind:template="playground.context.template" v-on:update:value="playground.context.value = $event; executeRaw();" v-bind:fixed-root="true"/>
 					</div>
 				</div>
 			</div>
