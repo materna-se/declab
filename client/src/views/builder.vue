@@ -1,12 +1,47 @@
 <template>
 	<div class="container-fluid">
+		<div class="d-flex align-items-center mb-2">
+			<h3 class="mb-0 mr-auto">Builder</h3>
+			<div>
+				<button class="btn btn-block btn-outline-secondary" v-on:click="detachWorker">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
+						<path d="M8 12h9.76l-2.5-2.5 1.41-1.42L21.59 13l-4.92 4.92-1.41-1.42 2.5-2.5H8v-2m11-9a2 2 0 0 1 2 2v4.67l-2-2V7H5v12h14v-.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z" fill="currentColor"/>
+					</svg>
+				</button>
+			</div>
+		</div>
+		<div class="mb-4">
+			<h4 class="mb-2">Save</h4>
+			<div class="row">
+				<div class="col-6">
+					<div v-bind:class="[!hasTestName() ? 'input-disabled' : null]">
+						<h5 class="mb-2">Test</h5>
+						<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.test.name">
+					</div>
+				</div>
+				<div class="col-6">
+					<div v-bind:class="[!hasInputName() ? 'input-disabled' : null]">
+						<h5 class="mb-2">Input</h5>
+						<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.input.name">
+					</div>
+				</div>
+			</div>
+			<template v-if="Object.keys(model.result.outputs).length > 0">
+				<h5 class="mt-4 mb-2">Outputs</h5>
+				<div class="row">
+					<div class="col-6 mb-2" v-for="(output, key) in model.result.outputs" v-bind:class="[!hasOutputName(key) ? 'input-disabled' : null]">
+						<h6 class="mb-2">{{key}}</h6>
+						<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.result.name[key]">
+					</div>
+				</div>
+			</template>
+			<button class="btn btn-outline-secondary mt-4 w-100" v-on:click="saveEntities">Save Entities</button>
+		</div>
 		<div class="row">
 			<div class="mb-4" v-if="mode !== 2" v-bind:class="{'col-6': mode === 0, 'col-12': mode === 1}">
-				<div class="row mb-2">
-					<div class="col-6">
-						<h3 class="mb-0">Input</h3>
-					</div>
-					<div class="col-6">
+				<div class="d-flex align-items-center mb-2">
+					<h4 class="mb-0 mr-auto">Input</h4>
+					<div>
 						<div class="input-group">
 							<div class="input-group-prepend">
 								<span class="input-group-text">Template</span>
@@ -24,6 +59,7 @@
 							<div class="card-body p-0">
 								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:value="model.input.value = $event; executeModel();"/>
 							</div>
+							<!--
 							<div class="card-footer card-footer-border">
 								<div class="input-group">
 									<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.input.name">
@@ -32,23 +68,13 @@
 									</div>
 								</div>
 							</div>
+							-->
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="mb-4" v-if="mode !== 1" v-bind:class="{'col-6': mode === 0, 'col-12': mode === 2}">
-				<div class="row">
-					<div class="col-10">
-						<h3 class="mb-2">Output</h3>
-					</div>
-					<div class="col-2">
-						<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="detachWorker">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
-								<path d="M8 12h9.76l-2.5-2.5 1.41-1.42L21.59 13l-4.92 4.92-1.41-1.42 2.5-2.5H8v-2m11-9a2 2 0 0 1 2 2v4.67l-2-2V7H5v12h14v-.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z" fill="currentColor"/>
-							</svg>
-						</button>
-					</div>
-				</div>
+				<h4 class="mb-2">Outputs</h4>
 				<div class="row mb-4" v-if="alert.message !== null">
 					<div class="col-12">
 						<alert v-bind:alert="alert"/>
@@ -56,16 +82,12 @@
 				</div>
 				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
 					<div class="card-header">
-						<div class="row">
-							<div class="col-10">
-								<h4 class="mb-0">{{key}}</h4>
-							</div>
-							<div class="col-2">
-								<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" class="d-block float-right" style="cursor: pointer" v-on:click="$set(model.result.visible, key, model.result.visible[key] !== true)">
-									<path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z" fill="currentColor" v-if="model.result.visible[key]"/>
-									<path d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6-6-6 1.41-1.42z" fill="currentColor" v-else/>
-								</svg>
-							</div>
+						<div class="d-flex align-items-center">
+							<h5 class="mb-0 mr-auto">{{key}}</h5>
+							<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" class="d-block float-right" style="cursor: pointer" v-on:click="$set(model.result.visible, key, model.result.visible[key] !== true)">
+								<path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z" fill="currentColor" v-if="model.result.visible[key]"/>
+								<path d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6-6-6 1.41-1.42z" fill="currentColor" v-else/>
+							</svg>
 						</div>
 					</div>
 					<template v-if="model.result.visible[key]">
@@ -73,11 +95,12 @@
 							<h5 class="mb-2">Output</h5>
 							<json-builder class="mb-0" v-bind:template="output" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 
-							<div class="mt-4" v-if="Object.keys(model.result.context[key]).length !== 0">
+							<div class="mt-4" v-if="model.result.context[key] !== undefined && Object.keys(model.result.context[key]).length !== 0">
 								<h5 class="mb-2">Context</h5>
 								<json-builder class="mb-0" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 							</div>
 						</div>
+						<!--
 						<div class="card-footer">
 							<div class="input-group">
 								<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.result.name[key]">
@@ -86,6 +109,7 @@
 								</div>
 							</div>
 						</div>
+						-->
 					</template>
 				</div>
 			</div>
@@ -116,6 +140,10 @@
 				inputs: {},
 
 				model: {
+					test: {
+						name: null
+					},
+
 					input: {
 						name: null,
 						value: {},
@@ -212,31 +240,73 @@
 				this.inputs = await Network.getInputs(true);
 			},
 			async addInput() {
-				await Network.addInput({
+				const uuid = await Network.addInput({
 					name: this.model.input.name,
 					value: this.model.input.value
 				});
 				await this.getInputs();
-
-				this.$root.displayAlert("The input was successfully saved.", "success");
+				return uuid;
 			},
 
 			//
 			// Outputs
 			//
 			async addOutput(decision) {
-				await Network.addOutput({
+				return await Network.addOutput({
 					name: this.model.result.name[decision],
 					decision: decision,
 					value: this.model.result.outputs[decision]
 				});
-
-				this.$root.displayAlert("The output was successfully saved.", "success");
 			},
+
+			//
+			// Outputs
+			//
+			async addTest(input, outputs) {
+				return await Network.addTest({
+					name: this.model.test.name,
+					input: input,
+					outputs: outputs
+				});
+			},
+
 
 			//
 			// Helpers
 			//
+			async saveEntities() {
+				if (this.hasTestName() && !this.hasInputName()) {
+					this.$root.displayAlert("You need to enter an input name if you want to save a test.", "danger");
+					return;
+				}
+
+				let input = null;
+				if (this.hasInputName()) {
+					input = await this.addInput();
+				}
+				const outputs = [];
+				for (const decision in this.model.result.outputs) {
+					if (this.hasOutputName(decision)) {
+						outputs.push(await this.addOutput(decision));
+					}
+				}
+
+				let test = null;
+				if (this.hasTestName()) {
+					test = await this.addTest(input, outputs);
+				}
+
+				this.$root.displayAlert((input !== null ? 1 : 0) + " inputs, " + outputs.length + " outputs and " + (test !== null ? 1 : 0) + " tests were successfully saved.", "success");
+			},
+			hasInputName() {
+				return this.model.input.name !== null && this.model.input.name !== '';
+			},
+			hasOutputName(decision) {
+				return this.model.result.name[decision] !== undefined && this.model.result.name[decision] !== '';
+			},
+			hasTestName() {
+				return this.model.test.name !== null && this.model.test.name !== '';
+			},
 			displayAlert(message, state) {
 				this.alert = {
 					message: message,
@@ -282,5 +352,9 @@
 
 	.card-borderless {
 		border: none;
+	}
+
+	.input-disabled {
+		opacity: 0.6;
 	}
 </style>
