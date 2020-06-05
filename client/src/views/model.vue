@@ -208,11 +208,22 @@
 				return new Promise(resolve => {
 					const fileReader = new FileReader();
 					fileReader.addEventListener("load", async function (readerEvent) {
-						const xml = readerEvent.target.result;
+						const file = readerEvent.target.result;
+
+						// Check if the file is starting with <. If it does, we'll expect it to be a .dmn file.
+						if(file.charAt(0) === "<") {
+							resolve({
+								name: file.match(/name="(.+?)"/)[1],
+								namespace: file.match(/namespace="(.+?)"/)[1],
+								source: file
+							});
+							return;
+						}
+
 						resolve({
-							name: xml.match(/name="(.+?)"/)[1],
-							namespace: xml.match(/namespace="(.+?)"/)[1],
-							source: xml
+							name: file.match(/class (.+?) /)[1],
+							namespace: file.match(/package (.+?);/)[1],
+							source: file
 						});
 					});
 					fileReader.readAsText(file, "UTF-8");
