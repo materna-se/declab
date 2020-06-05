@@ -167,7 +167,7 @@
 			},
 
 			isCurrentDecisionService(name, namespace) {
-				if(this.decisionSession === null) {
+				if (this.decisionSession === null) {
 					return false;
 				}
 
@@ -211,7 +211,7 @@
 						const file = readerEvent.target.result;
 
 						// Check if the file is starting with <. If it does, we'll expect it to be a .dmn file.
-						if(file.charAt(0) === "<") {
+						if (file.charAt(0) === "<") {
 							resolve({
 								name: file.match(/name="(.+?)"/)[1],
 								namespace: file.match(/namespace="(.+?)"/)[1],
@@ -220,9 +220,11 @@
 							return;
 						}
 
+						const namespace = file.match(/package (.+?);/)[1];
+						const name = file.match(/class (.+?) /)[1];
 						resolve({
-							name: file.match(/class (.+?) /)[1],
-							namespace: file.match(/package (.+?);/)[1],
+							name: name,
+							namespace: namespace + "." + name,
 							source: file
 						});
 					});
