@@ -87,7 +87,7 @@ public class WorkspaceManager {
 			workspaceUUID = generatedUUID;
 		}
 
-		Configuration configuration = (Configuration) SerializationHelper.getInstance().toClass(configManager.getContent(), Configuration.class);
+		Configuration configuration = (Configuration) SerializationHelper.getInstance().toClass(configManager.getFile(), Configuration.class);
 		//Upgrade path from version 1 to 2
 		if (configuration.getVersion() == 1) {
 			log.info("Workspace " + workspaceUUID + " needs to be upgraded from version 1 to 2.");
@@ -100,11 +100,11 @@ public class WorkspaceManager {
 
 				// Update the reference to the moved model file.
 				PersistenceDirectoryManager<String> modelDirectoryManager = new PersistenceDirectoryManager<>(workspaceUUID, "models", String.class, "dmn");
-				modelDirectoryManager.persistFile(modelUUID, modelFileManager.getContent());
+				modelDirectoryManager.persistFile(modelUUID, modelFileManager.getFile());
 
 				// Import model into a temporarily created decision session in order to obtain namespace and name.
 				DMNDecisionSession decisionSession = new DMNDecisionSession();
-				decisionSession.importModel("main", modelFileManager.getContent());
+				decisionSession.importModel("main", modelFileManager.getFile());
 				DMNModel importedModel = decisionSession.getRuntime().getModels().get(0);
 
 				// The configuration needs to be updated with obtained information.

@@ -114,7 +114,7 @@ public class TestServlet {
 
 			Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
 
-			ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getModel(workspace), InputServlet.enrichInput(inputManager, inputManager.getFile(test.getInput())).getValue());
+			ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getMainModelNamespace(workspace), InputServlet.enrichInput(inputManager, inputManager.getFile(test.getInput())).getValue());
 			Map<String, Object> calculatedOutputs = executionResult.getOutputs();
 
 			Map<String, TestResultOutput> comparedOutputs = new LinkedHashMap<>();

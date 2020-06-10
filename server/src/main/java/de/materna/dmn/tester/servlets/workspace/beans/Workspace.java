@@ -84,7 +84,6 @@ public class Workspace {
 	}
 
 	public void verify() throws IOException {
-		// TODO: verify for PersistenceFileManager
 		modelManager.verifyAllFiles();
 		playgroundManager.verifyAllFiles();
 		inputManager.verifyAllFiles();

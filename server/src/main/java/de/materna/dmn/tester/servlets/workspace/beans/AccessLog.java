@@ -23,7 +23,7 @@ public class AccessLog extends Serializable {
 		this.fileManager = fileManager;
 
 		if (fileManager.fileExists()) {
-			fromJSON(fileManager.getContent());
+			fromJSON(fileManager.getFile());
 		}
 	}
 

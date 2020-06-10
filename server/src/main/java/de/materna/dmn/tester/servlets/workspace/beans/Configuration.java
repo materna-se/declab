@@ -27,7 +27,7 @@ public class Configuration extends PublicConfiguration {
 		this.fileManager = fileManager;
 
 		if (fileManager.fileExists()) {
-			fromJSON(fileManager.getContent());
+			fromJSON(fileManager.getFile());
 		}
 	}
 
