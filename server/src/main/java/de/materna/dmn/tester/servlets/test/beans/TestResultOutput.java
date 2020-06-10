@@ -1,5 +1,6 @@
 package de.materna.dmn.tester.servlets.test.beans;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,7 +24,14 @@ public class TestResultOutput extends Serializable {
 	public TestResultOutput() {
 	}
 
-	public TestResultOutput(String uuid, String name, String decision, JsonNode expected, JsonNode calculated) {
+	@JsonCreator
+	public TestResultOutput(@JsonProperty(value = "uuid", required = true) String uuid,
+							@JsonProperty(value = "name", required = true) String name,
+							@JsonProperty(value = "decision", required = true) String decision,
+							@JsonProperty(value = "expected", required = true) JsonNode expected,
+							@JsonProperty(value = "calculated", required = true) JsonNode calculated) {
+		if(name == null) name = "";
+
 		this.uuid = uuid;
 		this.name = name;
 		this.decision = decision;

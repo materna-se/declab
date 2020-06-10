@@ -1,17 +1,22 @@
 package de.materna.dmn.tester.servlets.output.beans;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
 
+@JsonIgnoreProperties(ignoreUnknown=true) //TODO Solve this in SerializationHelper
 public class Output extends Serializable {
 	protected JsonNode value;
 
 	public Output() {
 	}
 
-	public Output(JsonNode value) {
+	@JsonCreator
+	public Output(@JsonProperty(value = "value", required = true) JsonNode value) {
 		this.value = value;
 	}
 
