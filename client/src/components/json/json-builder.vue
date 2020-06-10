@@ -51,12 +51,12 @@
 			}
 		},
 		mounted() {
-			this.value = this.convert ? this.enrichTemplate(this.template) : this.template;
+			this.value = this.importValue(this.template);
 		},
 		watch: {
 			template: {
 				handler: function (template) {
-					this.value = this.convert ? this.enrichTemplate(template) : JSON.parse(JSON.stringify(template));
+					this.value = this.importValue(template);
 				},
 				deep: true
 			},
@@ -74,6 +74,17 @@
 			cleanValue(value) {
 				const cleanedObject = Converter.clean(value);
 				return cleanedObject === undefined ? {} : cleanedObject;
+			},
+			importValue(value) {
+				if(this.convert) {
+					return this.enrichTemplate(value);
+				}
+
+				if(value.type === "object") {
+					return JSON.parse(JSON.stringify(value));
+				}
+
+				return {type: "object", value: JSON.parse(JSON.stringify(value))};
 			},
 			exportValue(value) {
 				this.cleanedValue = this.cleanValue(value);
