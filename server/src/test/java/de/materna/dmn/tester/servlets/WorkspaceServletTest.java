@@ -20,6 +20,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -476,8 +477,8 @@ public class WorkspaceServletTest {
 			Files.write(exportedFilePath, IOUtils.toByteArray(exportedZIPIS));
 
 			//Read both files
-			String goldenFileContentString = new String(Files.readAllBytes(goldenFilePath), "UTF-8");
-			String exportedFileContentString = new String(Files.readAllBytes(exportedFilePath), "UTF-8");
+			String goldenFileContentString = new String(Files.readAllBytes(goldenFilePath), StandardCharsets.UTF_8);
+			String exportedFileContentString = new String(Files.readAllBytes(exportedFilePath), StandardCharsets.UTF_8);
 
 			Assertions.assertEquals(goldenFileContentString, exportedFileContentString);
 		}
