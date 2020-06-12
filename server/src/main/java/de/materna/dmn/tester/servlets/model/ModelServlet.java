@@ -6,13 +6,13 @@ import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.Decision;
-import de.materna.dmn.tester.servlets.model.beans.Model;
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.DMNDecisionSession;
 import de.materna.jdec.dmn.DroolsAnalyzer;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.model.ImportResult;
+import de.materna.jdec.model.Model;
 import de.materna.jdec.model.ModelImportException;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
@@ -42,15 +42,7 @@ public class ModelServlet {
 		for (DMNModel model : DroolsHelper.getModels(workspace)) {
 			// At this moment, the name of the component is sufficient for us.
 			// All other fields are filtered out.
-			models.add(new Model(
-					model.getNamespace(),
-					model.getName(),
-					workspace.getDecisionSession().getModel(model.getNamespace()),
-					model.getDecisions().stream().filter(decisionNode -> decisionNode.getModelNamespace().equals(model.getNamespace())).map(decisionNode -> decisionNode.getName()).collect(Collectors.toSet()),
-					model.getInputs().stream().filter(inputDataNode -> inputDataNode.getModelNamespace().equals(model.getNamespace())).map(inputDataNode -> inputDataNode.getName()).collect(Collectors.toSet()),
-					model.getBusinessKnowledgeModels().stream().filter(businessKnowledgeModelNode -> businessKnowledgeModelNode.getModelNamespace().equals(model.getNamespace())).map(businessKnowledgeModelNode -> businessKnowledgeModelNode.getName()).collect(Collectors.toSet()),
-					model.getDecisionServices().stream().filter(decisionServiceNode -> decisionServiceNode.getModelNamespace().equals(model.getNamespace())).map(decisionServiceNode -> decisionServiceNode.getName()).collect(Collectors.toSet())
-			));
+			models.add(workspace.getDecisionSession().getModel(model.getNamespace()));
 		}
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(models)).build();
 	}
@@ -149,7 +141,7 @@ public class ModelServlet {
 	public Response getInputs(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getComplexInputStructure(workspace.getDecisionSession().getRuntime(), DroolsHelper.getModel(workspace).getNamespace()))).build();
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getComplexInputStructure(workspace.getDecisionSession().getRuntime(), DroolsHelper.getModel(workspace).getNamespace(), null))).build();
 	}
 
 	@POST
