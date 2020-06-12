@@ -18,7 +18,7 @@ public class PersistedInput extends Input {
 
 	@JsonCreator
 	public PersistedInput(@JsonProperty(value = "name", required = true) String name,
-						  @JsonProperty(value = "parent", required = true) String parent,
+						  @JsonProperty(value = "parent", required = false) String parent,
 						  @JsonProperty(value = "value", required = true) Map<String, ?> value) {
 		super(value);
 
