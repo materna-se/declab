@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dmn="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:feel="http://www.omg.org/spec/FEEL/20140401" xmlns:layout="https://products.bfs-intra.net/milestones/vr/spec/20170328/dmndi.xsd" xsi:schemaLocation="http://www.omg.org/spec/DMN/20151101/dmn.xsd http://www.omg.org/spec/DMN/20151101/dmn.xsd" id="_yk0KoGtKEeqoXq8GeFn6KA" name="anbieter" exporter="ACTICO Modeler" namespace="anbieter">
+  <dmn:extensionElements>
+    <layout:container id="_yk0KomtKEeqoXq8GeFn6KA" name="anbieter" type="Dmn" href="#_yk0KoGtKEeqoXq8GeFn6KA">
+      <layout:node id="_za7TRWtKEeqoXq8GeFn6KA" type="2009" href="#_za7TQGtKEeqoXq8GeFn6KA">
+        <layout:location x="480" y="139"/>
+      </layout:node>
+      <layout:node id="_1TU_V2tKEeqoXq8GeFn6KA" type="2003" href="#_1TU_UGtKEeqoXq8GeFn6KA">
+        <layout:location x="511" y="287"/>
+      </layout:node>
+      <layout:edge id="_N2661mtUEeqoXq8GeFn6KA" type="4001" href="#http://www.omg.org/spec/DMN/20151101/dmn.xsd:InformationRequirement$_za7TQGtKEeqoXq8GeFn6KA$_1TU_UGtKEeqoXq8GeFn6KA" source="#_1TU_V2tKEeqoXq8GeFn6KA" target="#_za7TRWtKEeqoXq8GeFn6KA">
+        <layout:bendpoints points="[4, -18, 0, 112]$[31, -124, 27, 6]"/>
+        <layout:targetAnchor id="(0.776,0.6363636363636364)"/>
+      </layout:edge>
+      <layout:DiContainerStyle/>
+    </layout:container>
+  </dmn:extensionElements>
+  <dmn:decision id="_za7TQGtKEeqoXq8GeFn6KA" name="danbieter">
+    <dmn:extensionElements>
+      <layout:container id="_38YFMGtKEeqoXq8GeFn6KA" name="" type="DMN_Expression" href="#_za7TQGtKEeqoXq8GeFn6KA"/>
+    </dmn:extensionElements>
+    <dmn:variable id="_za7TQWtKEeqoXq8GeFn6KA" name="danbieter" typeRef="feel:number"/>
+    <dmn:informationRequirement>
+      <dmn:requiredInput href="#_1TU_UGtKEeqoXq8GeFn6KA"/>
+    </dmn:informationRequirement>
+    <dmn:literalExpression id="_38YFMWtKEeqoXq8GeFn6KA">
+      <dmn:text>ianbieter</dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+  <dmn:inputData id="_1TU_UGtKEeqoXq8GeFn6KA" name="ianbieter">
+    <dmn:variable id="_1TU_UWtKEeqoXq8GeFn6KA" name="ianbieter" typeRef="feel:number"/>
+  </dmn:inputData>
+</dmn:definitions>

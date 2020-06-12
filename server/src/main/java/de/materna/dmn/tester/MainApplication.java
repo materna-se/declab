@@ -1,6 +1,8 @@
 package de.materna.dmn.tester;
 
 import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.dmn.tester.servlets.exceptions.DefaultOptionsMethodExceptionMapper;
+import de.materna.dmn.tester.servlets.exceptions.GeneralExceptionMapper;
 import de.materna.dmn.tester.servlets.filters.CSRFFilter;
 import de.materna.dmn.tester.servlets.filters.ReadAccessFilter;
 import de.materna.dmn.tester.servlets.filters.WriteAccessFilter;
@@ -38,6 +40,9 @@ public class MainApplication extends Application {
 		classes.add(CSRFFilter.class);
 		classes.add(ReadAccessFilter.class);
 		classes.add(WriteAccessFilter.class);
+		
+		classes.add(DefaultOptionsMethodExceptionMapper.class);
+		classes.add(GeneralExceptionMapper.class);
 	}
 
 	@Override
