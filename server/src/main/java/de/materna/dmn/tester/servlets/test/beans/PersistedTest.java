@@ -20,7 +20,7 @@ public class PersistedTest extends Serializable {
 
 	@JsonCreator
 	public PersistedTest(@JsonProperty(value = "name", required = true) String name,
-						 @JsonProperty(value = "description", required = true) String description,
+						 @JsonProperty(value = "description", required = false) String description,
 						 @JsonProperty(value = "input", required = true) String input,
 						 @JsonProperty(value = "outputs", required = true) List<String> outputs) {
 		this.name = name;
