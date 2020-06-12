@@ -20,8 +20,6 @@ public class PersistedOutput extends Output {
 						   @JsonProperty(value = "value", required = true) JsonNode value) {
 		super(value);
 
-		if(name == null) name = "";
-		
 		this.name = name;
 		this.decision = decision;
 	}

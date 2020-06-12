@@ -24,8 +24,6 @@ public class Playground extends Serializable {
 					  @JsonProperty(value = "description", required = true) String description,
 					  @JsonProperty(value = "expression", required = true) String expression,
 					  @JsonProperty(value = "context", required = true) Map<String, ?> context) {
-		if(name == null) name = "";
-		
 		this.name = name;
 		this.description = description;
 		this.expression = expression;

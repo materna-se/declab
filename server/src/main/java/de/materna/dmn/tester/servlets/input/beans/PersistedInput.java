@@ -22,8 +22,6 @@ public class PersistedInput extends Input {
 						  @JsonProperty(value = "value", required = true) Map<String, ?> value) {
 		super(value);
 
-		if(name == null) name = "";
-
 		this.name = name;
 		this.parent = parent;
 	}

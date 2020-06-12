@@ -23,8 +23,6 @@ public class PersistedTest extends Serializable {
 						 @JsonProperty(value = "description", required = true) String description,
 						 @JsonProperty(value = "input", required = true) String input,
 						 @JsonProperty(value = "outputs", required = true) List<String> outputs) {
-		if(name == null) name = "";
-		
 		this.name = name;
 		this.description = description;
 		this.input = input;

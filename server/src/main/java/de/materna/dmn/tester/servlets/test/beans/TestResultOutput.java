@@ -30,8 +30,6 @@ public class TestResultOutput extends Serializable {
 							@JsonProperty(value = "decision", required = true) String decision,
 							@JsonProperty(value = "expected", required = true) JsonNode expected,
 							@JsonProperty(value = "calculated", required = true) JsonNode calculated) {
-		if(name == null) name = "";
-
 		this.uuid = uuid;
 		this.name = name;
 		this.decision = decision;
