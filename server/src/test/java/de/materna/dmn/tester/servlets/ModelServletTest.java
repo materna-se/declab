@@ -1,26 +1,23 @@
 package de.materna.dmn.tester.servlets;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.UUID;
-
-import javax.ws.rs.core.MediaType;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import de.materna.dmn.tester.FileHelper;
+import de.materna.dmn.tester.ManagementHelper;
+import de.materna.dmn.tester.RequestHelper;
+import de.materna.jdec.model.ExecutionResult;
+import de.materna.jdec.model.Model;
+import de.materna.jdec.serialization.SerializationHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
-import de.materna.dmn.tester.FileHelper;
-import de.materna.dmn.tester.ManagementHelper;
-import de.materna.dmn.tester.RequestHelper;
-import de.materna.dmn.tester.servlets.model.beans.Model;
-import de.materna.jdec.model.ExecutionResult;
-import de.materna.jdec.serialization.SerializationHelper;
+import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.util.LinkedList;
+import java.util.UUID;
 
 public class ModelServletTest {
 	static String declabHost = ManagementHelper.declabHost;
@@ -202,7 +199,8 @@ public class ModelServletTest {
 
 			RequestHelper.emitRequest(url, "PUT", null, model1Json, MediaType.APPLICATION_JSON, 200, false);
 
-			LinkedList<Model> models = SerializationHelper.getInstance().toClass(RequestHelper.emitRequest(url, "GET", null, 200, true), new TypeReference<LinkedList<Model>>() {});
+			LinkedList<Model> models = SerializationHelper.getInstance().toClass(RequestHelper.emitRequest(url, "GET", null, 200, true), new TypeReference<LinkedList<Model>>() {
+			});
 			Assertions.assertEquals(1, models.size());
 		}
 
@@ -212,7 +210,8 @@ public class ModelServletTest {
 
 			RequestHelper.emitRequest(url, "PUT", null, model2Json, MediaType.APPLICATION_JSON, 400, false);
 
-			LinkedList<Model> models = SerializationHelper.getInstance().toClass(RequestHelper.emitRequest(url, "GET", null, 200, true), new TypeReference<LinkedList<Model>>() {});
+			LinkedList<Model> models = SerializationHelper.getInstance().toClass(RequestHelper.emitRequest(url, "GET", null, 200, true), new TypeReference<LinkedList<Model>>() {
+			});
 
 			//The only model in the list should be the anbieter model, since the nutzer model got rejected
 			Assertions.assertEquals(1, models.size());
@@ -225,7 +224,8 @@ public class ModelServletTest {
 
 			RequestHelper.emitRequest(url, "PUT", null, model3Json, MediaType.APPLICATION_JSON, 200, false);
 
-			LinkedList<Model> models = SerializationHelper.getInstance().toClass(RequestHelper.emitRequest(url, "GET", null, 200, true), new TypeReference<LinkedList<Model>>() {});
+			LinkedList<Model> models = SerializationHelper.getInstance().toClass(RequestHelper.emitRequest(url, "GET", null, 200, true), new TypeReference<LinkedList<Model>>() {
+			});
 			Assertions.assertEquals(2, models.size());
 		}
 
