@@ -115,8 +115,6 @@ public class WorkspaceManager {
 				model.put("uuid", modelUUID);
 				models.add(model);
 				configuration.setModels(models);
-
-				decisionSession.close();
 			}
 
 			configuration.setVersion(2);
