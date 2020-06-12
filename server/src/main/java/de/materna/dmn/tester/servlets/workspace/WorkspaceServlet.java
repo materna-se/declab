@@ -38,16 +38,10 @@ public class WorkspaceServlet {
 	@Path("/public")
 	@Produces("application/json")
 	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			Configuration configuration = workspace.getConfig();
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		Configuration configuration = workspace.getConfig();
 
-			return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJSON()).build();
-		}
-		catch (Exception e) {
-			log.error(e);
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJSON()).build();
 	}
 
 	@GET
@@ -55,16 +49,10 @@ public class WorkspaceServlet {
 	@Path("/config")
 	@Produces("application/json")
 	public Response getWorkspaceConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			Configuration configuration = workspace.getConfig();
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		Configuration configuration = workspace.getConfig();
 
-			return Response.status(Response.Status.OK).entity(configuration.toJSON()).build();
-		}
-		catch (Exception e) {
-			log.error(e);
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		return Response.status(Response.Status.OK).entity(configuration.toJSON()).build();
 	}
 
 	@POST
