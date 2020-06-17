@@ -1,19 +1,12 @@
 package de.materna.dmn.tester.servlets.test.beans;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
-
 import de.materna.dmn.tester.helpers.Serializable;
-import de.materna.dmn.tester.servlets.output.beans.EnrichedOutput;
-import de.materna.dmn.tester.servlets.output.beans.Output;
 import de.materna.jdec.serialization.SerializationHelper;
 
-import org.apache.log4j.Logger;
-
-@JsonIgnoreProperties(ignoreUnknown = true) //TODO Solve in SerializationHelper, remove this
 public class TestResultOutput extends Serializable {
 	private String uuid;
 	private String name;

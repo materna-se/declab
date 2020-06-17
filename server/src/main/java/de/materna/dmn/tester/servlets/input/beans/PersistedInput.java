@@ -1,14 +1,11 @@
 package de.materna.dmn.tester.servlets.input.beans;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import de.materna.jdec.serialization.SerializationHelper;
 
-@JsonIgnoreProperties(ignoreUnknown = true) //TODO Fix this in SerializationHelper
+import java.util.Map;
+
 public class PersistedInput extends Input {
 	private String name;
 	private String parent;
