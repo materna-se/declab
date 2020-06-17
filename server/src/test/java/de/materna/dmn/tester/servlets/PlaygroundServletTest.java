@@ -48,13 +48,13 @@ public class PlaygroundServletTest {
 		{
 			String randomUUID = UUID.randomUUID().toString();
 			urlTemplate = declabHost + "/api/workspaces/" + randomUUID + "/playgrounds";
-			url = urlTemplate;
 
+			url = urlTemplate;
 			RequestHelper.emitRequest(url, "GET", null, 404);
 			RequestHelper.emitRequest(url, "POST", null, 415);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 404, false);
 
-			url += "/" + randomUUID;
+			url = urlTemplate + "/" + randomUUID;
 			RequestHelper.emitRequest(url, "GET", null, 404);
 			RequestHelper.emitRequest(url, "PUT", null, 415);
 			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 404, false);
@@ -64,17 +64,15 @@ public class PlaygroundServletTest {
 		//Make workspace public
 		{
 			url = declabHost + "/api/workspaces/" + workspaceUUID + "/config";
-			String publicWorkspaceJson = FileHelper.readFile("workspace_public.json");
-			RequestHelper.emitRequest(url, "POST", null, publicWorkspaceJson, MediaType.APPLICATION_JSON, 200, true);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("workspace_public.json"), MediaType.APPLICATION_JSON, 200, true);
 		}
 
 		//Check all non-playground-specific endpoints in public workspace
 		{
 			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/playgrounds";
+
 			url = urlTemplate;
-
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "POST", null, 415);
 			RequestHelper.emitRequest(url, "POST", null, "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 400, false);
@@ -82,14 +80,10 @@ public class PlaygroundServletTest {
 
 		//Try creating invalid playgrounds in public workspace
 		{
-			String playgroundInvalid1Json = FileHelper.readFile("playground-test-1", "playground_invalid_1.json");
-			RequestHelper.emitRequest(url, "POST", null, playgroundInvalid1Json, MediaType.APPLICATION_JSON, 400, false);
-
-			String playgroundInvalid2Json = FileHelper.readFile("playground-test-1", "playground_invalid_2.json");
-			RequestHelper.emitRequest(url, "POST", null, playgroundInvalid2Json, MediaType.APPLICATION_JSON, 400, false);
-
-			String playgroundInvalid3Json = FileHelper.readFile("playground-test-1", "playground_invalid_3.json");
-			RequestHelper.emitRequest(url, "POST", null, playgroundInvalid3Json, MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("playground-test-1", "playground_invalid_1.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("playground-test-1", "playground_invalid_2.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("playground-test-1", "playground_invalid_3.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("playground-test-1", "playground_invalid_4.json"), MediaType.APPLICATION_JSON, 400, false);
 		}
 
 		//Create valid playground in public workspace
@@ -99,18 +93,14 @@ public class PlaygroundServletTest {
 
 		//Check all playground-specific endpoints
 		{
-			url += "/" + playgroundUUID;
+			url = urlTemplate + "/" + playgroundUUID;
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "PUT", null, 415);
 			RequestHelper.emitRequest(url, "PUT", null, "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 400, false);
-
 			RequestHelper.emitRequest(url, "PUT", null, playgroundValid2Json, MediaType.APPLICATION_JSON, 200, false);
-
 			RequestHelper.emitRequest(url, "DELETE", null, 204);
 		}
-
 
 		//Make workspace protected
 		{
@@ -123,10 +113,9 @@ public class PlaygroundServletTest {
 		//Check all non-playground-specific endpoints in protected workspace
 		{
 			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/playgrounds";
+
 			url = urlTemplate;
-
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "POST", "test", 415);
 			RequestHelper.emitRequest(url, "POST", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 401, false);
@@ -144,14 +133,12 @@ public class PlaygroundServletTest {
 			url += "/" + playgroundUUID;
 
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "PUT", "test", 415);
 			RequestHelper.emitRequest(url, "PUT", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", "", MediaType.APPLICATION_JSON, 400, false);
 			RequestHelper.emitRequest(url, "PUT", null, playgroundValid2Json, MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", playgroundValid2Json, MediaType.APPLICATION_JSON, 200, false);
-
 			RequestHelper.emitRequest(url, "DELETE", null, 401);
 			RequestHelper.emitRequest(url, "DELETE", "test", 204);
 		}
@@ -167,11 +154,10 @@ public class PlaygroundServletTest {
 		//Check all non-playground-specific endpoints in private workspace
 		{
 			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/playgrounds";
-			url = urlTemplate;
 
+			url = urlTemplate;
 			RequestHelper.emitRequest(url, "GET", null, 401);
 			RequestHelper.emitRequest(url, "GET", "test", 200);
-
 			RequestHelper.emitRequest(url, "POST", "test", 415);
 			RequestHelper.emitRequest(url, "POST", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 401, false);
@@ -190,14 +176,12 @@ public class PlaygroundServletTest {
 
 			RequestHelper.emitRequest(url, "GET", null, 401);
 			RequestHelper.emitRequest(url, "GET", "test", 200);
-
 			RequestHelper.emitRequest(url, "PUT", "test", 415);
 			RequestHelper.emitRequest(url, "PUT", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", "", MediaType.APPLICATION_JSON, 400, false);
 			RequestHelper.emitRequest(url, "PUT", null, playgroundValid2Json, MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", playgroundValid2Json, MediaType.APPLICATION_JSON, 200, false);
-
 			RequestHelper.emitRequest(url, "DELETE", null, 401);
 			RequestHelper.emitRequest(url, "DELETE", "test", 204);
 		}
@@ -220,14 +204,12 @@ public class PlaygroundServletTest {
 		Playground playground;
 		String playgroundUUID;
 
-
 		//Create playground
 		{
 			url = declabHost + "/api/workspaces/" + workspaceUUID + "/playgrounds/";
 
 			String playgroundJson = FileHelper.readFile("playground-test-1", "playground_1.json");
 			playground = (Playground) SerializationHelper.getInstance().toClass(playgroundJson, Playground.class);
-
 			playgroundUUID = RequestHelper.emitRequest(url, "POST", null, playgroundJson, MediaType.APPLICATION_JSON, 201, true);
 		}
 
@@ -235,9 +217,8 @@ public class PlaygroundServletTest {
 		{
 			url = declabHost + "/api/workspaces/" + workspaceUUID + "/playgrounds/" + playgroundUUID;
 
-			String playgroundJson = RequestHelper.emitRequest(url, "GET", null, 200, false);
-
 			//Compare to original playground object
+			String playgroundJson = RequestHelper.emitRequest(url, "GET", null, 200, false);
 			Playground playgroundToCompare = (Playground) SerializationHelper.getInstance().toClass(playgroundJson, Playground.class);
 			Assertions.assertEquals(playground.getName(), playgroundToCompare.getName());
 			Assertions.assertEquals(playground.getDescription(), playgroundToCompare.getDescription());
@@ -249,14 +230,13 @@ public class PlaygroundServletTest {
 		{
 			url = declabHost + "/api/workspaces/" + workspaceUUID + "/playgrounds/";
 
-			String playgroundsGetResponseString = RequestHelper.emitRequest(url, "GET", null, 200, false);
-			HashMap<String, Playground> playgrounds = SerializationHelper.getInstance().toClass(playgroundsGetResponseString, new TypeReference<HashMap<String, Playground>>() {});
+			String playgroundJson = RequestHelper.emitRequest(url, "GET", null, 200, false);
+			HashMap<String, Playground> playgrounds = SerializationHelper.getInstance().toClass(playgroundJson, new TypeReference<HashMap<String, Playground>>() {});
 
 			Assertions.assertEquals(1, playgrounds.size());
 
-			Playground playgroundToCompare = playgrounds.get(playgroundUUID);
-
 			//Compare to original playground object
+			Playground playgroundToCompare = playgrounds.get(playgroundUUID);
 			Assertions.assertEquals(playground.getName(), playgroundToCompare.getName());
 			Assertions.assertEquals(playground.getDescription(), playgroundToCompare.getDescription());
 			Assertions.assertEquals(playground.getExpression(), playgroundToCompare.getExpression());
@@ -269,7 +249,6 @@ public class PlaygroundServletTest {
 
 			String playgroundEditJson = FileHelper.readFile("playground-test-1", "playground_1_edit.json");
 			playground = (Playground) SerializationHelper.getInstance().toClass(playgroundEditJson, Playground.class);
-
 			RequestHelper.emitRequest(url, "PUT", null, playgroundEditJson, MediaType.APPLICATION_JSON, 200, true);
 		}
 
@@ -278,9 +257,9 @@ public class PlaygroundServletTest {
 			url = declabHost + "/api/workspaces/" + workspaceUUID + "/playgrounds/" + playgroundUUID;
 
 			String playgroundEditJson = RequestHelper.emitRequest(url, "GET", null, 200, true);
-			Playground playgroundToCompare = (Playground) SerializationHelper.getInstance().toClass(playgroundEditJson, Playground.class);
 
 			//Compare to original playground object
+			Playground playgroundToCompare = (Playground) SerializationHelper.getInstance().toClass(playgroundEditJson, Playground.class);
 			Assertions.assertEquals(playground.getName(), playgroundToCompare.getName());
 			Assertions.assertEquals(playground.getDescription(), playgroundToCompare.getDescription());
 			Assertions.assertEquals(playground.getExpression(), playgroundToCompare.getExpression());
@@ -291,14 +270,13 @@ public class PlaygroundServletTest {
 		{
 			url = declabHost + "/api/workspaces/" + workspaceUUID + "/playgrounds/";
 
-			String playgroundsGetResponseString = RequestHelper.emitRequest(url, "GET", null, 200, false);
-			HashMap<String, Playground> playgrounds = SerializationHelper.getInstance().toClass(playgroundsGetResponseString, new TypeReference<HashMap<String, Playground>>() {});
+			String playgroundJson = RequestHelper.emitRequest(url, "GET", null, 200, false);
+			HashMap<String, Playground> playgrounds = SerializationHelper.getInstance().toClass(playgroundJson, new TypeReference<HashMap<String, Playground>>() {});
 
 			Assertions.assertEquals(1, playgrounds.size());
 
-			Playground playgroundToCompare = playgrounds.get(playgroundUUID);
-
 			//Compare to original playground object
+			Playground playgroundToCompare = playgrounds.get(playgroundUUID);
 			Assertions.assertEquals(playground.getName(), playgroundToCompare.getName());
 			Assertions.assertEquals(playground.getDescription(), playgroundToCompare.getDescription());
 			Assertions.assertEquals(playground.getExpression(), playgroundToCompare.getExpression());

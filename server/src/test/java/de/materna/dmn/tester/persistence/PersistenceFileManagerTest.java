@@ -1,6 +1,6 @@
 package de.materna.dmn.tester.persistence;
 
-import de.materna.dmn.tester.TestHelper;
+import de.materna.dmn.tester.FileHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ class PersistenceFileManagerTest {
 
 	@BeforeAll
 	static void beforeAll() throws URISyntaxException {
-		System.setProperty("jboss.server.data.dir", TestHelper.getRootPath().toString());
+		System.setProperty("jboss.server.data.dir", FileHelper.getRootPath().toString());
 
 		persistenceFileManager = new PersistenceFileManager("test", "test.json");
 	}
@@ -34,14 +34,14 @@ class PersistenceFileManagerTest {
 	@Test
 	void getFileWithoutFile() {
 		Assertions.assertThrows(NoSuchFileException.class, () -> {
-			persistenceFileManager.getContent();
+			persistenceFileManager.getFile();
 		});
 	}
 
 	@Test
 	void getFileWithFile() throws IOException {
 		persistenceFileManager.persistFile("{}");
-		Assertions.assertEquals("{}", persistenceFileManager.getContent());
+		Assertions.assertEquals("{}", persistenceFileManager.getFile());
 		persistenceFileManager.removeFile();
 	}
 

@@ -52,13 +52,13 @@ public class TestServletTest {
 		{
 			String randomUUID = UUID.randomUUID().toString();
 			urlTemplate = declabHost + "/api/workspaces/" + randomUUID + "/tests";
-			url = urlTemplate;
 
+			url = urlTemplate;
 			RequestHelper.emitRequest(url, "GET", null, 404);
 			RequestHelper.emitRequest(url, "POST", null, 415);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 404, false);
 
-			url += "/" + randomUUID;
+			url = urlTemplate + "/" + randomUUID;
 			RequestHelper.emitRequest(url, "GET", null, 404);
 			RequestHelper.emitRequest(url, "POST", null, 404);
 			RequestHelper.emitRequest(url, "PUT", null, 415);
@@ -69,17 +69,15 @@ public class TestServletTest {
 		//Make workspace public
 		{
 			url = declabHost + "/api/workspaces/" + workspaceUUID + "/config";
-			String workspacePublicJson = FileHelper.readFile("workspace_public.json");
-			RequestHelper.emitRequest(url, "POST", null, workspacePublicJson, MediaType.APPLICATION_JSON, 200, true);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("workspace_public.json"), MediaType.APPLICATION_JSON, 200, true);
 		}
 
 		//Check all non-test-specific endpoints in public workspace
 		{
 			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/tests";
+
 			url = urlTemplate;
-
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "POST", null, 415);
 			RequestHelper.emitRequest(url, "POST", null, "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 400, false);
@@ -87,14 +85,10 @@ public class TestServletTest {
 
 		//Try creating invalid tests in public workspace
 		{
-			String testInvalid1Json = FileHelper.readFile("test-test-1", "test_invalid_1.json");
-			RequestHelper.emitRequest(url, "POST", null, testInvalid1Json, MediaType.APPLICATION_JSON, 400, false);
-
-			String testInvalid2Json = FileHelper.readFile("test-test-1", "test_invalid_2.json");
-			RequestHelper.emitRequest(url, "POST", null, testInvalid2Json, MediaType.APPLICATION_JSON, 400, false);
-
-			String testInvalid3Json = FileHelper.readFile("test-test-1", "test_invalid_3.json");
-			RequestHelper.emitRequest(url, "POST", null, testInvalid3Json, MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("test-test-1", "test_invalid_1.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("test-test-1", "test_invalid_2.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("test-test-1", "test_invalid_3.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("test-test-1", "test_invalid_4.json"), MediaType.APPLICATION_JSON, 400, false);
 		}
 
 		//Create valid test in public workspace
@@ -106,14 +100,11 @@ public class TestServletTest {
 		{
 			url += "/" + testUUID;
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "POST", null, 503);
-
 			RequestHelper.emitRequest(url, "PUT", null, 415);
 			RequestHelper.emitRequest(url, "PUT", null, "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 400, false);
 			RequestHelper.emitRequest(url, "PUT", null, FileHelper.readFile("test-test-1", "test_valid_2.json"), MediaType.APPLICATION_JSON, 204, false);
-
 			RequestHelper.emitRequest(url, "DELETE", null, 204);
 		}
 
@@ -129,10 +120,9 @@ public class TestServletTest {
 		//Check all non-test-specific endpoints in protected workspace
 		{
 			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/tests";
+
 			url = urlTemplate;
-
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "POST", "test", 415);
 			RequestHelper.emitRequest(url, "POST", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 401, false);
@@ -150,18 +140,14 @@ public class TestServletTest {
 			url += "/" + testUUID;
 
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "POST", null, 401);
 			RequestHelper.emitRequest(url, "POST", "test", 503);
-
 			RequestHelper.emitRequest(url, "PUT", "test", 415);
 			RequestHelper.emitRequest(url, "PUT", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", "", MediaType.APPLICATION_JSON, 400, false);
-
 			RequestHelper.emitRequest(url, "PUT", null, testValid2Json, MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", testValid2Json, MediaType.APPLICATION_JSON, 204, false);
-
 			RequestHelper.emitRequest(url, "DELETE", null, 401);
 			RequestHelper.emitRequest(url, "DELETE", "test", 204);
 		}
@@ -178,11 +164,10 @@ public class TestServletTest {
 		//Check all non-test-specific endpoints in private workspace
 		{
 			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/tests";
-			url = urlTemplate;
 
+			url = urlTemplate;
 			RequestHelper.emitRequest(url, "GET", null, 401);
 			RequestHelper.emitRequest(url, "GET", "test", 200);
-
 			RequestHelper.emitRequest(url, "POST", "test", 415);
 			RequestHelper.emitRequest(url, "POST", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 401, false);
@@ -201,18 +186,14 @@ public class TestServletTest {
 
 			RequestHelper.emitRequest(url, "GET", null, 401);
 			RequestHelper.emitRequest(url, "GET", "test", 200);
-
 			RequestHelper.emitRequest(url, "POST", null, 401);
 			RequestHelper.emitRequest(url, "POST", "test", 503);
-
 			RequestHelper.emitRequest(url, "PUT", "test", 415);
 			RequestHelper.emitRequest(url, "PUT", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", "", MediaType.APPLICATION_JSON, 400, false);
-
 			RequestHelper.emitRequest(url, "PUT", null, testValid2Json, MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", testValid2Json, MediaType.APPLICATION_JSON, 204, false);
-
 			RequestHelper.emitRequest(url, "DELETE", null, 401);
 			RequestHelper.emitRequest(url, "DELETE", "test", 204);
 		}
@@ -281,9 +262,8 @@ public class TestServletTest {
 
 			Assertions.assertEquals(1, tests.size());
 
-			PersistedTest testToCompare = tests.get(testUUID);
-
 			//Compare to original test object
+			PersistedTest testToCompare = tests.get(testUUID);
 			Assertions.assertEquals(test.getName(), testToCompare.getName());
 			Assertions.assertEquals(test.getDescription(), testToCompare.getDescription());
 			Assertions.assertEquals(test.getInput(), testToCompare.getInput());
@@ -319,9 +299,7 @@ public class TestServletTest {
 		{
 			url = declabHost + "/api/workspaces/" + workspaceUUID + "/outputs/" + output1UUID;
 
-			String output1EditJson = FileHelper.readFile("test-test-1", "output_1_edit.json");
-
-			RequestHelper.emitRequest(url, "PUT", null, output1EditJson, MediaType.APPLICATION_JSON, 204, false);
+			RequestHelper.emitRequest(url, "PUT", null, FileHelper.readFile("test-test-1", "output_1_edit.json"), MediaType.APPLICATION_JSON, 204, false);
 		}
 
 		//Run test
@@ -343,7 +321,7 @@ public class TestServletTest {
 			test.setDescription("descriptionedit");
 			test.setInput("inputedit");
 
-			List<String> outputs = new LinkedList<String>();
+			List<String> outputs = new LinkedList<>();
 			outputs.add("outputedit1");
 			outputs.add("outputedit2");
 			test.setOutputs(outputs);
@@ -372,9 +350,8 @@ public class TestServletTest {
 
 			Assertions.assertEquals(1, tests.size());
 
-			PersistedTest testToCompare = tests.get(testUUID);
-
 			//Compare to original test object
+			PersistedTest testToCompare = tests.get(testUUID);
 			Assertions.assertEquals(test.getName(), testToCompare.getName());
 			Assertions.assertEquals(test.getDescription(), testToCompare.getDescription());
 			Assertions.assertEquals(test.getInput(), testToCompare.getInput());
@@ -410,7 +387,7 @@ public class TestServletTest {
 			HashMap<String, PersistedTest> tests = SerializationHelper.getInstance().toClass(testJson, new TypeReference<HashMap<String, PersistedTest>>() {});
 
 			//Make sure the deleted test was removed from the overall pool
-			Assertions.assertEquals(null, tests.get(testUUID));
+			Assertions.assertNull(tests.get(testUUID));
 			Assertions.assertEquals(0, tests.size());
 		}
 
@@ -426,10 +403,12 @@ public class TestServletTest {
 	public void deleteWorkspace() {
 		Assertions.assertTrue(workspaceUUID != null && workspaceUUID.length() > 0);
 
-		String url = declabHost + "/api/workspaces/" + workspaceUUID;
+		String urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID;
+
+		String url = urlTemplate;
 		RequestHelper.emitRequest(url, "DELETE", "test", 204);
 
-		url += "/public";
+		url = urlTemplate + "/public";
 		RequestHelper.emitRequest(url, "GET", null, 404);
 	}
 }

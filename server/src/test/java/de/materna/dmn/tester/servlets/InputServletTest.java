@@ -47,8 +47,8 @@ public class InputServletTest {
 		{
 			String randomUUID = UUID.randomUUID().toString();
 			urlTemplate = declabHost + "/api/workspaces/" + randomUUID + "/inputs";
-			url = urlTemplate;
 
+			url = urlTemplate;
 			RequestHelper.emitRequest(url, "GET", null, 404);
 			RequestHelper.emitRequest(url, "POST", null, 415);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 404, false);
@@ -70,10 +70,9 @@ public class InputServletTest {
 		//Check all non-input-specific endpoints in public workspace
 		{
 			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs";
+
 			url = urlTemplate;
-
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "POST", null, 415);
 			RequestHelper.emitRequest(url, "POST", null, "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 400, false);
@@ -81,14 +80,10 @@ public class InputServletTest {
 
 		//Try creating invalid inputs in public workspace
 		{
-			String inputInvalid1Json = FileHelper.readFile("input-test-1", "input_invalid_1.json");
-			RequestHelper.emitRequest(url, "POST", null, inputInvalid1Json, MediaType.APPLICATION_JSON, 400, false);
-
-			String inputInvalid2Json = FileHelper.readFile("input-test-1", "input_invalid_2.json");
-			RequestHelper.emitRequest(url, "POST", null, inputInvalid2Json, MediaType.APPLICATION_JSON, 400, false);
-
-			String inputInvalid3Json = FileHelper.readFile("input-test-1", "input_invalid_3.json");
-			RequestHelper.emitRequest(url, "POST", null, inputInvalid3Json, MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("input-test-1", "input_invalid_1.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("input-test-1", "input_invalid_2.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("input-test-1", "input_invalid_3.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("input-test-1", "input_invalid_4.json"), MediaType.APPLICATION_JSON, 400, false);
 		}
 
 		//Create valid input in public workspace
@@ -100,13 +95,10 @@ public class InputServletTest {
 		{
 			url += "/" + inputUUID;
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "PUT", null, 415);
 			RequestHelper.emitRequest(url, "PUT", null, "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 400, false);
-
 			RequestHelper.emitRequest(url, "PUT", null, inputValid2Json, MediaType.APPLICATION_JSON, 204, false);
-
 			RequestHelper.emitRequest(url, "DELETE", null, 204);
 		}
 
@@ -121,10 +113,9 @@ public class InputServletTest {
 		//Check all non-input-specific endpoints in protected workspace
 		{
 			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs";
+
 			url = urlTemplate;
-
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "POST", "test", 415);
 			RequestHelper.emitRequest(url, "POST", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 401, false);
@@ -140,16 +131,13 @@ public class InputServletTest {
 		//Check all input-specific endpoints in protected workspace
 		{
 			url += "/" + inputUUID;
-
 			RequestHelper.emitRequest(url, "GET", null, 200);
-
 			RequestHelper.emitRequest(url, "PUT", "test", 415);
 			RequestHelper.emitRequest(url, "PUT", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", "", MediaType.APPLICATION_JSON, 400, false);
 			RequestHelper.emitRequest(url, "PUT", null, inputValid2Json, MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", inputValid2Json, MediaType.APPLICATION_JSON, 204, false);
-
 			RequestHelper.emitRequest(url, "DELETE", null, 401);
 			RequestHelper.emitRequest(url, "DELETE", "test", 204);
 		}
@@ -165,11 +153,10 @@ public class InputServletTest {
 		//Check all non-input-specific endpoints in private workspace
 		{
 			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs";
-			url = urlTemplate;
 
+			url = urlTemplate;
 			RequestHelper.emitRequest(url, "GET", null, 401);
 			RequestHelper.emitRequest(url, "GET", "test", 200);
-
 			RequestHelper.emitRequest(url, "POST", "test", 415);
 			RequestHelper.emitRequest(url, "POST", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 401, false);
@@ -185,17 +172,14 @@ public class InputServletTest {
 		//Check all input-specific endpoints in private workspace
 		{
 			url += "/" + inputUUID;
-
 			RequestHelper.emitRequest(url, "GET", null, 401);
 			RequestHelper.emitRequest(url, "GET", "test", 200);
-
 			RequestHelper.emitRequest(url, "PUT", "test", 415);
 			RequestHelper.emitRequest(url, "PUT", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", "", MediaType.APPLICATION_JSON, 400, false);
 			RequestHelper.emitRequest(url, "PUT", null, inputValid2Json, MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "PUT", "test", inputValid2Json, MediaType.APPLICATION_JSON, 204, false);
-
 			RequestHelper.emitRequest(url, "DELETE", null, 401);
 			RequestHelper.emitRequest(url, "DELETE", "test", 204);
 		}
@@ -406,10 +390,12 @@ public class InputServletTest {
 	public void deleteWorkspace() {
 		Assertions.assertTrue(workspaceUUID != null && workspaceUUID.length() > 0);
 
-		String url = declabHost + "/api/workspaces/" + workspaceUUID;
+		String urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID;
+
+		String url = urlTemplate;
 		RequestHelper.emitRequest(url, "DELETE", "test", 204);
 
-		url += "/public";
+		url = urlTemplate + "/public";
 		RequestHelper.emitRequest(url, "GET", null, 404);
 	}
 }

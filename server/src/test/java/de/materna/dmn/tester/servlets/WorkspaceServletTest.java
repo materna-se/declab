@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import de.materna.dmn.tester.FileHelper;
 import de.materna.dmn.tester.ManagementHelper;
 import de.materna.dmn.tester.RequestHelper;
-import de.materna.dmn.tester.TestHelper;
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.jdec.model.Model;
 import de.materna.jdec.serialization.SerializationHelper;
@@ -374,7 +373,7 @@ public class WorkspaceServletTest {
 		Configuration configBefore = (Configuration) SerializationHelper.getInstance().toClass(RequestHelper.emitRequest(url, "GET", null, 200, true), Configuration.class);
 
 		//Navigate to workspace .dtar
-		Path rootPath = TestHelper.getRootPath();
+		Path rootPath = FileHelper.getRootPath();
 		File workspaceDir = rootPath.resolve("scenarios").resolve("import-export-test-1").toFile();
 		File workspaceDtar = new File(workspaceDir.getPath() + File.separator + "import-export-test-1.dtar");
 		Assertions.assertTrue(workspaceDtar.exists() && workspaceDtar.isFile() && workspaceDtar.canRead());
