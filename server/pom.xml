@@ -38,6 +38,11 @@
 			<version>4.5.2.Final</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-multipart</artifactId>
+			<version>2.5.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.github.materna-se</groupId>
@@ -94,11 +99,6 @@
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>5.3.2</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-multipart</artifactId>
-			<version>2.5.1</version>
 		</dependency>
 	</dependencies>
 

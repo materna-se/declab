@@ -58,13 +58,13 @@ public class WorkspaceManager {
 			try {
 				index(subdir.getName());
 			}
-			catch (IOException e) {
+			catch (Exception e) {
 				log.error("Could not index workspace " + subdir.getName(), e);
 			}
 		}
 	}
 
-	public void index(String workspaceUUID) throws IOException {
+	public void index(String workspaceUUID) throws Exception {
 		//Upgrade path from version 0 to 1
 		PersistenceFileManager configManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
 		if (!configManager.fileExists()) {

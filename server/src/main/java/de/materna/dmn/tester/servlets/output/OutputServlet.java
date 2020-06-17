@@ -61,7 +61,11 @@ public class OutputServlet {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		String uuid = UUID.randomUUID().toString();
 
-		workspace.getOutputManager().persistFile(uuid, (PersistedOutput) SerializationHelper.getInstance().toClass(body, PersistedOutput.class));
+		PersistedOutput persistedOutput = (PersistedOutput) SerializationHelper.getInstance().toClass(body, PersistedOutput.class);
+		if(persistedOutput.getName() == null) {
+			throw new BadRequestException("Output name can't be null.");
+		}
+		workspace.getOutputManager().persistFile(uuid, persistedOutput);
 
 		workspace.getAccessLog().writeMessage("Created output " + uuid, System.currentTimeMillis());
 
@@ -80,7 +84,11 @@ public class OutputServlet {
 			throw new NotFoundException();
 		}
 
-		outputManager.persistFile(outputUUID, (PersistedOutput) SerializationHelper.getInstance().toClass(body, PersistedOutput.class));
+		PersistedOutput persistedOutput = (PersistedOutput) SerializationHelper.getInstance().toClass(body, PersistedOutput.class);
+		if(persistedOutput.getName() == null) {
+			throw new BadRequestException("Output name can't be null.");
+		}
+		outputManager.persistFile(outputUUID, persistedOutput);
 
 		workspace.getAccessLog().writeMessage("Edited output " + outputUUID, System.currentTimeMillis());
 

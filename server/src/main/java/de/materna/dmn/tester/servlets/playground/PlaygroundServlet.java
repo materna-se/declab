@@ -1,5 +1,6 @@
 package de.materna.dmn.tester.servlets.playground;
 
+import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
@@ -58,12 +59,9 @@ public class PlaygroundServlet {
 		String playgroundUUID = UUID.randomUUID().toString();
 
 		Playground playground = (Playground) SerializationHelper.getInstance().toClass(body, Playground.class);
-
-		//Validate
-		if (playground.name == null || playground.name.length() == 0) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
+		if (playground.getName() == null) {
+			throw new BadRequestException("Playground name can't be null.");
 		}
-
 		workspace.getPlaygroundManager().persistFile(playgroundUUID, playground);
 
 		workspace.getAccessLog().writeMessage("Added playground " + playgroundUUID, System.currentTimeMillis());
@@ -77,17 +75,14 @@ public class PlaygroundServlet {
 	@Consumes("application/json")
 	public Response editPlayground(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String playgroundUUID, String body) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-
-		Playground playground = (Playground) SerializationHelper.getInstance().toClass(body, Playground.class);
-
 		if (!workspace.getPlaygroundManager().fileExists(playgroundUUID)) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
-		if (playground.name == null || playground.name.length() == 0) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
+		Playground playground = (Playground) SerializationHelper.getInstance().toClass(body, Playground.class);
+		if (playground.getName() == null) {
+			throw new BadRequestException("Playground name can't be null.");
 		}
-
 		workspace.getPlaygroundManager().persistFile(playgroundUUID, playground);
 
 		workspace.getAccessLog().writeMessage("Edited playground " + playgroundUUID, System.currentTimeMillis());
@@ -100,12 +95,12 @@ public class PlaygroundServlet {
 	@Path("/playgrounds/{uuid}")
 	public Response deletePlayground(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String playgroundUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-
-		if (!workspace.getPlaygroundManager().fileExists(playgroundUUID)) {
+		PersistenceDirectoryManager<Playground> playgroundManager = workspace.getPlaygroundManager();
+		if (!playgroundManager.fileExists(playgroundUUID)) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
-		workspace.getPlaygroundManager().removeFile(playgroundUUID);
+		playgroundManager.removeFile(playgroundUUID);
 
 		workspace.getAccessLog().writeMessage("Deleted playground " + playgroundUUID, System.currentTimeMillis());
 
