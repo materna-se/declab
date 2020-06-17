@@ -19,7 +19,7 @@ public class PersistedInput extends Input {
 	@JsonCreator
 	public PersistedInput(@JsonProperty(value = "name", required = true) String name,
 						  @JsonProperty(value = "parent", required = false) String parent,
-						  @JsonProperty(value = "value", required = true) Map<String, ?> value) {
+						  @JsonProperty(value = "value", required = true) Map<String, Object> value) {
 		super(value);
 
 		this.name = name;
@@ -41,7 +41,7 @@ public class PersistedInput extends Input {
 	public void setParent(String parent) {
 		this.parent = parent;
 	}
-	
+
 	@Override
 	public void fromJSON(String json) {
 		PersistedInput temp = (PersistedInput) SerializationHelper.getInstance().toClass(json, PersistedInput.class);
