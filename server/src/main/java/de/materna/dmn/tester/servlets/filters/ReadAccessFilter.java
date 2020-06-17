@@ -11,7 +11,6 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
@@ -28,22 +27,11 @@ public class ReadAccessFilter implements ContainerRequestFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) {
-		try {
-			Workspace workspace = workspaceManager.get(AccessFilterHelper.matchPath(requestContext));
-			if (workspace == null) {
-				requestContext.abortWith(Response.status(Response.Status.NOT_FOUND).build());
-				return;
-			}
-			if (workspace.getConfig().getAccess() != Access.PRIVATE) {
-				return;
-			}
-
-			AccessFilterHelper.validateAuthorizationHeader(workspace, requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
+		Workspace workspace = workspaceManager.get(AccessFilterHelper.matchPath(requestContext));
+		if (workspace.getConfig().getAccess() != Access.PRIVATE) {
+			return;
 		}
-		catch (Exception e) {
-			log.error(e);
 
-			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
-		}
+		AccessFilterHelper.validateAuthorizationHeader(workspace, requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
 	}
 }

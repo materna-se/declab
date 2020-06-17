@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:anbieter="anbieter" xmlns:dmn="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:feel="http://www.omg.org/spec/FEEL/20140401" xmlns:layout="https://products.bfs-intra.net/milestones/vr/spec/20170328/dmndi.xsd" xmlns:nutzer="nutzer" xsi:schemaLocation="http://www.omg.org/spec/DMN/20151101/dmn.xsd http://www.omg.org/spec/DMN/20151101/dmn.xsd" id="_jt0BgGtHEeqoXq8GeFn6KA" name="nutzer" exporter="ACTICO Modeler" namespace="nutzer">
+  <dmn:extensionElements>
+    <layout:container id="_jt0BgmtHEeqoXq8GeFn6KA" name="nutzer" type="Dmn" href="#_jt0BgGtHEeqoXq8GeFn6KA">
+      <layout:node id="_kkqJ9WtHEeqoXq8GeFn6KA" type="2009" href="#_kkqJ8GtHEeqoXq8GeFn6KA">
+        <layout:location x="589" y="134"/>
+      </layout:node>
+      <layout:node id="_lqZC92tHEeqoXq8GeFn6KA" type="2003" href="#_lqZC8GtHEeqoXq8GeFn6KA">
+        <layout:location x="469" y="343"/>
+      </layout:node>
+      <layout:node id="_U6vAAGtNEeqoXq8GeFn6KA" type="2009" href="anbieter#_za7TQGtKEeqoXq8GeFn6KA">
+        <layout:location x="348" y="181"/>
+      </layout:node>
+      <layout:node id="_c2-oYGtOEeqoXq8GeFn6KA" type="2003" href="anbieter#_1TU_UGtKEeqoXq8GeFn6KA">
+        <layout:location x="278" y="368"/>
+      </layout:node>
+      <layout:edge id="_morQJWtHEeqoXq8GeFn6KA" type="4001" href="#http://www.omg.org/spec/DMN/20151101/dmn.xsd:InformationRequirement$_kkqJ8GtHEeqoXq8GeFn6KA$_lqZC8GtHEeqoXq8GeFn6KA" source="#_lqZC92tHEeqoXq8GeFn6KA" target="#_kkqJ9WtHEeqoXq8GeFn6KA">
+        <layout:bendpoints points="[-6, -18, 21, 106]$[35, -116, 62, 8]"/>
+      </layout:edge>
+      <layout:edge id="_DKTO1mtOEeqoXq8GeFn6KA" type="4001" href="#http://www.omg.org/spec/DMN/20151101/dmn.xsd:InformationRequirement$_kkqJ8GtHEeqoXq8GeFn6KA$_za7TQGtKEeqoXq8GeFn6KA" source="#_U6vAAGtNEeqoXq8GeFn6KA" target="#_kkqJ9WtHEeqoXq8GeFn6KA">
+        <layout:bendpoints points="[9, -3, -179, 48]$[189, -79, 1, -28]"/>
+        <layout:sourceAnchor id="(0.92,0.5636363636363636)"/>
+      </layout:edge>
+      <layout:DiContainerStyle/>
+    </layout:container>
+  </dmn:extensionElements>
+  <dmn:import importType="http://www.omg.org/spec/DMN/20151101/dmn.xsd" namespace="anbieter"/>
+  <dmn:decision id="_kkqJ8GtHEeqoXq8GeFn6KA" name="dnutzer">
+    <dmn:extensionElements>
+      <layout:container id="_ooxfoGtHEeqoXq8GeFn6KA" name="" type="DMN_Expression" href="#_kkqJ8GtHEeqoXq8GeFn6KA"/>
+    </dmn:extensionElements>
+    <dmn:variable id="_kkqJ8WtHEeqoXq8GeFn6KA" name="dnutzer" typeRef="feel:number"/>
+    <dmn:informationRequirement>
+      <dmn:requiredInput href="#_lqZC8GtHEeqoXq8GeFn6KA"/>
+    </dmn:informationRequirement>
+    <dmn:informationRequirement>
+      <dmn:requiredDecision href="anbieter#_za7TQGtKEeqoXq8GeFn6KA"/>
+    </dmn:informationRequirement>
+    <dmn:literalExpression id="_ooxfoWtHEeqoXq8GeFn6KA">
+      <dmn:text>inutzer + anbieter.danbieter</dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+  <dmn:inputData id="_lqZC8GtHEeqoXq8GeFn6KA" name="inutzer">
+    <dmn:variable id="_lqZC8WtHEeqoXq8GeFn6KA" name="inutzer" typeRef="feel:number"/>
+  </dmn:inputData>
+</dmn:definitions>

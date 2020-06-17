@@ -71,7 +71,6 @@ public class Workspace {
 	}
 
 	public void clearDecisionSession() {
-		decisionSession.close();
 		decisionSession = new DMNDecisionSession();
 	}
 

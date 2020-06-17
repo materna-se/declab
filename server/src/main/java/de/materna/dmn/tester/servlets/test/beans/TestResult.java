@@ -2,13 +2,23 @@ package de.materna.dmn.tester.servlets.test.beans;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
 
+@JsonIgnoreProperties(ignoreUnknown=true) //TODO Solve this in SerializationHelper
 public class TestResult extends Serializable {
 	private Map<String, TestResultOutput> outputs;
+	
+	public TestResult() {
+		
+	}
 
-	public TestResult(Map<String, TestResultOutput> outputs) {
+	@JsonCreator
+	public TestResult(@JsonProperty(value = "outputs", required = true) Map<String, TestResultOutput> outputs) {
 		this.outputs = outputs;
 	}
 

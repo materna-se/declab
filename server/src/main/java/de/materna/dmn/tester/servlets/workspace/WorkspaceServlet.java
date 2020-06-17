@@ -38,16 +38,10 @@ public class WorkspaceServlet {
 	@Path("/public")
 	@Produces("application/json")
 	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			Configuration configuration = workspace.getConfig();
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		Configuration configuration = workspace.getConfig();
 
-			return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJSON()).build();
-		}
-		catch (Exception e) {
-			log.error(e);
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJSON()).build();
 	}
 
 	@GET
@@ -55,16 +49,10 @@ public class WorkspaceServlet {
 	@Path("/config")
 	@Produces("application/json")
 	public Response getWorkspaceConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			Configuration configuration = workspace.getConfig();
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		Configuration configuration = workspace.getConfig();
 
-			return Response.status(Response.Status.OK).entity(configuration.toJSON()).build();
-		}
-		catch (Exception e) {
-			log.error(e);
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		return Response.status(Response.Status.OK).entity(configuration.toJSON()).build();
 	}
 
 	@POST
@@ -72,89 +60,71 @@ public class WorkspaceServlet {
 	@Path("/config")
 	@Consumes("application/json")
 	public Response editWorkspaceConfig(@PathParam("workspace") String workspaceUUID, String body) throws RuntimeException, IOException {
-		try {
-			HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, String>>() {
-			});
+		HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, String>>() {
+		});
 
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			Configuration configuration = workspace.getConfig();
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		Configuration configuration = workspace.getConfig();
 
-			// Store changes in temporary configuration to avoid situations where a change
-			// to the configuration object has been made but not logged or serialized.
-			Configuration tempConfiguration = new Configuration();
+		// Store changes in temporary configuration to avoid situations where a change
+		// to the configuration object has been made but not logged or serialized.
+		Configuration tempConfiguration = new Configuration();
 
-			// The name is optional, we will set it if the value is valid.
-			if (params.containsKey("name")) {
-				String name = params.get("name");
-				if (name == null || name.length() == 0) {
-					throw new BadRequestException();
-				}
-				tempConfiguration.setName(name);
+		// The name is optional, we will set it if the value is valid.
+		if (params.containsKey("name")) {
+			String name = params.get("name");
+			if (name == null || name.length() == 0) {
+				throw new BadRequestException();
 			}
-
-			// The description is optional, we will set it if the value is valid.
-			if (params.containsKey("description")) {
-				String description = params.get("description");
-				if (description == null) {
-					throw new BadRequestException();
-				}
-				tempConfiguration.setDescription(description);
-			}
-
-			// The description is optional, we will set it if the value is valid.
-			if (params.containsKey("description")) {
-				String description = params.get("description");
-				if (description == null) {
-					throw new BadRequestException();
-				}
-				tempConfiguration.setDescription(description);
-			}
-
-			// The token is optional if the access mode is set to public.
-			if (params.containsKey("token")) {
-				String token = params.get("token");
-				if (token == null || token.length() == 0) {
-					throw new BadRequestException();
-				}
-				tempConfiguration.setToken(HashingHelper.getInstance().getSaltedHash(token, configuration.getSalt()));
-			}
-
-			// The access mode is optional, we will set it if the value is valid.
-			if (params.containsKey("access")) {
-				Access access = Access.valueOf(params.get("access"));
-				if (access != Access.PUBLIC && (tempConfiguration.getToken() == null && configuration.getToken() == null)) {
-					throw new BadRequestException();
-				}
-				tempConfiguration.setAccess(access);
-			}
-
-			if (tempConfiguration.getName() != null) {
-				configuration.setName(tempConfiguration.getName());
-			}
-			if (tempConfiguration.getDescription() != null) {
-				configuration.setDescription(tempConfiguration.getDescription());
-			}
-			if (tempConfiguration.getToken() != null) {
-				configuration.setToken(tempConfiguration.getToken());
-			}
-			if (tempConfiguration.getAccess() != null) {
-				configuration.setAccess(tempConfiguration.getAccess());
-			}
-
-			configuration.setModifiedDate(System.currentTimeMillis());
-			configuration.serialize();
-
-			workspace.getAccessLog().writeMessage("Edited configuration", System.currentTimeMillis());
-
-			return Response.status(Response.Status.OK).build();
+			tempConfiguration.setName(name);
 		}
-		catch (IllegalArgumentException | BadRequestException e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
+
+		// The description is optional, we will set it if the value is valid.
+		if (params.containsKey("description")) {
+			String description = params.get("description");
+			if (description == null) {
+				throw new BadRequestException();
+			}
+			tempConfiguration.setDescription(description);
 		}
-		catch (Exception e) {
-			log.error(e);
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+
+		// The token is optional if the access mode is set to public.
+		if (params.containsKey("token")) {
+			String token = params.get("token");
+			if (token == null || token.length() == 0) {
+				throw new BadRequestException();
+			}
+			tempConfiguration.setToken(HashingHelper.getInstance().getSaltedHash(token, configuration.getSalt()));
 		}
+
+		// The access mode is optional, we will set it if the value is valid.
+		if (params.containsKey("access")) {
+			Access access = Access.valueOf(params.get("access"));
+			if (access != Access.PUBLIC && (tempConfiguration.getToken() == null && configuration.getToken() == null)) {
+				throw new BadRequestException();
+			}
+			tempConfiguration.setAccess(access);
+		}
+
+		if (tempConfiguration.getName() != null) {
+			configuration.setName(tempConfiguration.getName());
+		}
+		if (tempConfiguration.getDescription() != null) {
+			configuration.setDescription(tempConfiguration.getDescription());
+		}
+		if (tempConfiguration.getToken() != null) {
+			configuration.setToken(tempConfiguration.getToken());
+		}
+		if (tempConfiguration.getAccess() != null) {
+			configuration.setAccess(tempConfiguration.getAccess());
+		}
+
+		configuration.setModifiedDate(System.currentTimeMillis());
+		configuration.serialize();
+
+		workspace.getAccessLog().writeMessage("Edited configuration", System.currentTimeMillis());
+
+		return Response.status(Response.Status.OK).build();
 	}
 
 	@GET
@@ -162,36 +132,24 @@ public class WorkspaceServlet {
 	@Path("/log")
 	@Produces("application/json")
 	public Response getWorkspaceAccessLog(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-			workspace.getAccessLog().writeMessage("Accessed log", System.currentTimeMillis());
+		workspace.getAccessLog().writeMessage("Accessed log", System.currentTimeMillis());
 
-			return Response.status(Response.Status.OK).entity(workspace.getAccessLog().toJSON()).build();
-		}
-		catch (Exception e) {
-			log.error(e);
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		return Response.status(Response.Status.OK).entity(workspace.getAccessLog().toJSON()).build();
 	}
 
 	@DELETE
 	@WriteAccess
 	@Path("")
-	public Response deleteWorkspace(@PathParam("workspace") String workspaceUUID) {
-		try {
-			WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
-			if (!workspaceManager.has(workspaceUUID)) {
-				return Response.status(Response.Status.NOT_FOUND).build();
-			}
+	public Response deleteWorkspace(@PathParam("workspace") String workspaceUUID) throws IOException {
+		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
+		if (!workspaceManager.has(workspaceUUID)) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
 
-			workspaceManager.remove(workspaceUUID);
-			return Response.status(Response.Status.NO_CONTENT).build();
-		}
-		catch (Exception e) {
-			log.error(e);
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		workspaceManager.remove(workspaceUUID);
+		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 
 	@GET
@@ -270,6 +228,7 @@ public class WorkspaceServlet {
 						Configuration importConfiguration = (Configuration) SerializationHelper.getInstance().toClass(new String(IOUtils.toByteArray(zipInputStream), StandardCharsets.UTF_8), Configuration.class);
 						// Model import order needs to be merged with the current configuration.
 						if (importConfiguration.getVersion() == 2) {
+							currentConfiguration.setVersion(2);
 							currentConfiguration.setModels(importConfiguration.getModels());
 							currentConfiguration.setModifiedDate(System.currentTimeMillis());
 							currentConfiguration.serialize();

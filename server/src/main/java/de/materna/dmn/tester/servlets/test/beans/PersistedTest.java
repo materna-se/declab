@@ -2,6 +2,9 @@ package de.materna.dmn.tester.servlets.test.beans;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
 
@@ -15,7 +18,11 @@ public class PersistedTest extends Serializable {
 	public PersistedTest() {
 	}
 
-	public PersistedTest(String name, String description, String input, List<String> outputs) {
+	@JsonCreator
+	public PersistedTest(@JsonProperty(value = "name", required = true) String name,
+						 @JsonProperty(value = "description", required = false) String description,
+						 @JsonProperty(value = "input", required = true) String input,
+						 @JsonProperty(value = "outputs", required = true) List<String> outputs) {
 		this.name = name;
 		this.description = description;
 		this.input = input;

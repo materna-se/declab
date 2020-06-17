@@ -2,8 +2,13 @@ package de.materna.dmn.tester.servlets.input.beans;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.materna.jdec.serialization.SerializationHelper;
 
+@JsonIgnoreProperties(ignoreUnknown = true) //TODO Fix this in SerializationHelper
 public class PersistedInput extends Input {
 	private String name;
 	private String parent;
@@ -11,7 +16,10 @@ public class PersistedInput extends Input {
 	public PersistedInput() {
 	}
 
-	public PersistedInput(String name, String parent, Map<String, ?> value) {
+	@JsonCreator
+	public PersistedInput(@JsonProperty(value = "name", required = true) String name,
+						  @JsonProperty(value = "parent", required = false) String parent,
+						  @JsonProperty(value = "value", required = true) Map<String, ?> value) {
 		super(value);
 
 		this.name = name;
@@ -22,8 +30,16 @@ public class PersistedInput extends Input {
 		return name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public String getParent() {
 		return parent;
+	}
+
+	public void setParent(String parent) {
+		this.parent = parent;
 	}
 	
 	@Override

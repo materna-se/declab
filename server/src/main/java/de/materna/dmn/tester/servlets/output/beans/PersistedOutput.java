@@ -1,5 +1,7 @@
 package de.materna.dmn.tester.servlets.output.beans;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.materna.jdec.serialization.SerializationHelper;
@@ -12,7 +14,10 @@ public class PersistedOutput extends Output {
 		super();
 	}
 
-	public PersistedOutput(String name, String decision, JsonNode value) {
+	@JsonCreator
+	public PersistedOutput(@JsonProperty(value = "name", required = true) String name,
+						   @JsonProperty(value = "decision", required = true) String decision,
+						   @JsonProperty(value = "value", required = true) JsonNode value) {
 		super(value);
 
 		this.name = name;
