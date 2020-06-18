@@ -178,7 +178,6 @@
 					enabled: false
 				},
 
-				value: this.value
 				value: this.value,
 				readOnly: this.readonly
 			});
