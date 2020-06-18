@@ -228,7 +228,6 @@ public class WorkspaceServlet {
 						Configuration importConfiguration = (Configuration) SerializationHelper.getInstance().toClass(new String(IOUtils.toByteArray(zipInputStream), StandardCharsets.UTF_8), Configuration.class);
 						// Model import order needs to be merged with the current configuration.
 						if (importConfiguration.getVersion() == 2) {
-							currentConfiguration.setVersion(2);
 							currentConfiguration.setModels(importConfiguration.getModels());
 							currentConfiguration.setModifiedDate(System.currentTimeMillis());
 							currentConfiguration.serialize();
