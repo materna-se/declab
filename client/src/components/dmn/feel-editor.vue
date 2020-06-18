@@ -17,6 +17,9 @@
 		props: {
 			value: {
 				default: null
+			},
+			readonly: {
+				default: false
 			}
 		},
 		data() {
@@ -171,6 +174,8 @@
 				},
 
 				value: this.value
+				value: this.value,
+				readOnly: this.readonly
 			});
 			this.editor = editor;
 
