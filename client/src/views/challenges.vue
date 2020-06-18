@@ -17,8 +17,8 @@
 			<div class="col-9 mb-4">
 				<div class="row" v-if="mode === 'VIEW'">
 					<div class="col-6 mb-4">
-						<h4 class="mb-2">{{challenge.name}}</h4>
-						<p class="mb-4">{{challenge.description}}</p>
+						<h4 class="mb-2" style="text-align:center">{{challenge.name}}</h4>
+						<p class="mb-4" style="text-align:center">{{challenge.description}}</p>
 
 						<div class="card">
 							<div class="card-body">
@@ -28,6 +28,66 @@
 					</div>
 
 					<div class="col-6 mb-4">
+						<!-- Button to show hints / solution -->
+						<div class="mb-4" v-if="hint === -1">
+							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0" v-if="challenge.hints.length > 0">
+								<div>Need help?</div>
+							</button>
+							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0; showSolution()" v-else>
+								<div>Show solution</div>
+							</button>
+						</div>
+
+						<!-- Hints/Solution Header -->
+						<div class="mb-2" style="text-align:center" v-if="hint >= 0">
+							<h5 v-if="hint < challenge.hints.length">Hint {{hint + 1}}</h5>
+							<h5 v-else>Solution</h5>
+						</div>
+
+						<!-- If hints exist, add left/right buttons to iterate over all hints -->
+						<!-- Once the last hint is reached, change right button to a solution button -->
+						<div class="row mb-4" v-if="hint >= 0 && hint < challenge.hints.length && challenge.hints.length > 0">
+							<div class="container" style="display:flex">
+								<!-- Left button -->
+								<div style="width: 10%; float:left;" v-if="hint > 0">
+									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint -= 1">
+										<svg style="height:24px">
+  											<path fill="currentColor" d="M20,9V15H12V19.84L4.16,12L12,4.16V9H20Z" />
+										</svg>
+									</button>
+								</div>
+								<!-- Hint -->
+								<!-- FIXME: These textareas currently let the user scroll past the right edge of the page -->
+								<div class="ml-2 mr-2" style="width: 80%; float:left;" v-if="hint > 0 && hint < challenge.hints.length">
+									<textarea readonly class="form-control" style="resize:none;max-height:40px" wrap="soft" v-model="challenge.hints[hint]"/>
+								</div>
+								<!-- If no left button exists, might as well expand the hint box to fill the space -->
+								<div class="mr-2" style="width: 90%; float:left;" v-else>
+									<textarea readonly class="form-control" style="resize:none;max-height:40px" wrap="soft" v-model="challenge.hints[hint]"/>
+								</div>
+								<!-- Right button -->
+								<div style="width: 10%; float:left;" v-if="hint < challenge.hints.length">
+									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-if="hint >= 0 && hint < challenge.hints.length - 1" v-on:click="hint += 1">
+										<svg style="height:24px">
+    										<path fill="currentColor" d="M4,15V9H12V4.16L19.84,12L12,19.84V15H4Z" />
+										</svg>
+									</button>
+									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-else v-on:click="hint += 1; showSolution()">
+										<svg style="height:24px">
+    										<path fill="currentColor" d="M10 3H14V14H10V3M10 21V17H14V21H10Z" />
+										</svg>
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Add button to revert to original FEEL expression if solution is being shown -->
+						<div class="mb-4" v-if="hint === challenge.hints.length">
+							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint -= 1; showOriginalExpression()">
+								<div>Undo solution</div>
+							</button>
+						</div>
+
 						<div class="progress mb-4">
 							<div class="progress-bar" v-bind:class="[progress === 1 ? 'bg-success' : 'bg-primary']" v-bind:style="{width: progress * 100 + '%'}"></div>
 						</div>
@@ -46,7 +106,7 @@
 								<h5 class="mb-2">Input</h5>
 								<div class="card mb-4">
 									<div class="card-body">
-										<json-builder v-bind:template="scenario.input" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
+										<json-builder v-bind:template="scenario.input.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 									</div>
 								</div>
 
@@ -54,7 +114,7 @@
 								<h6 class="mb-2">Expected</h6>
 								<div class="card mb-4">
 									<div class="card-body">
-										<json-builder v-bind:template="scenario.output.expected" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
+										<json-builder v-bind:template="scenario.output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 									</div>
 								</div>
 
@@ -70,6 +130,9 @@
 									</div>
 								</div>
 							</div>
+						</div>
+						<div class="list-group-item" v-if="challenge.scenarios.length === 0">
+							<empty-collection/> 
 						</div>
 					</div>
 				</div>
@@ -94,91 +157,85 @@
 			"feel-editor": FEELEditor,
 			"empty-collection": EmptyCollectionComponent
 		},
-		mounted() {
-
+		async mounted() {
+			await this.getChallenges();
 		},
 		data() {
 			return {
 				mode: "SELECT",
-
+				order: false,
 				progress: 0,
-				expression: null,
+				expression: "",
+				expression_backup: "",
+
+				execution_timestamp: 0,
 
 				challenge: null,
-				challenges: {
-					test: {
-						name: "Calculating the Length of a List",
-						description: "This challenge involves creating a decision that calculates the length of a list. If the list is empty, the decision should return -1.",
-						scenarios: [
-							{
-								name: "Empty List",
-								input: {
-									input: []
-								},
-								output: {
-									alert: {
-										message: null,
-										state: null
-									},
-									expected: -1,
-									calculated: null,
-									equal: false
-								}
-							},
-							{
-								name: "List with One Element",
-								input: {
-									input: [1]
-								},
-								output: {
-									alert: {
-										message: null,
-										state: null
-									},
-									expected: 1,
-									calculated: null,
-									equal: false
-								}
-							},
-							{
-								name: "List with Four Elements",
-								input: {
-									input: [1, 2, 3, 4]
-								},
-								output: {
-									alert: {
-										message: null,
-										state: null
-									},
-									expected: 4,
-									calculated: null,
-									equal: false
-								}
-							}
-						],
-					}
-				}
+				challenges: {},
+
+				hint: -1,
 			}
 		},
 		methods: {
 			async setViewMode(uuid) {
 				this.challenge = this.challenges[uuid];
 
+				this.expression = "";
+				this.expression_backup = "";
+
 				this.mode = "VIEW";
 
-				this.executeRaw();
+				this.hint = -1;
+
+				await this.executeRaw();
+			},
+
+			async getChallenges() {
+				this.challenges = await Network.getChallenges(this.order);
+
+				//Initialize values not provided by the server
+				//The existence of these values is required for the executeRaw function
+				for (let [uuid, challenge] of Object.entries(this.challenges)) {
+					for (const scenario of challenge.scenarios) {
+						scenario.output.alert = {};
+						scenario.output.alert.message = null;
+						scenario.output.alert.status = null;
+
+						scenario.output.equal = false;
+
+						scenario.output.calculated = null;
+					}
+				}
+
+				this.mode = "SELECT";
 			},
 
 			//
 			// Model
 			//
 			async executeRaw() {
-				this.progress = 0;
+				//Store execution timestamp
+				const ts = new Date().getTime();
+				this.execution_timestamp = ts;
 
+				//Keep track of progress
+				var testsCompleted = 0;
+
+				//Erase all previous results
 				for (const scenario of this.challenge.scenarios) {
+					scenario.output.calculated = null;
+					scenario.output.equal = false;
+				}
+
+				//Create a copy of the array to store execution results in
+				var scenarios_temp = JSON.parse(JSON.stringify(this.challenge.scenarios));
+
+				//Calculate results
+				for (var scenario of scenarios_temp) {
+					scenario.output.equal = false;
 					let response;
 					try {
-						response = await Network.executeRaw(this.expression, scenario.input);
+						response = await Network.executeRaw(this.expression, scenario.input.value);
 						if (response.status !== 200) {
 							throw new Error();
 						}
@@ -187,7 +244,7 @@
 						scenario.output.calculated = null;
 						scenario.output.equal = false;
 						this.displayAlert(scenario, "The output can't be calculated.", "danger");
-						return;
+						continue;
 					}
 
 					const result = await response.json();
@@ -195,15 +252,29 @@
 					if (result.messages.length > 0) {
 						scenario.output.equal = false;
 						this.displayAlert(scenario, AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "warning");
+					}
+
+					scenario.output.equal = JSON.stringify(scenario.output.value) === JSON.stringify(scenario.output.calculated);
+
+					//Resolve race conditions caused by the fact that even though executeRaw is async,
+					//the v-on binding of the feel-editor doesn't actually wait for it :)
+					//If a newer execution has been started, stop immediately without applying
+					//any outdated execution results
+					if (this.execution_timestamp > ts) {
 						return;
 					}
 
-					scenario.output.equal = JSON.stringify(scenario.output.expected) === JSON.stringify(scenario.output.calculated);
 					if (scenario.output.equal) {
-						this.progress += 1 / this.challenge.scenarios.length;
+						testsCompleted += 1;
 					}
+
 					this.displayAlert(scenario, null, null);
 				}
+
+				//Apply execution results
+				Object.assign(this.challenge.scenarios, scenarios_temp);
+
+				this.progress = testsCompleted / this.challenge.scenarios.length;
 			},
 
 			//
@@ -215,6 +286,17 @@
 					state: state
 				}
 			},
+
+			showSolution() {
+				this.expression_backup = JSON.parse(JSON.stringify(this.expression));
+				this.expression = this.challenge.solution
+				this.executeRaw();
+			},
+
+			showOriginalExpression() {
+				this.expression = JSON.parse(JSON.stringify(this.expression_backup));
+				this.executeRaw();
+			}
 		}
 	};
 </script>
