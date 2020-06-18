@@ -9,10 +9,8 @@ import de.materna.dmn.tester.servlets.input.beans.Decision;
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.DMNDecisionSession;
-import de.materna.jdec.dmn.DroolsAnalyzer;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.model.ImportResult;
-import de.materna.jdec.model.Model;
 import de.materna.jdec.model.ModelImportException;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
@@ -25,7 +23,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Path("/workspaces/{workspace}")
 public class ModelServlet {
@@ -37,21 +34,14 @@ public class ModelServlet {
 	@Produces("application/json")
 	public Response getModels(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-
-		List<Model> models = new LinkedList<>();
-		for (DMNModel model : DroolsHelper.getModels(workspace)) {
-			// At this moment, the name of the component is sufficient for us.
-			// All other fields are filtered out.
-			models.add(workspace.getDecisionSession().getModel(model.getNamespace()));
-		}
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(models)).build();
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getModels())).build();
 	}
 
 	@PUT
 	@WriteAccess
 	@Path("/model")
 	@Consumes("application/json")
-	public Response importModels(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+	public Response importModels(@PathParam("workspace") String workspaceUUID, String body) throws Exception {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 		List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<List<Map<String, String>>>() {
@@ -85,7 +75,7 @@ public class ModelServlet {
 			// Check if the configured decision service still exists.
 			Configuration.DecisionService decisionService = configuration.getDecisionService();
 			if (decisionService != null) {
-				if (configuration.getModels().size() == 0 || DroolsHelper.getModel(workspace).getDecisionServices().stream().noneMatch(importedDecisionServiceNode -> importedDecisionServiceNode.getDecisionService().getName().equals(decisionService.getName()) && importedDecisionServiceNode.getModelNamespace().equals(decisionService.getNamespace()))) {
+				if (configuration.getModels().size() == 0 || workspace.getDecisionSession().getModel(DroolsHelper.getMainModelNamespace(workspace)).getDecisionServices().stream().noneMatch(name -> name.equals(decisionService.getName()))) {
 					// If the decision service does not exist anymore, we will remove the reference from the configuration.
 					configuration.setDecisionService(null);
 				}
@@ -104,7 +94,7 @@ public class ModelServlet {
 			for (Map.Entry<String, String> entry : currentFiles.entrySet()) {
 				workspace.getModelManager().persistFile(entry.getKey(), entry.getValue());
 			}
-			DroolsHelper.initModels(workspace);
+			DroolsHelper.importModels(workspace);
 
 			return Response.status(Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
 		}
@@ -141,7 +131,15 @@ public class ModelServlet {
 	public Response getInputs(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getComplexInputStructure(workspace.getDecisionSession().getRuntime(), DroolsHelper.getModel(workspace).getNamespace(), null))).build();
+		Configuration configuration = workspace.getConfig();
+		String mainModelNamespace = DroolsHelper.getMainModelNamespace(workspace);
+
+		if (configuration.getDecisionService() == null) {
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getInputStructure(mainModelNamespace))).build();
+		}
+
+		// TODO: Throw error if a decision service is selected on a Java decision model.
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getDMNDecisionSession().getInputStructure(mainModelNamespace, configuration.getDecisionService().getName()))).build();
 	}
 
 	@POST
@@ -155,13 +153,14 @@ public class ModelServlet {
 		Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 		});
 
-		DMNDecisionSession decisionSession = workspace.getDecisionSession();
-		DMNModel model = DroolsHelper.getModel(workspace);
-
 		Configuration configuration = workspace.getConfig();
-		String decisionServiceName = configuration.getDecisionService() == null ? null : configuration.getDecisionService().getName();
+		String mainModelNamespace = DroolsHelper.getMainModelNamespace(workspace);
 
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(decisionSession.executeModel(model, decisionServiceName, inputs))).build();
+		if (configuration.getDecisionService() == null) {
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().executeModel(mainModelNamespace, inputs))).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getDMNDecisionSession().executeModel(mainModelNamespace, configuration.getDecisionService().getName(), inputs))).build();
 	}
 
 	@POST
