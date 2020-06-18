@@ -102,6 +102,10 @@
 							{
 								name: "Playgrounds",
 								path: "playgrounds"
+							},
+							{
+								name: "Challenges",
+								path: "challenge_editor"
 							}
 						]
 					}
