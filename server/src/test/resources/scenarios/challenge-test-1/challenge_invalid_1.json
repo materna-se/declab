@@ -1,0 +1,1 @@
+{"name":"Challenge","deswcription":"Description","hints":["Hint 1","Hint 2","Hint 3"],"solution":"if true then true else false","scenarios":[{"name":"Scenario 1","input":{"ianbieter":125},"output":125},{"nsame":"Scenario 2","input":{"ianbieter":{122},"output":122}]}
