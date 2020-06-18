@@ -36,7 +36,13 @@ jobs:
       - attach_workspace:
           at: ~/project
       - run: |
-          cd ./declab/server
+          cd ~
+          wget https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+          tar -xzf apache-maven-3.6.3-bin.tar.gz
+
+          ls -la
+
+          cd ~/project/declab/server
           mv ./target/declab-*.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
 
           LIMIT=0
