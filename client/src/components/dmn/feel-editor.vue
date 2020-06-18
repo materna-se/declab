@@ -31,8 +31,13 @@
 		watch: {
 			value: {
 				handler: function (value) {
-					if (value === this.previousValue) {
+					if (value === this.editor.getValue()) {
 						return;
+					}
+
+					//The editor silently does nothing if you try to set its value to null
+					if(value === null) {
+						value = "";
 					}
 
 					this.editor.setValue(value);
