@@ -3,6 +3,7 @@ package de.materna.dmn.tester.servlets.workspace.beans;
 import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
+import de.materna.dmn.tester.servlets.challenges.beans.Challenge;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.playground.beans.Playground;
@@ -15,6 +16,8 @@ import java.io.IOException;
 public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);
 
+	private PersistenceDirectoryManager<Challenge> challengeManager;
+	
 	private PersistenceDirectoryManager<String> modelManager;
 	private PersistenceDirectoryManager<Playground> playgroundManager;
 
@@ -30,7 +33,7 @@ public class Workspace {
 	public Workspace(String workspaceUUID) throws IOException {
 		modelManager = new PersistenceDirectoryManager<>(workspaceUUID, "models", String.class, "dmn");
 		playgroundManager = new PersistenceDirectoryManager<>(workspaceUUID, "playgrounds", Playground.class, "json");
-
+		challengeManager = new PersistenceDirectoryManager<>(workspaceUUID, "challenges", Challenge.class, "json");
 		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class, "json");
 		outputManager = new PersistenceDirectoryManager<>(workspaceUUID, "outputs", PersistedOutput.class, "json");
 		testManager = new PersistenceDirectoryManager<>(workspaceUUID, "tests", PersistedTest.class, "json");
@@ -44,6 +47,10 @@ public class Workspace {
 		decisionSession = new DMNDecisionSession();
 
 		DroolsHelper.initModels(this);
+	}
+	
+	public PersistenceDirectoryManager<Challenge> getChallengeManager() {
+		return challengeManager;
 	}
 
 	public PersistenceDirectoryManager<String> getModelManager() {
