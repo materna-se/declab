@@ -41,8 +41,8 @@ jobs:
           tar -xzf ./apache-maven-3.6.3-bin.tar.gz
 
           ls -la ~
-          ls -la ~/apache-maven-3.6.3-bin
-          ls -la ~/apache-maven-3.6.3-bin/bin
+          ls -la ~/apache-maven-3.6.3
+          ls -la ~/apache-maven-3.6.3/bin
 
           cd ~/project/declab/server
           mv ./target/declab-*.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
@@ -63,7 +63,7 @@ jobs:
             sleep 1
           done
 
-          ~/apache-maven-3.6.3-bin/bin/mvn test
+          ~/apache-maven-3.6.3/bin/mvn test
       - persist_to_workspace:
           root: ~/project
           paths:
