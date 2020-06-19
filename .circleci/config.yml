@@ -39,6 +39,8 @@ jobs:
       - run: |
           cd ~
 
+          pwd ~
+
           curl -O https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
           tar -xzf ./apache-maven-3.6.3-bin.tar.gz
 
@@ -48,7 +50,7 @@ jobs:
           echo "
           FROM jboss/wildfly:19.1.0.Final
 
-          COPY ~/project/declab/server/target/declab.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
+          COPY /home/circleci/project/declab/server/target/declab.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
           " > Dockerfile
 
           docker build -t maternase/declab-integration-test:latest .
