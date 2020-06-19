@@ -52,9 +52,11 @@ jobs:
           " > Dockerfile
 
           docker build -t maternase/declab-integration-test:latest .
-          docker run -p 8080:8080 -it maternase/declab-integration-test:latest
+          docker run -p 127.0.0.1:8080:8080 -d maternase/declab-integration-test:latest
 
           docker container ls
+
+          sleep 30
 
           cd ~/project/declab
           ~/apache-maven-3.6.3/bin/mvn test
