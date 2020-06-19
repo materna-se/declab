@@ -39,32 +39,25 @@ jobs:
       - run: |
           cd ~
 
+          curl -O https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+          tar -xzf ./apache-maven-3.6.3-bin.tar.gz
+
+          cp ~/project/declab/server/target/declab-*.war ~/project/declab/server/target/declab.war
+          ls -la ~/project/declab/server/target
+
           echo "
           FROM jboss/wildfly:19.1.0.Final
 
-          RUN mkdir /opt/jboss/wildfly/maven
-          WORKDIR /opt/jboss/wildfly/maven
-          RUN curl -O https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
-          RUN tar -xzf ./apache-maven-3.6.3-bin.tar.gz
-
-          WORKDIR /opt/jboss/wildfly/project
-          RUN ls -la /opt/jboss/wildfly/project
-          RUN ls -la /opt/jboss/wildfly/project/declab
-          RUN ls -la /opt/jboss/wildfly/project/declab/server/target
-          RUN cp ./declab/server/target/declab-*.war ./declab/server/target/declab.war
-
-          WORKDIR /opt/jboss/wildfly
-          RUN ./bin/add-user.sh admin admin --silent
-          RUN ./bin/jboss-cli.sh --connect --controller=127.0.0.1:9990 --user=admin --password=admin --command="deploy --force /opt/jboss/wildfly/project/declab/server/target/declab.war"
-
-          WORKDIR /opt/jboss/wildfly/project
-          RUN /opt/jboss/wildfly/maven/apache-maven-3.6.3/bin/mvn test
-
-          CMD /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0
+          COPY ~/project/declab/server/target/declab.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
           " > Dockerfile
 
           docker build -t maternase/declab-integration-test:latest .
-          docker run -v ~/project:/opt/jboss/wildfly/project maternase/declab-integration-test:latest .
+          docker run -v 8080:8080 -it maternase/declab-integration-test:latest .
+
+          docker container ls
+
+          cd ~/project/declab
+          ~/apache-maven-3.6.3/bin/mvn test
       - persist_to_workspace:
           root: ~/project
           paths:
