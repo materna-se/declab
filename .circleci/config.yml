@@ -39,9 +39,6 @@ jobs:
           cd ~
           curl -O https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
           tar -xzf ./apache-maven-3.6.3-bin.tar.gz
-          sudo ln -s ./apache-maven-3.6.3-bin/bin/mvn /usr/bin/mvn
-
-          ls -la
 
           cd ~/project/declab/server
           mv ./target/declab-*.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
@@ -62,7 +59,7 @@ jobs:
             sleep 1
           done
 
-          mvn test
+          ~/apache-maven-3.6.3-bin/bin/mvn test
       - persist_to_workspace:
           root: ~/project
           paths:
