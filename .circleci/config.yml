@@ -56,7 +56,7 @@ jobs:
 
           sleep 30
 
-          cd ~/project/declab
+          cd ~/project/declab/server
           mvn test
       - persist_to_workspace:
           root: ~/project
