@@ -40,12 +40,8 @@ jobs:
           curl -O https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
           tar -xzf ./apache-maven-3.6.3-bin.tar.gz
 
-          ls -la ~
-          ls -la ~/apache-maven-3.6.3
-          ls -la ~/apache-maven-3.6.3/bin
-
           cd ~/project/declab/server
-          mv ./target/declab-*.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
+          cp ./target/declab-*.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
 
           LIMIT=0
           DONE=0
@@ -58,6 +54,8 @@ jobs:
               DONE=1
             else
               echo "Deployment not finished at $LIMIT..."
+              ls -la ./target
+              ls -la /opt/jboss/wildfly/standalone/deployments
               LIMIT=$(($LIMIT + 1))
             fi
             sleep 2
