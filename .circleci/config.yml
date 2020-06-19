@@ -52,7 +52,7 @@ jobs:
           " > Dockerfile
 
           docker build -t maternase/declab-integration-test:latest .
-          docker run -v 8080:8080 -it maternase/declab-integration-test:latest .
+          docker run -p 8080:8080 -it maternase/declab-integration-test:latest .
 
           docker container ls
 
