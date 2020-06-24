@@ -41,7 +41,7 @@ jobs:
           wget https://download.jboss.org/wildfly/20.0.0.Final/wildfly-20.0.0.Final.tar.gz
           tar -xvzf wildfly-20.0.0.Final.tar.gz
 
-          cp ./project/declab/server/target/declab-*.war ./wildfly-20.0.0.Final/standalone/deployments/ROOT.war
+          cp ./project/declab/server/target/declab-*.war ./wildfly-20.0.0.Final/standalone/deployments
 
           cd ~/wildfly-20.0.0.Final
           ./bin/standalone.sh &
