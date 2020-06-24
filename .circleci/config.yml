@@ -23,6 +23,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/project
+      - run: git clone https://github.com/materna-se/declab.git
       - run: cd ./declab/server && mvn package -Dmaven.test.skip=true
       - persist_to_workspace:
           root: ~/project
