@@ -31,30 +31,35 @@ jobs:
 
   test_server:
     docker:
-      - image: circleci/buildpack-deps:xenial
+      - image: circleci/openjdk:11-jdk-stretch
     steps:
       - attach_workspace:
           at: ~/project
-      - setup_remote_docker
       - run: |
-          sudo apt install default-jdk maven -y
+          cd ~
+          wget https://download.jboss.org/wildfly/20.0.0.Final/wildfly-20.0.0.Final.tar.gz
+          tar -xvzf wildfly-20.0.0.Final.tar.gz
 
-          cp ~/project/declab/server/target/declab-*.war ~/project/declab/server/target/declab.war
-          ls -la ~/project/declab/server/target
+          cp ./project/declab/server/target/declab-*.war ./wildfly-20.0.0.Final/standalone/deployments/ROOT.war
 
-          cd ~/project/declab/server/target
-          echo "
-          FROM jboss/wildfly:19.1.0.Final
+          cd ~/wildfly-20.0.0.Final
+          ./bin/standalone.sh &
 
-          COPY ./declab.war /opt/jboss/wildfly/standalone/deployments/ROOT.war
-          " > Dockerfile
-
-          docker build -t maternase/declab-integration-test:latest .
-          docker run -p 127.0.0.1:8080:8080 -d maternase/declab-integration-test:latest
-
-          docker container ls
-
-          sleep 30
+          LIMIT=0
+          DONE=0
+          while [ $LIMIT -lt 30 ] && [ $DONE -ne 1 ]
+          do
+            if [ -f ./standalone/deployments/ROOT.war.deployed ]
+            then
+              echo "Deployment is done."
+              DONE=1
+            else
+              echo "Deployment not finished at $LIMIT..."
+              ls -la ./standalone/deployments
+              LIMIT=$(($LIMIT + 1))
+            fi
+            sleep 2
+          done
 
           cd ~/project/declab/server
           mvn test
@@ -84,16 +89,16 @@ workflows:
   version: 2
   build_and_publish:
     jobs:
-      - build_client:
-          filters:
-            branches:
-              only: /.*/
-            tags:
-              only: /.*/
+      #- build_client:
+      #    filters:
+      #      branches:
+      #        only: /.*/
+      #      tags:
+      #        only: /.*/
 
       - build_server:
-          requires:
-            - build_client
+          #requires:
+           # - build_client
           filters:
             branches:
               only: /.*/
