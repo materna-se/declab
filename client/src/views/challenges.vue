@@ -52,7 +52,7 @@
 								<div style="width: 10%; float:left;" v-if="hint > 0">
 									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint -= 1">
 										<svg style="height:24px">
-  											<path fill="currentColor" d="M20,9V15H12V19.84L4.16,12L12,4.16V9H20Z" />
+											<path fill="currentColor" d="M20,9V15H12V19.84L4.16,12L12,4.16V9H20Z"/>
 										</svg>
 									</button>
 								</div>
@@ -69,12 +69,12 @@
 								<div style="width: 10%; float:left;" v-if="hint < challenge.hints.length">
 									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-if="hint >= 0 && hint < challenge.hints.length - 1" v-on:click="hint += 1">
 										<svg style="height:24px">
-    										<path fill="currentColor" d="M4,15V9H12V4.16L19.84,12L12,19.84V15H4Z" />
+											<path fill="currentColor" d="M4,15V9H12V4.16L19.84,12L12,19.84V15H4Z"/>
 										</svg>
 									</button>
 									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-else v-on:click="hint += 1; showSolution()">
 										<svg style="height:24px">
-    										<path fill="currentColor" d="M10 3H14V14H10V3M10 21V17H14V21H10Z" />
+											<path fill="currentColor" d="M10 3H14V14H10V3M10 21V17H14V21H10Z"/>
 										</svg>
 									</button>
 								</div>
@@ -132,7 +132,7 @@
 							</div>
 						</div>
 						<div class="list-group-item" v-if="challenge.scenarios.length === 0">
-							<empty-collection/> 
+							<empty-collection/>
 						</div>
 					</div>
 				</div>
@@ -289,7 +289,7 @@
 
 			showSolution() {
 				this.expression_backup = JSON.parse(JSON.stringify(this.expression));
-				this.expression = this.challenge.solution
+				this.expression = this.challenge.solution;
 				this.executeRaw();
 			},
 
