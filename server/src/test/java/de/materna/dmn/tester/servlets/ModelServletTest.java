@@ -39,7 +39,6 @@ public class ModelServletTest {
 		String url;
 
 		String model1Json = FileHelper.readFile("model-test-1", "anbieter.json");
-		String input1Json = FileHelper.readFile("model-test-1", "nutzer.dmn");
 
 		//Check for non-existent models, make sure all endpoints handle as expected
 		{
@@ -93,7 +92,6 @@ public class ModelServletTest {
 			RequestHelper.emitRequest(url, "POST", null, 415);
 			RequestHelper.emitRequest(url, "POST", null, "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "{_}", MediaType.APPLICATION_JSON, 400, false);
-			RequestHelper.emitRequest(url, "POST", null, input1Json, MediaType.APPLICATION_JSON, 200, false);
 
 			url = urlTemplate + "/execute/raw";
 			RequestHelper.emitRequest(url, "POST", null, 415);
@@ -129,7 +127,6 @@ public class ModelServletTest {
 			RequestHelper.emitRequest(url, "POST", null, 415);
 			RequestHelper.emitRequest(url, "POST", null, "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "{_}", MediaType.APPLICATION_JSON, 400, false);
-			RequestHelper.emitRequest(url, "POST", null, input1Json, MediaType.APPLICATION_JSON, 200, false);
 
 			url = urlTemplate + "/execute/raw";
 			RequestHelper.emitRequest(url, "POST", null, 415);
@@ -169,8 +166,6 @@ public class ModelServletTest {
 			RequestHelper.emitRequest(url, "POST", null, "{}", MediaType.TEXT_PLAIN, 415, false);
 			RequestHelper.emitRequest(url, "POST", null, "{_}", MediaType.APPLICATION_JSON, 401, false);
 			RequestHelper.emitRequest(url, "POST", "test", "{_}", MediaType.APPLICATION_JSON, 400, false);
-			RequestHelper.emitRequest(url, "POST", null, input1Json, MediaType.APPLICATION_JSON, 401, false);
-			RequestHelper.emitRequest(url, "POST", "test", input1Json, MediaType.APPLICATION_JSON, 200, false);
 
 			url = urlTemplate + "/execute/raw";
 			RequestHelper.emitRequest(url, "POST", null, 415);
@@ -181,15 +176,13 @@ public class ModelServletTest {
 	}
 
 	@Test
-	public void verifyFunctionality() throws URISyntaxException, UnsupportedEncodingException, IOException {
+	public void verifyDMNFunctionality() throws URISyntaxException, UnsupportedEncodingException, IOException {
 		Assertions.assertTrue(workspaceUUID != null && workspaceUUID.length() > 0);
 
 		String model1Json = FileHelper.readFile("model-test-1", "anbieter.json");
 		String model2Json = FileHelper.readFile("model-test-1", "nutzer.json");
 		String model3Json = FileHelper.readFile("model-test-1", "anbieter_nutzer.json");
 		String input1Json = FileHelper.readFile("model-test-1", "input.json");
-
-		String modelsBackup;
 
 		String url;
 
@@ -238,6 +231,37 @@ public class ModelServletTest {
 			//Compare calculated results to expected results
 			Assertions.assertEquals(1, result.getOutputs().get("anbieter.danbieter"));
 			Assertions.assertEquals(13, result.getOutputs().get("dnutzer"));
+		}
+	}
+
+	@Test
+	public void verifyJavaFunctionality() throws URISyntaxException, UnsupportedEncodingException, IOException {
+		Assertions.assertTrue(workspaceUUID != null && workspaceUUID.length() > 0);
+
+		String model = FileHelper.readFile("model-test-2", "EmploymentStatusDecision.json");
+		String input = FileHelper.readFile("model-test-2", "input.json");
+
+		String url;
+
+		//Import model
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/model/";
+
+			RequestHelper.emitRequest(url, "PUT", null, model, MediaType.APPLICATION_JSON, 200, false);
+
+			LinkedList<Model> models = SerializationHelper.getInstance().toClass(RequestHelper.emitRequest(url, "GET", null, 200, true), new TypeReference<LinkedList<Model>>() {
+			});
+			Assertions.assertEquals(1, models.size());
+		}
+
+		//Run test
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/model/execute";
+
+			ExecutionResult result = (ExecutionResult) SerializationHelper.getInstance().toClass(RequestHelper.emitRequest(url, "POST", null, input, MediaType.APPLICATION_JSON, 200, true), ExecutionResult.class);
+
+			//Compare calculated results to expected results
+			Assertions.assertEquals("You are UNEMPLOYED", result.getOutputs().get("Employment Status Statement"));
 		}
 	}
 
