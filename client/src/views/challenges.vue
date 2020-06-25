@@ -168,8 +168,6 @@
 				expression: "",
 				expression_backup: "",
 
-				execution_timestamp: 0,
-
 				challenge: null,
 				challenges: {},
 
@@ -197,13 +195,9 @@
 				//The existence of these values is required for the executeRaw function
 				for (let [uuid, challenge] of Object.entries(this.challenges)) {
 					for (const scenario of challenge.scenarios) {
-						scenario.output.alert = {};
-						scenario.output.alert.message = null;
-						scenario.output.alert.status = null;
-
-						scenario.output.equal = false;
-
-						scenario.output.calculated = null;
+						this.$set(scenario.output, "alert", {message: null, status: null});
+						this.$set(scenario.output, "equal", false);
+						this.$set(scenario.output, "calculated", null);
 					}
 				}
 
@@ -214,10 +208,6 @@
 			// Model
 			//
 			async executeRaw() {
-				//Store execution timestamp
-				const ts = new Date().getTime();
-				this.execution_timestamp = ts;
-
 				//Keep track of progress
 				var testsCompleted = 0;
 
@@ -227,11 +217,8 @@
 					scenario.output.equal = false;
 				}
 
-				//Create a copy of the array to store execution results in
-				var scenarios_temp = JSON.parse(JSON.stringify(this.challenge.scenarios));
-
 				//Calculate results
-				for (var scenario of scenarios_temp) {
+				for (const scenario of this.challenge.scenarios) {
 					scenario.output.equal = false;
 					let response;
 					try {
@@ -252,27 +239,16 @@
 					if (result.messages.length > 0) {
 						scenario.output.equal = false;
 						this.displayAlert(scenario, AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "warning");
+						continue;
 					}
 
 					scenario.output.equal = JSON.stringify(scenario.output.value) === JSON.stringify(scenario.output.calculated);
-
-					//Resolve race conditions caused by the fact that even though executeRaw is async,
-					//the v-on binding of the feel-editor doesn't actually wait for it :)
-					//If a newer execution has been started, stop immediately without applying
-					//any outdated execution results
-					if (this.execution_timestamp > ts) {
-						return;
-					}
-
 					if (scenario.output.equal) {
 						testsCompleted += 1;
 					}
 
 					this.displayAlert(scenario, null, null);
 				}
-
-				//Apply execution results
-				Object.assign(this.challenge.scenarios, scenarios_temp);
 
 				this.progress = testsCompleted / this.challenge.scenarios.length;
 			},
