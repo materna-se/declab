@@ -1,12 +1,44 @@
 <template>
 	<div>
-		<h3 class="mb-2">Challenges</h3>
+		<div class="row">
+			<div class="col-11 mb-2">
+				<h3 class="mb-0">Challenges</h3>
+			</div>
+			<div class="col-1 mb-2">
+				<button class="btn btn-block btn-outline-secondary" v-on:click="setAddMode">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
+						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+					</svg>
+				</button>
+			</div>
+		</div>
 		<div class="row">
 			<div class="col-3 mb-4">
+				<div class="row mb-2">
+					<div class="col-12">
+						<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="order = !order; getChallenges()">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
+								<path d="M9.25 5l3.25-3.25L15.75 5h-6.5m-.36 9.3H6L5.28 17H2.91L6 7h3l3.13 10H9.67l-.78-2.7m-2.56-1.62h2.23l-.63-2.12-.26-.97-.25-.96h-.03l-.22.97-.24.98-.6 2.1M13.05 17v-1.26l4.75-6.77v-.06h-4.3V7h7.23v1.34L16.09 15v.08h4.71V17h-7.75z" fill="currentColor" v-if="order"/>
+								<path d="M15.75 19l-3.25 3.25L9.25 19h6.5m-6.86-4.7H6L5.28 17H2.91L6 7h3l3.13 10H9.67l-.78-2.7m-2.56-1.62h2.23l-.63-2.12-.26-.97-.25-.96h-.03l-.22.97-.24.98-.6 2.1M13.05 17v-1.26l4.75-6.77v-.06h-4.3V7h7.23v1.34L16.09 15v.08h4.71V17h-7.75z" fill="currentColor" v-else/>
+							</svg>
+						</button>
+					</div>
+				</div>
 				<div class="list-group">
 					<template v-if="Object.keys(challenges).length !== 0">
 						<div class="list-group-item list-group-item-action c-pointer" v-for="(challenge, uuid) in challenges" v-bind:key="uuid" v-on:click.self="setViewMode(uuid)">
-							<span class="d-block" v-on:click="setViewMode(uuid)">{{challenge.name}}</span>
+							<span class="d-block float-left mr-4" v-on:click="setViewMode(uuid)">{{challenge.name}}</span>
+							<div class="float-right">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setEditMode(uuid)">
+									<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
+								</svg>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setDuplicateMode(uuid)">
+									<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"/>
+								</svg>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left" v-on:click="deleteChallenge(uuid)">
+									<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
+								</svg>
+							</div>
 						</div>
 					</template>
 					<div class="list-group-item" v-else>
@@ -15,125 +47,137 @@
 				</div>
 			</div>
 			<div class="col-9 mb-4">
-				<div class="row" v-if="mode === 'VIEW'">
-					<div class="col-6 mb-4">
-						<h4 class="mb-2" style="text-align:center">{{challenge.name}}</h4>
-						<p class="mb-4" style="text-align:center">{{challenge.description}}</p>
-
-						<div class="card">
-							<div class="card-body">
-								<feel-editor v-model="expression" v-on:input="executeRaw"/>
-							</div>
-						</div>
+				<div class="card" v-if="mode === 'VIEW'">
+					<div class="card-header">
+						<h4 class="mb-0">{{challenge.name}}</h4>
 					</div>
-
-					<div class="col-6 mb-4">
-						<!-- Button to show hints / solution -->
-						<div class="mb-4" v-if="hint === -1">
-							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0" v-if="challenge.hints.length > 0">
-								<div>Need help?</div>
-							</button>
-							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0; showSolution()" v-else>
-								<div>Show solution</div>
-							</button>
-						</div>
-
-						<!-- Hints/Solution Header -->
-						<div class="mb-2" style="text-align:center" v-if="hint >= 0">
-							<h5 v-if="hint < challenge.hints.length">Hint {{hint + 1}}</h5>
-							<h5 v-else>Solution</h5>
-						</div>
-
-						<!-- If hints exist, add left/right buttons to iterate over all hints -->
-						<!-- Once the last hint is reached, change right button to a solution button -->
-						<div class="row mb-4" v-if="hint >= 0 && hint < challenge.hints.length && challenge.hints.length > 0">
-							<div class="container" style="display:flex">
-								<!-- Left button -->
-								<div style="width: 10%; float:left;" v-if="hint > 0">
-									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint -= 1">
-										<svg style="height:24px">
-											<path fill="currentColor" d="M20,9V15H12V19.84L4.16,12L12,4.16V9H20Z"/>
-										</svg>
-									</button>
-								</div>
-								<!-- Hint -->
-								<!-- FIXME: These textareas currently let the user scroll past the right edge of the page -->
-								<div class="ml-2 mr-2" style="width: 80%; float:left;" v-if="hint > 0 && hint < challenge.hints.length">
-									<textarea readonly class="form-control" style="resize:none;max-height:40px" wrap="soft" v-model="challenge.hints[hint]"/>
-								</div>
-								<!-- If no left button exists, might as well expand the hint box to fill the space -->
-								<div class="mr-2" style="width: 90%; float:left;" v-else>
-									<textarea readonly class="form-control" style="resize:none;max-height:40px" wrap="soft" v-model="challenge.hints[hint]"/>
-								</div>
-								<!-- Right button -->
-								<div style="width: 10%; float:left;" v-if="hint < challenge.hints.length">
-									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-if="hint >= 0 && hint < challenge.hints.length - 1" v-on:click="hint += 1">
-										<svg style="height:24px">
-											<path fill="currentColor" d="M4,15V9H12V4.16L19.84,12L12,19.84V15H4Z"/>
-										</svg>
-									</button>
-									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-else v-on:click="hint += 1; showSolution()">
-										<svg style="height:24px">
-											<path fill="currentColor" d="M10 3H14V14H10V3M10 21V17H14V21H10Z"/>
-										</svg>
-									</button>
-								</div>
-							</div>
-						</div>
-
-						<!-- Add button to revert to original FEEL expression if solution is being shown -->
-						<div class="mb-4" v-if="hint === challenge.hints.length">
-							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint -= 1; showOriginalExpression()">
-								<div>Undo solution</div>
-							</button>
-						</div>
-
-						<div class="progress mb-4">
-							<div class="progress-bar" v-bind:class="[progress === 1 ? 'bg-success' : 'bg-primary']" v-bind:style="{width: progress * 100 + '%'}"></div>
-						</div>
-
-						<div class="card mb-4" v-for="scenario of challenge.scenarios">
-							<div class="card-header d-flex align-items-center" v-bind:class="[scenario.output.equal ? 'text-success' : 'text-danger']">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="mr-2" v-if="scenario.output.equal">
-									<path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8-1.41-1.42z" fill="currentColor"/>
-								</svg>
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="mr-2" v-else>
-									<path d="M12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m0-18C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m2.59 6L12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41 14.59 8z" fill="currentColor"/>
-								</svg>
-								<h5 class="mb-0">{{scenario.name}}</h5>
-							</div>
-							<div class="card-body" v-if="!scenario.output.equal">
-								<h5 class="mb-2">Input</h5>
-								<div class="card mb-4">
-									<div class="card-body">
-										<json-builder v-bind:template="scenario.input.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
+					<div class="card-body">
+						<h5 class="mb-2">Description</h5>
+						<input class="form-control mb-4" v-model="challenge.description" readonly>
+						<h5 class="mb-2">Hints</h5>
+						<div class="list-group mb-4">
+							<template v-if="challenge.hints.length !== 0">
+								<div class="list-group-item" v-for="hint in challenge.hints">
+									<div class="mr-auto">
+										<p class="mb-0">{{hint}}</p>
 									</div>
 								</div>
+							</template>
+							<div class="list-group-item" v-else>
+								<empty-collection/>
+							</div>
+						</div>
+						<h5 class="mb-2">Solution</h5>
+						<div class="card mb-4">
+							<div class="card-body">
+								<feel-editor v-model="challenge.solution" readonly="true"/>
+							</div>
+						</div>
 
-								<h5 class="mb-2">Output</h5>
-								<h6 class="mb-2">Expected</h6>
-								<div class="card mb-4">
-									<div class="card-body">
+
+						<h5 class="mb-2">Scenarios</h5>
+						<div class="list-group">
+							<template v-if="challenge.scenarios.length !== 0">
+								<div class="list-group-item" v-for="scenario in challenge.scenarios">
+									<div class="mr-auto">
+										<h5 class="mb-2">{{scenario.name}}</h5>
+										<h6 class="mb-1">Input</h6>
+										<json-builder v-bind:template="scenario.input.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
+										<hr>
+										<h6 class="mb-1">Output</h6>
 										<json-builder v-bind:template="scenario.output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 									</div>
 								</div>
-
-								<h6 class="mb-2">Calculated</h6>
-								<div class="row mb-2" v-if="scenario.output.alert.message !== null">
-									<div class="col-12">
-										<alert v-bind:alert="scenario.output.alert"/>
-									</div>
-								</div>
-								<div class="card">
-									<div class="card-body">
-										<json-builder v-bind:template="scenario.output.calculated" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
-									</div>
-								</div>
+							</template>
+							<div class="list-group-item" v-else>
+								<empty-collection/>
 							</div>
 						</div>
-						<div class="list-group-item" v-if="challenge.scenarios.length === 0">
-							<empty-collection/>
+					</div>
+				</div>
+				<div class="card" v-if="mode === 'ADD' || mode === 'EDIT'">
+					<div class="card-body">
+						<h5 class="mb-2">Name</h5>
+						<input class="form-control mb-4" v-model="challenge.name">
+
+						<h5 class="mb-2">Description</h5>
+						<input class="form-control mb-4" v-model="challenge.description">
+
+						<h5 class="mb-2">Hints</h5>
+						<div class="list-group mb-2">
+							<template v-if="challenge.hints.length !== 0">
+								<div class="list-group-item" v-for="(hint, index) in challenge.hints">
+									<div class="row mx-0">
+										<div class="mr-auto">
+											<input class="form-control mb-0" v-model="challenge.hints[index]">
+										</div>
+										<div class="float-right">
+											<button class="btn btn-block btn-outline-secondary" v-on:click="challenge.hints.splice(index, 1)">
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
+													<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
+												</svg>
+											</button>
+										</div>
+									</div>
+								</div>
+							</template>
+							<div class="list-group-item" v-else>
+								<empty-collection/>
+							</div>
 						</div>
+
+						<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="challenge.hints.push('')">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
+								<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+							</svg>
+						</button>
+
+						<h5 class="mb-2">Solution</h5>
+						<div class="card mb-4">
+							<div class="card-body">
+								<feel-editor v-model="challenge.solution"/>
+							</div>
+						</div>
+
+						<h5 class="mb-2">Scenarios</h5>
+						<div class="list-group">
+							<template v-if="challenge.scenarios.length !== 0">
+								<div class="list-group-item" v-for="(scenario, index) of challenge.scenarios">
+									<div class="mr-auto">
+										<h5 class="mb-2">Name</h5>
+										<div>
+											<input class="form-control mb-4" v-model="scenario.name">
+										</div>
+										<h6 class="mb-1">Input</h6>
+										<json-builder v-bind:template="scenario.input.template" v-bind:convert="true" v-on:update:value="scenario.input.value = $event"/>
+										<hr>
+										<h6 class="mb-1">Output</h6>
+										<json-builder v-bind:template="scenario.output.template" v-bind:convert="true" v-on:update:value="scenario.output.value = $event"/>
+										<div class="float-right mt-2">
+											<button class="btn btn-block btn-outline-secondary" v-on:click="challenge.scenarios.splice(index, 1)">
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
+													<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
+												</svg>
+											</button>
+										</div>
+									</div>
+								</div>
+							</template>
+							<div class="list-group-item" v-else>
+								<empty-collection/>
+							</div>
+						</div>
+
+						<button class="btn btn-block btn-outline-secondary mt-2" v-on:click="challenge.scenarios.push({'name':'New Scenario','input':{'value':{}, 'template':{}},'output':{'value':'', 'template':''}})">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
+								<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+							</svg>
+						</button>
+
+						<hr>
+
+						<button class="btn btn-block btn-outline-secondary" v-if="mode === 'ADD'" v-on:click="addChallenge">Save Challenge</button>
+						<button class="btn btn-block btn-outline-secondary" v-if="mode === 'EDIT'" v-on:click="editChallenge">Save Challenge</button>
 					</div>
 				</div>
 			</div>
@@ -143,19 +187,16 @@
 
 <script>
 	import Network from "../helpers/network";
-
+	import Converter from "../components/json/json-builder-converter";
 	import FEELEditor from "../components/dmn/feel-editor.vue";
 	import JSONBuilder from "../components/json/json-builder.vue";
-	import Alert from "../components/alert/alert.vue";
-	import AlertHelper from "../components/alert/alert-helper";
 	import EmptyCollectionComponent from "../components/empty-collection.vue";
 
 	export default {
 		components: {
-			"alert": Alert,
-			"json-builder": JSONBuilder,
 			"feel-editor": FEELEditor,
-			"empty-collection": EmptyCollectionComponent
+			"json-builder": JSONBuilder,
+			"empty-collection": EmptyCollectionComponent,
 		},
 		async mounted() {
 			await this.getChallenges();
@@ -163,116 +204,118 @@
 		data() {
 			return {
 				mode: "SELECT",
+
+				hints: [],
+				scenarios: [],
+
 				order: false,
-				progress: 0,
-				expression: "",
-				expression_backup: "",
-
-				challenge: null,
 				challenges: {},
-
-				hint: -1,
+				challenge: {
+					uuid: null,
+					name: null,
+					decision: null,
+					hints: null,
+					solution: null,
+					scenarios: null
+				}
 			}
 		},
 		methods: {
-			async setViewMode(uuid) {
-				this.challenge = this.challenges[uuid];
-
-				this.expression = "";
-				this.expression_backup = "";
-
-				this.mode = "VIEW";
-
-				this.hint = -1;
-
-				await this.executeRaw();
-			},
-
+			//
+			// Challenges
+			//
 			async getChallenges() {
 				this.challenges = await Network.getChallenges(this.order);
 
 				//Initialize values not provided by the server
-				//The existence of these values is required for the executeRaw function
+				//The existence of these templates is required for json-builders
 				for (let [uuid, challenge] of Object.entries(this.challenges)) {
 					for (const scenario of challenge.scenarios) {
-						this.$set(scenario.output, "alert", {message: null, status: null});
-						this.$set(scenario.output, "equal", false);
-						this.$set(scenario.output, "calculated", null);
+						scenario.input.template = JSON.parse(JSON.stringify(scenario.input.value));
+						scenario.output.template = JSON.parse(JSON.stringify(scenario.output.value));
 					}
 				}
 
 				this.mode = "SELECT";
 			},
+			async addChallenge() {
+				await Network.addChallenge({
+					name: this.challenge.name,
+					description: this.challenge.description,
+                    hints: this.challenge.hints,
+                    solution: this.challenge.solution,
+                    scenarios: this.challenge.scenarios
+				});
 
-			//
-			// Model
-			//
-			async executeRaw() {
-				//Keep track of progress
-				var testsCompleted = 0;
+				this.$root.displayAlert("The challenge was successfully created.", "success");
 
-				//Erase all previous results
-				for (const scenario of this.challenge.scenarios) {
-					scenario.output.calculated = null;
-					scenario.output.equal = false;
-				}
+				await this.getChallenges();
+			},
+			async editChallenge() {
+				await Network.editChallenge(this.challenge.uuid, {
+					name: this.challenge.name,
+					description: this.challenge.description,
+                    hints: this.challenge.hints,
+                    solution: this.challenge.solution,
+                    scenarios: this.challenge.scenarios
+				});
 
-				//Calculate results
-				for (const scenario of this.challenge.scenarios) {
-					scenario.output.equal = false;
-					let response;
-					try {
-						response = await Network.executeRaw(this.expression, scenario.input.value);
-						if (response.status !== 200) {
-							throw new Error();
-						}
-					}
-					catch (e) {
-						scenario.output.calculated = null;
-						scenario.output.equal = false;
-						this.displayAlert(scenario, "The output can't be calculated.", "danger");
-						continue;
-					}
+				this.$root.displayAlert("The challenge was successfully edited.", "success");
 
-					const result = await response.json();
-					scenario.output.calculated = result.outputs.main;
-					if (result.messages.length > 0) {
-						scenario.output.equal = false;
-						this.displayAlert(scenario, AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "warning");
-						continue;
-					}
+				await this.getChallenges();
+			},
+			async deleteChallenge(uuid) {
+				await Network.deleteChallenge(uuid);
 
-					scenario.output.equal = JSON.stringify(scenario.output.value) === JSON.stringify(scenario.output.calculated);
-					if (scenario.output.equal) {
-						testsCompleted += 1;
-					}
+				this.$root.displayAlert("The challenge was successfully deleted.", "success");
 
-					this.displayAlert(scenario, null, null);
-				}
-
-				this.progress = testsCompleted / this.challenge.scenarios.length;
+				await this.getChallenges();
 			},
 
 			//
-			// Helpers
+			// View Modes
 			//
-			displayAlert(scenario, message, state) {
-				scenario.output.alert = {
-					message: message,
-					state: state
-				}
-			},
+			setViewMode(uuid) {
+				const challenge = this.challenges[uuid];
 
-			showSolution() {
-				this.expression_backup = JSON.parse(JSON.stringify(this.expression));
-				this.expression = this.challenge.solution;
-				this.executeRaw();
-			},
+				//Use JSON utils to do a deep copy of the entire object
+				this.challenge = JSON.parse(JSON.stringify(challenge))
+				this.challenge.uuid = uuid;
 
-			showOriginalExpression() {
-				this.expression = JSON.parse(JSON.stringify(this.expression_backup));
-				this.executeRaw();
+				this.mode = "VIEW";
+			},
+			setAddMode() {
+				this.challenge = {
+                    uuid: null,
+					name: null,
+					description: null,
+                    hints: [],
+                    solution: null,
+                    scenarios: []
+				};
+
+				this.mode = "ADD";
+			},
+			setEditMode(uuid) {
+				const challenge = this.challenges[uuid];
+
+				//Use JSON utils to do a deep copy of the entire object
+				this.challenge = JSON.parse(JSON.stringify(challenge))
+				this.challenge.uuid = uuid;
+
+				this.mode = "EDIT";
+			},
+			setDuplicateMode(uuid) {
+				const challenge = this.challenges[uuid];
+
+				//Use JSON utils to do a deep copy of the entire object
+				this.challenge = JSON.parse(JSON.stringify(challenge))
+
+				this.mode = "ADD";
 			}
 		}
 	};
 </script>
+
+<style>
+</style>

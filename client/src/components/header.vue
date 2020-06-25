@@ -56,8 +56,8 @@
 								path: "playground"
 							},
 							{
-								name: "Challenges",
-								path: "challenges"
+								name: "Challenger",
+								path: "challenger"
 							}
 						]
 					},
@@ -105,7 +105,7 @@
 							},
 							{
 								name: "Challenges",
-								path: "challenge_editor"
+								path: "challenges"
 							}
 						]
 					}

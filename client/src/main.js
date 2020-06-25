@@ -21,13 +21,13 @@ import Network from "./helpers/network";
 const Index = () => import('./views/index.vue');
 const Model = () => import('./views/model.vue');
 const Builder = () => import('./views/builder.vue');
-const Challenge_Editor = () => import('./views/challenge_editor.vue');
+const Challenges = () => import('./views/challenges.vue');
 const Playgrounds = () => import('./views/playgrounds.vue');
 const Inputs = () => import('./views/inputs.vue');
 const Outputs = () => import('./views/outputs.vue');
 const Tests = () => import('./views/tests.vue');
 const Playground = () => import('./views/playground.vue');
-const Challenges = () => import('./views/challenges.vue');
+const Challenger = () => import('./views/challenger.vue');
 const Publisher = () => import('./views/publisher.vue');
 const Discoverer = () => import('./views/discoverer.vue');
 const Settings = () => import('./views/settings.vue');
@@ -40,7 +40,7 @@ const router = new VueRouter({
 		{path: '/', component: Index},
 		{path: '/:workspace/model', component: Model},
 		{path: '/:workspace/builder', component: Builder},
-		{path: '/:workspace/challenge_editor', component: Challenge_Editor},
+		{path: '/:workspace/challenger', component: Challenger},
 		{path: '/:workspace/playgrounds', component: Playgrounds},
 		{path: '/:workspace/inputs', component: Inputs},
 		{path: '/:workspace/outputs', component: Outputs},
