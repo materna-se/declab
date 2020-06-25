@@ -107,17 +107,13 @@
 						<div class="list-group mb-2">
 							<template v-if="challenge.hints.length !== 0">
 								<div class="list-group-item" v-for="(hint, index) in challenge.hints">
-									<div class="row mx-0">
-										<div class="mr-auto">
-											<input class="form-control mb-0" v-model="challenge.hints[index]">
-										</div>
-										<div class="float-right">
-											<button class="btn btn-block btn-outline-secondary" v-on:click="challenge.hints.splice(index, 1)">
-												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
-													<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
-												</svg>
-											</button>
-										</div>
+									<div class="row mx-0 flex-row">
+										<input class="form-control mb-0 mr-2" style="flex: 1" v-model="challenge.hints[index]">
+										<button class="btn btn-outline-secondary" v-on:click="challenge.hints.splice(index, 1)">
+											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
+												<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
+											</svg>
+										</button>
 									</div>
 								</div>
 							</template>
@@ -279,7 +275,7 @@
 				const challenge = this.challenges[uuid];
 
 				//Use JSON utils to do a deep copy of the entire object
-				this.challenge = JSON.parse(JSON.stringify(challenge))
+				this.challenge = JSON.parse(JSON.stringify(challenge));
 				this.challenge.uuid = uuid;
 
 				this.mode = "VIEW";
@@ -300,7 +296,7 @@
 				const challenge = this.challenges[uuid];
 
 				//Use JSON utils to do a deep copy of the entire object
-				this.challenge = JSON.parse(JSON.stringify(challenge))
+				this.challenge = JSON.parse(JSON.stringify(challenge));
 				this.challenge.uuid = uuid;
 
 				this.mode = "EDIT";
@@ -309,7 +305,7 @@
 				const challenge = this.challenges[uuid];
 
 				//Use JSON utils to do a deep copy of the entire object
-				this.challenge = JSON.parse(JSON.stringify(challenge))
+				this.challenge = JSON.parse(JSON.stringify(challenge));
 
 				this.mode = "ADD";
 			}
