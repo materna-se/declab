@@ -110,9 +110,51 @@ export default {
 	},
 
 	//
+	// Challenges
+	//
+	async getChallenges(order) {
+		const queryString = new URLSearchParams();
+		queryString.append("order", String(order === undefined ? false : order));
+
+		const response = await this._authorizedFetch(this._endpoint + "/challenges?" + queryString.toString(), {});
+		return await response.json();
+	},
+
+	async getChallenge(uuid) {
+		const response = await this._authorizedFetch(this._endpoint + "/challenges/" + uuid, {});
+		return await response.json();
+	},
+
+	async addChallenge(challenge) {
+		const response = await this._authorizedFetch(this._endpoint + "/challenges", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(challenge)
+		});
+
+		//TODO A JSON-parsing error occurs if we just "return await response.json()";
+		//Seems like it doesn't actually await the response, so it tries to parse incomplete JSON
+		const ret = await response.text();
+		return JSON.stringify(ret);
+	},
+
+	async editChallenge(uuid, challenge) {
+		await this._authorizedFetch(this._endpoint + "/challenges/" + uuid, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(challenge)
+		});
+	},
+
+	async deleteChallenge(uuid) {
+		await this._authorizedFetch(this._endpoint + "/challenges/" + uuid, {
+			method: "DELETE"
+		});
+	},
+
+	//
 	// Playgrounds
 	//
-
 	async getPlaygrounds(order) {
 		const queryString = new URLSearchParams();
 		queryString.append("order", String(order === undefined ? false : order));

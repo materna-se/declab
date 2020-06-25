@@ -23,19 +23,58 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/project
-      - run: cd ./declab/server && mvn package
+      - run: cd ./declab/server && mvn package -Dmaven.test.skip=true
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - ./declab
+
+  test_server:
+    docker:
+      - image: circleci/openjdk:11-jdk-stretch
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run: |
+          cd ~
+          wget https://download.jboss.org/wildfly/20.0.0.Final/wildfly-20.0.0.Final.tar.gz
+          tar -xvzf wildfly-20.0.0.Final.tar.gz
+
+          cp ./project/declab/server/target/declab-*.war ./wildfly-20.0.0.Final/standalone/deployments
+
+          cd ~/wildfly-20.0.0.Final
+          ./bin/standalone.sh &
+
+          LIMIT=0
+          DONE=0
+          while [ $LIMIT -lt 30 ] && [ $DONE -ne 1 ]
+          do
+            if (ls ./standalone/deployments/declab-*.war.deployed)
+            then
+              echo "Deployment is done."
+              DONE=1
+            else
+              echo "Deployment not finished at $LIMIT..."
+              ls -la ./standalone/deployments
+              LIMIT=$(($LIMIT + 1))
+            fi
+            sleep 2
+          done
+
+          cd ~/project/declab/server
+          mvn test
       - persist_to_workspace:
           root: ~/project
           paths:
             - ./declab
 
   publish_release:
-      docker:
-        - image: cibuilds/github:0.10
-      steps:
-        - attach_workspace:
-            at: ~/project
-        - run: cd ./declab/server && ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -recreate -replace ${CIRCLE_TAG} ./target/declab-${CIRCLE_TAG}.war
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run: cd ./declab/server && ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -recreate -replace ${CIRCLE_TAG} ./target/declab-${CIRCLE_TAG}.war
 
   publish_container:
     docker:
@@ -60,6 +99,15 @@ workflows:
       - build_server:
           requires:
             - build_client
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
+
+      - test_server:
+          requires:
+            - build_server
           filters:
             branches:
               only: /.*/

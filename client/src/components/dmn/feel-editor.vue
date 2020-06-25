@@ -17,6 +17,9 @@
 		props: {
 			value: {
 				default: null
+			},
+			readonly: {
+				default: false
 			}
 		},
 		data() {
@@ -28,8 +31,13 @@
 		watch: {
 			value: {
 				handler: function (value) {
-					if (value === this.previousValue) {
+					if (value === this.editor.getValue()) {
 						return;
+					}
+
+					//The editor silently does nothing if you try to set its value to null
+					if(value === null) {
+						value = "";
 					}
 
 					this.editor.setValue(value);
@@ -170,7 +178,8 @@
 					enabled: false
 				},
 
-				value: this.value
+				value: this.value,
+				readOnly: this.readonly
 			});
 			this.editor = editor;
 

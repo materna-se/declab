@@ -56,8 +56,8 @@
 								path: "playground"
 							},
 							{
-								name: "Challenges",
-								path: "challenges"
+								name: "Challenger",
+								path: "challenger"
 							}
 						]
 					},
@@ -102,6 +102,10 @@
 							{
 								name: "Playgrounds",
 								path: "playgrounds"
+							},
+							{
+								name: "Challenges",
+								path: "challenges"
 							}
 						]
 					}
