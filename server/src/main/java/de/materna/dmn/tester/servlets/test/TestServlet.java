@@ -65,11 +65,15 @@ public class TestServlet {
 	@WriteAccess
 	@Path("/tests")
 	@Consumes("application/json")
-	public Response createTest(@PathParam("workspace") String workspaceUUID, String body) throws IOException, RuntimeException {
+	public Response createTest(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		String uuid = UUID.randomUUID().toString();
 
-		workspace.getTestManager().persistFile(uuid, (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class));
+		PersistedTest persistedTest = (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class);
+		if (persistedTest.getName() == null) {
+			throw new BadRequestException("Test name can't be null.");
+		}
+		workspace.getTestManager().persistFile(uuid, persistedTest);
 
 		workspace.getAccessLog().writeMessage("Created test " + uuid, System.currentTimeMillis());
 
@@ -83,16 +87,15 @@ public class TestServlet {
 	public Response runTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
-		PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
-		PersistedTest test = testManager.getFile(testUUID);
+		PersistedTest test = workspace.getTestManager().getFile(testUUID);
 		if (test == null) {
 			throw new NotFoundException();
 		}
 
 		Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
 
-		ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getModel(workspace), InputServlet.enrichInput(inputManager, inputManager.getFile(test.getInput())).getValue());
+		ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getMainModelNamespace(workspace), InputServlet.enrichInput(inputManager, inputManager.getFile(test.getInput())).getValue());
 		Map<String, Object> calculatedOutputs = executionResult.getOutputs();
 
 		Map<String, TestResultOutput> comparedOutputs = new LinkedHashMap<>();
@@ -113,12 +116,15 @@ public class TestServlet {
 	public Response editTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID, String body) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
-
 		if (!testManager.getFiles().containsKey(testUUID)) {
 			throw new NotFoundException();
 		}
 
-		testManager.persistFile(testUUID, (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class));
+		PersistedTest persistedTest = (PersistedTest) SerializationHelper.getInstance().toClass(body, PersistedTest.class);
+		if (persistedTest.getName() == null) {
+			throw new BadRequestException("Test name can't be null.");
+		}
+		testManager.persistFile(testUUID, persistedTest);
 
 		workspace.getAccessLog().writeMessage("Edited test " + testUUID, System.currentTimeMillis());
 

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import de.materna.dmn.tester.FileHelper;
 import de.materna.dmn.tester.ManagementHelper;
 import de.materna.dmn.tester.RequestHelper;
-import de.materna.dmn.tester.TestHelper;
-import de.materna.dmn.tester.servlets.model.beans.Model;
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
+import de.materna.jdec.model.Model;
 import de.materna.jdec.serialization.SerializationHelper;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.*;
 
@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -373,7 +374,7 @@ public class WorkspaceServletTest {
 		Configuration configBefore = (Configuration) SerializationHelper.getInstance().toClass(RequestHelper.emitRequest(url, "GET", null, 200, true), Configuration.class);
 
 		//Navigate to workspace .dtar
-		Path rootPath = TestHelper.getRootPath();
+		Path rootPath = FileHelper.getRootPath();
 		File workspaceDir = rootPath.resolve("scenarios").resolve("import-export-test-1").toFile();
 		File workspaceDtar = new File(workspaceDir.getPath() + File.separator + "import-export-test-1.dtar");
 		Assertions.assertTrue(workspaceDtar.exists() && workspaceDtar.isFile() && workspaceDtar.canRead());
@@ -447,44 +448,42 @@ public class WorkspaceServletTest {
 		url = urlTemplate + "/backup";
 		byte[] workspaceExportDtarBytes = RequestHelper.emitRequestRawResponse(url, "GET", null, 200);
 
-		//Create temporary directory for file comparison
-		Path tempDirectory = Paths.get(workspaceDir.getAbsolutePath(), "__TEMP");
-		if (!Files.exists(tempDirectory)) {
-			Files.createDirectory(tempDirectory);
-		}
 
-		//Crawl exported .dtar, compare to golden .dtar
-		Path goldenFilePath = Paths.get(tempDirectory.toString(), "golden.file");
-		Path exportedFilePath = Paths.get(tempDirectory.toString(), "exported.file");
+		InputStream goldenStream = new ByteArrayInputStream(workspaceDtarBytes);
+		ZipInputStream goldenZIPStream = new ZipInputStream(goldenStream);
 
-		InputStream goldenIS = new ByteArrayInputStream(workspaceDtarBytes);
-		ZipInputStream goldenZIPIS = new ZipInputStream(goldenIS);
+		// Create temporary directory for file comparison
+		Path goldenComparisonDirectory = Paths.get(workspaceDir.getAbsolutePath(), "comparison");
 
-		InputStream exportedIS = new ByteArrayInputStream(workspaceExportDtarBytes);
-		ZipInputStream exportedZIPIS = new ZipInputStream(exportedIS);
-
+		// Export the golden zip archive
 		while (true) {
-			ZipEntry goldenZE = goldenZIPIS.getNextEntry();
-			ZipEntry exportedZE = exportedZIPIS.getNextEntry();
-			if (goldenZE == null || exportedZE == null) {
-				Assertions.assertEquals(goldenZE, exportedZE);
+			ZipEntry zipEntry = goldenZIPStream.getNextEntry();
+			if (zipEntry == null) {
 				break;
 			}
 
-			//Write both files
-			Files.write(goldenFilePath, IOUtils.toByteArray(goldenZIPIS));
-			Files.write(exportedFilePath, IOUtils.toByteArray(exportedZIPIS));
+			// If the directory for the entity does not exist yet, it will be created.
+			Path entityPath = goldenComparisonDirectory.resolve(zipEntry.getName());
+			Files.createDirectories(entityPath.getParent());
 
-			//Read both files
-			String goldenFileContentString = new String(Files.readAllBytes(goldenFilePath), "UTF-8");
-			String exportedFileContentString = new String(Files.readAllBytes(exportedFilePath), "UTF-8");
-
-			Assertions.assertEquals(goldenFileContentString, exportedFileContentString);
+			Files.write(entityPath, IOUtils.toByteArray(goldenZIPStream));
 		}
 
-		Files.delete(goldenFilePath);
-		Files.delete(exportedFilePath);
-		Files.delete(tempDirectory);
+		InputStream exportedStream = new ByteArrayInputStream(workspaceExportDtarBytes);
+		ZipInputStream exportedZIPStream = new ZipInputStream(exportedStream);
+
+		// Iterate through the exported zip archive and compare all files with their golden counterparts
+		while (true) {
+			ZipEntry zipEntry = exportedZIPStream.getNextEntry();
+			if (zipEntry == null) {
+				break;
+			}
+
+
+			Assertions.assertEquals(new String(IOUtils.toByteArray(exportedZIPStream), StandardCharsets.UTF_8), new String(Files.readAllBytes(goldenComparisonDirectory.resolve(zipEntry.getName())), StandardCharsets.UTF_8));
+		}
+
+		FileUtils.deleteDirectory(goldenComparisonDirectory.toFile());
 	}
 
 	@AfterEach

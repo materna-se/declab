@@ -3,6 +3,9 @@ package de.materna.dmn.tester.servlets.playground.beans;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
 
@@ -14,6 +17,17 @@ public class Playground extends Serializable {
 	
 	public Playground() {
 		
+	}
+
+	@JsonCreator
+	public Playground(@JsonProperty(value = "name", required = true) String name,
+					  @JsonProperty(value = "description", required = true) String description,
+					  @JsonProperty(value = "expression", required = true) String expression,
+					  @JsonProperty(value = "context", required = true) Map<String, ?> context) {
+		this.name = name;
+		this.description = description;
+		this.expression = expression;
+		this.context = context;
 	}
 
 	public String getName() {
@@ -48,7 +62,7 @@ public class Playground extends Serializable {
 		this.context = context;
 	}
 	
-	public void fromJson(String json) {
+	public void fromJSON(String json) {
 		Playground temp = (Playground) SerializationHelper.getInstance().toClass(json, Playground.class);
 		this.name = temp.getName();
 		this.description = temp.getDescription();

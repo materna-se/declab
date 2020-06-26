@@ -6,9 +6,9 @@ import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.Decision;
-import de.materna.dmn.tester.servlets.model.beans.Model;
+import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
-import de.materna.jdec.dmn.DroolsAnalyzer;
+import de.materna.jdec.DMNDecisionSession;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.model.ImportResult;
 import de.materna.jdec.model.ModelImportException;
@@ -23,7 +23,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Path("/workspaces/{workspace}")
 public class ModelServlet {
@@ -35,29 +34,14 @@ public class ModelServlet {
 	@Produces("application/json")
 	public Response getModels(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-
-		List<Model> models = new LinkedList<>();
-		for (DMNModel model : DroolsHelper.getModels(workspace)) {
-			// At this moment, the name of the component is sufficient for us.
-			// All other fields are filtered out.
-			models.add(new Model(
-					model.getNamespace(),
-					model.getName(),
-					workspace.getDecisionSession().getModel(model.getNamespace()),
-					model.getDecisions().stream().filter(decisionNode -> decisionNode.getModelNamespace().equals(model.getNamespace())).map(decisionNode -> decisionNode.getName()).collect(Collectors.toSet()),
-					model.getInputs().stream().filter(inputDataNode -> inputDataNode.getModelNamespace().equals(model.getNamespace())).map(inputDataNode -> inputDataNode.getName()).collect(Collectors.toSet()),
-					model.getBusinessKnowledgeModels().stream().filter(businessKnowledgeModelNode -> businessKnowledgeModelNode.getModelNamespace().equals(model.getNamespace())).map(businessKnowledgeModelNode -> businessKnowledgeModelNode.getName()).collect(Collectors.toSet()),
-					model.getDecisionServices().stream().filter(decisionServiceNode -> decisionServiceNode.getModelNamespace().equals(model.getNamespace())).map(decisionServiceNode -> decisionServiceNode.getName()).collect(Collectors.toSet())
-			));
-		}
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(models)).build();
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getModels())).build();
 	}
 
 	@PUT
 	@WriteAccess
 	@Path("/model")
 	@Consumes("application/json")
-	public Response importModels(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+	public Response importModels(@PathParam("workspace") String workspaceUUID, String body) throws Exception {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 		List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<List<Map<String, String>>>() {
@@ -85,12 +69,23 @@ public class ModelServlet {
 
 				importedModels.add(model);
 			}
-			workspace.getConfig().setModels(importedModels);
+			Configuration configuration = workspace.getConfig();
+			configuration.setModels(importedModels);
+
+			// Check if the configured decision service still exists.
+			Configuration.DecisionService decisionService = configuration.getDecisionService();
+			if (decisionService != null) {
+				if (configuration.getModels().size() == 0 || workspace.getDecisionSession().getModel(DroolsHelper.getMainModelNamespace(workspace)).getDecisionServices().stream().noneMatch(name -> name.equals(decisionService.getName()))) {
+					// If the decision service does not exist anymore, we will remove the reference from the configuration.
+					configuration.setDecisionService(null);
+				}
+			}
 
 			// Update the configuration and add an access log entry.
-			workspace.getConfig().setModifiedDate(System.currentTimeMillis());
-			workspace.getConfig().serialize();
-			workspace.getAccessLog().writeMessage("Imported models", workspace.getConfig().getModifiedDate());
+			configuration.setModifiedDate(System.currentTimeMillis());
+			configuration.serialize();
+
+			workspace.getAccessLog().writeMessage("Imported models", configuration.getModifiedDate());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(importResult)).build();
 
@@ -99,10 +94,34 @@ public class ModelServlet {
 			for (Map.Entry<String, String> entry : currentFiles.entrySet()) {
 				workspace.getModelManager().persistFile(entry.getKey(), entry.getValue());
 			}
-			DroolsHelper.initModels(workspace);
+			DroolsHelper.importModels(workspace);
 
 			return Response.status(Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
 		}
+	}
+
+	@GET
+	@ReadAccess
+	@Produces("application/json")
+	@Path("/model/decision-session")
+	public Response getDecisionSession(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getConfig().getDecisionService())).build();
+	}
+
+	@PUT
+	@WriteAccess
+	@Consumes("application/json")
+	@Path("/model/decision-session")
+	public Response setDecisionSession(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+
+		Configuration configuration = workspace.getConfig();
+		configuration.setDecisionService((Configuration.DecisionService) SerializationHelper.getInstance().toClass(body, Configuration.DecisionService.class));
+		configuration.serialize();
+
+		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 
 	@GET
@@ -112,7 +131,15 @@ public class ModelServlet {
 	public Response getInputs(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(DroolsAnalyzer.getComplexInputStructure(workspace.getDecisionSession().getRuntime(), DroolsHelper.getModel(workspace).getNamespace()))).build();
+		Configuration configuration = workspace.getConfig();
+		String mainModelNamespace = DroolsHelper.getMainModelNamespace(workspace);
+
+		if (configuration.getDecisionService() == null) {
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getInputStructure(mainModelNamespace))).build();
+		}
+
+		// TODO: Throw error if a decision service is selected on a Java decision model.
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getDMNDecisionSession().getInputStructure(mainModelNamespace, configuration.getDecisionService().getName()))).build();
 	}
 
 	@POST
@@ -126,8 +153,14 @@ public class ModelServlet {
 		Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 		});
 
-		ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getModel(workspace), inputs);
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(executionResult)).build();
+		Configuration configuration = workspace.getConfig();
+		String mainModelNamespace = DroolsHelper.getMainModelNamespace(workspace);
+
+		if (configuration.getDecisionService() == null) {
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().executeModel(mainModelNamespace, inputs))).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getDMNDecisionSession().executeModel(mainModelNamespace, configuration.getDecisionService().getName(), inputs))).build();
 	}
 
 	@POST

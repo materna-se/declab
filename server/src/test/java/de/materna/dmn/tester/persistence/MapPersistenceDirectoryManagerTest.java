@@ -1,6 +1,6 @@
 package de.materna.dmn.tester.persistence;
 
-import de.materna.dmn.tester.TestHelper;
+import de.materna.dmn.tester.FileHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ class MapPersistenceDirectoryManagerTest {
 
 	@BeforeAll
 	static void beforeAll() throws IOException, URISyntaxException {
-		System.setProperty("jboss.server.data.dir", TestHelper.getRootPath().toString());
+		System.setProperty("jboss.server.data.dir", FileHelper.getRootPath().toString());
 
 		persistenceDirectoryManager = new PersistenceDirectoryManager<>("test", "test", Object.class, "json");
 		content = new HashMap<>();

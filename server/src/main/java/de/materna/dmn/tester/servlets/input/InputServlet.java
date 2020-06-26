@@ -65,7 +65,11 @@ public class InputServlet {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		String uuid = UUID.randomUUID().toString();
 
-		workspace.getInputManager().persistFile(uuid, (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class));
+		PersistedInput persistedInput = (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class);
+		if(persistedInput.getName() == null) {
+			throw new BadRequestException("Input name can't be null.");
+		}
+		workspace.getInputManager().persistFile(uuid, persistedInput);
 
 		workspace.getAccessLog().writeMessage("Created input" + uuid, System.currentTimeMillis());
 
@@ -84,11 +88,14 @@ public class InputServlet {
 			throw new NotFoundException();
 		}
 
-		PersistedInput input = (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class);
-		if (inputUUID.equals(input.getParent())) {
+		PersistedInput persistedInput = (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class);
+		if(persistedInput.getName() == null) {
+			throw new BadRequestException("Input name can't be null.");
+		}
+		if (inputUUID.equals(persistedInput.getParent())) {
 			throw new BadRequestException(String.format("Input with uuid %s can't reference itself.", inputUUID));
 		}
-		inputManager.persistFile(inputUUID, input);
+		inputManager.persistFile(inputUUID, persistedInput);
 
 		workspace.getAccessLog().writeMessage("Edited input " + inputUUID, System.currentTimeMillis());
 
@@ -150,6 +157,6 @@ public class InputServlet {
 
 		PersistedInput parentInput = enrichInput(inputManager, inputManager.getFile(input.getParent()));
 
-		return new PersistedInput(input.getName(), input.getParent(), (Map<String, ?>) MergingHelper.merge(parentInput.getValue(), input.getValue()));
+		return new PersistedInput(input.getName(), input.getParent(), (Map<String, Object>) MergingHelper.merge(parentInput.getValue(), input.getValue()));
 	}
 }

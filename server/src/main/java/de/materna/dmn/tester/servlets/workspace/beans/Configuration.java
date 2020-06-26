@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -12,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Configuration extends PublicConfiguration {
-	private static final Logger log = Logger.getLogger(Configuration.class);
-
 	private PersistenceFileManager fileManager;
 
 	private String token = null;
@@ -21,6 +18,7 @@ public class Configuration extends PublicConfiguration {
 	private long createdDate = Long.MIN_VALUE;
 	private long modifiedDate = Long.MIN_VALUE;
 	private List<Map<String, String>> models = new LinkedList<>();
+	private DecisionService decisionService = null;
 
 	public Configuration() {
 	}
@@ -29,23 +27,12 @@ public class Configuration extends PublicConfiguration {
 		this.fileManager = fileManager;
 
 		if (fileManager.fileExists()) {
-			fromJson(fileManager.getContent());
+			fromJSON(fileManager.getFile());
 		}
 	}
 
 	public void serialize() throws IOException {
-		fileManager.persistFile(toJson());
-	}
-
-
-	@JsonIgnore
-	public PublicConfiguration getPublicConfig() {
-		PublicConfiguration pubconfig = new PublicConfiguration();
-		pubconfig.setVersion(this.version);
-		pubconfig.setName(this.name);
-		pubconfig.setDescription(this.description);
-		pubconfig.setAccess(this.access);
-		return pubconfig;
+		fileManager.persistFile(toJSON());
 	}
 
 	public String getToken() {
@@ -96,8 +83,26 @@ public class Configuration extends PublicConfiguration {
 		this.models = models;
 	}
 
+	public DecisionService getDecisionService() {
+		return decisionService;
+	}
+
+	public void setDecisionService(DecisionService decisionService) {
+		this.decisionService = decisionService;
+	}
+
+	@JsonIgnore
+	public PublicConfiguration getPublicConfig() {
+		PublicConfiguration publicConfiguration = new PublicConfiguration();
+		publicConfiguration.setVersion(this.version);
+		publicConfiguration.setName(this.name);
+		publicConfiguration.setDescription(this.description);
+		publicConfiguration.setAccess(this.access);
+		return publicConfiguration;
+	}
+
 	@Override
-	public void fromJson(String body) {
+	public void fromJSON(String body) {
 		Configuration temp = (Configuration) SerializationHelper.getInstance().toClass(body, Configuration.class);
 		this.version = temp.getVersion();
 		this.name = temp.getName();
@@ -108,5 +113,21 @@ public class Configuration extends PublicConfiguration {
 		this.token = temp.getToken();
 		this.salt = temp.getSalt();
 		this.models = temp.getModels();
+	}
+
+	public static class DecisionService {
+		private String name;
+		private String namespace;
+
+		public DecisionService() {
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getNamespace() {
+			return namespace;
+		}
 	}
 }

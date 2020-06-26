@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<template v-if="developerMode === true">
-			<textarea class="form-control w-100 mb-1" v-model="editedValue"/>
-			<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="applyValue">Apply</button>
+			<textarea class="form-control w-100 mb-1" v-model="editedValue" v-bind:readonly="fixed || fixedValues"/>
+			<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="applyValue" v-if="!fixed && !fixedValues">Apply</button>
 		</template>
 		<json-builder-table v-if="value !== null" v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues"/>
 		<json-builder-selector v-if="!fixed && !fixedRoot" v-bind:value="value" v-bind:mode="'edit'"/>
@@ -51,12 +51,12 @@
 			}
 		},
 		mounted() {
-			this.value = this.convert ? this.enrichTemplate(this.template) : this.template;
+			this.value = this.importValue(this.template);
 		},
 		watch: {
 			template: {
 				handler: function (template) {
-					this.value = this.convert ? this.enrichTemplate(template) : JSON.parse(JSON.stringify(template));
+					this.value = this.importValue(template);
 				},
 				deep: true
 			},
@@ -74,6 +74,17 @@
 			cleanValue(value) {
 				const cleanedObject = Converter.clean(value);
 				return cleanedObject === undefined ? {} : cleanedObject;
+			},
+			importValue(value) {
+				if(this.convert) {
+					return this.enrichTemplate(value);
+				}
+
+				if(value.type === "object") {
+					return JSON.parse(JSON.stringify(value));
+				}
+
+				return {type: "object", value: JSON.parse(JSON.stringify(value))};
 			},
 			exportValue(value) {
 				this.cleanedValue = this.cleanValue(value);

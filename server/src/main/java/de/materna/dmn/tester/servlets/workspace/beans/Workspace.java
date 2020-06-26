@@ -3,11 +3,12 @@ package de.materna.dmn.tester.servlets.workspace.beans;
 import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
+import de.materna.dmn.tester.servlets.challenges.beans.Challenge;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.playground.beans.Playground;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
-import de.materna.jdec.DMNDecisionSession;
+import de.materna.jdec.HybridDecisionSession;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -15,6 +16,8 @@ import java.io.IOException;
 public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);
 
+	private PersistenceDirectoryManager<Challenge> challengeManager;
+	
 	private PersistenceDirectoryManager<String> modelManager;
 	private PersistenceDirectoryManager<Playground> playgroundManager;
 
@@ -22,28 +25,34 @@ public class Workspace {
 	private PersistenceDirectoryManager<PersistedOutput> outputManager;
 	private PersistenceDirectoryManager<PersistedTest> testManager;
 
+	private PersistenceFileManager configurationManager;
 	private Configuration configuration;
+	private PersistenceFileManager accessLogManager;
 	private AccessLog accessLog;
 
-	private DMNDecisionSession decisionSession;
+	private HybridDecisionSession decisionSession;
 
-	public Workspace(String workspaceUUID) throws IOException {
+	public Workspace(String workspaceUUID) throws Exception {
 		modelManager = new PersistenceDirectoryManager<>(workspaceUUID, "models", String.class, "dmn");
 		playgroundManager = new PersistenceDirectoryManager<>(workspaceUUID, "playgrounds", Playground.class, "json");
-
+		challengeManager = new PersistenceDirectoryManager<>(workspaceUUID, "challenges", Challenge.class, "json");
 		inputManager = new PersistenceDirectoryManager<>(workspaceUUID, "inputs", PersistedInput.class, "json");
 		outputManager = new PersistenceDirectoryManager<>(workspaceUUID, "outputs", PersistedOutput.class, "json");
 		testManager = new PersistenceDirectoryManager<>(workspaceUUID, "tests", PersistedTest.class, "json");
 
-		PersistenceFileManager configurationManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
+		configurationManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
 		configuration = new Configuration(configurationManager);
 
-		PersistenceFileManager accessLogManager = new PersistenceFileManager(workspaceUUID, "access.log");
+		accessLogManager = new PersistenceFileManager(workspaceUUID, "access.log");
 		accessLog = new AccessLog(accessLogManager);
 
-		decisionSession = new DMNDecisionSession();
+		decisionSession = new HybridDecisionSession();
 
-		DroolsHelper.initModels(this);
+		DroolsHelper.importModels(this);
+	}
+	
+	public PersistenceDirectoryManager<Challenge> getChallengeManager() {
+		return challengeManager;
 	}
 
 	public PersistenceDirectoryManager<String> getModelManager() {
@@ -66,13 +75,12 @@ public class Workspace {
 		return testManager;
 	}
 
-	public DMNDecisionSession getDecisionSession() {
+	public HybridDecisionSession getDecisionSession() {
 		return decisionSession;
 	}
 
-	public void clearDecisionSession() {
-		decisionSession.close();
-		decisionSession = new DMNDecisionSession();
+	public void clearDecisionSession() throws Exception {
+		decisionSession = new HybridDecisionSession();
 	}
 
 	public Configuration getConfig() {
@@ -84,7 +92,6 @@ public class Workspace {
 	}
 
 	public void verify() throws IOException {
-		// TODO: verify for PersistenceFileManager
 		modelManager.verifyAllFiles();
 		playgroundManager.verifyAllFiles();
 		inputManager.verifyAllFiles();

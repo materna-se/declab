@@ -1,0 +1,1 @@
+{"name":"Challenge 2","description":"Description 2","hints":["Hint 1 2","Hint 2 2","Hint 3 2"],"solution":"if true then true else true","scenarios":[{"name":"Scenario 1 2","input":{"value":{"ianbieter":1252}},"output":{"value":1252}},{"name":"Scenario 2 2","input":{"value":{"ianbieter":1222}},"output":{"value":1222}}]}

@@ -22,294 +22,380 @@ import de.materna.jdec.serialization.SerializationHelper;
 public class InputServletTest {
 	static String declabHost = ManagementHelper.declabHost;
 	static String workspaceUUID = "";
-	
+
 	@BeforeEach
 	public void createWorkspace() throws URISyntaxException, IOException {
-		//Create workspace
-		String workspaceJson = FileHelper.readFile("workspace_public.json");
-		String createdWorkspaceUUID = RequestHelper.emitRequest(declabHost + "/api/workspaces", "POST", null, workspaceJson, MediaType.APPLICATION_JSON, 200, true);
+		String createdWorkspaceUUID = RequestHelper.emitRequest(declabHost + "/api/workspaces", "POST", null, FileHelper.readFile("workspace_public.json"), MediaType.APPLICATION_JSON, 200, true);
 		Assertions.assertTrue(createdWorkspaceUUID != null && createdWorkspaceUUID.length() > 0);
-		
-		String url = declabHost + "/api/workspaces/" + createdWorkspaceUUID + "/public";
-		RequestHelper.emitRequest(url, "GET", null, 200);
-		
+
 		workspaceUUID = createdWorkspaceUUID;
 	}
-	
+
 	@Test
 	public void verifyResponseStatuses() throws URISyntaxException, IOException {
 		Assertions.assertTrue(workspaceUUID != null && workspaceUUID.length() > 0);
-		
-		//Check for non-existent workspaces, make sure all endpoints handle as expected
-		String randomUUID = UUID.randomUUID().toString();
-		String urlTemplate = declabHost + "/api/workspaces/" + randomUUID + "/inputs";
-		String url = urlTemplate;
-		
-		RequestHelper.emitRequest(url, "GET", null, 404);
-		RequestHelper.emitRequest(url, "POST", null, 415);
-		RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 404, false);
-		
-		url += "/" + randomUUID;
-		RequestHelper.emitRequest(url, "GET", null, 404);
-		RequestHelper.emitRequest(url, "PUT", null, 415);
-		RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 404, false);
-		RequestHelper.emitRequest(url, "DELETE", null, 404);
-		
-		//Public workspace
-		url = declabHost + "/api/workspaces/" + workspaceUUID + "/config";
-		String publicWorkspaceJson = "{\"access\":\"PUBLIC\",\"token\":\"test\"}";
-		RequestHelper.emitRequest(url, "POST", null, publicWorkspaceJson, MediaType.APPLICATION_JSON, 200, true);
-		
-		//Check all non-input-specific endpoints
-		urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs";
-		url = urlTemplate;
-		
-		RequestHelper.emitRequest(url, "GET", null, 200);
-		
-		RequestHelper.emitRequest(url, "POST", null, 415);
-		RequestHelper.emitRequest(url, "POST", null, "{}", MediaType.TEXT_PLAIN, 415, false);
-		RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 400, false);
-		
-		//Try creating invalid inputs
-		String inputInvalid1Json = FileHelper.readFile("input-test-1", "input_invalid_1.json");
-		RequestHelper.emitRequest(url, "POST", null, inputInvalid1Json, MediaType.APPLICATION_JSON, 400, false);
-		
-		String inputInvalid2Json = FileHelper.readFile("input-test-1", "input_invalid_2.json");
-		RequestHelper.emitRequest(url, "POST", null, inputInvalid2Json, MediaType.APPLICATION_JSON, 400, false);
-		
-		String inputInvalid3Json = FileHelper.readFile("input-test-1", "input_invalid_3.json");
-		RequestHelper.emitRequest(url, "POST", null, inputInvalid3Json, MediaType.APPLICATION_JSON, 400, false);
-		
-		//Create valid input
-		String inputJson = FileHelper.readFile("input-test-1", "input_valid_1.json");
-		String inputUUID = RequestHelper.emitRequest(url, "POST", null, inputJson, MediaType.APPLICATION_JSON, 201, true);
-		
-		//Check all input-specific endpoints
-		url += "/" + inputUUID;
-		RequestHelper.emitRequest(url, "GET", null, 200);
-		
-		RequestHelper.emitRequest(url, "PUT", null, 415);
-		RequestHelper.emitRequest(url, "PUT", null, "{}", MediaType.TEXT_PLAIN, 415, false);
-		RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 400, false);
-		
-		String inputEditJson = FileHelper.readFile("input-test-1", "input_valid_2.json");
-		RequestHelper.emitRequest(url, "PUT", null, inputEditJson, MediaType.APPLICATION_JSON, 204, false);
-		
-		RequestHelper.emitRequest(url, "DELETE", null, 204);
-		
-		//Protected workspace
-		url = declabHost + "/api/workspaces/" + workspaceUUID + "/config";
-		String protectedWorkspaceJson = "{\"access\":\"PROTECTED\"}";
-		RequestHelper.emitRequest(url, "POST", null, protectedWorkspaceJson, MediaType.APPLICATION_JSON, 200, true);
-		RequestHelper.emitRequest(url, "POST", "test", protectedWorkspaceJson, MediaType.APPLICATION_JSON, 200, true);
-		
-		//Check all non-input-specific endpoints
-		urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs";
-		url = urlTemplate;
-		
-		RequestHelper.emitRequest(url, "GET", null, 200);
-		
-		RequestHelper.emitRequest(url, "POST", "test", 415);
-		RequestHelper.emitRequest(url, "POST", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
-		RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 401, false);
-		RequestHelper.emitRequest(url, "POST", "test", "", MediaType.APPLICATION_JSON, 400, false);
-		
-		//Create valid input
-		RequestHelper.emitRequest(url, "POST", null, inputJson, MediaType.APPLICATION_JSON, 401, true);
-		inputUUID = RequestHelper.emitRequest(url, "POST", "test", inputJson, MediaType.APPLICATION_JSON, 201, true);
-		
-		//Check all input-specific endpoints
-		url += "/" + inputUUID;
-		
-		RequestHelper.emitRequest(url, "GET", null, 200);
-		
-		RequestHelper.emitRequest(url, "PUT", "test", 415);
-		RequestHelper.emitRequest(url, "PUT", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
-		RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 401, false);
-		RequestHelper.emitRequest(url, "PUT", "test", "", MediaType.APPLICATION_JSON, 400, false);
-		RequestHelper.emitRequest(url, "PUT", null, inputEditJson, MediaType.APPLICATION_JSON, 401, false);
-		RequestHelper.emitRequest(url, "PUT", "test", inputEditJson, MediaType.APPLICATION_JSON, 204, false);
-		
-		RequestHelper.emitRequest(url, "DELETE", null, 401);
-		RequestHelper.emitRequest(url, "DELETE", "test", 204);
-		
-		
-		//Private workspace
-		url = declabHost + "/api/workspaces/" + workspaceUUID + "/config";
-		String privateWorkspaceJson = "{\"access\":\"PRIVATE\"}";
-		RequestHelper.emitRequest(url, "POST", null, privateWorkspaceJson, MediaType.APPLICATION_JSON, 401, true);
-		RequestHelper.emitRequest(url, "POST", "test", privateWorkspaceJson, MediaType.APPLICATION_JSON, 200, true);
-		
-		//Check all non-input-specific endpoints
-		urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs";
-		url = urlTemplate;
-		
-		RequestHelper.emitRequest(url, "GET", null, 401);
-		RequestHelper.emitRequest(url, "GET", "test", 200);
-		
-		RequestHelper.emitRequest(url, "POST", "test", 415);
-		RequestHelper.emitRequest(url, "POST", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
-		RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 401, false);
-		RequestHelper.emitRequest(url, "POST", "test", "", MediaType.APPLICATION_JSON, 400, false);
-		
-		//Create valid input
-		RequestHelper.emitRequest(url, "POST", null, inputJson, MediaType.APPLICATION_JSON, 401, true);
-		inputUUID = RequestHelper.emitRequest(url, "POST", "test", inputJson, MediaType.APPLICATION_JSON, 201, true);
-		
-		//Check all input-specific endpoints
-		url += "/" + inputUUID;
-		
-		RequestHelper.emitRequest(url, "GET", null, 401);
-		RequestHelper.emitRequest(url, "GET", "test", 200);
 
-		RequestHelper.emitRequest(url, "PUT", "test", 415);
-		RequestHelper.emitRequest(url, "PUT", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
-		RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 401, false);
-		RequestHelper.emitRequest(url, "PUT", "test", "", MediaType.APPLICATION_JSON, 400, false);
-		RequestHelper.emitRequest(url, "PUT", null, inputEditJson, MediaType.APPLICATION_JSON, 401, false);
-		RequestHelper.emitRequest(url, "PUT", "test", inputEditJson, MediaType.APPLICATION_JSON, 204, false);
-		
-		RequestHelper.emitRequest(url, "DELETE", null, 401);
-		RequestHelper.emitRequest(url, "DELETE", "test", 204);
-		
+		String urlTemplate;
+		String url;
+
+		String inputUUID;
+
+		String inputValid1Json = FileHelper.readFile("input-test-1", "input_valid_1.json");
+		String inputValid2Json = FileHelper.readFile("input-test-1", "input_valid_2.json");
+
+		//Check for non-existent inputs, make sure all endpoints handle as expected
+		{
+			String randomUUID = UUID.randomUUID().toString();
+			urlTemplate = declabHost + "/api/workspaces/" + randomUUID + "/inputs";
+
+			url = urlTemplate;
+			RequestHelper.emitRequest(url, "GET", null, 404);
+			RequestHelper.emitRequest(url, "POST", null, 415);
+			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 404, false);
+
+			url += "/" + randomUUID;
+			RequestHelper.emitRequest(url, "GET", null, 404);
+			RequestHelper.emitRequest(url, "PUT", null, 415);
+			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 404, false);
+			RequestHelper.emitRequest(url, "DELETE", null, 404);
+		}
+
+		//Make workspace public
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/config";
+			String publicWorkspaceJson = FileHelper.readFile("workspace_public.json");
+			RequestHelper.emitRequest(url, "POST", null, publicWorkspaceJson, MediaType.APPLICATION_JSON, 200, true);
+		}
+
+		//Check all non-input-specific endpoints in public workspace
+		{
+			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs";
+
+			url = urlTemplate;
+			RequestHelper.emitRequest(url, "GET", null, 200);
+			RequestHelper.emitRequest(url, "POST", null, 415);
+			RequestHelper.emitRequest(url, "POST", null, "{}", MediaType.TEXT_PLAIN, 415, false);
+			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 400, false);
+		}
+
+		//Try creating invalid inputs in public workspace
+		{
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("input-test-1", "input_invalid_1.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("input-test-1", "input_invalid_2.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("input-test-1", "input_invalid_3.json"), MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "POST", null, FileHelper.readFile("input-test-1", "input_invalid_4.json"), MediaType.APPLICATION_JSON, 400, false);
+		}
+
+		//Create valid input in public workspace
+		{
+			inputUUID = RequestHelper.emitRequest(url, "POST", null, inputValid1Json, MediaType.APPLICATION_JSON, 201, true);
+		}
+
+		//Check all input-specific endpoints in public workspace
+		{
+			url += "/" + inputUUID;
+			RequestHelper.emitRequest(url, "GET", null, 200);
+			RequestHelper.emitRequest(url, "PUT", null, 415);
+			RequestHelper.emitRequest(url, "PUT", null, "{}", MediaType.TEXT_PLAIN, 415, false);
+			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "PUT", null, inputValid2Json, MediaType.APPLICATION_JSON, 204, false);
+			RequestHelper.emitRequest(url, "DELETE", null, 204);
+		}
+
+		//Make workspace protected
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/config";
+			String protectedWorkspaceJson = FileHelper.readFile("workspace_protected.json");
+			RequestHelper.emitRequest(url, "POST", null, protectedWorkspaceJson, MediaType.APPLICATION_JSON, 200, true);
+			RequestHelper.emitRequest(url, "POST", "test", protectedWorkspaceJson, MediaType.APPLICATION_JSON, 200, true);
+		}
+
+		//Check all non-input-specific endpoints in protected workspace
+		{
+			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs";
+
+			url = urlTemplate;
+			RequestHelper.emitRequest(url, "GET", null, 200);
+			RequestHelper.emitRequest(url, "POST", "test", 415);
+			RequestHelper.emitRequest(url, "POST", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
+			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 401, false);
+			RequestHelper.emitRequest(url, "POST", "test", "", MediaType.APPLICATION_JSON, 400, false);
+		}
+
+		//Create valid input in protected workspace
+		{
+			RequestHelper.emitRequest(url, "POST", null, inputValid1Json, MediaType.APPLICATION_JSON, 401, true);
+			inputUUID = RequestHelper.emitRequest(url, "POST", "test", inputValid1Json, MediaType.APPLICATION_JSON, 201, true);
+		}
+
+		//Check all input-specific endpoints in protected workspace
+		{
+			url += "/" + inputUUID;
+			RequestHelper.emitRequest(url, "GET", null, 200);
+			RequestHelper.emitRequest(url, "PUT", "test", 415);
+			RequestHelper.emitRequest(url, "PUT", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
+			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 401, false);
+			RequestHelper.emitRequest(url, "PUT", "test", "", MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "PUT", null, inputValid2Json, MediaType.APPLICATION_JSON, 401, false);
+			RequestHelper.emitRequest(url, "PUT", "test", inputValid2Json, MediaType.APPLICATION_JSON, 204, false);
+			RequestHelper.emitRequest(url, "DELETE", null, 401);
+			RequestHelper.emitRequest(url, "DELETE", "test", 204);
+		}
+
+		//Make workspace private
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/config";
+			String privateWorkspaceJson = FileHelper.readFile("workspace_private.json");
+			RequestHelper.emitRequest(url, "POST", null, privateWorkspaceJson, MediaType.APPLICATION_JSON, 401, true);
+			RequestHelper.emitRequest(url, "POST", "test", privateWorkspaceJson, MediaType.APPLICATION_JSON, 200, true);
+		}
+
+		//Check all non-input-specific endpoints in private workspace
+		{
+			urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs";
+
+			url = urlTemplate;
+			RequestHelper.emitRequest(url, "GET", null, 401);
+			RequestHelper.emitRequest(url, "GET", "test", 200);
+			RequestHelper.emitRequest(url, "POST", "test", 415);
+			RequestHelper.emitRequest(url, "POST", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
+			RequestHelper.emitRequest(url, "POST", null, "", MediaType.APPLICATION_JSON, 401, false);
+			RequestHelper.emitRequest(url, "POST", "test", "", MediaType.APPLICATION_JSON, 400, false);
+		}
+
+		//Create valid input in private workspace
+		{
+			RequestHelper.emitRequest(url, "POST", null, inputValid1Json, MediaType.APPLICATION_JSON, 401, true);
+			inputUUID = RequestHelper.emitRequest(url, "POST", "test", inputValid1Json, MediaType.APPLICATION_JSON, 201, true);
+		}
+
+		//Check all input-specific endpoints in private workspace
+		{
+			url += "/" + inputUUID;
+			RequestHelper.emitRequest(url, "GET", null, 401);
+			RequestHelper.emitRequest(url, "GET", "test", 200);
+			RequestHelper.emitRequest(url, "PUT", "test", 415);
+			RequestHelper.emitRequest(url, "PUT", "test", "{}", MediaType.TEXT_PLAIN, 415, false);
+			RequestHelper.emitRequest(url, "PUT", null, "", MediaType.APPLICATION_JSON, 401, false);
+			RequestHelper.emitRequest(url, "PUT", "test", "", MediaType.APPLICATION_JSON, 400, false);
+			RequestHelper.emitRequest(url, "PUT", null, inputValid2Json, MediaType.APPLICATION_JSON, 401, false);
+			RequestHelper.emitRequest(url, "PUT", "test", inputValid2Json, MediaType.APPLICATION_JSON, 204, false);
+			RequestHelper.emitRequest(url, "DELETE", null, 401);
+			RequestHelper.emitRequest(url, "DELETE", "test", 204);
+		}
+
 		//Make workspace public again to be tidy
-		url = declabHost + "/api/workspaces/" + workspaceUUID + "/config";
-		RequestHelper.emitRequest(url, "POST", null, publicWorkspaceJson, MediaType.APPLICATION_JSON, 401, true);
-		RequestHelper.emitRequest(url, "POST", "test", publicWorkspaceJson, MediaType.APPLICATION_JSON, 200, true);
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/config";
+			String publicWorkspaceJson = FileHelper.readFile("workspace_public.json");
+			RequestHelper.emitRequest(url, "POST", null, publicWorkspaceJson, MediaType.APPLICATION_JSON, 401, true);
+			RequestHelper.emitRequest(url, "POST", "test", publicWorkspaceJson, MediaType.APPLICATION_JSON, 200, true);
+		}
 	}
-	
+
 	@Test
 	public void verifyFunctionality() throws URISyntaxException, IOException {
 		Assertions.assertTrue(workspaceUUID != null && workspaceUUID.length() > 0);
 
-		String url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/";
-		
+		String inputParentUUID, inputChildUUID;
+
+		String inputParentJson, inputChildJson;
+
+		PersistedInput inputParent, inputChild;
+
+		String url;
+
 		//Create parent input
-		String input1Json = FileHelper.readFile("input-test-1", "parent_input_1.json");
-		PersistedInput input1 = (PersistedInput) SerializationHelper.getInstance().toClass(input1Json, PersistedInput.class);
-		
-		String input1UUID = RequestHelper.emitRequest(url, "POST", null, input1Json, MediaType.APPLICATION_JSON, 201, true);
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/";
 
-		//Get parent input
-		url += input1UUID;
-		String input1GetBody = RequestHelper.emitRequest(url, "GET", null, 200, true);
+			inputParentJson = FileHelper.readFile("input-test-1", "parent_input_1.json");
+			inputParent = (PersistedInput) SerializationHelper.getInstance().toClass(inputParentJson, PersistedInput.class);
 
-		//Check that parent input has not changed
-		PersistedInput input1Get = (PersistedInput) SerializationHelper.getInstance().toClass(input1GetBody, PersistedInput.class);
-		Assertions.assertEquals(input1.getName(), input1Get.getName());
-		Assertions.assertEquals(input1.getParent(), input1Get.getParent());
-		Assertions.assertEquals(input1.getValue(), input1Get.getValue());
-		
-		//Check that exactly 1 input has been created
-		url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/";
-		String inputsGetBody = RequestHelper.emitRequest(url, "GET", null, 200, false);
-		
-		HashMap<String, ?> inputs = SerializationHelper.getInstance().toClass(inputsGetBody, new TypeReference<HashMap<String, ?>>() {});
-		Assertions.assertTrue(1 == inputs.size() && null != inputs.get(input1UUID));
-		
+			inputParentUUID = RequestHelper.emitRequest(url, "POST", null, inputParentJson, MediaType.APPLICATION_JSON, 201, true);
+		}
+
+		//Get parent input indirectly
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/";
+			String inputsJson = RequestHelper.emitRequest(url, "GET", null, 200, false);
+
+			HashMap<String, PersistedInput> inputs = SerializationHelper.getInstance().toClass(inputsJson, new TypeReference<HashMap<String, PersistedInput>>() {});
+			Assertions.assertEquals(1, inputs.size());
+
+			PersistedInput inputToCompare = inputs.get(inputParentUUID);
+
+			//Compare to original parent input object
+			Assertions.assertEquals(inputParent.getName(), inputToCompare.getName());
+			Assertions.assertEquals(inputParent.getParent(), inputToCompare.getParent());
+			Assertions.assertEquals(inputParent.getValue(), inputToCompare.getValue());
+		}
+
+		//Get parent input directly
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/" + inputParentUUID;
+			String inputJson = RequestHelper.emitRequest(url, "GET", null, 200, true);
+			PersistedInput inputToCompare = (PersistedInput) SerializationHelper.getInstance().toClass(inputJson, PersistedInput.class);
+
+			//Compare to original parent input object
+			Assertions.assertEquals(inputParent.getName(), inputToCompare.getName());
+			Assertions.assertEquals(inputParent.getParent(), inputToCompare.getParent());
+			Assertions.assertEquals(inputParent.getValue(), inputToCompare.getValue());
+		}
+
 		//Create child input
-		String input2Json = FileHelper.readFile("input-test-1", "child_input_1.json");
-		PersistedInput input2 = (PersistedInput) SerializationHelper.getInstance().toClass(input2Json, PersistedInput.class);
-		
-		//Set correct parent UUID on child input
-		input2.setParent(input1UUID);
-		input2Json = SerializationHelper.getInstance().toJSON(input2);
-		String input2UUID = RequestHelper.emitRequest(url, "POST", null, input2Json, MediaType.APPLICATION_JSON, 201, true);
-		
-		//Get child input
-		url += input2UUID;
-		String input2GetBody = RequestHelper.emitRequest(url, "GET", null, 200, true);
-		
-		//Check that child input has changed as expected
-		PersistedInput input2Get = (PersistedInput) SerializationHelper.getInstance().toClass(input2GetBody, PersistedInput.class);
-		Assertions.assertEquals(input2.getName(), input2Get.getName());
-		Assertions.assertEquals(input2.getParent(), input2Get.getParent());
-		Assertions.assertEquals(input2.getValue(), input2Get.getValue());
-		
-		url += "?merge=true";
-		
-		String input2GetMergedBody = RequestHelper.emitRequest(url, "GET", null, 200, true);
-		PersistedInput input2GetMerged = (PersistedInput) SerializationHelper.getInstance().toClass(input2GetMergedBody, PersistedInput.class);
-		Assertions.assertEquals(input2.getName(), input2GetMerged.getName());
-		Assertions.assertEquals(input2.getParent(), input2GetMerged.getParent());
-		Assertions.assertNotEquals(input2.getValue(), input2GetMerged.getValue());
-		
-		//Check that exactly 1 other input has been created
-		url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/";
-		inputsGetBody = RequestHelper.emitRequest(url, "GET", null, 200, false);
-		
-		inputs = SerializationHelper.getInstance().toClass(inputsGetBody, new TypeReference<HashMap<String, ?>>() {});
-		Assertions.assertEquals(2, inputs.size());
-		Assertions.assertNotEquals(null, inputs.get(input1UUID));
-		Assertions.assertNotEquals(null, inputs.get(input2UUID));
-		
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/";
+
+			inputChildJson = FileHelper.readFile("input-test-1", "child_input_1.json");
+			inputChild = (PersistedInput) SerializationHelper.getInstance().toClass(inputChildJson, PersistedInput.class);
+
+			//Set correct parent UUID on child input
+			inputChild.setParent(inputParentUUID);
+
+			inputChildJson = SerializationHelper.getInstance().toJSON(inputChild);
+			inputChildUUID = RequestHelper.emitRequest(url, "POST", null, inputChildJson, MediaType.APPLICATION_JSON, 201, true);
+		}
+
+		//Get child input indirectly
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/";
+			String inputsJson = RequestHelper.emitRequest(url, "GET", null, 200, false);
+
+			HashMap<String, PersistedInput> inputs = SerializationHelper.getInstance().toClass(inputsJson, new TypeReference<HashMap<String, PersistedInput>>() {});
+			Assertions.assertEquals(2, inputs.size());
+
+			PersistedInput inputToCompare = inputs.get(inputChildUUID);
+
+			//Compare to original child input object
+			Assertions.assertEquals(inputChild.getName(), inputToCompare.getName());
+			Assertions.assertEquals(inputChild.getParent(), inputToCompare.getParent());
+			Assertions.assertEquals(inputChild.getValue(), inputToCompare.getValue());
+		}
+
+		//Get child input directly
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/" + inputChildUUID;
+			String inputJson = RequestHelper.emitRequest(url, "GET", null, 200, true);
+			PersistedInput inputToCompare = (PersistedInput) SerializationHelper.getInstance().toClass(inputJson, PersistedInput.class);
+
+			//Compare to original child input object
+			Assertions.assertEquals(inputChild.getName(), inputToCompare.getName());
+			Assertions.assertEquals(inputChild.getParent(), inputToCompare.getParent());
+			Assertions.assertEquals(inputChild.getValue(), inputToCompare.getValue());
+		}
+
+		//Get merged child input directly
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/" + inputChildUUID + "?merge=true";
+
+			String inputJson = RequestHelper.emitRequest(url, "GET", null, 200, true);
+			PersistedInput inputToCompare = (PersistedInput) SerializationHelper.getInstance().toClass(inputJson, PersistedInput.class);
+			Assertions.assertEquals(inputChild.getName(), inputToCompare.getName());
+			Assertions.assertEquals(inputChild.getParent(), inputToCompare.getParent());
+			Assertions.assertNotEquals(inputChild.getValue(), inputToCompare.getValue());
+		}
+
 		//Edit parent input
-		url += input1UUID;
-		
-		String input1EditJson = FileHelper.readFile("input-test-1", "parent_input_2.json");
-		PersistedInput input1Edit = (PersistedInput) SerializationHelper.getInstance().toClass(input1EditJson, PersistedInput.class);
-		
-		RequestHelper.emitRequest(url, "PUT", null, input1EditJson, MediaType.APPLICATION_JSON, 204, false);
-	
-		//Get edited parent input
-		String input1EditGetBody = RequestHelper.emitRequest(url, "GET", null, 200, true);
-		PersistedInput input1EditGet = (PersistedInput) SerializationHelper.getInstance().toClass(input1EditGetBody, PersistedInput.class);
-		
-		//Check that edited parent input was edited as expected
-		Assertions.assertEquals(input1Edit.getName(), input1EditGet.getName());
-		Assertions.assertEquals(input1Edit.getParent(), input1EditGet.getParent());
-		Assertions.assertEquals(input1Edit.getValue(), input1EditGet.getValue());
-		
-		//Get edited child input
-		url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/" + input2UUID;
-		String input2EditGetBody = RequestHelper.emitRequest(url, "GET", null, 200, true);
-		
-		//Check that child input has changed as expected due to edited parent input
-		PersistedInput input2EditGet = (PersistedInput) SerializationHelper.getInstance().toClass(input2EditGetBody, PersistedInput.class);
-		Assertions.assertEquals(input2.getName(), input2EditGet.getName());
-		Assertions.assertEquals(input2.getParent(), input2EditGet.getParent());
-		Assertions.assertEquals(input2.getValue(), input2EditGet.getValue());
-		
-		//Get merged edited child input
-		url += "/?merge=true";
-		String input2EditGetMergedBody = RequestHelper.emitRequest(url, "GET", null, 200, true);
-		
-		//Check that child input has changed as expected due to edited parent input
-		PersistedInput input2EditGetMerged = (PersistedInput) SerializationHelper.getInstance().toClass(input2EditGetMergedBody, PersistedInput.class);
-		Assertions.assertEquals(input2.getName(), input2EditGetMerged.getName());
-		Assertions.assertEquals(input2.getParent(), input2EditGetMerged.getParent());
-		Assertions.assertNotEquals(input2.getValue(), input2EditGetMerged.getValue());
-		
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/" + inputParentUUID;
+
+			inputParentJson = FileHelper.readFile("input-test-1", "parent_input_2.json");
+			inputParent = (PersistedInput) SerializationHelper.getInstance().toClass(inputParentJson, PersistedInput.class);
+
+			RequestHelper.emitRequest(url, "PUT", null, inputParentJson, MediaType.APPLICATION_JSON, 204, false);
+		}
+
+		//Get edited parent input directly
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/" + inputParentUUID;
+
+			String inputJson = RequestHelper.emitRequest(url, "GET", null, 200, true);
+			PersistedInput inputToCompare = (PersistedInput) SerializationHelper.getInstance().toClass(inputJson, PersistedInput.class);
+
+			//Compare to original parent input object
+			Assertions.assertEquals(inputParent.getName(), inputToCompare.getName());
+			Assertions.assertEquals(inputParent.getParent(), inputToCompare.getParent());
+			Assertions.assertEquals(inputParent.getValue(), inputToCompare.getValue());
+		}
+
+		//Get edited child input directly
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/" + inputChildUUID;
+
+			String inputJson = RequestHelper.emitRequest(url, "GET", null, 200, true);
+			PersistedInput inputToCompare = (PersistedInput) SerializationHelper.getInstance().toClass(inputJson, PersistedInput.class);
+
+			//Compare to original child input object
+			//Without merging, the child input should not change even if the parent input changes
+			Assertions.assertEquals(inputChild.getName(), inputToCompare.getName());
+			Assertions.assertEquals(inputChild.getParent(), inputToCompare.getParent());
+			Assertions.assertEquals(inputChild.getValue(), inputToCompare.getValue());
+		}
+
+		//Get merged edited child input directly
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/" + inputChildUUID + "/?merge=true";
+
+			String inputJson = RequestHelper.emitRequest(url, "GET", null, 200, true);
+			PersistedInput inputToCompare = (PersistedInput) SerializationHelper.getInstance().toClass(inputJson, PersistedInput.class);
+
+			//Compare to original child input object
+			//Merging the parent and child inputs should have changed the child input's value
+			Assertions.assertEquals(inputChild.getName(), inputToCompare.getName());
+			Assertions.assertEquals(inputChild.getParent(), inputToCompare.getParent());
+			Assertions.assertNotEquals(inputChild.getValue(), inputToCompare.getValue());
+		}
+
 		//Delete child input
-		url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/" + input2UUID;
-		RequestHelper.emitRequest(url, "DELETE", null, 204);
-		
-		//Check that child input doesn't exist anymore
-		RequestHelper.emitRequest(url, "GET", null, 404);
-		
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/" + inputChildUUID;
+
+			RequestHelper.emitRequest(url, "DELETE", null, 204);
+
+			RequestHelper.emitRequest(url, "GET", null, 404);
+		}
+
 		//Check that there is only 1 input now
-		url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/";
-		inputsGetBody = RequestHelper.emitRequest(url, "GET", null, 200, false);
-		
-		inputs = SerializationHelper.getInstance().toClass(inputsGetBody, new TypeReference<HashMap<String, ?>>() {});
-		Assertions.assertTrue(1 == inputs.size() && null != inputs.get(input1UUID));
-		
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/";
+
+			String inputsJson = RequestHelper.emitRequest(url, "GET", null, 200, false);
+
+			HashMap<String, PersistedInput> inputs = SerializationHelper.getInstance().toClass(inputsJson, new TypeReference<HashMap<String, PersistedInput>>() {});
+			Assertions.assertTrue(1 == inputs.size() && null != inputs.get(inputParentUUID));
+		}
+
 		//Delete parent input
-		url += input1UUID;
-		RequestHelper.emitRequest(url, "DELETE", null, 204);
-		
-		//Check that parent input doesn't exist anymore
-		RequestHelper.emitRequest(url, "GET", null, 404);
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/" + inputParentUUID;
+
+			RequestHelper.emitRequest(url, "DELETE", null, 204);
+
+			RequestHelper.emitRequest(url, "GET", null, 404);
+		}
+
+		//Check that there are no inputs left
+		{
+			url = declabHost + "/api/workspaces/" + workspaceUUID + "/inputs/";
+
+			String inputsJson = RequestHelper.emitRequest(url, "GET", null, 200, false);
+
+			HashMap<String, PersistedInput> inputs = SerializationHelper.getInstance().toClass(inputsJson, new TypeReference<HashMap<String, PersistedInput>>() {});
+			Assertions.assertEquals(0, inputs.size());
+		}
 	}
-	
+
 	@AfterEach
 	public void deleteWorkspace() {
 		Assertions.assertTrue(workspaceUUID != null && workspaceUUID.length() > 0);
-		
-		String url = declabHost + "/api/workspaces/" + workspaceUUID;
+
+		String urlTemplate = declabHost + "/api/workspaces/" + workspaceUUID;
+
+		String url = urlTemplate;
 		RequestHelper.emitRequest(url, "DELETE", "test", 204);
-		
-		url += "/public";
+
+		url = urlTemplate + "/public";
 		RequestHelper.emitRequest(url, "GET", null, 404);
 	}
 }

@@ -54,8 +54,14 @@
 					<div class="card-body">
 						<h5 class="mb-2">Description</h5>
 						<input class="form-control mb-4" v-model="playground.description" readonly>
+
 						<h5 class="mb-2">Expression</h5>
-						<input class="form-control mb-4" v-model="playground.expression" readonly>
+						<div class="card mb-4">
+							<div class="card-body">
+								<feel-editor v-model="playground.expression" readonly="true"/>
+							</div>
+						</div>
+
 						<h5 class="mb-2">Context</h5>
 						<json-builder v-bind:template="playground.context" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 					</div>
@@ -67,8 +73,13 @@
 						
 						<h5 class="mb-2">Description</h5>
 						<input class="form-control mb-4" v-model="playground.description">
+						
 						<h5 class="mb-2">Expression</h5>
-						<input class="form-control mb-4" v-model="playground.expression">
+						<div class="card mb-4">
+							<div class="card-body">
+								<feel-editor v-model="playground.expression"/>
+							</div>
+						</div>
 
 						<h5 class="mb-2">Context</h5>
 						<json-builder v-bind:template="playground.template" v-bind:fixed-root="true" v-on:update:value="playground.context = $event"/>
@@ -87,12 +98,13 @@
 <script>
 	import Network from "../helpers/network";
 	import Converter from "../components/json/json-builder-converter";
-
+	import FEELEditor from "../components/dmn/feel-editor.vue";
 	import JSONBuilder from "../components/json/json-builder.vue";
 	import EmptyCollectionComponent from "../components/empty-collection.vue";
 
 	export default {
 		components: {
+			"feel-editor": FEELEditor,
 			"json-builder": JSONBuilder,
 			"empty-collection": EmptyCollectionComponent
 		},

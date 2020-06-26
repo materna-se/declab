@@ -58,21 +58,20 @@ public class WorkspaceManager {
 			try {
 				index(subdir.getName());
 			}
-			catch (IOException e) {
+			catch (Exception e) {
 				log.error("Could not index workspace " + subdir.getName(), e);
 			}
 		}
 	}
 
-	public void index(String workspaceUUID) throws IOException {
+	public void index(String workspaceUUID) throws Exception {
 		//Upgrade path from version 0 to 1
 		PersistenceFileManager configManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
-		Path workspaceDirectory = configManager.getPath().getParent();
 		if (!configManager.fileExists()) {
 			log.info("Workspace " + workspaceUUID + " needs to be upgraded from version 0 to 1.");
 
 			String generatedUUID = UUID.randomUUID().toString();
-			workspaceDirectory = Files.move(configManager.getPath().getParent(), Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", generatedUUID));
+			Files.move(configManager.getPath().getParent(), Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", generatedUUID));
 
 			// Create configuration.json
 			configManager = new PersistenceFileManager(generatedUUID, "configuration.json");
@@ -88,7 +87,7 @@ public class WorkspaceManager {
 			workspaceUUID = generatedUUID;
 		}
 
-		Configuration configuration = (Configuration) SerializationHelper.getInstance().toClass(configManager.getContent(), Configuration.class);
+		Configuration configuration = (Configuration) SerializationHelper.getInstance().toClass(configManager.getFile(), Configuration.class);
 		//Upgrade path from version 1 to 2
 		if (configuration.getVersion() == 1) {
 			log.info("Workspace " + workspaceUUID + " needs to be upgraded from version 1 to 2.");
@@ -101,11 +100,11 @@ public class WorkspaceManager {
 
 				// Update the reference to the moved model file.
 				PersistenceDirectoryManager<String> modelDirectoryManager = new PersistenceDirectoryManager<>(workspaceUUID, "models", String.class, "dmn");
-				modelDirectoryManager.persistFile(modelUUID, modelFileManager.getContent());
+				modelDirectoryManager.persistFile(modelUUID, modelFileManager.getFile());
 
 				// Import model into a temporarily created decision session in order to obtain namespace and name.
 				DMNDecisionSession decisionSession = new DMNDecisionSession();
-				decisionSession.importModel("main", modelFileManager.getContent());
+				decisionSession.importModel("main", modelFileManager.getFile());
 				DMNModel importedModel = decisionSession.getRuntime().getModels().get(0);
 
 				// The configuration needs to be updated with obtained information.
@@ -116,8 +115,6 @@ public class WorkspaceManager {
 				model.put("uuid", modelUUID);
 				models.add(model);
 				configuration.setModels(models);
-
-				decisionSession.close();
 			}
 
 			configuration.setVersion(2);

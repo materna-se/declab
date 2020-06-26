@@ -20,7 +20,7 @@ public class EnrichedOutput extends PersistedOutput {
 	}
 	
 	@Override
-	public void fromJson(String json) {
+	public void fromJSON(String json) {
 		EnrichedOutput temp = (EnrichedOutput) SerializationHelper.getInstance().toClass(json, EnrichedOutput.class);
 		this.value = temp.getValue();
 		this.name = temp.getName();

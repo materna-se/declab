@@ -37,11 +37,11 @@ public class WorkspaceServlet {
 	@GET
 	@Path("/public")
 	@Produces("application/json")
-	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID) throws NotFoundException, RuntimeException, IOException {
+	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		Configuration configuration = workspace.getConfig();
 
-		return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJson()).build();
+		return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJSON()).build();
 	}
 
 	@GET
@@ -49,16 +49,10 @@ public class WorkspaceServlet {
 	@Path("/config")
 	@Produces("application/json")
 	public Response getWorkspaceConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
-		try {
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-			Configuration configuration = workspace.getConfig();
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		Configuration configuration = workspace.getConfig();
 
-			return Response.status(Response.Status.OK).entity(configuration.toJson()).build();
-		}
-		catch (Exception e) {
-			log.error(e);
-			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-		}
+		return Response.status(Response.Status.OK).entity(configuration.toJSON()).build();
 	}
 
 	@POST
@@ -142,7 +136,7 @@ public class WorkspaceServlet {
 
 		workspace.getAccessLog().writeMessage("Accessed log", System.currentTimeMillis());
 
-		return Response.status(Response.Status.OK).entity(workspace.getAccessLog().toJson()).build();
+		return Response.status(Response.Status.OK).entity(workspace.getAccessLog().toJSON()).build();
 	}
 
 	@DELETE
@@ -207,7 +201,7 @@ public class WorkspaceServlet {
 	@WriteAccess
 	@Path("/backup")
 	@Consumes("multipart/form-data")
-	public Response importWorkspace(@PathParam("workspace") String workspaceUUID, MultipartFormDataInput multipartFormDataInput) throws IOException {
+	public Response importWorkspace(@PathParam("workspace") String workspaceUUID, MultipartFormDataInput multipartFormDataInput) throws Exception {
 		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
 		Workspace workspace = workspaceManager.get(workspaceUUID);
 
@@ -234,7 +228,6 @@ public class WorkspaceServlet {
 						Configuration importConfiguration = (Configuration) SerializationHelper.getInstance().toClass(new String(IOUtils.toByteArray(zipInputStream), StandardCharsets.UTF_8), Configuration.class);
 						// Model import order needs to be merged with the current configuration.
 						if (importConfiguration.getVersion() == 2) {
-							currentConfiguration.setVersion(2);
 							currentConfiguration.setModels(importConfiguration.getModels());
 							currentConfiguration.setModifiedDate(System.currentTimeMillis());
 							currentConfiguration.serialize();

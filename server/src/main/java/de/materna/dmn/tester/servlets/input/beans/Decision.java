@@ -1,9 +1,11 @@
 package de.materna.dmn.tester.servlets.input.beans;
 
-import java.util.Map;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
+
+import java.util.Map;
 
 public class Decision extends Serializable {
 	private String expression;
@@ -12,7 +14,9 @@ public class Decision extends Serializable {
 	public Decision() {
 	}
 
-	public Decision(String expression, Map<String, Object> context) {
+	@JsonCreator
+	public Decision(@JsonProperty(value = "expression", required = true) String expression,
+					@JsonProperty(value = "context", required = true) Map<String, Object> context) {
 		this.expression = expression;
 		this.context = context;
 	}
@@ -32,8 +36,8 @@ public class Decision extends Serializable {
 	public void setContext(Map<String, Object> context) {
 		this.context = context;
 	}
-	
-	public void fromJson(String json) {
+
+	public void fromJSON(String json) {
 		Decision temp = (Decision) SerializationHelper.getInstance().toClass(json, Decision.class);
 		this.expression = temp.getExpression();
 		this.context = temp.getContext();
