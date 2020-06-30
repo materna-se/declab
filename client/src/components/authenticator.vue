@@ -1,9 +1,9 @@
 <template>
 	<div>
 		<div class="modal-backdrop fade show"></div>
-		<div class="modal fade show" style="display: block" v-on:click.self="$root.authentication = false">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
+		<div class="modal show" style="display: block" v-on:click.self="$root.authentication = false">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content p-4">
 					<div class="modal-body">
 						<p class="mb-2">To perform this action, please enter the workspace password.</p>
 						<input placeholder="Enter Password..." class="form-control mb-2" v-on:keyup="updateToken($event.target.value)" v-on:keyup.enter="reload">
