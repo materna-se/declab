@@ -2,40 +2,20 @@
 	<div class="container-fluid">
 		<div class="d-flex align-items-center mb-2">
 			<h3 class="mb-0 mr-auto">Builder</h3>
+			<div class="mr-2">
+				<button class="btn btn-block btn-outline-secondary px-4" v-on:click="modal.visible = true">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
+						<path d="M15 9H5V5h10m-3 14a3 3 0 01-3-3 3 3 0 013-3 3 3 0 013 3 3 3 0 01-3 3m5-16H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z" fill="currentColor"/>
+					</svg>
+				</button>
+			</div>
 			<div>
-				<button class="btn btn-block btn-outline-secondary" v-on:click="detachWorker">
+				<button class="btn btn-block btn-outline-secondary px-4" v-on:click="detachWorker">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M8 12h9.76l-2.5-2.5 1.41-1.42L21.59 13l-4.92 4.92-1.41-1.42 2.5-2.5H8v-2m11-9a2 2 0 0 1 2 2v4.67l-2-2V7H5v12h14v-.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z" fill="currentColor"/>
 					</svg>
 				</button>
 			</div>
-		</div>
-		<div class="mb-4">
-			<h4 class="mb-2">Save</h4>
-			<div class="row">
-				<div class="col-6">
-					<div v-bind:class="[!hasTestName() ? 'input-disabled' : null]">
-						<h5 class="mb-2">Test</h5>
-						<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.test.name">
-					</div>
-				</div>
-				<div class="col-6">
-					<div v-bind:class="[!hasInputName() ? 'input-disabled' : null]">
-						<h5 class="mb-2">Input</h5>
-						<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.input.name">
-					</div>
-				</div>
-			</div>
-			<template v-if="Object.keys(model.result.outputs).length > 0">
-				<h5 class="mt-4 mb-2">Outputs</h5>
-				<div class="row">
-					<div class="col-6 mb-2" v-for="(output, key) in model.result.outputs" v-bind:class="[!hasOutputName(key) ? 'input-disabled' : null]">
-						<h6 class="mb-2">{{key}}</h6>
-						<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.result.name[key]">
-					</div>
-				</div>
-			</template>
-			<button class="btn btn-outline-secondary mt-4 w-100" v-on:click="saveEntities">Save Entities</button>
 		</div>
 		<div class="row">
 			<div class="mb-4" v-if="mode !== 2" v-bind:class="{'col-6': mode === 0, 'col-12': mode === 1}">
@@ -59,16 +39,6 @@
 							<div class="card-body p-0">
 								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:value="model.input.value = $event; executeModel();"/>
 							</div>
-							<!--
-							<div class="card-footer card-footer-border">
-								<div class="input-group">
-									<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.input.name">
-									<div class="input-group-append">
-										<button class="btn btn-outline-secondary" v-on:click="addInput">Save Input</button>
-									</div>
-								</div>
-							</div>
-							-->
 						</div>
 					</div>
 				</div>
@@ -100,20 +70,41 @@
 								<json-builder class="mb-0" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 							</div>
 						</div>
-						<!--
-						<div class="card-footer">
-							<div class="input-group">
-								<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.result.name[key]">
-								<div class="input-group-append">
-									<button class="btn btn-outline-secondary" v-on:click="addOutput(key)">Save Output</button>
-								</div>
-							</div>
-						</div>
-						-->
 					</template>
 				</div>
 			</div>
 		</div>
+
+		<template v-if="modal.visible">
+			<div class="modal-backdrop fade show"></div>
+			<div class="modal show" style="display: block" v-on:click.self="modal.visible = false">
+				<div class="modal-dialog modal-dialog-centered modal-lg">
+					<div class="modal-content p-4">
+						<div class="modal-body">
+							<h4 class="mb-4">Save Entities</h4>
+							<div class="mb-4" v-bind:class="[!hasTestName() ? 'input-disabled' : null]">
+								<h5 class="mb-2">Test</h5>
+								<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.test.name">
+							</div>
+							<div class="mb-4" v-bind:class="[!hasInputName() ? 'input-disabled' : null]">
+								<h5 class="mb-2">Input</h5>
+								<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.input.name">
+							</div>
+							<template v-if="Object.keys(model.result.outputs).length > 0">
+								<h5 class="mt-4 mb-2">Outputs</h5>
+								<div class="row">
+									<div class="col-6 mb-2" v-for="(output, key) in model.result.outputs" v-bind:class="[!hasOutputName(key) ? 'input-disabled' : null]">
+										<h6 class="mb-2">{{key}}</h6>
+										<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.result.name[key]">
+									</div>
+								</div>
+							</template>
+							<button class="btn btn-outline-secondary mt-4 w-100" v-on:click="saveEntities">Save Entities</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</template>
 	</div>
 </template>
 
@@ -135,6 +126,10 @@
 				alert: {
 					message: null,
 					state: null
+				},
+
+				modal: {
+					visible: false
 				},
 
 				inputs: {},
