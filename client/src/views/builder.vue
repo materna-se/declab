@@ -291,7 +291,7 @@
 					test = await this.addTest(input, outputs);
 				}
 
-				this.$root.displayAlert((input !== null ? 1 : 0) + " " + (input !== null ? "input" : "inputs") + ", " + outputs.length + " " + (outputs.length === 1 ? "output" : "outputs") + " and " + (test !== null ? 1 : 0) + " " + (input !== null ? "test" : "tests") + " were successfully saved.", "success");
+				this.$root.displayAlert((input !== null ? 1 : 0) + " " + (input !== null ? "input" : "inputs") + ", " + outputs.length + " " + (outputs.length === 1 ? "output" : "outputs") + " and " + (test !== null ? 1 : 0) + " " + (test !== null ? "test" : "tests") + " were successfully saved.", "success");
 			},
 			hasInputName() {
 				return this.model.input.name !== null && this.model.input.name !== '';
