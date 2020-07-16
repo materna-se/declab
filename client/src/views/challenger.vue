@@ -49,7 +49,7 @@
 						<div class="row mb-4" v-if="hint >= 0 && hint < challenge.hints.length && challenge.hints.length > 0">
 							<div class="container" style="display:flex">
 								<!-- Left button -->
-								<div style="width: 10%; float:left;" v-if="hint > 0">
+								<div class="mr-2" v-if="hint > 0">
 									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint -= 1">
 										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 											<path d="M20,9V15H12V19.84L4.16,12L12,4.16V9H20Z" fill="currentColor"/>
@@ -57,22 +57,17 @@
 									</button>
 								</div>
 								<!-- Hint -->
-								<!-- FIXME: These textareas currently let the user scroll past the right edge of the page -->
-								<div class="ml-2 mr-2" style="width: 80%; float:left;" v-if="hint > 0 && hint < challenge.hints.length">
-									<textarea readonly class="form-control" style="resize:none;max-height:40px" wrap="soft" v-model="challenge.hints[hint]"/>
-								</div>
-								<!-- If no left button exists, might as well expand the hint box to fill the space -->
-								<div class="mr-2" style="width: 90%; float:left;" v-else>
+								<div style="flex: 1">
 									<textarea readonly class="form-control" style="resize:none;max-height:40px" wrap="soft" v-model="challenge.hints[hint]"/>
 								</div>
 								<!-- Right button -->
-								<div style="width: 10%; float:left;" v-if="hint < challenge.hints.length">
-									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-if="hint >= 0 && hint < challenge.hints.length - 1" v-on:click="hint += 1">
+								<div class="ml-2" v-if="hint < challenge.hints.length">
+									<button class="btn btn-block btn-outline-secondary" style="text-align: center" v-if="hint >= 0 && hint < challenge.hints.length - 1" v-on:click="hint += 1">
 										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 											<path d="M4,15V9H12V4.16L19.84,12L12,19.84V15H4Z" fill="currentColor"/>
 										</svg>
 									</button>
-									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-else v-on:click="hint += 1; showSolution()">
+									<button class="btn btn-block btn-outline-secondary" style="text-align: center" v-else v-on:click="hint += 1; showSolution()">
 										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 											<path d="M10 3H14V14H10V3M10 21V17H14V21H10Z" fill="currentColor"/>
 										</svg>
