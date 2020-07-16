@@ -99,19 +99,11 @@
 							</div>
 							<div class="card-body" v-if="!scenario.output.equal">
 								<h5 class="mb-2">Input</h5>
-								<div class="card mb-4">
-									<div class="card-body">
-										<json-builder v-bind:template="scenario.input.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
-									</div>
-								</div>
+								<json-builder class="mb-4" v-bind:template="scenario.input.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 
 								<h5 class="mb-2">Output</h5>
 								<h6 class="mb-2">Expected</h6>
-								<div class="card mb-4">
-									<div class="card-body">
-										<json-builder v-bind:template="scenario.output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
-									</div>
-								</div>
+								<json-builder class="mb-4" v-bind:template="scenario.output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 
 								<h6 class="mb-2">Calculated</h6>
 								<div class="row mb-2" v-if="scenario.output.alert.message !== null">
@@ -119,11 +111,7 @@
 										<alert v-bind:alert="scenario.output.alert"/>
 									</div>
 								</div>
-								<div class="card">
-									<div class="card-body">
-										<json-builder v-bind:template="scenario.output.calculated" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
-									</div>
-								</div>
+								<json-builder v-bind:template="scenario.output.calculated" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 							</div>
 						</div>
 						<div class="list-group-item" v-if="challenge.scenarios.length === 0">
