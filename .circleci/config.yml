@@ -116,7 +116,7 @@ workflows:
 
       - publish_release:
           requires:
-            - build_server
+            - test_server
           filters:
             branches:
               ignore: /.*/
@@ -125,7 +125,7 @@ workflows:
 
       - publish_container:
           requires:
-            - build_server
+            - test_server
           filters:
             branches:
               ignore: /.*/
