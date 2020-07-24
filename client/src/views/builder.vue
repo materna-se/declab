@@ -217,14 +217,14 @@
 					this.model.result.outputs = result.outputs;
 					this.model.result.context = result.context;
 					if (result.messages.length > 0) {
-						this.displayAlert(AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "warning");
+						this.displayAlert(AlertHelper.buildList("The output was calculated, the following messages were returned:", result.messages), "warning");
 						return;
 					}
 
 					this.displayAlert(null, null);
 				}
 				catch (e) {
-					this.displayAlert("The output can't be calculated.", "danger");
+					this.displayAlert("The output could not be calculated.", "danger");
 				}
 			},
 

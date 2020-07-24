@@ -194,13 +194,13 @@
 
 				if (result.successful) {
 					return {
-						message: "The model was imported, but the following warnings have occurred:",
+						message: "The model was imported, the following messages were returned:",
 						state: "warning"
 					};
 				}
 
 				return {
-					message: "The model could not be imported, the following errors have occurred:",
+					message: "The model could not be imported, the following messages were returned:",
 					state: "danger"
 				};
 			},

@@ -113,14 +113,14 @@
 				const response = await Network.executeRaw(this.playground.expression, this.playground.context.value);
 				if (response.status !== 200) {
 					this.playground.output.outputs = null;
-					this.displayAlert("The output can't be calculated.", "danger");
+					this.displayAlert("The output could not be calculated.", "danger");
 					return;
 				}
 
 				const result = await response.json();
 				this.playground.output.outputs = result.outputs.main;
 				if (result.messages.length > 0) {
-					this.displayAlert(AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "warning");
+					this.displayAlert(AlertHelper.buildList("The output was calculated, the following messages were returned:", result.messages), "warning");
 					return;
 				}
 				this.displayAlert(null, null);

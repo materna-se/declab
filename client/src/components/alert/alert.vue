@@ -12,3 +12,19 @@
 		}
 	}
 </script>
+
+<style>
+	.alert-message {
+		border-bottom: 1px solid #ececec;
+		padding: 5px 0;
+	}
+
+	.alert-message:first-child {
+		padding-top: 0;
+	}
+
+	.alert-message:last-child {
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+</style>

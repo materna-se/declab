@@ -213,7 +213,7 @@
 					catch (e) {
 						scenario.output.calculated = null;
 						scenario.output.equal = false;
-						this.displayAlert(scenario, "The output can't be calculated.", "danger");
+						this.displayAlert(scenario, "The output could not be calculated.", "danger");
 						continue;
 					}
 
@@ -221,7 +221,7 @@
 					scenario.output.calculated = result.outputs.main;
 					if (result.messages.length > 0) {
 						scenario.output.equal = false;
-						this.displayAlert(scenario, AlertHelper.buildList("The output was calculated, but the following warnings have occurred:", result.messages), "warning");
+						this.displayAlert(scenario, AlertHelper.buildList("The output was calculated, the following messages were returned:", result.messages), "warning");
 						continue;
 					}
 
