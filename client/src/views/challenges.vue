@@ -76,9 +76,9 @@
 
 
 						<h5 class="mb-2">Scenarios</h5>
-						<div class="list-group">
-							<template v-if="challenge.scenarios.length !== 0">
-								<div class="list-group-item" v-for="scenario in challenge.scenarios">
+						<template v-if="challenge.scenarios.length !== 0">
+							<div class="card mb-4" v-for="(scenario, index) of challenge.scenarios">
+								<div class="card-body">
 									<div class="mr-auto">
 										<h5 class="mb-2">{{scenario.name}}</h5>
 										<h6 class="mb-1">Input</h6>
@@ -88,8 +88,10 @@
 										<json-builder v-bind:template="scenario.output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 									</div>
 								</div>
-							</template>
-							<div class="list-group-item" v-else>
+							</div>
+						</template>
+						<div class="card mb-4" v-else>
+							<div class="card-body">
 								<empty-collection/>
 							</div>
 						</div>
@@ -136,19 +138,10 @@
 						</div>
 
 						<h5 class="mb-2">Scenarios</h5>
-						<div class="list-group">
-							<template v-if="challenge.scenarios.length !== 0">
-								<div class="list-group-item" v-for="(scenario, index) of challenge.scenarios">
+						<template v-if="challenge.scenarios.length !== 0">
+							<div class="card mb-4" v-for="(scenario, index) of challenge.scenarios">
+								<div class="card-body">
 									<div class="mr-auto">
-										<h5 class="mb-2">Name</h5>
-										<div>
-											<input class="form-control mb-4" v-model="scenario.name">
-										</div>
-										<h6 class="mb-1">Input</h6>
-										<json-builder v-bind:template="scenario.input.template" v-bind:convert="true" v-on:update:value="scenario.input.value = $event"/>
-										<hr>
-										<h6 class="mb-1">Output</h6>
-										<json-builder v-bind:template="scenario.output.template" v-bind:convert="true" v-on:update:value="scenario.output.value = $event"/>
 										<div class="float-right mt-2">
 											<button class="btn btn-block btn-outline-secondary" v-on:click="challenge.scenarios.splice(index, 1)">
 												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
@@ -156,10 +149,21 @@
 												</svg>
 											</button>
 										</div>
+										<div style="clear:both"></div>
+										<h5 class="mb-2">Name</h5>
+										<input class="form-control mb-4" v-model="scenario.name">
+
+										<h5 class="mb-1">Input</h5>
+										<json-builder v-bind:template="scenario.input.template" v-bind:convert="true" v-on:update:value="scenario.input.value = $event"/>
+
+										<h5 class="mb-1">Output</h5>
+										<json-builder v-bind:template="scenario.output.template" v-bind:convert="true" v-on:update:value="scenario.output.value = $event"/>
 									</div>
 								</div>
-							</template>
-							<div class="list-group-item" v-else>
+							</div>
+						</template>
+						<div class="card mb-4" v-else>
+							<div class="card-body">
 								<empty-collection/>
 							</div>
 						</div>
@@ -183,7 +187,6 @@
 
 <script>
 	import Network from "../helpers/network";
-	import Converter from "../components/json/json-builder-converter";
 	import FEELEditor from "../components/dmn/feel-editor.vue";
 	import JSONBuilder from "../components/json/json-builder.vue";
 	import EmptyCollectionComponent from "../components/empty-collection.vue";
@@ -238,9 +241,9 @@
 				await Network.addChallenge({
 					name: this.challenge.name,
 					description: this.challenge.description,
-                    hints: this.challenge.hints,
-                    solution: this.challenge.solution,
-                    scenarios: this.challenge.scenarios
+					hints: this.challenge.hints,
+					solution: this.challenge.solution,
+					scenarios: this.challenge.scenarios
 				});
 
 				this.$root.displayAlert("The challenge was successfully created.", "success");
@@ -251,9 +254,9 @@
 				await Network.editChallenge(this.challenge.uuid, {
 					name: this.challenge.name,
 					description: this.challenge.description,
-                    hints: this.challenge.hints,
-                    solution: this.challenge.solution,
-                    scenarios: this.challenge.scenarios
+					hints: this.challenge.hints,
+					solution: this.challenge.solution,
+					scenarios: this.challenge.scenarios
 				});
 
 				this.$root.displayAlert("The challenge was successfully edited.", "success");
@@ -282,12 +285,12 @@
 			},
 			setAddMode() {
 				this.challenge = {
-                    uuid: null,
+					uuid: null,
 					name: null,
 					description: null,
-                    hints: [],
-                    solution: null,
-                    scenarios: []
+					hints: [],
+					solution: null,
+					scenarios: []
 				};
 
 				this.mode = "ADD";
