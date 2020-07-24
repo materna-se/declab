@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<template v-if="developerMode === true">
-			<textarea class="form-control w-100 mb-1" v-model="editedValue" v-bind:readonly="fixed || fixedValues"/>
-			<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="applyValue" v-if="!fixed && !fixedValues">Apply</button>
+			<textarea class="form-control w-100 mb-1" v-model="editedValue"/>
+			<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="applyValue">Apply</button>
 		</template>
 		<json-builder-table v-if="value !== null" v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues"/>
 		<json-builder-selector v-if="!fixed && !fixedRoot" v-bind:value="value" v-bind:mode="'edit'"/>
