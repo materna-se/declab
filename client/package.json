@@ -1,6 +1,6 @@
 {
 	"name": "declab",
-	"version": "2.3.0",
+	"version": "2.3.5",
 	"private": true,
 	"scripts": {
 		"dev": "webpack-dev-server --open --hot",
