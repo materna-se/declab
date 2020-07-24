@@ -154,7 +154,7 @@
 										<input class="form-control mb-4" v-model="scenario.name">
 
 										<h5 class="mb-1">Input</h5>
-										<json-builder v-bind:template="scenario.input.template" v-bind:convert="true" v-on:update:value="scenario.input.value = $event"/>
+										<json-builder class="mb-4" v-bind:template="scenario.input.template" v-bind:convert="true" v-bind:fixed-root="true" v-on:update:value="scenario.input.value = $event"/>
 
 										<h5 class="mb-1">Output</h5>
 										<json-builder v-bind:template="scenario.output.template" v-bind:convert="true" v-on:update:value="scenario.output.value = $event"/>
