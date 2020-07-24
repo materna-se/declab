@@ -8,16 +8,12 @@ import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.Decision;
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
-import de.materna.jdec.DMNDecisionSession;
+import de.materna.jdec.HybridDecisionSession;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.model.ImportResult;
 import de.materna.jdec.model.ModelImportException;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.log4j.Logger;
-import org.kie.dmn.api.core.DMNModel;
-import org.kie.dmn.feel.FEEL;
-import org.kie.dmn.feel.lang.FEELProfile;
-import org.kie.dmn.feel.parser.feel11.profiles.KieExtendedFEELProfile;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -168,27 +164,17 @@ public class ModelServlet {
 	@Path("/model/execute/raw")
 	@Consumes("application/json")
 	@Produces("text/plain")
-	public Response calculateRawResult(String body) {
+	public Response calculateRawResult(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
 		Decision decision = (Decision) SerializationHelper.getInstance().toClass(body, Decision.class);
 
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		HybridDecisionSession decisionSession = workspace.getDecisionSession();
 		try {
-			List<FEELProfile> profiles = new ArrayList<>();
-			profiles.add(new KieExtendedFEELProfile());
-			FEEL feel = FEEL.newInstance(profiles);
-
-			List<String> messages = new LinkedList<>();
-			feel.addListener(feelEvent -> messages.add(feelEvent.getMessage()));
-
-			HashMap<String, Object> outputs = new LinkedHashMap<>();
-			outputs.put("main", DroolsHelper.cleanResult(feel.evaluate(decision.getExpression(), decision.getContext())));
-
-			ExecutionResult modelResult = new ExecutionResult(outputs, null, messages);
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(modelResult)).build();
+			ExecutionResult executionResult = decisionSession.getDMNDecisionSession().executeExpression(decision.getExpression(), decision.getContext());
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(executionResult)).build();
 		}
-		catch (Exception exception) {
-			log.error(exception);
-
-			return Response.status(Response.Status.BAD_REQUEST).build();
+		catch (ModelImportException exception) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
 		}
 	}
 }
