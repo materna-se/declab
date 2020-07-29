@@ -1,23 +1,5 @@
 export default {
 	srcDir: './src',
-	plugins: [
-		'./plugins/tooltip',
-		'./plugins/draggable',
-		'./plugins/router',
-	],
-	router: {
-		mode: 'hash'
-	},
-	mode: "spa",
-	env: {
-		DECLAB_HOST: (() => {
-			return process.env.DECLAB_HOST === undefined ? "http://127.0.0.1:8080/declab-" + process.env.npm_package_version + "/api" : process.env.DECLAB_HOST;
-		})(),
-		DECLAB_VERSION: process.env.npm_package_version,
-		DECLAB_TIME: (() => {
-			return new Date().toISOString().split("Z")[0].split("T").join(", ");
-		})(),
-	},
 	head: {
 		meta: [
 			{
@@ -35,8 +17,27 @@ export default {
 			},
 			{
 				rel: 'icon',
-				href: '/favicon.ico'
+				href: '/favicon-32x32.png'
 			}
-		]
+		],
+		title: "declab"
+	},
+	mode: "spa",
+	router: {
+		mode: 'hash'
+	},
+	plugins: [
+		'./plugins/tooltip',
+		'./plugins/draggable',
+		'./plugins/router',
+	],
+	env: {
+		DECLAB_HOST: (() => {
+			return process.env.DECLAB_HOST === undefined ? "http://127.0.0.1:8080/declab-" + process.env.npm_package_version + "/api" : process.env.DECLAB_HOST;
+		})(),
+		DECLAB_VERSION: process.env.npm_package_version,
+		DECLAB_TIME: (() => {
+			return new Date().toISOString().split("Z")[0].split("T").join(", ");
+		})(),
 	}
 }
