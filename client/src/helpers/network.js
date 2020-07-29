@@ -342,7 +342,7 @@ export default {
 	async _authorizedFetch(url, options) {
 		const vue = this._vue;
 
-		vue.loading = true;
+		vue.store.commit("setLoading", true);
 
 		const token = configuration.getToken();
 		if (token !== undefined) {
@@ -358,14 +358,13 @@ export default {
 
 		const response = await fetch(url, options);
 		if (response.status === 401) {
-			vue.authentication.visible = true;
 			await new Promise(resolve => {
-				vue.authentication.promise = resolve;
+				vue.store.commit("setAuthentication", true, resolve);
 			});
 			return this._authorizedFetch(url, options);
 		}
 
-		vue.loading = false;
+		vue.store.commit("setLoading", false);
 
 		return response;
 	}
