@@ -22,10 +22,10 @@ export const mutations = {
 			state: alertState
 		}
 	},
-	setAuthentication(state, authenticationVisible, authenticationPromise) {
-		state.authentication = {
-			visible: authenticationVisible,
-			promise: authenticationPromise
-		}
+	setAuthenticationVisibility(state, authenticationVisible) {
+		state.authentication.visible = authenticationVisible;
+	},
+	setAuthenticationPromise(state, authenticationPromise) {
+		state.authentication.promise = authenticationPromise;
 	},
 };

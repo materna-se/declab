@@ -358,8 +358,9 @@ export default {
 
 		const response = await fetch(url, options);
 		if (response.status === 401) {
+			vue.store.commit("setAuthenticationVisibility", true);
 			await new Promise(resolve => {
-				vue.store.commit("setAuthentication", true, resolve);
+				vue.store.commit("setAuthenticationPromise", resolve);
 			});
 			return this._authorizedFetch(url, options);
 		}

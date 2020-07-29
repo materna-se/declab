@@ -3,12 +3,12 @@
 		<loading v-bind:loading="$store.state.loading"></loading>
 		<dmn-header></dmn-header>
 		<div class="container-fluid">
-			<!--<authenticator v-if="authentication.visible"></authenticator>
-			<div class="row mb-4" v-if="alert.message !== null">
+			<authenticator v-if="$store.state.authentication.visible"></authenticator>
+			<div class="row mb-4" v-if="$store.state.alert.message !== null">
 				<div class="col-12">
-					<alert v-bind:alert="alert"></alert>
+					<alert v-bind:alert="$store.state.alert"></alert>
 				</div>
-			</div>-->
+			</div>
 			<router-view></router-view>
 		</div>
 		<dmn-footer></dmn-footer>

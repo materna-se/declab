@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="modal-backdrop fade show"></div>
-		<div class="modal show" style="display: block" v-on:click.self="$root.authentication = false">
+		<div class="modal show" style="display: block" v-on:click.self="$store.commit('setAuthenticationVisibility', false)">
 			<div class="modal-dialog modal-dialog-centered modal-lg">
 				<div class="modal-content p-4">
 					<div class="modal-body">
@@ -25,8 +25,8 @@
 				Configuration.setToken(token);
 			},
 			async reload() {
-				this.$root.authentication.visible = false;
-				await this.$root.authentication.promise();
+				this.$store.commit("setAuthenticationVisibility", false);
+				await this.$store.state.authentication.promise();
 			}
 		}
 	}
