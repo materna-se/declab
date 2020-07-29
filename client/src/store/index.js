@@ -16,16 +16,20 @@ export const mutations = {
 	setLoading(state, loading) {
 		state.loading = loading;
 	},
-	displayAlert(state, alertMessage, alertState) {
-		state.alert = {
-			message: alertMessage,
-			state: alertState
+	displayAlert(state, alert) {
+		if (alert === null) {
+			state.alert = {
+				message: null,
+				state: null
+			};
+			return;
 		}
+		state.alert = alert;
 	},
-	setAuthenticationVisibility(state, authenticationVisible) {
-		state.authentication.visible = authenticationVisible;
+	setAuthenticationVisibility(state, visible) {
+		state.authentication.visible = visible;
 	},
-	setAuthenticationPromise(state, authenticationPromise) {
-		state.authentication.promise = authenticationPromise;
+	setAuthenticationPromise(state, promise) {
+		state.authentication.promise = promise;
 	},
 };
