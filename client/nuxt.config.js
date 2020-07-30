@@ -13,7 +13,7 @@ export default {
 		link: [
 			{
 				rel: 'stylesheet',
-				href: 'https://fonts.googleapis.com/css?family=Noto+Sans:400,700|Source+Code+Pro:400'
+				href: 'https://fonts.googleapis.com/css?family=PT+Sans:400,700|Source+Code+Pro:400'
 			},
 			{
 				rel: 'icon',

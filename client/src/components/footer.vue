@@ -36,15 +36,14 @@
 	}
 
 	body {
-		margin-bottom: 40px;
+		margin-bottom: 50px;
 	}
 
 	.sticky-footer {
 		position: absolute;
 		bottom: 0;
 		width: 100%;
-		height: 40px;
-		background-color: #f5f5f5;
-		line-height: 40px;
+		height: 50px;
+		line-height: 50px;
 	}
 </style>

@@ -1,6 +1,7 @@
 body {
-	font-family: "Noto Sans", sans-serif;
+	font-family: "PT Sans", sans-serif;
 	font-size: 0.95rem;
+	background: #f6f6f8;
 }
 
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
@@ -22,6 +23,17 @@ a:hover {
 hr {
 	margin-top: 1.5rem;
 	margin-bottom: 1.5rem;
+}
+
+.card, .list-group {
+	box-shadow: 0 0 20px 0 rgba(117, 202, 136, 0.12);
+}
+
+.btn-outline-secondary {
+	background: #ffffff;
+	border: 1px solid rgba(0,0,0,.125);
+	color: #495057;
+	box-shadow: 0 0 20px 0 rgba(117, 202, 136, 0.12);
 }
 
 pre, code {
