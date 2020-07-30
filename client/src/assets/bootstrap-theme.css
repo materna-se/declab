@@ -45,40 +45,8 @@ pre, code {
 	border-color: rgba(0, 0, 0, .125);
 }
 
-.bg-primary {
-	background-color: #7aade1 !important;
-}
-
-.bg-success {
-	background-color: #4caf50 !important;
-}
-
-.bg-warning {
-	background-color: #ffde3b !important;
-}
-
-.bg-danger {
-	background-color: #f44336 !important;
-}
-
-.border-success {
-	border-color: #4caf50 !important;
-}
-
-.border-danger {
-	border-color: #f44336 !important;
-}
-
 .border-lg {
 	border-width: 2px;
-}
-
-.text-success {
-	color: #4caf50 !important;
-}
-
-.text-danger {
-	color: #f44336 !important;
 }
 
 .custom-file-label {
@@ -94,7 +62,6 @@ pre, code {
 .c-pointer {
 	cursor: pointer;
 }
-
 
 .table-minimize th,
 .table-minimize td {
@@ -145,7 +112,7 @@ code {
 }
 
 small {
-	font-size: 0.75rem;
+	font-size: 0.85rem;
 }
 
 /* Tooltips: Core */

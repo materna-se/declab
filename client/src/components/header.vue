@@ -41,6 +41,15 @@
 	.navbar .navbar-brand .navbar-brand-secondary {
 		color: #c8eacf;
 	}
+
+	.dropdown-menu {
+		padding: .5rem;
+	}
+
+	.dropdown-item {
+		border-radius: .25rem;
+		padding: .4rem .8rem;
+	}
 </style>
 
 <script>
