@@ -25,8 +25,8 @@
 <style scoped>
 	.navbar,
 	.navbar .dropdown-item:active {
-		background: #75ca88;
-		box-shadow: 0 0 20px 0 rgba(30, 159, 58, 0.5);
+		background: rgb(44, 103, 112);
+		box-shadow: 0 0 20px 0 rgba(44, 103, 112, 0.5);
 	}
 
 	.navbar .navbar-brand,
@@ -39,7 +39,7 @@
 	}
 
 	.navbar .navbar-brand .navbar-brand-secondary {
-		color: #c8eacf;
+		color: rgb(145, 185, 191);
 	}
 
 	.dropdown-menu {

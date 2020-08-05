@@ -1,46 +1,77 @@
 <template>
-	<div class="loading-indicator" v-if="loading">
+	<div class="loading-indicator" v-bind:class="{visible: loading, invisible: !loading}">
+		<img v-bind:src="loadingImage"/>
 	</div>
 </template>
 
 <script>
+	import LoadingImage from "../assets/loading.svg";
+
 	export default {
-		props: ["loading"]
+		props: ["loading"],
+		data() {
+			return {
+				loadingImage: LoadingImage
+			}
+		}
 	}
 </script>
 
 <style scoped>
 	.loading-indicator {
 		position: absolute;
-		top: 0;
-		left: 0;
+		bottom: 15px;
+		right: 15px;
 		z-index: 1;
 
+		width: 65px;
+		height: 65px;
+
+		border-radius: .25rem;
+
+		background: rgb(44, 103, 112);
+		box-shadow: 0 0 20px 0 rgba(44, 103, 112, 0.5);
+
+		padding: 15px;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		/*animation: loading-indicator-invisible .3s ease-out;*/
+	}
+
+	.loading-indicator.visible {
+		animation: loading-indicator-visible .3s ease-out;
+	}
+
+	.loading-indicator.invisible {
+		animation: loading-indicator-invisible .3s ease-out;
+	}
+
+	.loading-indicator img {
 		width: 100%;
-		height: 4px;
-
-		background: #c8eacf;
-		overflow: hidden;
 	}
 
-	.loading-indicator:before {
-		content: '';
-
-		position: absolute;
-		height: 4px;
-
-		width: 25%;
-
-		background-color: #5c9d69;
-		animation: loading-animation 2s infinite ease-out;
-	}
-
-	@keyframes loading-animation {
+	@keyframes loading-indicator-visible {
 		0% {
-			left: -50%;
+			opacity: 0;
+			display: none;
 		}
 		100% {
-			left: 100%;
+			opacity: 1;
+			display: block;
+		}
+	}
+
+	@keyframes loading-indicator-invisible {
+		0% {
+			opacity: 1;
+			display: block;
+		}
+		100% {
+			opacity: 0;
+			display: none;
 		}
 	}
 </style>
