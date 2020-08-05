@@ -1,15 +1,15 @@
 <template>
 	<div>
-		<loading v-bind:loading="$store.state.loading"></loading>
 		<dmn-header></dmn-header>
 		<div class="container-fluid">
-			<authenticator v-if="$store.state.authentication.visible"></authenticator>
 			<div class="row mb-4" v-if="$store.state.alert.message !== null">
 				<div class="col-12">
 					<alert v-bind:alert="$store.state.alert"></alert>
 				</div>
 			</div>
 			<router-view></router-view>
+			<authenticator v-if="$store.state.authentication.visible"></authenticator>
+			<loading v-bind:loading="$store.state.loading"></loading>
 		</div>
 		<dmn-footer></dmn-footer>
 	</div>
