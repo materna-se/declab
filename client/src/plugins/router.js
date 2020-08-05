@@ -7,11 +7,10 @@ export default (context) => {
 		next();
 	});
 	vue.router.afterEach(async (to, from) => {
-		vue.store.commit("setLoading", false);
 		vue.store.commit("displayAlert", null);
 
 		Network.setEndpoint(vue, process.env.DECLAB_HOST, to.params.workspace);
 
-		//setTimeout(() => vue.$store.setLoading(false), 500);
+		setTimeout(() => vue.store.commit("setLoading", false), 500);
 	});
 }

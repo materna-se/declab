@@ -365,7 +365,7 @@ export default {
 			return this._authorizedFetch(url, options);
 		}
 
-		vue.store.commit("setLoading", false);
+		setTimeout(() => vue.store.commit("setLoading", false), 500);
 
 		return response;
 	}
