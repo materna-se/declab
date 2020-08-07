@@ -96,13 +96,18 @@
 </template>
 
 <script>
-	import Network from "../helpers/network";
-	import Converter from "../components/json/json-builder-converter";
-	import FEELEditor from "../components/dmn/feel-editor.vue";
-	import JSONBuilder from "../components/json/json-builder.vue";
-	import EmptyCollectionComponent from "../components/empty-collection.vue";
+	import Network from "../../helpers/network";
+	import Converter from "../../components/json/json-builder-converter";
+	import FEELEditor from "../../components/dmn/feel-editor.vue";
+	import JSONBuilder from "../../components/json/json-builder.vue";
+	import EmptyCollectionComponent from "../../components/empty-collection.vue";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Playgrounds",
+			}
+		},
 		components: {
 			"feel-editor": FEELEditor,
 			"json-builder": JSONBuilder,
@@ -143,7 +148,10 @@
 					context: this.playground.context
 				});
 
-				this.$root.displayAlert("The playground was successfully created.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The playground was successfully created.",
+					state: "success"
+				});
 
 				await this.getPlaygrounds();
 			},
@@ -155,14 +163,20 @@
 					context: this.playground.context
 				});
 
-				this.$root.displayAlert("The playground was successfully edited.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The playground was successfully edited.",
+					state: "success"
+				});
 
 				await this.getPlaygrounds();
 			},
 			async deletePlayground(uuid) {
 				await Network.deletePlayground(uuid);
 
-				this.$root.displayAlert("The playground was successfully deleted.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The playground was successfully deleted.",
+					state: "success"
+				});
 
 				await this.getPlaygrounds();
 			},

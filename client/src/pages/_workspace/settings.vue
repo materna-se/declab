@@ -67,13 +67,18 @@
 </style>
 
 <script>
-	import Network from "../helpers/network";
-	import Configuration from "../helpers/configuration";
-	import AlertHelper from "../components/alert/alert-helper";
+	import Network from "../../helpers/network";
+	import Configuration from "../../helpers/configuration";
+	import AlertHelper from "../../components/alert/alert-helper";
 	import {format} from 'timeago.js';
-	import ConfiguratorComponent from "../components/configurator.vue";
+	import ConfiguratorComponent from "../../components/configurator.vue";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Settings",
+			}
+		},
 		components: {
 			"configurator": ConfiguratorComponent,
 		},
@@ -106,11 +111,14 @@
 				}).reverse();
 			},
 			async editWorkspace() {
-				this.$root.displayAlert(null, null);
+				this.$store.commit("displayAlert", null);
 
 				const name = this.serverConfiguration.name;
 				if (name === null) {
-					this.$root.displayAlert("You need to enter a name.", "danger");
+					this.$store.commit("displayAlert", {
+						message: 'You need to enter a name.',
+						state: "danger"
+					});
 					return;
 				}
 
@@ -126,7 +134,10 @@
 
 				let access = this.serverConfiguration.access;
 				if (access !== "PUBLIC" && token === undefined) {
-					this.$root.displayAlert("You need to enter a password when you set the access mode to " + access.toLowerCase() + ".", "danger");
+					this.$store.commit("displayAlert", {
+						message: "You need to enter a password when you set the access mode to " + access.toLowerCase() + ".",
+						state: "danger"
+					});
 				}
 
 				await Network.editWorkspace({
@@ -136,21 +147,27 @@
 					token: token
 				});
 
-				this.$root.displayAlert('The workspace was successfully saved.', "success");
+				this.$store.commit("displayAlert", {
+					message: 'The workspace was successfully saved.',
+					state: "success"
+				});
 			},
 			async importWorkspace(event) {
 				const result = await Network.importWorkspace(event.target.files[0]);
-				this.$root.displayAlert(AlertHelper.buildList((() => {
-					if (result.successful && result.messages.length === 0) {
-						return "The workspace was successfully imported.";
-					}
+				this.$store.commit("displayAlert", {
+					message: AlertHelper.buildList((() => {
+						if (result.successful && result.messages.length === 0) {
+							return "The workspace was successfully imported.";
+						}
 
-					if (result.successful) {
-						return "The workspace was imported, but the following warnings have occurred:";
-					}
+						if (result.successful) {
+							return "The workspace was imported, but the following warnings have occurred:";
+						}
 
-					return "The workspace could not be imported, the following errors have occurred:";
-				})(), result.messages), result.successful ? "success" : "danger");
+						return "The workspace could not be imported, the following errors have occurred:";
+					})(), result.messages),
+					state: result.successful ? "success" : "danger"
+				});
 
 				// To allow another execution of the listener, we have to reset the value.
 				event.target.value = null;

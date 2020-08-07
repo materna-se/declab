@@ -84,12 +84,17 @@
 </template>
 
 <script>
-	import Network from "../helpers/network";
+	import Network from "../../helpers/network";
 
-	import JSONBuilder from "../components/json/json-builder.vue";
-	import EmptyCollectionComponent from "../components/empty-collection.vue";
+	import JSONBuilder from "../../components/json/json-builder.vue";
+	import EmptyCollectionComponent from "../../components/empty-collection.vue";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Outputs",
+			}
+		},
 		components: {
 			"json-builder": JSONBuilder,
 			"empty-collection": EmptyCollectionComponent
@@ -146,7 +151,10 @@
 					value: this.output.value
 				});
 
-				this.$root.displayAlert("The output was successfully created.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The output was successfully created.",
+					state: "success"
+				});
 
 				await this.getOutputs();
 			},
@@ -157,14 +165,20 @@
 					value: this.output.value
 				});
 
-				this.$root.displayAlert("The output was successfully edited.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The output was successfully edited.",
+					state: "success"
+				});
 
 				await this.getOutputs();
 			},
 			async deleteOutput(uuid) {
 				await Network.deleteOutput(uuid);
 
-				this.$root.displayAlert("The output was successfully deleted.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The output was successfully deleted.",
+					state: "success"
+				});
 
 				await this.getOutputs();
 			},

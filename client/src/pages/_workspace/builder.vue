@@ -45,7 +45,7 @@
 			</div>
 			<div class="mb-4" v-if="mode !== 1" v-bind:class="{'col-6': mode === 0, 'col-12': mode === 2}">
 				<h4 class="mb-2">Outputs</h4>
-				<div class="row mb-4" v-if="alert.message !== null">
+				<div class="row mb-2" v-if="alert.message !== null">
 					<div class="col-12">
 						<alert v-bind:alert="alert"/>
 					</div>
@@ -109,14 +109,19 @@
 </template>
 
 <script>
-	import Network from "../helpers/network";
-	import AlertHelper from "../components/alert/alert-helper";
-	import Converter from "../components/json/json-builder-converter";
+	import Network from "../../helpers/network";
+	import AlertHelper from "../../components/alert/alert-helper";
+	import Converter from "../../components/json/json-builder-converter";
 
-	import Alert from "../components/alert/alert.vue";
-	import JSONBuilder from "../components/json/json-builder.vue";
+	import Alert from "../../components/alert/alert.vue";
+	import JSONBuilder from "../../components/json/json-builder.vue";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Builder",
+			}
+		},
 		components: {
 			"alert": Alert,
 			"json-builder": JSONBuilder,
@@ -271,7 +276,10 @@
 			//
 			async saveEntities() {
 				if (this.hasTestName() && !this.hasInputName()) {
-					this.$root.displayAlert("You need to enter an input name if you want to save a test.", "danger");
+					this.$store.commit("displayAlert", {
+						message: "You need to enter an input name if you want to save a test.",
+						state: "danger"
+					});
 					return;
 				}
 
@@ -291,7 +299,10 @@
 					test = await this.addTest(input, outputs);
 				}
 
-				this.$root.displayAlert((input !== null ? 1 : 0) + " " + (input !== null ? "input" : "inputs") + ", " + outputs.length + " " + (outputs.length === 1 ? "output" : "outputs") + " and " + (test !== null ? 1 : 0) + " " + (test !== null ? "test" : "tests") + " were successfully saved.", "success");
+				this.$store.commit("displayAlert", {
+					message: ((input !== null ? 1 : 0) + " " + (input !== null ? "input" : "inputs") + ", " + outputs.length + " " + (outputs.length === 1 ? "output" : "outputs") + " and " + (test !== null ? 1 : 0) + " " + (test !== null ? "test" : "tests") + " were successfully saved."),
+					state: "success"
+				});
 			},
 			hasInputName() {
 				return this.model.input.name !== null && this.model.input.name !== '';

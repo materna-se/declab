@@ -107,11 +107,16 @@
 </style>
 
 <script>
-	import Network from "../helpers/network";
+	import Network from "../../helpers/network";
 	import draggable from 'vuedraggable'
-	import AlertHelper from "../components/alert/alert-helper";
+	import AlertHelper from "../../components/alert/alert-helper";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Model",
+			}
+		},
 		components: {
 			"draggable": draggable,
 		},
@@ -151,12 +156,15 @@
 				this.decisionSession = await Network.getDecisionSession();
 			},
 			async importModels() {
-				this.$root.displayAlert(null, null);
+				this.$store.commit("displayAlert",null);
 
 				const result = await Network.importModels(this.models);
 
 				const resultAlert = this.getResultAlert(result);
-				this.$root.displayAlert(AlertHelper.buildList(resultAlert.message, result.messages), resultAlert.state);
+				this.$store.commit("displayAlert", {
+					message:  AlertHelper.buildList(resultAlert.message, result.messages),
+					state: resultAlert.state
+				});
 
 				await this.getModel();
 			},

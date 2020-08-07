@@ -186,12 +186,17 @@
 </template>
 
 <script>
-	import Network from "../helpers/network";
-	import FEELEditor from "../components/dmn/feel-editor.vue";
-	import JSONBuilder from "../components/json/json-builder.vue";
-	import EmptyCollectionComponent from "../components/empty-collection.vue";
+	import Network from "../../helpers/network";
+	import FEELEditor from "../../components/dmn/feel-editor.vue";
+	import JSONBuilder from "../../components/json/json-builder.vue";
+	import EmptyCollectionComponent from "../../components/empty-collection.vue";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Challenges",
+			}
+		},
 		components: {
 			"feel-editor": FEELEditor,
 			"json-builder": JSONBuilder,
@@ -246,7 +251,10 @@
 					scenarios: this.challenge.scenarios
 				});
 
-				this.$root.displayAlert("The challenge was successfully created.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The challenge was successfully created.",
+					state: "success"
+				});
 
 				await this.getChallenges();
 			},
@@ -259,14 +267,20 @@
 					scenarios: this.challenge.scenarios
 				});
 
-				this.$root.displayAlert("The challenge was successfully edited.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The challenge was successfully edited.",
+					state: "success"
+				});
 
 				await this.getChallenges();
 			},
 			async deleteChallenge(uuid) {
 				await Network.deleteChallenge(uuid);
 
-				this.$root.displayAlert("The challenge was successfully deleted.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The challenge was successfully deleted.",
+					state: "success"
+				});
 
 				await this.getChallenges();
 			},

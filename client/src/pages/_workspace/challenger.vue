@@ -125,15 +125,20 @@
 </template>
 
 <script>
-	import Network from "../helpers/network";
+	import Network from "../../helpers/network";
 
-	import FEELEditor from "../components/dmn/feel-editor.vue";
-	import JSONBuilder from "../components/json/json-builder.vue";
-	import Alert from "../components/alert/alert.vue";
-	import AlertHelper from "../components/alert/alert-helper";
-	import EmptyCollectionComponent from "../components/empty-collection.vue";
+	import FEELEditor from "../../components/dmn/feel-editor.vue";
+	import JSONBuilder from "../../components/json/json-builder.vue";
+	import Alert from "../../components/alert/alert.vue";
+	import AlertHelper from "../../components/alert/alert-helper";
+	import EmptyCollectionComponent from "../../components/empty-collection.vue";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Challenger",
+			}
+		},
 		components: {
 			"alert": Alert,
 			"json-builder": JSONBuilder,
@@ -192,7 +197,7 @@
 			//
 			async executeRaw() {
 				//Keep track of progress
-				var testsCompleted = 0;
+				let testsCompleted = 0;
 
 				//Erase all previous results
 				for (const scenario of this.challenge.scenarios) {

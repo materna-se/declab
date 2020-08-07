@@ -63,13 +63,18 @@
 </template>
 
 <script>
-	import Network from "../helpers/network";
+	import Network from "../../helpers/network";
 	import JSONPath from "jsonpath";
 	import debounce from "lodash/debounce";
-	import FEELEditor from "../components/dmn/feel-editor.vue";
-	import JSONBuilder from "../components/json/json-builder.vue";
+	import FEELEditor from "../../components/dmn/feel-editor.vue";
+	import JSONBuilder from "../../components/json/json-builder.vue";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Discoverer",
+			}
+		},
 		async mounted() {
 			await this.getInputs();
 		},

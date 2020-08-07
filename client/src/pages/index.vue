@@ -79,14 +79,20 @@
 			async createWorkspace() {
 				const name = this.workspace.name;
 				if (name === undefined) {
-					this.$root.displayAlert("You need to enter a name.", "danger");
+					this.$store.commit("displayAlert", {
+						message: "You need to enter a name.",
+						state: "danger"
+					});
 					return;
 				}
 				let description = this.workspace.description;
 				let token = this.workspace.token;
 				let access = this.workspace.access;
 				if (access !== "PUBLIC" && token === undefined) {
-					this.$root.displayAlert("You need to enter a password when you set the access mode to " + access.toLowerCase() + ".", "danger");
+					this.$store.commit("displayAlert", {
+						message: "You need to enter a password when you set the access mode to " + access.toLowerCase() + ".",
+						state: "danger"
+					});
 				}
 
 				const id = await Network.createWorkspace({

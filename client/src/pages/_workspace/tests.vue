@@ -141,12 +141,17 @@
 </style>
 
 <script>
-	import Network from "../helpers/network";
+	import Network from "../../helpers/network";
 	import DiffMatchPatch from 'diff-match-patch';
-	import JSONBuilder from "../components/json/json-builder.vue";
-	import EmptyCollectionComponent from "../components/empty-collection.vue";
+	import JSONBuilder from "../../components/json/json-builder.vue";
+	import EmptyCollectionComponent from "../../components/empty-collection.vue";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Tests",
+			}
+		},
 		components: {
 			"json-builder": JSONBuilder,
 			"empty-collection": EmptyCollectionComponent
@@ -217,7 +222,10 @@
 					outputs: this.test.outputs
 				});
 
-				this.$root.displayAlert("The test was successfully created.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The test was successfully created.",
+					state: "success"
+				});
 
 				this.getTests();
 			},
@@ -229,14 +237,20 @@
 					outputs: this.test.outputs
 				});
 
-				this.$root.displayAlert("The test was successfully edited.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The test was successfully edited.",
+					state: "success"
+				});
 
 				this.getTests();
 			},
 			async deleteTest(uuid) {
 				await Network.deleteTest(uuid);
 
-				this.$root.displayAlert("The test was successfully deleted.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The test was successfully deleted.",
+					state: "success"
+				});
 
 				this.getTests();
 			},

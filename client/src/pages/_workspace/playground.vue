@@ -2,7 +2,7 @@
 	<div>
 		<div class="row mb-4">
 			<div class="col-6">
-				<h4 class="mb-2">Playground</h4>
+				<h3 class="mb-2">Playground</h3>
 
 				<div class="input-group mb-2">
 					<div class="input-group-prepend">
@@ -38,7 +38,7 @@
 			</div>
 			<div class="col-6">
 				<h3 class="mb-2">Output</h3>
-				<div class="row mb-4" v-if="alert.message !== null">
+				<div class="row mb-2" v-if="alert.message !== null">
 					<div class="col-12">
 						<alert v-bind:alert="alert"/>
 					</div>
@@ -64,14 +64,19 @@
 </template>
 
 <script>
-	import Network from "../helpers/network";
+	import Network from "../../helpers/network";
 
-	import FEELEditor from "../components/dmn/feel-editor.vue";
-	import JSONBuilder from "../components/json/json-builder.vue";
-	import Alert from "../components/alert/alert.vue";
-	import AlertHelper from "../components/alert/alert-helper";
+	import FEELEditor from "../../components/dmn/feel-editor.vue";
+	import JSONBuilder from "../../components/json/json-builder.vue";
+	import Alert from "../../components/alert/alert.vue";
+	import AlertHelper from "../../components/alert/alert-helper";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Playground",
+			}
+		},
 		components: {
 			"alert": Alert,
 			"json-builder": JSONBuilder,
@@ -146,7 +151,10 @@
 			async savePlayground() {
 				//Do not allow saving if playground has no name
 				if (this.playground.name === null || this.playground.name === "") {
-					this.$root.displayAlert("The playground must have a name.", "danger");
+					this.$store.commit("displayAlert", {
+						message: "The playground must have a name.",
+						state: "danger"
+					});
 					return;
 				}
 
@@ -166,7 +174,10 @@
 					await Network.editPlayground(this.playground.uuid, playground);
 				}
 
-				this.$root.displayAlert("The playground was successfully saved.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The playground was successfully saved.",
+					state: "success"
+				});
 
 				//Update page
 				this.playgrounds = await Network.getPlaygrounds();

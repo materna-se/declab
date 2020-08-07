@@ -59,12 +59,17 @@
 </template>
 
 <script>
-	import Network from "../helpers/network";
+	import Network from "../../helpers/network";
 	import DiffMatchPatch from 'diff-match-patch';
 
-	import JSONBuilder from "../components/json/json-builder.vue";
+	import JSONBuilder from "../../components/json/json-builder.vue";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Publisher",
+			}
+		},
 		async mounted() {
 			await this.getInputs();
 			await this.getOutputs();

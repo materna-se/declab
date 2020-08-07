@@ -88,13 +88,18 @@
 </template>
 
 <script>
-	import Network from "../helpers/network";
-	import Converter from "../components/json/json-builder-converter";
+	import Network from "../../helpers/network";
+	import Converter from "../../components/json/json-builder-converter";
 
-	import JSONBuilder from "../components/json/json-builder.vue";
-	import EmptyCollectionComponent from "../components/empty-collection.vue";
+	import JSONBuilder from "../../components/json/json-builder.vue";
+	import EmptyCollectionComponent from "../../components/empty-collection.vue";
 
 	export default {
+		head() {
+			return {
+				title: "declab - Inputs",
+			}
+		},
 		components: {
 			"json-builder": JSONBuilder,
 			"empty-collection": EmptyCollectionComponent
@@ -133,7 +138,10 @@
 					value: this.input.value
 				});
 
-				this.$root.displayAlert("The input was successfully created.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The input was successfully created.",
+					state: "success"
+				});
 
 				await this.getInputs();
 			},
@@ -144,14 +152,20 @@
 					value: this.input.value
 				});
 
-				this.$root.displayAlert("The input was successfully edited.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The input was successfully edited.",
+					state: "success"
+				});
 
 				await this.getInputs();
 			},
 			async deleteInput(uuid) {
 				await Network.deleteInput(uuid);
 
-				this.$root.displayAlert("The input was successfully deleted.", "success");
+				this.$store.commit("displayAlert", {
+					message: "The input was successfully deleted.",
+					state: "success"
+				});
 
 				await this.getInputs();
 			},
