@@ -4,7 +4,7 @@
 		Display value based on the data type.
 		-->
 		<div class="input-group" v-if="['string', 'date', 'time', 'dateTime'].includes(value.type)" v-bind:class="[value.value === value.template ? 'input-disabled' : null]">
-			<div class="input-group-prepend">
+			<div class="input-group-prepend" v-on:click="exportPath(path)">
 				<span class="input-group-text">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 11a2 2 0 0 1 2 2v4H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2m-2 2v2h2v-2H4m16 0v2h2v2h-2a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2v2h-2m-8-6v4h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V7h2m0 8h2v-2h-2v2z" fill="currentColor"/></svg>
 				</span>
@@ -12,7 +12,7 @@
 			<input type="text" placeholder="Enter Value..." class="form-control" v-bind:value="value.value" v-bind:disabled="fixedValues" v-on:input="$set(value, 'value', $event.target.value === '' ? undefined : $event.target.value)">
 		</div>
 		<div class="input-group" v-else-if="value.type === 'number'" v-bind:class="[value.value === value.template ? 'input-disabled' : null]">
-			<div class="input-group-prepend">
+			<div class="input-group-prepend" v-on:click="exportPath(path)">
 				<span class="input-group-text">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 17V9H2V7h4v10H4m18-2a2 2 0 0 1-2 2h-4v-2h4v-2h-2v-2h2V9h-4V7h4a2 2 0 0 1 2 2v1.5a1.5 1.5 0 0 1-1.5 1.5 1.5 1.5 0 0 1 1.5 1.5V15m-8 0v2H8v-4a2 2 0 0 1 2-2h2V9H8V7h4a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2v2h4z" fill="currentColor"/></svg>
 				</span>
@@ -52,10 +52,10 @@
 				<tbody>
 				<tr v-for="(childValue, childKey) in value.value">
 					<td class="td-minimize bg-light">
-						<span class="input-group-text input-group-text-disabled w-100">{{childKey}}</span>
+						<span class="input-group-text input-group-text-disabled w-100" v-on:click="exportPath([...path, childKey])">{{childKey}}</span>
 					</td>
 					<td>
-						<json-builder-table v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues"/>
+						<json-builder-table v-bind:path="[...path, childKey]" v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues" v-on:update:path="exportPath($event)"/>
 					</td>
 					<td class="td-minimize bg-light" v-if="!fixed">
 						<button type="button" class="btn btn-white" v-on:click="$delete(value.value, childKey)">
@@ -70,7 +70,7 @@
 		</div>
 		<div v-else-if="value.type === 'array'">
 			<p class="my-4 text-center text-muted" v-if="value.value.length === 0 && !fixed"><small>Please select a type!</small></p>
-			<div class="input-group-text input-group-table" v-else>
+			<div class="input-group-text input-group-table" v-on:click="exportPath(path)" v-else>
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 					<path d="M7 13v-2h14v2H7m0 6v-2h14v2H7M7 7V5h14v2H7M3 8V5H2V4h2v4H3m-1 9v-1h3v4H2v-1h2v-.5H3v-1h1V17H2m2.25-7a.75.75 0 0 1 .75.75c0 .2-.08.39-.21.52L3.12 13H5v1H2v-.92L4 11H2v-1h2.25z" fill="currentColor"/>
 				</svg>
@@ -79,7 +79,7 @@
 				<tbody>
 				<tr v-for="(childValue, childIndex) of value.value" v-bind:key="childIndex">
 					<td>
-						<json-builder-table v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues"/>
+						<json-builder-table v-bind:path="[...path, childIndex]" v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues" v-on:update:path="exportPath($event)"/>
 					</td>
 					<td class="td-minimize bg-light" v-if="!fixedValues">
 						<button type="button" class="btn btn-white mb-1" v-on:click="value.value.splice(childIndex + 1, 0, JSON.parse(JSON.stringify(childValue)))">
@@ -117,7 +117,7 @@
 		<json-builder-selector v-if="['object', 'array'].includes(value.type) && !fixed" v-bind:value="value" v-bind:mode="'add'"/>
 	</div>
 </template>
-
+j
 <script>
 	import JSONBuilderSelector from "./json-builder-selector.vue";
 
@@ -127,10 +127,16 @@
 			"json-builder-selector": JSONBuilderSelector
 		},
 		props: {
+			path: null,
 			value: null,
 			fixed: null,
 			fixedValues: null,
 			fixedRoot: null,
+		},
+		methods: {
+			exportPath(path) {
+				this.$emit('update:path', path);
+			},
 		}
 	}
 </script>
