@@ -26,6 +26,7 @@
 	},
 	"devDependencies": {
 		"webpack": "^4.44.0",
-		"@babel/core": "^7.10.5"
+		"@babel/core": "^7.10.5",
+		"file-loader": "^6.0.0"
 	}
 }
