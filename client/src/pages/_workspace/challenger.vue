@@ -22,7 +22,7 @@
 
 						<div class="card">
 							<div class="card-body">
-								<feel-editor v-model="expression" v-on:input="executeRaw"/>
+								<literal-expression v-model="expression" v-on:input="executeRaw"/>
 							</div>
 						</div>
 					</div>
@@ -127,7 +127,7 @@
 <script>
 	import Network from "../../helpers/network";
 
-	import FEELEditor from "../../components/dmn/feel-editor.vue";
+	import LiteralExpression from "../../components/dmn/literal-expression.vue";
 	import JSONBuilder from "../../components/json/json-builder.vue";
 	import Alert from "../../components/alert/alert.vue";
 	import AlertHelper from "../../components/alert/alert-helper";
@@ -142,7 +142,7 @@
 		components: {
 			"alert": Alert,
 			"json-builder": JSONBuilder,
-			"feel-editor": FEELEditor,
+			"literal-expression": LiteralExpression,
 			"empty-collection": EmptyCollectionComponent
 		},
 		async mounted() {

@@ -16,7 +16,7 @@
 				<h5 class="mb-2">Values</h5>
 				<div class="card mb-4">
 					<div class="card-body">
-						<feel-editor v-model="options.expression" v-on:input="startDebouncedDiscovery"/>
+						<literal-expression v-model="options.expression" v-on:input="startDebouncedDiscovery"/>
 					</div>
 				</div>
 
@@ -66,7 +66,7 @@
 	import Network from "../../helpers/network";
 	import JSONPath from "jsonpath";
 	import debounce from "lodash/debounce";
-	import FEELEditor from "../../components/dmn/feel-editor.vue";
+	import LiteralExpression from "../../components/dmn/literal-expression.vue";
 	import JSONBuilder from "../../components/json/json-builder.vue";
 
 	export default {
@@ -79,7 +79,7 @@
 			await this.getInputs();
 		},
 		components: {
-			"feel-editor": FEELEditor,
+			"literal-expression": LiteralExpression,
 			"json-builder": JSONBuilder
 		},
 		data() {

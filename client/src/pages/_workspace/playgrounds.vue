@@ -58,7 +58,7 @@
 						<h5 class="mb-2">Expression</h5>
 						<div class="card mb-4">
 							<div class="card-body">
-								<feel-editor v-model="playground.expression" readonly="true"/>
+								<literal-expression v-model="playground.expression" readonly="true"/>
 							</div>
 						</div>
 
@@ -77,7 +77,7 @@
 						<h5 class="mb-2">Expression</h5>
 						<div class="card mb-4">
 							<div class="card-body">
-								<feel-editor v-model="playground.expression"/>
+								<literal-expression v-model="playground.expression"/>
 							</div>
 						</div>
 
@@ -98,7 +98,7 @@
 <script>
 	import Network from "../../helpers/network";
 	import Converter from "../../components/json/json-builder-converter";
-	import FEELEditor from "../../components/dmn/feel-editor.vue";
+	import LiteralExpression from "../../components/dmn/literal-expression.vue";
 	import JSONBuilder from "../../components/json/json-builder.vue";
 	import EmptyCollectionComponent from "../../components/empty-collection.vue";
 
@@ -109,7 +109,7 @@
 			}
 		},
 		components: {
-			"feel-editor": FEELEditor,
+			"literal-expression": LiteralExpression,
 			"json-builder": JSONBuilder,
 			"empty-collection": EmptyCollectionComponent
 		},
