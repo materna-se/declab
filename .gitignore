@@ -1,0 +1,8 @@
+##### IntelliJ #####
+.idea
+*.iml
+
+##### Files from master branch #####
+.circleci
+client
+server
