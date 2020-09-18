@@ -10,7 +10,7 @@
 					<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="editWorkspace">Save Configuration</button>
 
 					<h5 class="mb-2">Developer Mode</h5>
-					<p class="mb-2">The developer mode enables features like using raw JSON in the builder. It is intended for developers and should be used with caution.</p>
+					<p class="mb-2">The developer mode allows you to use features such as raw JSON in the builder. It is intended for developers and should be used with caution.</p>
 					<input type="checkbox" v-model="clientConfiguration.developerMode" v-on:change="updateDeveloperMode">
 				</div>
 			</div>
