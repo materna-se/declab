@@ -1,0 +1,10 @@
+{
+	"name": "declab",
+	"version": "1.0.0",
+	"scripts": {
+		"start": "docsify serve ."
+	},
+	"dependencies": {
+		"docsify-cli": "^4.4.1"
+	}
+}
