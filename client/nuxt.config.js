@@ -1,5 +1,8 @@
 export default {
 	srcDir: './src',
+	generate: {
+		dir: '../server/src/main/webapp',
+	},
 	head: {
 		meta: [
 			{
