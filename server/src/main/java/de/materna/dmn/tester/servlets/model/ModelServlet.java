@@ -40,7 +40,7 @@ public class ModelServlet {
 	public Response importModels(@PathParam("workspace") String workspaceUUID, String body) throws Exception {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<List<Map<String, String>>>() {
+		List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<LinkedList<Map<String, String>>>() {
 		});
 
 		// Save current decision models so we can rollback if the import fails.
@@ -53,7 +53,7 @@ public class ModelServlet {
 		try {
 			ImportResult importResult = new ImportResult();
 
-			LinkedList<Map<String, String>> importedModels = new LinkedList<>();
+			List<Map<String, String>> importedModels = new LinkedList<>();
 			// Import the provided models, collect all import messages.
 			for (Map<String, String> model : models) {
 				importResult.getMessages().addAll(workspace.getDecisionSession().importModel(model.get("namespace"), model.get("source")).getMessages());
