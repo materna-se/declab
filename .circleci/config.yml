@@ -92,7 +92,7 @@ workflows:
       - build_client:
           filters:
             branches:
-              only: /.*/
+              only: /^(?!.*(documentation).*).*$/
             tags:
               only: /.*/
 
