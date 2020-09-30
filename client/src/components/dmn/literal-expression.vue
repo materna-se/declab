@@ -1,5 +1,5 @@
 <template>
-	<div id="monaco-container"></div>
+	<div :name="this.elementName" id="monaco-container"></div>
 </template>
 
 <style>
@@ -20,6 +20,9 @@
 			},
 			readonly: {
 				default: false
+			},
+			elementName: {
+				default: "literal-expression-main"
 			}
 		},
 		data() {
@@ -159,7 +162,8 @@
 				}
 			});
 
-			const editor = monaco.editor.create(document.getElementById("monaco-container"), {
+			// Use getElementsByName to allow multiple feel-editors per page
+			const editor = monaco.editor.create(document.getElementsByName(this.elementName)[0], {
 				language: 'feel-language',
 				theme: 'feel-theme',
 
