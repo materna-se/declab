@@ -50,7 +50,7 @@ Users can also save and load their playgrounds. To save a playground, simply ent
 
 ## Challenger
 
-The challenger page is a place for users to practice their FEEL (Friendly Enough Expression Language) skills in small programming challenges. These challenges can be created by other users within the same workspace using the challenge editor page. As such, these two pages go hand in hand.
+The challenger page (found under `Education 🡒 Challenger`) is a place for users to practice their FEEL (Friendly Enough Expression Language) skills in small programming challenges. These challenges can be created by other users within the same workspace using the challenge editor page. As such, these two pages go hand in hand.
 
 Every challenge has a name (*required*), a description (*optional*), a list of hints (*optional*), a list of test cases (*required*) and a solution (*required*). Users can test their own FEEL solutions against the list of test cases, view hints if they are given and compare their solutions to that provided by the challenge creator. This gives users the ability to create interactive FEEL programming classes. The knowledge gained from this can be applied in DMN development.
 
