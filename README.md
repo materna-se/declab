@@ -40,6 +40,14 @@ To delete a workspace, you first have to enter it. Afterwards, there is a gear w
 
 ## Playground
 
+The playground page provides users with the means to discover FEEL at their own pace. Users can create elaborate input structures and experiment with the way FEEL expressions operate on the data. This gives users the opportunity to test FEEL expressions for Business Knowledge Models and Decisions in real DMN applications.
+
+To get started, navigate to the playground page under `Education 🡒 Playground`. You will be met with a FEEL editor, a context editor and an output column. The context can provide information to the FEEL expression, which will create the displayed output. 
+
+![Using a playground](./images/using-a-playground-1.png)
+
+Users can also save and load their playgrounds. To save a playground, simply enter a name (*required*) and a description (*optional*) under the Playground section, then click on the save icon (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="display: inline"><path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" fill="currentColor"></path></svg>). To load a playground, select the desired option from the "Playground" dropdown menu. If you wish to clone a playground, simply load it, make your changes and click on the clone icon (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="display: inline"><path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"></path></svg>). This will allow you to save the playground under a new, different path.
+
 ## Challenger
 
 The challenger page is a place for users to practice their FEEL (Friendly Enough Expression Language) skills in small programming challenges. These challenges can be created by other users within the same workspace using the challenge editor page. As such, these two pages go hand in hand.
