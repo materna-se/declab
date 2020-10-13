@@ -42,6 +42,16 @@ To delete a workspace, you first have to enter it. Afterwards, there is a gear w
 
 ## Challenger
 
+The challenger page is a place for users to practice their FEEL (Friendly Enough Expression Language) skills in small programming challenges. These challenges can be created by other users within the same workspace using the challenge editor page. As such, these two pages go hand in hand.
+
+Every challenge has a name (*required*), a description (*optional*), a list of hints (*optional*), a list of test cases (*required*) and a solution (*required*). Users can test their own FEEL solutions against the list of test cases, view hints if they are given and compare their solutions to that provided by the challenge creator. This gives users the ability to create interactive FEEL programming classes. The knowledge gained from this can be applied in DMN development.
+
+![Creating a challenge](./images/creating-a-challenge.png)
+
+To create a challenge, you must first enter a workspace. Next, navigate to `Design 🡒 Challenges` in the navigation bar. Click the + button in the top right to create a new challenge. This will provide you with a form where you can enter the name and description, create an optional list of hints, specify a solution and create a list of test cases. Each test case consists of an input and an output, and the FEEL code that users provide must convert the given input to the given output. If all test cases are successful, the user has passed the challenge.
+
+![Solving a challenge](./images/solving-a-challenge.png)
+
 # Execution
 
 ## Model
