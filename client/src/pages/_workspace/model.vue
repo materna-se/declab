@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<draggable class="row mb-4" v-model="importedModels" animation="150" draggable=".draggable" v-on:update="orderModels">
-			<div class="col-4 mb-4 draggable" v-on:drop="onReplaceModelDrop($event, index)" v-on:dragover="onModelDragOver" v-on:dragenter="onModelDragOver" v-for="(importedModel, index) of importedModels">
+		<draggable v-model="importedModels" animation="150" draggable=".draggable" v-on:update="orderModels">
+			<div class="mb-2 draggable" v-on:drop="onReplaceModelDrop($event, index)" v-on:dragover="onModelDragOver" v-on:dragenter="onModelDragOver" v-for="(importedModel, index) of importedModels">
 				<div class="card">
 					<div class="card-header d-flex align-items-center">
 						<h4 class="mb-0 mr-auto">{{importedModel.name}}</h4>
@@ -9,39 +9,44 @@
 							<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 						</svg>
 					</div>
-					<div class="card-body">
-						<template v-if="importedModel.decisions.length > 0">
-							<h5 class="mb-2" style="clear: both">Decisions</h5>
-							<div class="dmn dmn-decision mr-2 mb-2" v-for="decision of importedModel.decisions">
-								{{decision}}
-							</div>
-							<div style="clear: both"></div>
-						</template>
-						<template v-if="importedModel.inputs.length > 0">
-							<h5 class="mb-2" style="clear: both">Inputs</h5>
-							<div class="dmn dmn-input mr-2 mb-2" v-for="input in importedModel.inputs">
-								{{input}}
-							</div>
-							<div style="clear: both"></div>
-						</template>
-						<template v-if="importedModel.knowledgeModels.length > 0">
-							<h5 class="mb-2">Business Knowledge Models</h5>
-							<div class="dmn dmn-bkm mr-2 mb-2" v-for="knowledgeModel in importedModel.knowledgeModels">
-								{{knowledgeModel}}
-							</div>
-							<div style="clear: both"></div>
-						</template>
-						<template v-if="importedModel.decisionServices.length > 0">
-							<h5 class="mb-2">Decision Services</h5>
-							<div class="dmn dmn-ds mr-2 mb-2" v-for="decisionSessionName in importedModel.decisionServices">
-								<span v-on:click="toggleDecisionService(decisionSessionName, importedModel.namespace)" v-bind:class="[isCurrentDecisionService(decisionSessionName, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionSessionName}}</span>
-							</div>
-						</template>
+					<div class="card-body" style="display: flex; flex-direction: row; padding-bottom: 0.75rem">
+						<div>
+							<template v-if="importedModel.decisions.length > 0">
+								<h5 class="mb-2" style="clear: both">Decisions</h5>
+								<div class="dmn dmn-decision mb-2 mr-2" v-for="decision of importedModel.decisions">
+									{{decision}}
+								</div>
+							</template>
+						</div>
+						<div>
+							<template v-if="importedModel.inputs.length > 0">
+								<h5 class="mb-2" style="clear: both">Inputs</h5>
+								<div class="dmn dmn-input mb-2 mr-2" v-for="input in importedModel.inputs">
+									{{input}}
+								</div>
+							</template>
+						</div>
+						<div>
+							<template v-if="importedModel.knowledgeModels.length > 0">
+								<h5 class="mb-2">Business Knowledge Models</h5>
+								<div class="dmn dmn-bkm mb-2 mr-2" v-for="knowledgeModel in importedModel.knowledgeModels">
+									{{knowledgeModel}}
+								</div>
+							</template>
+						</div>
+						<div>
+							<template v-if="importedModel.decisionServices.length > 0">
+								<h5 class="mb-2">Decision Services</h5>
+								<div class="dmn dmn-ds mb-2 mr-2" v-for="decisionSessionName in importedModel.decisionServices">
+									<span v-on:click="toggleDecisionService(decisionSessionName, importedModel.namespace)" v-bind:class="[isCurrentDecisionService(decisionSessionName, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionSessionName}}</span>
+								</div>
+							</template>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="col-4 mb-4" v-on:drop="onAddModelsDrop" v-on:dragover="onModelDragOver" v-on:dragenter="onModelDragOver">
+			<div class="mb-2" v-on:drop="onAddModelsDrop" v-on:dragover="onModelDragOver" v-on:dragenter="onModelDragOver">
 				<div class="card" style="height: 100%; min-height: 191px"> <!-- 191 is the height of a model without decisions, inputs and knowledge models -->
 					<div class="card-body text-muted d-flex justify-content-center align-items-center">
 						<div class="d-flex flex-column align-items-center">
@@ -156,13 +161,13 @@
 				this.decisionSession = await Network.getDecisionSession();
 			},
 			async importModels() {
-				this.$store.commit("displayAlert",null);
+				this.$store.commit("displayAlert", null);
 
 				const result = await Network.importModels(this.models);
 
 				const resultAlert = this.getResultAlert(result);
 				this.$store.commit("displayAlert", {
-					message:  AlertHelper.buildList(resultAlert.message, result.messages),
+					message: AlertHelper.buildList(resultAlert.message, result.messages),
 					state: resultAlert.state
 				});
 
