@@ -1,3 +1,9 @@
+const FileSystem = require("fs");
+const Path = require("path");
+const XML = require('pixl-xml');
+
+const pom = XML.parse(FileSystem.readFileSync(Path.resolve(__dirname, "..", "server", "pom.xml")).toString());
+
 export default {
 	srcDir: './src',
 	generate: {
@@ -39,8 +45,9 @@ export default {
 			return process.env.DECLAB_HOST === undefined ? "http://127.0.0.1:8080/declab-" + process.env.npm_package_version + "/api" : process.env.DECLAB_HOST;
 		})(),
 		DECLAB_VERSION: process.env.npm_package_version,
-		DECLAB_TIME: (() => {
-			return new Date().toISOString().split("Z")[0].split("T").join(", ");
-		})(),
+		DECLAB_TIME: new Date().toISOString().split("Z")[0].split("T").join(", "),
+		DECLAB_JDEC_VERSION: pom.dependencies.dependency.find((dependency) => {
+			return dependency.artifactId === "jdec";
+		}).version,
 	}
 }

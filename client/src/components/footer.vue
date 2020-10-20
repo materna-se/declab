@@ -9,7 +9,7 @@
 				</div>
 				<div class="col-4">
 					<small class="d-block text-right text-muted">
-						Version {{version}} (built at {{time}})
+						Version {{version}} (built at {{time}} with jDEC {{jDECVersion}})
 					</small>
 				</div>
 			</div>
@@ -23,6 +23,7 @@
 			return {
 				version: process.env.DECLAB_VERSION,
 				time: process.env.DECLAB_TIME,
+				jDECVersion: process.env.DECLAB_JDEC_VERSION,
 			};
 		}
 	}
