@@ -2,9 +2,10 @@ const FileSystem = require("fs");
 const Path = require("path");
 const XML = require('pixl-xml');
 
-const pom = XML.parse(FileSystem.readFileSync(Path.resolve(__dirname, "..", "server", "pom.xml")).toString());
+const fetch = require('node-fetch');
 
 export default async function() {
+	const dependencyDescription = await getDependencyDescription();
 	return {
 		srcDir: './src',
 		generate: {
@@ -47,9 +48,26 @@ export default async function() {
 			})(),
 			DECLAB_VERSION: process.env.npm_package_version,
 			DECLAB_TIME: new Date().toISOString().split("Z")[0].split("T").join(", "),
-			DECLAB_JDEC_VERSION: pom.dependencies.dependency.find((dependency) => {
-				return dependency.artifactId === "jdec";
-			}).version,
+			DECLAB_DEPENDENCY_DESCRIPTION: dependencyDescription,
 		}
 	};
+}
+
+async function getDependencyDescription() {
+	const declabPOM = XML.parse(FileSystem.readFileSync(Path.resolve(__dirname, "..", "server", "pom.xml")).toString());
+	const jDECVersion = declabPOM.dependencies.dependency.find((dependency) => {
+		return dependency.artifactId === "jdec";
+	}).version;
+
+	const jDECRelease = XML.parse(await (await fetch("https://oss.sonatype.org/content/repositories/snapshots/com/github/materna-se/jdec/" + jDECVersion + "/maven-metadata.xml")).text());
+	const jDECReleaseVersion = jDECRelease.versioning.snapshotVersions.snapshotVersion.find((version) => {
+		return version.extension === "pom";
+	}).value;
+
+	const jDECPOM = XML.parse(await (await fetch("https://oss.sonatype.org/content/repositories/snapshots/com/github/materna-se/jdec/" + jDECVersion + "/jdec-" + jDECReleaseVersion + ".pom")).text());
+	const droolsVersion = jDECPOM.dependencies.dependency.find((dependency) => {
+		return dependency.artifactId === "kie-dmn-core";
+	}).version;
+
+	return "jDEC " + jDECVersion + " and Drools " + droolsVersion;
 }
