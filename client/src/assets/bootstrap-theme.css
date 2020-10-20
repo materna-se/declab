@@ -167,3 +167,8 @@ small {
 	opacity: 1;
 	transition: opacity .15s;
 }
+
+.modal {
+	overflow-x: hidden;
+	overflow-y: auto;
+}

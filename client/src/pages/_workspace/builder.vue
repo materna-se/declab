@@ -77,7 +77,7 @@
 
 		<template v-if="modal.visible">
 			<div class="modal-backdrop fade show"></div>
-			<div class="modal show" style="display: block" v-on:click.self="modal.visible = false">
+			<div class="modal fade show" style="display: block" v-on:click.self="modal.visible = false">
 				<div class="modal-dialog modal-dialog-centered modal-lg">
 					<div class="modal-content p-4">
 						<div class="modal-body">
@@ -346,16 +346,6 @@
 </script>
 
 <style scoped>
-	.card-header-border {
-		border: 1px solid #dee2e6;
-		border-bottom: none;
-	}
-
-	.card-footer-border {
-		border: 1px solid #dee2e6;
-		border-top: none;
-	}
-
 	.card-borderless {
 		border: none;
 	}
