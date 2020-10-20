@@ -172,3 +172,13 @@ small {
 	overflow-x: hidden;
 	overflow-y: auto;
 }
+
+.tooltip {
+	z-index: 1;
+}
+
+.tooltip.developer .tooltip-inner {
+	max-width: 600px;
+	text-align: left;
+	font-family: "Source Code Pro", monospace;
+}

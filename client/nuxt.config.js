@@ -4,8 +4,8 @@ const XML = require('pixl-xml');
 
 const fetch = require('node-fetch');
 
-export default async function() {
-	const dependencyDescription = await getDependencyDescription();
+export default async function () {
+	const developerInformation = await getDeveloperInformation();
 	return {
 		srcDir: './src',
 		generate: {
@@ -47,13 +47,12 @@ export default async function() {
 				return process.env.DECLAB_HOST === undefined ? "http://127.0.0.1:8080/declab-" + process.env.npm_package_version + "/api" : process.env.DECLAB_HOST;
 			})(),
 			DECLAB_VERSION: process.env.npm_package_version,
-			DECLAB_TIME: new Date().toISOString().split("Z")[0].split("T").join(", "),
-			DECLAB_DEPENDENCY_DESCRIPTION: dependencyDescription,
+			DECLAB_DEVELOPER_INFORMATION: developerInformation,
 		}
 	};
 }
 
-async function getDependencyDescription() {
+async function getDeveloperInformation() {
 	const declabPOM = XML.parse(FileSystem.readFileSync(Path.resolve(__dirname, "..", "server", "pom.xml")).toString());
 	const jDECVersion = declabPOM.dependencies.dependency.find((dependency) => {
 		return dependency.artifactId === "jdec";
@@ -69,5 +68,7 @@ async function getDependencyDescription() {
 		return dependency.artifactId === "kie-dmn-core";
 	}).version;
 
-	return "jDEC " + jDECVersion + " and Drools " + droolsVersion;
+	return "Build Time: " + new Date().toISOString().split("Z")[0].split("T").join(", ") + "<br>" +
+		"Build Environment: " + process.env.NODE_ENV + "<br>" +
+		"Dependencies: jDEC " + jDECVersion + ", Drools " + droolsVersion;
 }

@@ -86,10 +86,3 @@
 		}
 	}
 </script>
-
-
-<style>
-	.tooltip {
-		z-index: 33;
-	}
-</style>
