@@ -50,6 +50,7 @@
 						<alert v-bind:alert="alert"/>
 					</div>
 				</div>
+
 				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
 					<div class="card-header">
 						<div class="d-flex align-items-center">
@@ -153,6 +154,7 @@
 					result: {
 						outputs: {},
 						context: {},
+						accessLog: {},
 						visible: {},
 						name: {}
 					}
@@ -221,6 +223,7 @@
 					const result = await Network.executeModel(this.model.input.value);
 					this.model.result.outputs = result.outputs;
 					this.model.result.context = result.context;
+					this.model.result.accessLog = result.accessLog;
 					if (result.messages.length > 0) {
 						this.displayAlert(AlertHelper.buildList("The output was calculated, the following messages were returned:", result.messages), "warning");
 						return;
