@@ -1,3 +1,5 @@
+import isEqual from "lodash/isEqual"
+
 export class Node {
     constructor(values, subtree) {
         this.values = values;
@@ -12,8 +14,7 @@ export class Node {
         if (other instanceof Leaf) {
             return false;
         }
-        // TODO: There has to be a more performant way to do this
-        return JSON.stringify(this.subtree) === JSON.stringify(other.subtree);
+        return isEqual(this.subtree, other.subtree);
     }
 
     getFirst() {

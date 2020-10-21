@@ -12,16 +12,24 @@
 				<div class="list-group mb-2">
 					<template v-if="options.inputs.length !== 0">
 						
-						<div class="list-group-item" v-for="(inputOption, index) in options.inputs" v-on:click.self="toggleISelExpanded(index)">
+						<div class="list-group-item" v-for="(inputOption, index) in options.inputs">
 							<div class="row mx-0 mb-2 flex-row">
-								<input class="form-control mb-0 mr-2" placeholder="Enter JSONPath..." style="flex: 1" v-model="options.inputs[index]['selector']">
-								<button class="btn btn-outline-secondary" v-on:click="toggleInput(options.inputs[index]['selector'])">
+								<button class="btn btn-outline-secondary" v-on:click="toggleInputExpanded(index)">
+									<svg v-if="!options.inputs[index]['expanded']" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
+										<path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" fill="currentColor"/>
+									</svg>
+									<svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
+										<path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" fill="currentColor"/>
+									</svg>
+								</button>
+								<input class="form-control mb-0 mr-2 ml-2" placeholder="Enter JSONPath..." style="flex: 1" v-model="options.inputs[index]['selector']">
+								<button class="btn btn-outline-secondary" v-on:click="removeInput(index)">
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
 										<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 									</svg>
 								</button>
 							</div>
-							<div class="row mx-0 flex-row" v-if="options.iSelExpanded.includes(index)">
+							<div class="row mx-0 flex-row" v-if="options.inputs[index]['expanded']">
 								<literal-expression :elementName="'literal-expression-' + index" v-model="options.inputs[index]['expression']"/>
 							</div>
 						</div>
@@ -31,7 +39,7 @@
 					</div>
 				</div>
 
-				<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="options.inputs.push({'selector' : '', 'expression' : ''})">
+				<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="options.inputs.push({'selector' : '', 'expression' : '', 'expanded' : false})">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
 					</svg>
@@ -63,19 +71,17 @@
 				</button>
 
 				<h5 class="mb-2">Discovery</h5>
-				<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="startDiscovery()">
+				<button class="btn btn-block btn-outline-secondary mb-4" :disabled="inputTemplateSelected === null || options.inputs.length == 0" v-on:click="startDiscovery()">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M8,5.14V19.14L19,12.14L8,5.14Z" fill="currentColor"/>
 					</svg>
 				</button>				
 			</div>
 
-
-
 			<div class="col-8 mb-4" v-if="inputTemplateSelected !== null">
 				<h4 class="mb-2">Input</h4>
 				<p class="text-right">Click on nodes to add input selectors!</p>
-				<json-builder class="mb-4" v-bind:template="options.inputTemplate" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true" v-on:update:path="toggleInput(convertPath($event));"/>
+				<json-builder class="mb-4" v-bind:template="options.inputTemplate" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true" v-on:update:path="addInput(convertPath($event));"/>
 
 				<h4 class="mb-2">Output</h4>
 				<p class="text-right">Click on nodes to add output selectors!</p>
@@ -91,7 +97,6 @@
 <script>
 	import Network from "../../helpers/network";
 	import JSONPath from "jsonpath";
-	import debounce from "lodash/debounce";
 	import LiteralExpression from "../../components/dmn/literal-expression.vue";
 	import JSONBuilder from "../../components/json/json-builder.vue";
 	import { Node } from "../../helpers/discovery"
@@ -130,9 +135,6 @@
 				options: {
 					// Input selectors and expressions
 					inputs: [],
-
-					// Which input selectors have their FEEL-Editor expanded
-					iSelExpanded: [],
 
 					// Input selector cache
 					inputExpressions: {},
@@ -200,7 +202,13 @@
 				for (let i = 0; i < inputValues.length; i++) {
 					// Apply current input value to current selector
 					const value = inputValues[i];
-					JSONPath.value(currentInput, selector, value);
+
+					try {
+						JSONPath.value(currentInput, selector, value);
+					} catch(err) {
+						// Inform user of any warnings or errors
+					}
+					
 
 					// Are there more input selectors to consider?
 					if (hasSubspace) {
@@ -221,17 +229,14 @@
 							let currentOutputAdjusted = {};
 
 							for (const selector of this.options.outputs) {
-								// Do nothing if selector is invalid
+								// Ignore invalid output selectors
 								try {
 									if (JSONPath.query(currentOutput, selector).length > 0) {
 										JSONPath.value(currentOutputAdjusted, selector, JSONPath.query(currentOutput, selector));
 									}
 								} catch(err) {
-									// TODO: Tell user if problems occured
-									// Implement warnings like in Model view?
+									
 								}
-
-								
 							}
 
 							currentOutput = currentOutputAdjusted;
@@ -313,55 +318,22 @@
 				return JSONPath.stringify(path);
 			},
 
-			toggleInput(path) {
-				// TODO: How to make sure only end paths can be added?
+			addInput(path) {
+				let expression = "";
 
-				// Add / remove selector
-				let selectorMatches = this.options.inputs.filter(e => e.selector === path);
-				if (selectorMatches.length > 0) {
-					// Remove the selector (all matches in case there are multiple)
-					// Store the expression for reference
-					for (const selector of selectorMatches) {
-						// Cache the expression in case this selector will be re-added
-						this.options.inputExpressions[path] = selector["expression"];
-
-						// Get index of selector
-						let selDltIndex = this.options.inputs.indexOf(selector);
-
-						// Remove selector
-						this.options.inputs.splice(selDltIndex, 1);
-
-						// Remove expansion for selector
-						this.options.iSelExpanded.splice(this.options.iSelExpanded.indexOf(selDltIndex), 1);
-
-						// Adjust other expansion indexes
-						for (let [i, selIndex] of this.options.iSelExpanded.entries()) {
-							if (selIndex > selDltIndex) {
-								this.options.iSelExpanded[i] -= 1;
-							}
-						}
-					}
-				} else {
-					// Add the selector
-					let expression = "";
-
-					if (this.options.inputExpressions[path] !== undefined) {
-						expression = this.options.inputExpressions[path];
-					}
-
-					this.options.inputs.push({"selector" : path, "expression" : expression});
+				if (this.options.inputExpressions[path] !== undefined) {
+					expression = this.options.inputExpressions[path];
 				}
+
+				this.options.inputs.push({"selector" : path, "expression" : expression, "expanded" : false});
 			},
 
-			toggleISelExpanded(index) {
-				let indexMatches = this.options.iSelExpanded.filter(e => e === index)
-				if (indexMatches.length > 0) {
-					for (const index of indexMatches) {
-						this.options.iSelExpanded.splice(this.options.iSelExpanded.indexOf(index), 1);
-					}
-				} else {
-					this.options.iSelExpanded.push(index);
-				}
+			removeInput(index) {
+				this.options.inputs.splice(index, 1);
+			},
+
+			toggleInputExpanded(index) {
+				this.options.inputs[index]["expanded"] = !this.options.inputs[index]["expanded"];
 			},
 
 			toggleOutput(path) {
