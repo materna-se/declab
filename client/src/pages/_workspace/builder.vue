@@ -51,6 +51,8 @@
 					</div>
 				</div>
 
+				<!--<code><pre>{{JSON.stringify(model.result.accessLog, null, 2)}}</pre></code>-->
+
 				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
 					<div class="card-header">
 						<div class="d-flex align-items-center">
