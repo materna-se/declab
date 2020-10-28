@@ -172,7 +172,7 @@
 				let currentInput = JSON.parse(JSON.stringify(this.inputTemplates[this.inputTemplateSelected]));
 
 				// Embark on a multi-dimensional discovery :)
-				this.results = await this.mDimDiscovery(0, currentInput, this.results, ts);
+				this.results = await this.mDimDiscovery(0, currentInput["value"], this.results, ts);
 
 				// Check if discovery was cancelled?
 				this.drawDiscovery();
