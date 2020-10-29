@@ -1,0 +1,224 @@
+<html>
+<head>
+	<title>declab - Utilities</title>
+	<meta charset="UTF-8">
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uuid@latest/dist/umd/uuidv4.min.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,700|Source+Code+Pro:400">
+	<style>
+		body {
+			font-family: "PT Sans", sans-serif;
+			margin: 0;
+			background: #f6f6f8;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			min-height: 100vh;
+		}
+
+		h1, h2, h3 {
+			margin: 0 0 0.5rem 0;
+		}
+
+		code {
+			font-family: "Source Code Pro", monospace;
+			font-size: .85rem;
+		}
+
+		.card {
+			position: relative;
+			background: #fff;
+			border: 1px solid rgba(0, 0, 0, .125);
+			border-radius: 0.25rem;
+			box-shadow: 0 0 20px 0 rgba(117, 202, 136, .12);
+			padding: 1.25rem;
+			margin-bottom: 2rem
+		}
+
+		.card:last-child {
+			margin-bottom: 0;
+		}
+	</style>
+</head>
+<body>
+<div id="app">
+	<h1>Conversions</h1>
+	<h2>DMN 1.1 (ACTICO) to DMN 1.2 (Kogito)</h2>
+	<div class="card" v-on:drop="onDrop($event, 2)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
+		<code>Drag and drop models here!</code>
+	</div>
+	<h2>DMN 1.2 (Kogito) to DMN 1.1 (ACTICO)</h2>
+	<div class="card" v-on:drop="onDrop($event, 1)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
+		<code>Drag and drop models here!</code>
+	</div>
+
+	<h1>Fixes</h1>
+	<h2>ACTICO Decision Service</h2>
+	<div class="card" v-on:drop="onDrop($event, 3)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
+		<code>Drag and drop models here!</code>
+	</div>
+</div>
+<script>
+	var app = new Vue({
+		el: '#app',
+		data: {},
+		methods: {
+			// Listeners
+			onDrag(e) {
+				e.preventDefault(); // See https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#droptargets.
+			},
+			async onDrop(e, target) {
+				e.preventDefault();
+
+				const files = e.dataTransfer.files;
+				if (files.length !== 1) {
+					return;
+				}
+
+				const file = files[0];
+				const content = await new Promise(resolve => {
+					const fileReader = new FileReader();
+					fileReader.addEventListener("load", async function (readerEvent) {
+						resolve(readerEvent.target.result);
+					});
+					fileReader.readAsText(file, "UTF-8");
+				});
+
+				const downloadElement = document.createElement("a");
+				downloadElement.href = URL.createObjectURL(new Blob([this.processModel(content, target)], {type: 'text/xml'}));
+				downloadElement.download = file.name;
+				downloadElement.click();
+			},
+			/*
+			The following targets are supported:
+			1: DMN 1.2 (Kogito) to DMN 1.1 (ACTICO)
+			2: DMN 1.1 (ACTICO) to DMN 1.2 (Kogito)
+			3: ACTICO Decision Service Fix
+			 */
+			processModel(content, target) {
+				// Reference: https://github.com/materna-se/jdec/blob/master/src/main/java/de/materna/jdec/dmn/conversions/ActicoConverter.java.
+
+				switch (target) {
+					case 1:
+					case 2: {
+						let rootElement = this.deserializeModel(this.updateModelVersion(content, target));
+
+						this.updateDataTypes(rootElement, target);
+						this.convertLayout(rootElement, target);
+
+						if (target === 2) {
+							this.fixActicoDecisionServices(rootElement);
+						}
+
+						return this.serializeModel(rootElement);
+					}
+					case 3: {
+						let rootElement = this.deserializeModel(content);
+						this.fixActicoDecisionServices(rootElement);
+						return this.serializeModel(rootElement);
+					}
+				}
+			},
+
+			// Helpers
+
+			deserializeModel(content) {
+				return (new DOMParser()).parseFromString(content, "application/xml").children[0];
+			},
+			serializeModel(rootElement) {
+				return (new XMLSerializer()).serializeToString(rootElement);
+			},
+
+			// Conversions
+
+			/**
+			 * Updates the dmn: and feel: namespace URI between DMN 1.1 and DMN 1.2.
+			 */
+			updateModelVersion(content, target) {
+				// This needs to be done before parsing, because it is not possible to change the namespace URI afterwards.
+				// See https://developer.mozilla.org/en-US/docs/Web/API/Element/namespaceURI.
+				content = content.replace(/xmlns:dmn="(.*?)"/, function (match, first) {
+					switch (target) {
+						case 1:
+							return "xmlns:dmn=\"http://www.omg.org/spec/DMN/20151101/dmn.xsd\"";
+						case 2:
+							return "xmlns:dmn=\"http://www.omg.org/spec/DMN/20180521/MODEL/\"";
+					}
+				});
+				content = content.replace(/xmlns:feel="(.*?)"/, function (match, first) {
+					switch (target) {
+						case 1:
+							return "xmlns:feel=\"http://www.omg.org/spec/FEEL/20140401\"";
+						case 2:
+							return "xmlns:feel=\"http://www.omg.org/spec/DMN/20180521/FEEL/\"";
+					}
+				});
+				return content;
+			},
+			/**
+			 * Converts feel:* to * in DMN 1.1 to DMN 1.2 conversions and * to feel:* in DMN 1.2 to DMN 1.1 conversions.
+			 */
+			updateDataTypes(rootElement, target) {
+				for (const typeElement of rootElement.querySelectorAll("[typeRef]")) {
+					switch (target) {
+						case 1:
+							typeElement.setAttribute("typeRef", "feel:" + typeElement.getAttribute("typeRef"));
+							continue;
+						case 2:
+							typeElement.setAttribute("typeRef", typeElement.getAttribute("typeRef").replace("feel:", ""));
+							continue;
+					}
+				}
+				for (const typeElement of rootElement.querySelectorAll("*")) {
+					switch (target) {
+						case 1:
+							// "If the type language is FEEL the built-in types are the FEEL built-in data types: number, string, boolean, days and time duration, years and months duration, time, and date and time. A typeRef referencing a built-in type SHALL omit the prefix." (https://www.omg.org/spec/DMN/1.2/PDF)
+							if (/^(number|string|boolean|days and time duration|years and months duration|time|date and time)/.test(typeElement.innerHTML)) {
+								typeElement.innerHTML = "feel:" + typeElement.innerHTML;
+							}
+							continue;
+						case 2:
+							if (typeElement.innerHTML.startsWith("feel:")) {
+								typeElement.innerHTML = typeElement.innerHTML.substring(5);
+							}
+							continue;
+					}
+				}
+			},
+			/**
+			 * Converts the layout between the ACTICO and Kogito format.
+			 * @todo
+			 */
+			convertLayout(rootElement, target) {
+				switch (target) {
+					case 1:
+						// TODO:
+						Array.from(rootElement.getElementsByTagName("dmndi:DMNDI")).forEach(element => element.remove());
+						break;
+					case 2:
+						Array.from(rootElement.getElementsByTagName("dmn:extensionElements")).forEach(element => element.remove());
+						break;
+				}
+			},
+
+			// Fixes
+
+			/**
+			 * Adds the required variable tag to decision services.
+			 * ACTICO omits the tag and thus creates models that are not compliant with the DMN specification.
+			 */
+			fixActicoDecisionServices(rootElement) {
+				for (const decisionServiceElement of rootElement.getElementsByTagName("dmn:decisionService")) {
+					if (decisionServiceElement.getElementsByTagName("dmn:variable").length === 0) {
+						const variableElement = document.createElementNS("http://www.omg.org/spec/DMN/20180521/MODEL/", "dmn:variable");
+						variableElement.setAttribute("id", "_" + uuidv4());
+						variableElement.setAttribute("name", decisionServiceElement.getAttribute("name"));
+						decisionServiceElement.appendChild(variableElement);
+					}
+				}
+			}
+		}
+	})
+</script>
+</body>
+</html>
