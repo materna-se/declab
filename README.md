@@ -46,11 +46,11 @@ To get started, navigate to the playground page under `Education 🡒 Playground
 
 ![Using a playground](./images/using-a-playground-1.png)
 
-Users can also save and load their playgrounds. To save a playground, simply enter a name (*required*) and a description (*optional*) under the Playground section, then click on the save icon (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="display: inline"><path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" fill="currentColor"></path></svg>). To load a playground, select the desired option from the "Playground" dropdown menu. If you wish to clone a playground, simply load it, make your changes and click on the clone icon (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="display: inline"><path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"></path></svg>). This will allow you to save the playground under a new, different name.
+Users can also save and load their playgrounds. To save a playground, simply enter a name (*required*) and a description (*optional*) under the Playground section, then click on the save icon (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="display: inline"><path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" fill="currentColor"></path></svg>). To load a playground, select the desired option from the "Playground" dropdown menu. If you wish to clone a playground, simply load it, make your changes and click on the clone icon (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="display: inline"><path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"></path></svg>). This will allow you to save the playground under a new, different name. The playgrounds can also be managed using the playground designer page under `Design 🡒 Playgrounds`. As such, these two pages go hand in hand.
 
 ## Challenger
 
-The challenger page (found under `Education 🡒 Challenger`) is a place for users to practice their FEEL (Friendly Enough Expression Language) skills in small programming challenges. These challenges can be created by other users within the same workspace using the challenge editor page. As such, these two pages go hand in hand.
+The challenger page (found under `Education 🡒 Challenger`) is a place for users to practice their FEEL (Friendly Enough Expression Language) skills in small programming challenges. The challenges can also be managed using the challenge designer page under `Design 🡒 Challenges`. As such, these two pages go hand in hand.
 
 Every challenge has a name (*required*), a description (*optional*), a list of hints (*optional*), a list of test cases (*required*) and a solution (*required*). Users can test their own FEEL solutions against the list of test cases, view hints if they are given and compare their solutions to that provided by the challenge creator. This gives users the ability to create interactive FEEL programming classes. The knowledge gained from this can be applied in DMN development.
 
@@ -98,5 +98,10 @@ There are currently three types of messages that can be returned during the impo
 ## Builder
 
 ## Publisher
+At times, it might be helpful to share your created test cases with others to get feedback. For example, the test cases could be shared with your client during development to ensure that the defined logic has been implemented correctly. The publisher allows you to view all created test cases and then save them as PDF or print them.
+
+![Viewing all Models](./images/using-the-publisher.png)
+
+By clicking the <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="display: inline"><path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7m4.5-10.09l4.5-4.5V10h2V3h-7v2h3.59l-4.5 4.5 1.41 1.41z" fill="currentColor"></path></svg> button, you can expand all test cases, by clicking the <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="display: inline"><path d="M19.5 3.09L15 7.59V4h-2v7h7V9h-3.59l4.5-4.5-1.41-1.41M4 13v2h3.59l-4.5 4.5 1.41 1.41 4.5-4.5V20h2v-7H4z" fill="currentColor"></path></svg> button, you can collapse all test cases. You can also expand or collapse individual test cases by clicking on them. To save them as PDF or to print them, you can use the shortcut <kbd>Control</kbd> + <kbd>P</kbd>.
 
 ## Discoverer
