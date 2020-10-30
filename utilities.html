@@ -214,9 +214,11 @@
 							break;
 						}
 						case 2: {
-							const oldType = typeElement.getAttribute("typeRef");
-							typeElement.setAttribute("typeRef", typeElement.getAttribute("typeRef").replace("feel:", ""));
-							this.logs.push("Type " + oldType + " was converted to " + typeElement.getAttribute("typeRef") + ".");
+							if (typeElement.innerHTML.startsWith("feel:")) {
+								const oldType = typeElement.getAttribute("typeRef");
+								typeElement.setAttribute("typeRef", typeElement.getAttribute("typeRef").substring(5));
+								this.logs.push("Type " + oldType + " was converted to " + typeElement.getAttribute("typeRef") + ".");
+							}
 							break;
 						}
 					}
@@ -282,7 +284,7 @@
 				}
 			},
 			fixActicoFunctionDefinition(rootElement) {
-				for (const functionDefinitionElement of rootElement.getElementsByTagName("dmn:functionDefinition")) {
+				for (const functionDefinitionElement of rootElement.querySelectorAll("functionDefinition, encapsulatedLogic")) {
 					if(functionDefinitionElement.getAttribute("kind") === null) {
 						functionDefinitionElement.setAttribute("kind", "FEEL");
 						this.logs.push("ACTICO Function Definition " + functionDefinitionElement.getAttribute("id") + " was fixed.");
