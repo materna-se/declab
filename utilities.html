@@ -148,12 +148,9 @@
 
 						if (target === 2) {
 							this.fixActicoDecisionServices(rootElement);
-						}
-
-						if (target === 2) {
 							this.fixActicoFunctionDefinition(rootElement);
+							this.fixActicoAssociations(rootElement);
 						}
-
 						return this.serializeModel(rootElement);
 					}
 					case 3: {
@@ -250,17 +247,16 @@
 			convertLayout(rootElement, target) {
 				switch (target) {
 					case 1:
-						// TODO:
-						Array.from(rootElement.getElementsByTagName("dmndi:DMNDI")).forEach(element => {
+						for (const element of Array.from(rootElement.getElementsByTagName("dmndi:DMNDI"))) {
 							element.remove();
 							this.logs.push("Diagram interchange element was removed.");
-						});
+						}
 						break;
 					case 2:
-						Array.from(rootElement.getElementsByTagName("dmn:extensionElements")).forEach(element => {
+						for (const element of Array.from(rootElement.getElementsByTagName("dmn:extensionElements"))) {
 							element.remove();
 							this.logs.push("Extension element was removed.");
-						});
+						}
 						break;
 				}
 			},
@@ -288,6 +284,14 @@
 					if(functionDefinitionElement.getAttribute("kind") === null) {
 						functionDefinitionElement.setAttribute("kind", "FEEL");
 						this.logs.push("ACTICO Function Definition " + functionDefinitionElement.getAttribute("id") + " was fixed.");
+					}
+				}
+			},
+			fixActicoAssociations(rootElement) {
+				for (const associationElement of rootElement.querySelectorAll("association")) {
+					if(associationElement.querySelectorAll("sourceRef").length === 0 || functionDefinitionElement.querySelectorAll("targetRef").length === 0) {
+						associationElement.remove();
+						this.logs.push("ACTICO Association " + associationElement.getAttribute("id") + " was fixed.");
 					}
 				}
 			}
