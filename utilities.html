@@ -150,6 +150,10 @@
 							this.fixActicoDecisionServices(rootElement);
 						}
 
+						if (target === 2) {
+							this.fixActicoFunctionDefinition(rootElement);
+						}
+
 						return this.serializeModel(rootElement);
 					}
 					case 3: {
@@ -274,6 +278,14 @@
 						decisionServiceElement.appendChild(variableElement);
 
 						this.logs.push("ACTICO Decision Service " + decisionServiceElement.getAttribute("name") + " was fixed.");
+					}
+				}
+			},
+			fixActicoFunctionDefinition(rootElement) {
+				for (const functionDefinitionElement of rootElement.getElementsByTagName("dmn:functionDefinition")) {
+					if(functionDefinitionElement.getAttribute("kind") === null) {
+						functionDefinitionElement.setAttribute("kind", "FEEL");
+						this.logs.push("ACTICO Function Definition " + functionDefinitionElement.getAttribute("id") + " was fixed.");
 					}
 				}
 			}
