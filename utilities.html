@@ -10,10 +10,10 @@
 			font-family: "PT Sans", sans-serif;
 			margin: 0;
 			background: #f6f6f8;
+			min-height: 100vh;
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			min-height: 100vh;
 		}
 
 		h1, h2, h3 {
@@ -23,6 +23,20 @@
 		code {
 			font-family: "Source Code Pro", monospace;
 			font-size: .85rem;
+		}
+
+		#app {
+			width: 1000px;
+			display: flex;
+		}
+
+		.container.left {
+			flex: 1;
+			margin-right: 1rem;
+		}
+
+		.container.right {
+			flex: 1;
 		}
 
 		.card {
@@ -38,30 +52,51 @@
 		.card:last-child {
 			margin-bottom: 0;
 		}
+
+		.console {
+			background: #000;
+			border-radius: 0.25rem;
+			color: #fff;
+			padding: 1.25rem;
+		}
+
+		.console code {
+			display: block;
+		}
 	</style>
 </head>
 <body>
 <div id="app">
-	<h1>Conversions</h1>
-	<h2>DMN 1.1 (ACTICO) to DMN 1.2 (Kogito)</h2>
-	<div class="card" v-on:drop="onDrop($event, 2)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
-		<code>Drag and drop models here!</code>
-	</div>
-	<h2>DMN 1.2 (Kogito) to DMN 1.1 (ACTICO)</h2>
-	<div class="card" v-on:drop="onDrop($event, 1)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
-		<code>Drag and drop models here!</code>
-	</div>
+	<div class="container left">
+		<h1>Conversions</h1>
+		<h2>DMN 1.1 (ACTICO) to DMN 1.2 (Kogito)</h2>
+		<div class="card" v-on:drop="onDrop($event, 2)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
+			<code>Drag and drop models here!</code>
+		</div>
+		<h2>DMN 1.2 (Kogito) to DMN 1.1 (ACTICO)</h2>
+		<div class="card" v-on:drop="onDrop($event, 1)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
+			<code>Drag and drop models here!</code>
+		</div>
 
-	<h1>Fixes</h1>
-	<h2>ACTICO Decision Service</h2>
-	<div class="card" v-on:drop="onDrop($event, 3)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
-		<code>Drag and drop models here!</code>
+		<h1>Fixes</h1>
+		<h2>ACTICO Decision Service</h2>
+		<div class="card" v-on:drop="onDrop($event, 3)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
+			<code>Drag and drop models here!</code>
+		</div>
+	</div>
+	<div class="container right">
+		<h1>Logs</h1>
+		<div class="console">
+			<code v-for="log of logs">{{log}}</code>
+		</div>
 	</div>
 </div>
 <script>
 	var app = new Vue({
 		el: '#app',
-		data: {},
+		data: {
+			logs: []
+		},
 		methods: {
 			// Listeners
 			onDrag(e) {
@@ -69,6 +104,8 @@
 			},
 			async onDrop(e, target) {
 				e.preventDefault();
+
+				this.logs = [];
 
 				const files = e.dataTransfer.files;
 				if (files.length !== 1) {
@@ -84,10 +121,14 @@
 					fileReader.readAsText(file, "UTF-8");
 				});
 
+				this.logs.push("File " + file.name + " was imported.");
+
 				const downloadElement = document.createElement("a");
 				downloadElement.href = URL.createObjectURL(new Blob([this.processModel(content, target)], {type: 'text/xml'}));
 				downloadElement.download = file.name;
 				downloadElement.click();
+
+				this.logs.push("File " + file.name + " was exported.");
 			},
 			/*
 			The following targets are supported:
@@ -97,7 +138,6 @@
 			 */
 			processModel(content, target) {
 				// Reference: https://github.com/materna-se/jdec/blob/master/src/main/java/de/materna/jdec/dmn/conversions/ActicoConverter.java.
-
 				switch (target) {
 					case 1:
 					case 2: {
@@ -144,6 +184,7 @@
 						case 2:
 							return "xmlns:dmn=\"http://www.omg.org/spec/DMN/20180521/MODEL/\"";
 					}
+					this.logs.push("DMN version was updated.");
 				});
 				content = content.replace(/xmlns:feel="(.*?)"/, function (match, first) {
 					switch (target) {
@@ -152,6 +193,7 @@
 						case 2:
 							return "xmlns:feel=\"http://www.omg.org/spec/DMN/20180521/FEEL/\"";
 					}
+					this.logs.push("FEEL version was updated.");
 				});
 				return content;
 			},
@@ -161,12 +203,18 @@
 			updateDataTypes(rootElement, target) {
 				for (const typeElement of rootElement.querySelectorAll("[typeRef]")) {
 					switch (target) {
-						case 1:
+						case 1: {
+							const oldType = typeElement.getAttribute("typeRef");
 							typeElement.setAttribute("typeRef", "feel:" + typeElement.getAttribute("typeRef"));
-							continue;
-						case 2:
+							this.logs.push("Type " + oldType + " was converted to " + typeElement.getAttribute("typeRef") + ".");
+							break;
+						}
+						case 2: {
+							const oldType = typeElement.getAttribute("typeRef");
 							typeElement.setAttribute("typeRef", typeElement.getAttribute("typeRef").replace("feel:", ""));
-							continue;
+							this.logs.push("Type " + oldType + " was converted to " + typeElement.getAttribute("typeRef") + ".");
+							break;
+						}
 					}
 				}
 				for (const typeElement of rootElement.querySelectorAll("*")) {
@@ -174,14 +222,18 @@
 						case 1:
 							// "If the type language is FEEL the built-in types are the FEEL built-in data types: number, string, boolean, days and time duration, years and months duration, time, and date and time. A typeRef referencing a built-in type SHALL omit the prefix." (https://www.omg.org/spec/DMN/1.2/PDF)
 							if (/^(number|string|boolean|days and time duration|years and months duration|time|date and time)/.test(typeElement.innerHTML)) {
+								const oldType = typeElement.innerHTML;
 								typeElement.innerHTML = "feel:" + typeElement.innerHTML;
+								this.logs.push("Type " + oldType + " was converted to " + typeElement.innerHTML + ".");
 							}
-							continue;
+							break;
 						case 2:
 							if (typeElement.innerHTML.startsWith("feel:")) {
+								const oldType = typeElement.innerHTML;
 								typeElement.innerHTML = typeElement.innerHTML.substring(5);
+								this.logs.push("Type " + oldType + " was converted to " + typeElement.innerHTML + ".");
 							}
-							continue;
+							break;
 					}
 				}
 			},
@@ -193,10 +245,16 @@
 				switch (target) {
 					case 1:
 						// TODO:
-						Array.from(rootElement.getElementsByTagName("dmndi:DMNDI")).forEach(element => element.remove());
+						Array.from(rootElement.getElementsByTagName("dmndi:DMNDI")).forEach(element => {
+							element.remove();
+							this.logs.push("Diagram interchange element was removed.");
+						});
 						break;
 					case 2:
-						Array.from(rootElement.getElementsByTagName("dmn:extensionElements")).forEach(element => element.remove());
+						Array.from(rootElement.getElementsByTagName("dmn:extensionElements")).forEach(element => {
+							element.remove();
+							this.logs.push("Extension element was removed.");
+						});
 						break;
 				}
 			},
@@ -214,6 +272,8 @@
 						variableElement.setAttribute("id", "_" + uuidv4());
 						variableElement.setAttribute("name", decisionServiceElement.getAttribute("name"));
 						decisionServiceElement.appendChild(variableElement);
+
+						this.logs.push("ACTICO Decision Service " + decisionServiceElement.getAttribute("name") + " was fixed.");
 					}
 				}
 			}
