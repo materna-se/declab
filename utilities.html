@@ -26,6 +26,12 @@
 		}
 
 		#app {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.container.parent {
 			width: 1000px;
 			display: flex;
 		}
@@ -67,27 +73,31 @@
 </head>
 <body>
 <div id="app">
-	<div class="container left">
-		<h1>Conversions</h1>
-		<h2>DMN 1.1 (ACTICO) to DMN 1.2 (Kogito)</h2>
-		<div class="card" v-on:drop="onDrop($event, 2)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
-			<code>Drag and drop models here!</code>
-		</div>
-		<h2>DMN 1.2 (Kogito) to DMN 1.1 (ACTICO)</h2>
-		<div class="card" v-on:drop="onDrop($event, 1)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
-			<code>Drag and drop models here!</code>
-		</div>
+	<img src="https://raw.githubusercontent.com/materna-se/declab/master/docs/logo.png" style="margin-bottom: 2rem; width: 100px">
 
-		<h1>Fixes</h1>
-		<h2>ACTICO Decision Service</h2>
-		<div class="card" v-on:drop="onDrop($event, 3)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
-			<code>Drag and drop models here!</code>
+	<div class="container parent">
+		<div class="container left">
+			<h1>Conversions</h1>
+			<h2>DMN 1.1 (ACTICO) to DMN 1.2 (Kogito)</h2>
+			<div class="card" v-on:drop="onDrop($event, 2)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
+				<code>Drag and drop models here!</code>
+			</div>
+			<h2>DMN 1.2 (Kogito) to DMN 1.1 (ACTICO)</h2>
+			<div class="card" v-on:drop="onDrop($event, 1)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
+				<code>Drag and drop models here!</code>
+			</div>
+
+			<h1>Fixes</h1>
+			<h2>ACTICO Decision Service</h2>
+			<div class="card" v-on:drop="onDrop($event, 3)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
+				<code>Drag and drop models here!</code>
+			</div>
 		</div>
-	</div>
-	<div class="container right">
-		<h1>Logs</h1>
-		<div class="console">
-			<code v-for="log of logs">{{log}}</code>
+		<div class="container right">
+			<h1>Logs</h1>
+			<div class="console">
+				<code v-for="log of logs">{{log}}</code>
+			</div>
 		</div>
 	</div>
 </div>
@@ -107,28 +117,33 @@
 
 				this.logs = [];
 
-				const files = e.dataTransfer.files;
-				if (files.length !== 1) {
-					return;
-				}
+				try {
+					const files = e.dataTransfer.files;
+					if (files.length !== 1) {
+						throw new Error("Please select only one file!");
+					}
 
-				const file = files[0];
-				const content = await new Promise(resolve => {
-					const fileReader = new FileReader();
-					fileReader.addEventListener("load", async function (readerEvent) {
-						resolve(readerEvent.target.result);
+					const file = files[0];
+					const content = await new Promise(resolve => {
+						const fileReader = new FileReader();
+						fileReader.addEventListener("load", async function (readerEvent) {
+							resolve(readerEvent.target.result);
+						});
+						fileReader.readAsText(file, "UTF-8");
 					});
-					fileReader.readAsText(file, "UTF-8");
-				});
 
-				this.logs.push("File " + file.name + " was imported.");
+					this.logs.push("File " + file.name + " was imported.");
 
-				const downloadElement = document.createElement("a");
-				downloadElement.href = URL.createObjectURL(new Blob([this.processModel(content, target)], {type: 'text/xml'}));
-				downloadElement.download = file.name;
-				downloadElement.click();
+					const downloadElement = document.createElement("a");
+					downloadElement.href = URL.createObjectURL(new Blob([this.processModel(content, target)], {type: 'text/xml'}));
+					downloadElement.download = file.name;
+					downloadElement.click();
 
-				this.logs.push("File " + file.name + " was exported.");
+					this.logs.push("File " + file.name + " was exported.");
+				}
+				catch (e) {
+					this.logs.push("Error: " + e.message);
+				}
 			},
 			/*
 			The following targets are supported:
@@ -281,7 +296,7 @@
 			},
 			fixActicoFunctionDefinition(rootElement) {
 				for (const functionDefinitionElement of rootElement.querySelectorAll("functionDefinition, encapsulatedLogic")) {
-					if(functionDefinitionElement.getAttribute("kind") === null) {
+					if (functionDefinitionElement.getAttribute("kind") === null) {
 						functionDefinitionElement.setAttribute("kind", "FEEL");
 						this.logs.push("ACTICO Function Definition " + functionDefinitionElement.getAttribute("id") + " was fixed.");
 					}
@@ -289,7 +304,7 @@
 			},
 			fixActicoAssociations(rootElement) {
 				for (const associationElement of rootElement.querySelectorAll("association")) {
-					if(associationElement.querySelectorAll("sourceRef").length === 0 || functionDefinitionElement.querySelectorAll("targetRef").length === 0) {
+					if (associationElement.querySelectorAll("sourceRef").length === 0 || functionDefinitionElement.querySelectorAll("targetRef").length === 0) {
 						associationElement.remove();
 						this.logs.push("ACTICO Association " + associationElement.getAttribute("id") + " was fixed.");
 					}
