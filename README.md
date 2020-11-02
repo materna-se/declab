@@ -58,7 +58,13 @@ To create a challenge, you must first enter a workspace. Next, navigate to `Desi
 
 ![Creating a challenge](./images/creating-a-challenge.png)
 
-After creating a challenge, you can invite others to navigate to `Education 🡒 Challenges` and try to solve the previously created challenge. If all test cases are successful, the user has passed the challenge.
+After creating a challenge, you can invite others to navigate to `Education 🡒 Challenges` and try to solve the previously created challenge. 
+
+Each time the FEEL expression is changed, the challenge is checked again to see if it has been solved yet. If the challenge has not been solved yet, it will be shown exactly which test cases still fail:
+
+![Not solving a challenge](./images/not-solving-a-challenge.png)
+
+If all test cases are successful, the user has solved the challenge.
 
 ![Solving a challenge](./images/solving-a-challenge.png)
 
