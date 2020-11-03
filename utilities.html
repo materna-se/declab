@@ -304,7 +304,7 @@
 			},
 			fixActicoAssociations(rootElement) {
 				for (const associationElement of rootElement.querySelectorAll("association")) {
-					if (associationElement.querySelectorAll("sourceRef").length === 0 || functionDefinitionElement.querySelectorAll("targetRef").length === 0) {
+					if (associationElement.querySelectorAll("sourceRef").length === 0 || associationElement.querySelectorAll("targetRef").length === 0) {
 						associationElement.remove();
 						this.logs.push("ACTICO Association " + associationElement.getAttribute("id") + " was fixed.");
 					}
