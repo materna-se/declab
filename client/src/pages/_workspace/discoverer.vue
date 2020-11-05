@@ -71,7 +71,7 @@
 				</button>
 
 				<h5 class="mb-2">Discovery</h5>
-				<button class="btn btn-block btn-outline-secondary mb-4" :disabled="inputTemplateSelected === null || options.inputs.length == 0" v-on:click="startDiscovery()">
+				<button class="btn btn-block btn-outline-secondary mb-4" :disabled="inputTemplateSelected === null || options.inputs.length != 2" v-on:click="startDiscovery()">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M8,5.14V19.14L19,12.14L8,5.14Z" fill="currentColor"/>
 					</svg>
@@ -88,11 +88,32 @@
 				<json-builder class="mb-4" v-bind:template="outputStruct" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true" v-on:update:path="toggleOutput(convertPath($event));"/>
 
 				<h4 class="mb-2">Discovery</h4>
-				<div id="discovery-d3" width="800" height="920"/>
+				<table id="discovery-table" class="styled-table">
+				</table>
 			</div>
 		</div>
 	</div>
 </template>
+
+<style>
+	.styled-table {
+		border-collapse: collapse;
+		margin: 25px 0;
+		font-size: 0.9em;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		min-width: 400px;
+		box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+	}
+
+	.styled-table th,
+	.styled-table td {
+    	padding: 12px 15px;
+	}
+
+	.styled-table tbody tr {
+		border-bottom: 1px solid #dddddd;
+	}
+</style>
 
 <script>
 	import Network from "../../helpers/network";
@@ -102,6 +123,8 @@
 	import { Node } from "../../helpers/discovery"
 	import { Leaf } from "../../helpers/discovery"
 	import EmptyCollectionComponent from "../../components/empty-collection.vue";
+	import Colors from "../../helpers/colors";
+	import isEqual from "lodash/isEqual"
 
 	import * as d3 from "d3";
 
@@ -163,6 +186,10 @@
 				this.executionTimestamp = Date.now();
 				const ts = this.executionTimestamp;
 
+				// Clear alerts
+				this.$store.commit("displayAlert",null);
+				this.messages = [];
+
 				// Evaluate all expressions beforehand and cache the results
 				await this.evaluateInputExpressions();
 
@@ -191,7 +218,6 @@
 			async mDimDiscovery(depth, currentInput, root, ts) {
 				// Check if another discovery has been started or if this discovery was cancelled
 				if (this.executionTimestamp != ts || this.cancelled) {
-					console.log("CANCELLED");
 					return root;
 				}
 
@@ -209,6 +235,7 @@
 						JSONPath.value(currentInput, selector, value);
 					} catch(err) {
 						// Inform user of any warnings or errors
+						console.log("Caught error with selector apply");
 					}
 					
 
@@ -255,62 +282,147 @@
 			},
 
 			drawDiscovery() {
-				// DELETEME
-				// set the dimensions and margins of the graph
+				// If there are 2 input selectors, draw a table / spreadsheet
+				if (this.options.inputs.length != 2) {
+					return;
+				}
 
-				var width = 460
-				var height = 460
-				var radius = width / 2 // radius of the dendrogram
+				// Iterate through results
+				// Every node A of depth 1 is a row
+				// Every node B of depth 2 describes a column value of A
 
-				var svg = d3.select("#discovery-d3")
-					.append("svg")
-						.attr("width", width)
-						.attr("height", height)
-					.append("g")
-						.attr("transform", "translate(" + radius + "," + radius + ")");
+				// Step 1: Iterate over a single depth 2 subtree. These nodes will form the table's header row
+				// Step 2: Add selector 1 as an additional column.
+				// Step 3: Iterate over all depth 2 subtrees. Each subtree is a row with its root as the selector column.
 
-				// read json data
-				d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_dendrogram.json").then(function(data) {
-					// Create the cluster layout:
-					var cluster = d3.cluster()
-						.size([360, radius - 60]);  // 360 means whole circle. radius - 60 means 60 px of margin around dendrogram
+				let colors = {};
 
-					// Give the data to this cluster layout:
-					var root = d3.hierarchy(data, function(d) {
-						return d.children;
-					});
-					cluster(root);
+				//let columns = [this.options.inputs[0]["selector"]];
+				let columns = [""]
+				let d2Subtree = this.results.subtree[0].subtree;
 
-					// Features of the links between nodes:
-					var linksGenerator = d3.linkRadial()
-						.angle(function(d) { return d.x / 180 * Math.PI; })
-						.radius(function(d) { return d.y; });
+				for (const x of d2Subtree) {
+					columns = columns.concat(x.values);
+				}
 
-					// Add the links between nodes:
-					svg.selectAll('path')
-						.data(root.links())
-						.enter()
-						.append('path')
-						.attr("d", linksGenerator)
-						.style("fill", 'none')
-						.attr("stroke", '#ccc')
+				let rows = [];
+
+				for (const i of this.results.subtree) { // Depth 1 nodes (ROWS)
+					let row = [];
+					row.push(i.values);
+
+					for (const k of i.subtree) { // Depth 2 nodes (CELLS)
+						for (const l of k.values) { // Values in depth 2 node
+							row.push(k.output);
+
+							const outputJson = JSON.stringify(k.output);
+
+							if (colors[outputJson] === undefined) {
+								colors[outputJson] = Colors.pleasingRandomColor();
+							}
+						}
+					}
+
+					// Row is complete
+					rows.push(row);
+				}
+
+				// Optimize columns
+				for (var i = 1; i < columns.length; i++) {
+					let areEqual = true;
+
+					for (var rowI of rows) {
+						if (!isEqual(rowI[i], rowI[i-1])) {
+							areEqual = false;
+							break;
+						}
+					}
+
+					if (areEqual) {
+						columns[i - 1] = [].concat(columns[i-1], columns[i]);
+						columns.splice(i, 1);
+
+						for (var rowI of rows) {
+							rowI.splice(i, 1);
+						}
+
+						i = i - 1;
+					}
+				}
 
 
-					// Add a circle for each node.
-					svg.selectAll("g")
-						.data(root.descendants())
-						.enter()
-						.append("g")
-						.attr("transform", function(d) {
-							return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")";
-						})
-						.append("circle")
-							.attr("r", 7)
-							.style("fill", "#69b3a2")
-							.attr("stroke", "black")
-							.style("stroke-width", 2)
 
-				});
+				let table = document.getElementById("discovery-table");
+
+				// Remove old table contents
+				while (table.hasChildNodes()) {
+					table.removeChild(table.lastChild);
+				}
+
+				let thead = table.createTHead();
+				let row = thead.insertRow();
+				for (let key of columns) {
+					let th = document.createElement("th");
+
+					let text = undefined;
+					
+					if (!Array.isArray(key)) {
+						text = document.createTextNode(key);
+					} else {
+						text = document.createTextNode(key[0] + " - " + key[key.length - 1]);
+					}
+
+					th.title = JSON.stringify(key);
+
+					th.appendChild(text);
+					row.appendChild(th);
+				}
+
+				for (const row of rows) {
+					for (let i = 1; i < row.length; i++) {
+						const output = row[i];
+
+						const outputJson = JSON.stringify(output);
+
+						if (colors[outputJson] === undefined) {
+							colors[outputJson] = Colors.pleasingRandomColor();
+						}
+					}
+
+					// Row is finished
+					let trow = table.insertRow();
+					for (let i = 0; i < row.length; i++) {
+						const output = row[i];
+
+						const outputJson = JSON.stringify(output);
+
+						let cell = trow.insertCell();
+
+						if(i > 0) {
+							let outputValues = Object.values(output)
+							if (outputValues.length == 1) {
+								let text = document.createTextNode(outputValues[0]);
+								cell.appendChild(text);
+							}
+							cell.style.backgroundColor = colors[outputJson];
+							cell.title = outputJson;
+						} else {
+							let text = undefined;
+							if (output.length == 1) {
+								text = document.createTextNode(output[0]);
+							} else {
+								text = document.createTextNode(output[0] + " - " + output[output.length - 1]);
+								cell.title = outputJson;
+							}
+
+							cell.appendChild(text);
+						}
+					}
+
+
+					
+				}
+
 			},
 
 			//
@@ -321,13 +433,13 @@
 			},
 
 			addInput(path) {
-				let expression = "";
+				let expression = "[]";
 
 				if (this.options.inputExpressions[path] !== undefined) {
 					expression = this.options.inputExpressions[path];
 				}
 
-				this.options.inputs.push({"selector" : path, "expression" : expression, "expanded" : false});
+				this.options.inputs.push({"selector" : path, "expression" : expression, "expanded" : true});
 			},
 
 			removeInput(index) {
