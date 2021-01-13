@@ -1,5 +1,15 @@
 <template>
 	<div>
+		<div class="d-flex align-items-center mb-2">
+			<h3 class="mb-0 mr-auto">Models</h3>
+
+			<div>
+				<button class="btn btn-block btn-outline-secondary" v-on:click="importSample">
+					Import Sample
+				</button>
+			</div>
+		</div>
+
 		<draggable v-model="importedModels" animation="150" draggable=".draggable" v-on:update="orderModels">
 			<div class="mb-2 draggable" v-on:drop="onReplaceModelDrop($event, index)" v-on:dragover="onModelDragOver" v-on:dragenter="onModelDragOver" v-for="(importedModel, index) of importedModels">
 				<div class="card">
@@ -61,55 +71,6 @@
 		</draggable>
 	</div>
 </template>
-
-<style>
-	.dmn {
-		float: left;
-
-		padding: 0.5rem 1rem;
-
-		border: 1px solid rgba(0, 0, 0, .125);
-	}
-
-	.dmn-decision {
-		background: #fdeb7a;
-
-		border-radius: 3px;
-	}
-
-	.dmn-input {
-		background: #92c0ff;
-		border-radius: 15px;
-	}
-
-	.dmn-bkm {
-		background: #9aeb9b;
-		border-radius: 15px 3px 15px 3px;
-	}
-
-	.dmn-ds {
-		background: #9a7afd;
-		border-radius: 3px;
-		position: relative;
-	}
-
-	.dmn-ds span {
-		background: #9a7afd;
-		position: relative;
-		z-index: 1;
-	}
-
-	.dmn-ds::after {
-		display: block;
-		content: '';
-		border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-		position: absolute;
-		width: 100%;
-		height: 1px;
-		top: 50%;
-		left: 0;
-	}
-</style>
 
 <script>
 	import Network from "../../helpers/network";
@@ -175,10 +136,16 @@
 			},
 			deleteModel(index) {
 				this.$delete(this.models, index);
-				this.$delete(this.importedModels, index);
 				this.importModels();
 			},
 
+			async importSample() {
+				const response = await fetch("./samples/sample.dtar");
+				const blob = await response.blob();
+
+				const result = await Network.importWorkspace(blob);
+				await this.getModel();
+			},
 			isCurrentDecisionService(name, namespace) {
 				if (this.decisionSession === null) {
 					return false;
@@ -278,3 +245,52 @@
 		}
 	};
 </script>
+
+<style>
+	.dmn {
+		float: left;
+
+		padding: 0.5rem 1rem;
+
+		border: 1px solid rgba(0, 0, 0, .125);
+	}
+
+	.dmn-decision {
+		background: #fdeb7a;
+
+		border-radius: 3px;
+	}
+
+	.dmn-input {
+		background: #92c0ff;
+		border-radius: 15px;
+	}
+
+	.dmn-bkm {
+		background: #9aeb9b;
+		border-radius: 15px 3px 15px 3px;
+	}
+
+	.dmn-ds {
+		background: #9a7afd;
+		border-radius: 3px;
+		position: relative;
+	}
+
+	.dmn-ds span {
+		background: #9a7afd;
+		position: relative;
+		z-index: 1;
+	}
+
+	.dmn-ds::after {
+		display: block;
+		content: '';
+		border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+		position: absolute;
+		width: 100%;
+		height: 1px;
+		top: 50%;
+		left: 0;
+	}
+</style>
