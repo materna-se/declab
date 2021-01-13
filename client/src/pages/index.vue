@@ -6,6 +6,12 @@
 			<div class="col-4 mb-4">
 				<h4 class="mb-2">Workspaces</h4>
 
+				<div class="row mb-4" v-if="demoMode === true">
+					<div class="col-12">
+						<alert v-bind:alert="{message: 'Workspaces are hidden in the demo version. Please remember your workspace link if you want to continue working on it later!', state: 'info'}"/>
+					</div>
+				</div>
+
 				<div class="card mb-4">
 					<div class="card-body">
 						<configurator class="mb-4" v-model="workspace"></configurator>
@@ -53,15 +59,19 @@
 	import EmptyCollectionComponent from "../components/empty-collection.vue";
 	import ConfiguratorComponent from "../components/configurator.vue";
 	import Network from "../helpers/network";
+	import Alert from "../components/alert/alert";
 
 	export default {
 		components: {
+			"alert": Alert,
 			"empty-collection": EmptyCollectionComponent,
 			"configurator": ConfiguratorComponent,
 		},
 		data() {
 			return {
 				query: null,
+
+				demoMode: process.env.DECLAB_DEMO_MODE,
 
 				workspaces: [],
 				workspace: {
@@ -74,7 +84,9 @@
 		},
 		methods: {
 			async getWorkspaces() {
-				this.workspaces = await Network.getWorkspaces(this.query);
+				if (!this.demoMode) {
+					this.workspaces = await Network.getWorkspaces(this.query);
+				}
 			},
 			async createWorkspace() {
 				const name = this.workspace.name;

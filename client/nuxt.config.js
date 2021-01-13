@@ -48,6 +48,7 @@ export default async function () {
 			})(),
 			DECLAB_VERSION: process.env.npm_package_version,
 			DECLAB_DEVELOPER_INFORMATION: developerInformation,
+			DECLAB_DEMO_MODE: false
 		}
 	};
 }
