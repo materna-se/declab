@@ -1,0 +1,91 @@
+<html>
+<head>
+	<title>declab - Utilities</title>
+	<meta charset="UTF-8">
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uuid@latest/dist/umd/uuidv4.min.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,700|Source+Code+Pro:400">
+	<style>
+        body {
+            font-family: "PT Sans", sans-serif;
+            margin: 0;
+            background: #f6f6f8;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1, h2, h3 {
+            margin: 0 0 0.5rem 0;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container.parent {
+            width: 1000px;
+        }
+	</style>
+</head>
+<body>
+<div id="app">
+	<img src="https://raw.githubusercontent.com/materna-se/declab/master/docs/logo.png" style="margin-bottom: 2rem; width: 100px">
+
+	<div class="container parent">
+	</div>
+</div>
+<script>
+	var app = new Vue({
+		el: '#app',
+		data: {},
+		mounted() {
+			const parameters = new URLSearchParams(location.search);
+			const count = parameters.get("count");
+			if (count === null) {
+				alert("Query parameter ?count={number} is not defined!");
+				return;
+			}
+			this.generate(Number(count));
+		},
+		methods: {
+			generate(count) {
+				let template = `<dmn:definitions xmlns:dmn="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns="https://kiegroup.org/dmn/_1418555B-8C03-4FD4-941B-AA5D0128A586" xmlns:feel="http://www.omg.org/spec/DMN/20180521/FEEL/" xmlns:kie="http://www.drools.org/kie/dmn/1.2" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="_5DA40C8F-DE11-4286-8F77-D9516E0A7100" name="generator" typeLanguage="http://www.omg.org/spec/DMN/20180521/FEEL/" namespace="https://kiegroup.org/dmn/_1418555B-8C03-4FD4-941B-AA5D0128A586">`;
+				for (let i = 1; i <= count; i++) {
+					template += `<dmn:decision id="_A422DACC-7983-4BAD-9C76-${i}" name="Decision ${i}"><dmn:variable id="_49D302D4-1896-49C5-A3E6-${i}" name="Decision ${i}"/>`;
+
+					if (i !== 1) {
+						template += `<dmn:informationRequirement id="_31C6C2AD-34F3-4374-9D03-${i}"><dmn:requiredDecision href="#_A422DACC-7983-4BAD-9C76-${i - 1}"/></dmn:informationRequirement>`;
+					}
+					else {
+						template += `<dmn:informationRequirement id="_F159180B-E96B-4BF7-BAFC-A3D1DAEA0957"><dmn:requiredInput href="#_B0F59A96-D1A8-45D7-BF8C-4EAA7AE699A6"/></dmn:informationRequirement>`;
+					}
+
+					// Expression
+					if (i !== 1) {
+						template += `<dmn:literalExpression id="_1919BF68-DD5B-4DB5-BA2A-${i}"><dmn:text>Decision ${i - 1} + 1</dmn:text></dmn:literalExpression>`;
+					}
+					else {
+						template += `<dmn:literalExpression id="_1919BF68-DD5B-4DB5-BA2A-${i}"><dmn:text>Input + 1</dmn:text></dmn:literalExpression>`;
+					}
+
+					template += `</dmn:decision>`;
+				}
+
+				template += `<dmn:inputData id="_B0F59A96-D1A8-45D7-BF8C-4EAA7AE699A6" name="Input"><dmn:variable id="_D8BC657A-2B56-4A0E-BACC-83144264666F" name="Input" typeRef="number"/></dmn:inputData>`;
+
+				template += `</dmn:definitions>`;
+
+				const downloadElement = document.createElement("a");
+				downloadElement.href = URL.createObjectURL(new Blob([template], {type: 'text/xml'}));
+				downloadElement.download = "generator-" + count + ".dmn";
+				downloadElement.click();
+			},
+		}
+	})
+</script>
+</body>
+</html>
