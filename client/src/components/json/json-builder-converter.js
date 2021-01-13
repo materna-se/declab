@@ -90,15 +90,15 @@ export default {
 		}
 	},
 
-	merge: function (existing, template) {
+	merge: function (existing, update) {
 		if (existing === undefined) {
-			return template;
+			return update;
 		}
 
-		if (existing.type === "object" && template.type === "object") {
+		if (existing.type === "object" && update.type === "object") {
 			const mergedObject = JSON.parse(JSON.stringify(existing.value));
-			for (const key in template.value) {
-				mergedObject[key] = this.merge(existing.value[key], template.value[key]);
+			for (const key in update.value) {
+				mergedObject[key] = this.merge(existing.value[key], update.value[key]);
 			}
 			return {
 				type: "object",
@@ -106,15 +106,15 @@ export default {
 			};
 		}
 
-		if(existing.type === "array" && template.type === "array") {
+		if(existing.type === "array" && update.type === "array") {
 			// The first element will always exist. We will use it as a structure element.
 			const existingStructure = existing.value[0];
 
 			const mergedArray = [];
-			for (const templateElement of template.value) {
+			for (const updateElement of update.value) {
 				const existingElement = JSON.parse(JSON.stringify(existingStructure));
 
-				mergedArray.push(this.merge(existingElement, templateElement));
+				mergedArray.push(this.merge(existingElement, updateElement));
 			}
 			return {
 				type: "array",
@@ -123,28 +123,32 @@ export default {
 		}
 
 		return {
-			type: template.type,
-			value: template.value,
-			options: template.options !== undefined ? template.options : existing.options,
+			type: update.type,
+			value: update.value,
+			options: update.options !== undefined ? update.options : existing.options,
 		};
 	},
 
-	addTemplate: function (existing, template) {
+	addTemplate: function (existing, update) {
+		if(existing === undefined || update === undefined || existing.type !== update.type) {
+			return;
+		}
+
 		switch (existing.type) {
 			case "string":
 			case "number":
 			case "boolean":
 			case "null":
-				existing.template = template.value;
+				existing.template = update.value;
 				return;
 			case "object":
 				for (const key in existing.value) {
-					this.addTemplate(existing.value[key], template.value[key]);
+					this.addTemplate(existing.value[key], update.value[key]);
 				}
 				return;
 			case "array":
 				for (let i = 0; i < existing.value.length; i++) {
-					this.addTemplate(existing.value[i], template.value[i]);
+					this.addTemplate(existing.value[i], update.value[i]);
 				}
 				return;
 		}

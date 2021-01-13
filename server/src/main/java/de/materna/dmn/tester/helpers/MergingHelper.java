@@ -3,44 +3,44 @@ package de.materna.dmn.tester.helpers;
 import java.util.*;
 
 public class MergingHelper {
-	public static Object merge(Object existing, Object template) {
-		if (template instanceof Map) {
+	public static Object merge(Object existing, Object update) {
+		if (existing instanceof Map && update instanceof Map) {
 			Map<String, Object> existingMap = (Map<String, Object>) existing;
-			Map<String, Object> templateMap = (Map<String, Object>) template;
+			Map<String, Object> updateMap = (Map<String, Object>) update;
 
 			Map<String, Object> mergedMap = new LinkedHashMap<>(existingMap);
-			for (String key : templateMap.keySet()) {
-				mergedMap.put(key, merge(mergedMap.get(key), templateMap.get(key)));
+			for (String key : updateMap.keySet()) {
+				mergedMap.put(key, merge(mergedMap.get(key), updateMap.get(key)));
 			}
 
 			return mergedMap;
 		}
 
-		if (template instanceof List) {
+		if (existing instanceof List && update instanceof List) {
 			List<Object> existingList = (List<Object>) existing;
-			List<Object> templateList = (List<Object>) template;
+			List<Object> updateList = (List<Object>) update;
 
 			Iterator<Object> existingIterator = existingList.iterator();
-			Iterator<Object> templateIterator = templateList.iterator();
+			Iterator<Object> updateIterator = updateList.iterator();
 
 			List<Object> mergedList = new LinkedList<>();
 
-			while (existingIterator.hasNext() || templateIterator.hasNext()) {
+			while (existingIterator.hasNext() || updateIterator.hasNext()) {
 				if (!existingIterator.hasNext()) {
-					mergedList.add(templateIterator.next());
+					mergedList.add(updateIterator.next());
 					continue;
 				}
-				if (!templateIterator.hasNext()) {
+				if (!updateIterator.hasNext()) {
 					mergedList.add(existingIterator.next());
 					continue;
 				}
 
-				mergedList.add(merge(existingIterator.next(), templateIterator.next()));
+				mergedList.add(merge(existingIterator.next(), updateIterator.next()));
 			}
 
 			return mergedList;
 		}
 
-		return template;
+		return update;
 	}
 }

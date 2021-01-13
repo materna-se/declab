@@ -6,8 +6,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
+import org.apache.log4j.Logger;
 
 public class TestResultOutput extends Serializable {
+	private static final Logger log = Logger.getLogger(TestResultOutput.class);
+
 	private String uuid;
 	private String name;
 	private String decision;
@@ -52,7 +55,7 @@ public class TestResultOutput extends Serializable {
 
 	@JsonProperty
 	public boolean isEqual() {
-		if (expected instanceof NullNode || calculated == null) {
+		if (expected instanceof NullNode && calculated instanceof NullNode) {
 			return true;
 		}
 
