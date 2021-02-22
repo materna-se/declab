@@ -15,7 +15,7 @@
 		"diff-match-patch": "^1.0.5",
 		"jsonpath": "^1.1.0",
 		"lodash": "^4.17.21",
-		"monaco-editor": "^0.18.1",
+		"monaco-editor": "^0.22.3",
 		"nuxt": "^2.15.1",
 		"regenerator-runtime": "^0.13.7",
 		"timeago.js": "^4.0.2",
