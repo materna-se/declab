@@ -17,8 +17,8 @@
 				</button>
 			</div>
 		</div>
-		<div class="row">
-			<div class="mb-4" v-if="mode !== 2" v-bind:class="{'col-6': mode === 0, 'col-12': mode === 1}">
+		<div class="d-flex">
+			<div class="mb-4" v-if="mode !== 2" style="flex: 1" v-bind:style="{'margin-right': mode === 0 ? '30px' : null}">
 				<div class="d-flex align-items-center mb-2">
 					<h4 class="mb-0 mr-auto">Input</h4>
 					<div>
@@ -36,14 +36,14 @@
 				<div class="row">
 					<div class="col-12">
 						<div class="card card-borderless mb-2">
-							<div class="card-body p-0">
+							<div class="card-body p-0" style="overflow-x: auto">
 								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:value="model.input.value = $event; executeModel();"/>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="mb-4" v-if="mode !== 1" v-bind:class="{'col-6': mode === 0, 'col-12': mode === 2}">
+			<div class="mb-4" v-if="mode !== 1" style="flex: 1">
 				<h4 class="mb-2">Outputs</h4>
 				<div class="row mb-2" v-if="alert.message !== null">
 					<div class="col-12">
