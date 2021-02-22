@@ -1,7 +1,10 @@
 <template>
-	<nav class="navbar navbar-expand mb-4">
+	<nav class="navbar navbar-expand mb-4 p-0">
 		<!-- Manual / route -->
-		<router-link to="/" class="navbar-brand">dec<span class="navbar-brand-secondary">lab</span></router-link>
+		<router-link to="/" class="navbar-brand">
+			<span class="navbar-brand-primary">dec</span>
+			<span class="navbar-brand-secondary">lab</span>
+		</router-link>
 
 		<!-- Builder for all custom routes -->
 		<ul class="navbar-nav mr-auto">
@@ -25,8 +28,8 @@
 <style scoped>
 	.navbar,
 	.navbar .dropdown-item:active {
-		background: rgb(44, 103, 112);
-		box-shadow: 0 0 20px 0 rgba(44, 103, 112, 0.5);
+		background: rgb(57, 62, 70);
+		box-shadow: 0 0 20px 0 rgba(57, 62, 70, 0.5);
 	}
 
 	.navbar .navbar-brand,
@@ -35,11 +38,25 @@
 	}
 
 	.navbar .navbar-brand {
-		font-size: 1.5rem;
+		font-size: 1.8rem;
+		padding: 0 1rem;
+		display: flex;
+	}
+
+	.navbar .navbar-brand .navbar-brand-primary {
+		background: rgb(198, 22, 35);
+		color: #ffffff;
+		line-height: 50px;
+		padding-right: 3px;
+		padding-left: 3px;
 	}
 
 	.navbar .navbar-brand .navbar-brand-secondary {
-		color: rgb(145, 185, 191);
+		background: rgb(70, 75, 83);
+		color: #ffffff;
+		line-height: 50px;
+		padding-left: 3px;
+		padding-right: 3px;
 	}
 
 	.dropdown-menu {
