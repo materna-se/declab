@@ -328,18 +328,21 @@
 				const vue = this;
 
 				// We need to detach the output into another window.
-				this.worker = window.open(location.href);
+				const worker = window.open(location.href);
 				// This custom event will be received when vue has finished mounting.
-				this.worker.addEventListener("aftermount", function () {
+				worker.addEventListener("aftermount", function () {
 					vue.mode = 1;
 					vue.displayAlert(null, null);
 					vue.executeModel();
+
+					// This event will be received when the opened window is closed or the user navigates away.
+					// It can only be added *after* the opened window is loaded.
+					worker.addEventListener("beforeunload", function () {
+						vue.mode = 0;
+						vue.executeModel();
+					});
 				});
-				// This event will be received when the opened window is closed or the user navigates away.
-				this.worker.addEventListener("beforeunload", function () {
-					vue.mode = 0;
-					vue.executeModel();
-				});
+				this.worker = worker;
 			},
 			importInput(input) {
 				const currentInput = JSON.parse(JSON.stringify(this.model.input.template));
