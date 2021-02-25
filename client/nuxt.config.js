@@ -33,7 +33,8 @@ export default async function () {
 			],
 			title: "declab"
 		},
-		mode: "spa",
+		ssr: false,
+		target: 'static',
 		router: {
 			mode: 'hash'
 		},
@@ -48,7 +49,7 @@ export default async function () {
 			})(),
 			DECLAB_VERSION: process.env.npm_package_version,
 			DECLAB_DEVELOPER_INFORMATION: developerInformation,
-			DECLAB_DEMO_MODE: false
+			DECLAB_DEMO_MODE: true
 		}
 	};
 }

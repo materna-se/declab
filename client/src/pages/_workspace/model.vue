@@ -143,7 +143,7 @@
 				const response = await fetch("./samples/sample.dtar");
 				const blob = await response.blob();
 
-				const result = await Network.importWorkspace(blob);
+				await Network.importWorkspace(blob);
 				await this.getModel();
 			},
 			isCurrentDecisionService(name, namespace) {
@@ -155,7 +155,7 @@
 			},
 			async toggleDecisionService(name, namespace) {
 				this.decisionSession = this.isCurrentDecisionService(name, namespace) ? null : {name: name, namespace: namespace};
-				this.updateDecisionService();
+				await this.updateDecisionService();
 			},
 			async updateDecisionService() {
 				await Network.setDecisionSession(this.decisionSession);
