@@ -14,7 +14,7 @@ To provide an overview of the imported model, the included decisions, inputs and
 ![](./docs/model-overview.png)
 
 #### Powerful Builder
-To simplify the creation of tests, the test framework supports the user by providing a powerful builder.
+To simplify the creation of tests, declab supports the user by providing a powerful builder.
 It supports complex data types and an increasing number of FEEL data types
 (`feel:string`, `feel:number` and `feel:boolean`). Support for `feel:date`, `feel:time`, `feel:dateTime` is planned.
 The builder also suggests values that are predefined inside the imported model.
@@ -22,13 +22,13 @@ The builder also suggests values that are predefined inside the imported model.
 ![](./docs/builder.png)
 
 #### Batch Execution
-The test framework is designed for the creation of hundreds of tests.
+declab is designed for the creation of hundreds of tests.
 To test a modified model, all created tests can be executed simultaneously.
 
 ![](./docs/test-execution.gif)
 
 #### Structured Results
-If an executed test fails, the test framework supports the user by providing
+If an executed test fails, declab supports the user by providing
 a clear overview of the differences between the expected and calculated output.
 
 ![](./docs/test-output.png)
@@ -80,10 +80,10 @@ cd ./server
 mvn clean package
 ```
 Afterwards, the generated web archive can be found at `./server/target/declab-{version}.war`.
-If the test framework should be directly executed on an application server, the generated
+If declab should be directly executed on an application server, the generated
 web archive can be copied into the specified directory (for example `./standalone/deployments`).
 
-If the test framework should be executed in a Docker Container,
+If declab should be executed in a Docker container,
 the project can be built and executed by using the included Dockerfile.
 ```
 docker build -t declab:1.0.0 .
