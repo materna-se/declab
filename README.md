@@ -89,3 +89,7 @@ the project can be built and executed by using the included Dockerfile.
 docker build -t declab:1.0.0 .
 docker run -p 127.0.0.1:8080:8080 declab:1.0.0 
 ```
+
+## License
+This project is available under the Apache License 2.0. Please refer to the [LICENSE.md](https://github.com/declab/LICENSE.md) for more detailed information.
+The [CONTRIBUTING.md](https://github.com/declab/CONTRIBUTING.md) and [CODE-OF-CONDUCT.md](https://github.com/declab/CODE-OF-CONDUCT.md) are based on the great [Open Source Template](https://github.com/auth0/open-source-template) created by Auth0, available under the MIT License.
