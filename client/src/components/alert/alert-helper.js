@@ -3,7 +3,7 @@ export default {
 		return `
 			<p class="${list.length === 0 ? 'mb-0' : 'mb-2'}">${message}</p>
 			${list.length > 0 ? `
-				<div class="alert alert-light mb-0">
+				<div class="alert alert-light mb-0" style="max-height: 255px; overflow-y: scroll">
 				${list.map((message) => `
 					<p class="alert-message mb-0">
 						<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" class="">

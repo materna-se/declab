@@ -126,8 +126,6 @@
 	import Colors from "../../helpers/colors";
 	import isEqual from "lodash/isEqual"
 
-	import * as d3 from "d3";
-
 	export default {
 		head() {
 			return {
