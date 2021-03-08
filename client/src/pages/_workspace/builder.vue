@@ -51,29 +51,19 @@
 					</div>
 				</div>
 
-				<!--<code><pre>{{JSON.stringify(model.result.accessLog, null, 2)}}</pre></code>-->
-
 				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
-					<div class="card-header">
-						<div class="d-flex align-items-center">
-							<h5 class="mb-0 mr-auto">{{key}}</h5>
-							<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" class="d-block float-right" style="cursor: pointer" v-on:click="$set(model.result.visible, key, model.result.visible[key] !== true)">
-								<path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z" fill="currentColor" v-if="model.result.visible[key]"/>
-								<path d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6-6-6 1.41-1.42z" fill="currentColor" v-else/>
-							</svg>
+					<div class="card-header" v-on:click="$set(model.result.visibleOutputs, key, model.result.visibleOutputs[key] !== true)">
+						<h5 class="mb-0">{{key}} <small>({{model.result.visibleOutputs[key] ? 'click to hide' : 'click to show'}})</small></h5>
+					</div>
+					<div class="card-body" v-if="model.result.visibleOutputs[key]">
+						<h5 class="mb-2">Output</h5>
+						<json-builder class="mb-0" v-bind:template="output" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
+
+						<div class="mt-4" v-if="model.result.context[key] !== undefined && Object.keys(model.result.context[key]).length !== 0">
+							<h5 class="mb-0" v-on:click="$set(model.result.visibleContexts, key, model.result.visibleContexts[key] !== true)">Context <small>({{model.result.visibleContexts[key] ? 'click to hide' : 'click to show'}})</small></h5>
+							<json-builder class="mt-2" v-if="model.result.visibleContexts[key]" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 						</div>
 					</div>
-					<template v-if="model.result.visible[key]">
-						<div class="card-body">
-							<h5 class="mb-2">Output</h5>
-							<json-builder class="mb-0" v-bind:template="output" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
-
-							<div class="mt-4" v-if="model.result.context[key] !== undefined && Object.keys(model.result.context[key]).length !== 0">
-								<h5 class="mb-2">Context</h5>
-								<json-builder class="mb-0" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
-							</div>
-						</div>
-					</template>
 				</div>
 
 				<h4 class="mb-2 mt-3" v-on:click="accessLogVisible = !accessLogVisible">Access Log <small>({{accessLogVisible ? 'click to hide' : 'click to show'}})</small></h4>
@@ -81,9 +71,9 @@
 			</div>
 		</div>
 
-		<template v-if="modal.visible">
+		<template v-if="modalVisible">
 			<div class="modal-backdrop fade show"></div>
-			<div class="modal fade show" style="display: block" v-on:click.self="modal.visible = false">
+			<div class="modal fade show" style="display: block" v-on:click.self="modalVisible = false">
 				<div class="modal-dialog modal-dialog-centered modal-lg">
 					<div class="modal-content p-4">
 						<div class="modal-body">
@@ -160,9 +150,10 @@
 
 					result: {
 						outputs: {},
+						visibleOutputs: {},
 						context: {},
+						visibleContexts: {},
 						accessLog: {},
-						visible: {},
 						name: {}
 					}
 				},
