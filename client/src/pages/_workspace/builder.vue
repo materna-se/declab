@@ -3,7 +3,7 @@
 		<div class="d-flex align-items-center mb-2">
 			<h3 class="mb-0 mr-auto">Builder</h3>
 			<div class="mr-2">
-				<button class="btn btn-block btn-outline-secondary px-4" v-on:click="modal.visible = true">
+				<button class="btn btn-block btn-outline-secondary px-4" v-on:click="modalVisible = true">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M15 9H5V5h10m-3 14a3 3 0 01-3-3 3 3 0 013-3 3 3 0 013 3 3 3 0 01-3 3m5-16H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z" fill="currentColor"/>
 					</svg>
@@ -75,6 +75,9 @@
 						</div>
 					</template>
 				</div>
+
+				<h4 class="mb-2 mt-3" v-on:click="accessLogVisible = !accessLogVisible">Access Log <small>({{accessLogVisible ? 'click to hide' : 'click to show'}})</small></h4>
+				<access-log v-if="accessLogVisible" v-bind:entries="model.result.accessLog"></access-log>
 			</div>
 		</div>
 
@@ -118,6 +121,7 @@
 
 	import Alert from "../../components/alert/alert.vue";
 	import JSONBuilder from "../../components/json/json-builder.vue";
+	import AccessLogComponent from "../../components/dmn/access-log.vue";
 
 	export default {
 		head() {
@@ -128,6 +132,7 @@
 		components: {
 			"alert": Alert,
 			"json-builder": JSONBuilder,
+			"access-log": AccessLogComponent,
 		},
 		data() {
 			return {
@@ -136,9 +141,9 @@
 					state: null
 				},
 
-				modal: {
-					visible: false
-				},
+				modalVisible: false,
+
+				accessLogVisible: false,
 
 				inputs: {},
 
