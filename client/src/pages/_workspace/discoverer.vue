@@ -11,7 +11,7 @@
 				<h5 class="mb-2">Input Selectors</h5>
 				<div class="list-group mb-2">
 					<template v-if="options.inputs.length !== 0">
-						
+
 						<div class="list-group-item" v-for="(inputOption, index) in options.inputs">
 							<div class="row mx-0 mb-2 flex-row">
 								<button class="btn btn-outline-secondary" v-on:click="toggleInputExpanded(index)">
@@ -75,53 +75,34 @@
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M8,5.14V19.14L19,12.14L8,5.14Z" fill="currentColor"/>
 					</svg>
-				</button>				
+				</button>
 			</div>
 
 			<div class="col-8 mb-4" v-if="inputTemplateSelected !== null">
-				<h4 class="mb-2">Input</h4>
-				<p class="text-right">Click on nodes to add input selectors!</p>
+				<h4 class="mb-2">Input <small>(click on nodes to add input selectors)</small></h4>
 				<json-builder class="mb-4" v-bind:template="options.inputTemplate" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true" v-on:update:path="addInput(convertPath($event));"/>
 
-				<h4 class="mb-2">Output</h4>
-				<p class="text-right">Click on nodes to add output selectors!</p>
+				<h4 class="mb-2">Output <small>(click on nodes to add output selectors)</small></h4>
 				<json-builder class="mb-4" v-bind:template="outputStruct" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true" v-on:update:path="toggleOutput(convertPath($event));"/>
 
 				<h4 class="mb-2">Discovery</h4>
-				<table id="discovery-table" class="styled-table">
-				</table>
+				<div class="card">
+					<div class="card-body">
+						<table id="discovery-table" class="table table-bordered mb-0">
+						</table>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
-
-<style>
-	.styled-table {
-		border-collapse: collapse;
-		margin: 25px 0;
-		font-size: 0.9em;
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-		min-width: 400px;
-		box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-	}
-
-	.styled-table th,
-	.styled-table td {
-    	padding: 12px 15px;
-	}
-
-	.styled-table tbody tr {
-		border-bottom: 1px solid #dddddd;
-	}
-</style>
 
 <script>
 	import Network from "../../helpers/network";
 	import JSONPath from "jsonpath";
 	import LiteralExpression from "../../components/dmn/literal-expression.vue";
 	import JSONBuilder from "../../components/json/json-builder.vue";
-	import { Node } from "../../helpers/discovery"
-	import { Leaf } from "../../helpers/discovery"
+	import {Leaf, Node} from "../../helpers/discovery"
 	import EmptyCollectionComponent from "../../components/empty-collection.vue";
 	import Colors from "../../helpers/colors";
 	import isEqual from "lodash/isEqual"
@@ -185,7 +166,7 @@
 				const ts = this.executionTimestamp;
 
 				// Clear alerts
-				this.$store.commit("displayAlert",null);
+				this.$store.commit("displayAlert", null);
 				this.messages = [];
 
 				// Evaluate all expressions beforehand and cache the results
@@ -224,18 +205,19 @@
 
 				const hasSubspace = (depth < this.options.inputs.length - 1);
 
-				
+
 				for (let i = 0; i < inputValues.length; i++) {
 					// Apply current input value to current selector
 					const value = inputValues[i];
 
 					try {
 						JSONPath.value(currentInput, selector, value);
-					} catch(err) {
+					}
+					catch (err) {
 						// Inform user of any warnings or errors
 						console.log("Caught error with selector apply");
 					}
-					
+
 
 					// Are there more input selectors to consider?
 					if (hasSubspace) {
@@ -244,8 +226,9 @@
 
 						// The recursive function call will populate this node, and then
 						// we can merge it into our current root
-						root.merge(await this.mDimDiscovery(depth+1, currentInput, new_root, ts));
-					} else {
+						root.merge(await this.mDimDiscovery(depth + 1, currentInput, new_root, ts));
+					}
+					else {
 						// Handle discovery with completed input struct
 
 						// Calculate output
@@ -261,8 +244,9 @@
 									if (JSONPath.query(currentOutput, selector).length > 0) {
 										JSONPath.value(currentOutputAdjusted, selector, JSONPath.query(currentOutput, selector));
 									}
-								} catch(err) {
-									
+								}
+								catch (err) {
+
 								}
 							}
 
@@ -330,14 +314,14 @@
 					let areEqual = true;
 
 					for (var rowI of rows) {
-						if (!isEqual(rowI[i], rowI[i-1])) {
+						if (!isEqual(rowI[i], rowI[i - 1])) {
 							areEqual = false;
 							break;
 						}
 					}
 
 					if (areEqual) {
-						columns[i - 1] = [].concat(columns[i-1], columns[i]);
+						columns[i - 1] = [].concat(columns[i - 1], columns[i]);
 						columns.splice(i, 1);
 
 						for (var rowI of rows) {
@@ -347,7 +331,6 @@
 						i = i - 1;
 					}
 				}
-
 
 
 				let table = document.getElementById("discovery-table");
@@ -363,10 +346,11 @@
 					let th = document.createElement("th");
 
 					let text = undefined;
-					
+
 					if (!Array.isArray(key)) {
 						text = document.createTextNode(key);
-					} else {
+					}
+					else {
 						text = document.createTextNode(key[0] + " - " + key[key.length - 1]);
 					}
 
@@ -396,7 +380,7 @@
 
 						let cell = trow.insertCell();
 
-						if(i > 0) {
+						if (i > 0) {
 							let outputValues = Object.values(output)
 							if (outputValues.length == 1) {
 								let text = document.createTextNode(outputValues[0]);
@@ -404,11 +388,13 @@
 							}
 							cell.style.backgroundColor = colors[outputJson];
 							cell.title = outputJson;
-						} else {
+						}
+						else {
 							let text = undefined;
 							if (output.length == 1) {
 								text = document.createTextNode(output[0]);
-							} else {
+							}
+							else {
 								text = document.createTextNode(output[0] + " - " + output[output.length - 1]);
 								cell.title = outputJson;
 							}
@@ -418,7 +404,6 @@
 					}
 
 
-					
 				}
 
 			},
@@ -437,7 +422,7 @@
 					expression = this.options.inputExpressions[path];
 				}
 
-				this.options.inputs.push({"selector" : path, "expression" : expression, "expanded" : true});
+				this.options.inputs.push({"selector": path, "expression": expression, "expanded": true});
 			},
 
 			removeInput(index) {
@@ -455,7 +440,8 @@
 					for (const selector of selectorMatches) {
 						this.options.outputs.splice(this.options.outputs.indexOf(selector), 1);
 					}
-				} else {
+				}
+				else {
 					// Add the selector
 					this.options.outputs.push(path);
 				}
