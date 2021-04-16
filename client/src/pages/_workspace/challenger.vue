@@ -28,26 +28,19 @@
 					</div>
 
 					<div class="col-6 mb-4">
+						<!-- Hints/Solution Header -->
+						<h4 class="mb-2">Hints</h4>
+
 						<!-- Button to show hints / solution -->
 						<div class="mb-4" v-if="hint === -1">
-							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0" v-if="challenge.hints.length > 0">
-								<div>Need help?</div>
-							</button>
-							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0; showSolution()" v-else>
-								<div>Show solution</div>
-							</button>
-						</div>
-
-						<!-- Hints/Solution Header -->
-						<div class="mb-2" style="text-align:center" v-if="hint >= 0">
-							<h5 v-if="hint < challenge.hints.length">Hint {{hint + 1}}</h5>
-							<h5 v-else>Solution</h5>
+							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0" v-if="challenge.hints.length > 0">Show hint</button>
+							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0; showSolution()" v-else>Show solution</button>
 						</div>
 
 						<!-- If hints exist, add left/right buttons to iterate over all hints -->
 						<!-- Once the last hint is reached, change right button to a solution button -->
 						<div class="row mb-4" v-if="hint >= 0 && hint < challenge.hints.length && challenge.hints.length > 0">
-							<div class="container" style="display:flex">
+							<div class="container" style="display: flex">
 								<!-- Left button -->
 								<div class="mr-2" v-if="hint > 0">
 									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint -= 1">
@@ -56,10 +49,12 @@
 										</svg>
 									</button>
 								</div>
+
 								<!-- Hint -->
 								<div style="flex: 1">
 									<textarea readonly class="form-control" style="resize:none;max-height:40px" wrap="soft" v-model="challenge.hints[hint]"/>
 								</div>
+
 								<!-- Right button -->
 								<div class="ml-2" v-if="hint < challenge.hints.length">
 									<button class="btn btn-block btn-outline-secondary" style="text-align: center" v-if="hint >= 0 && hint < challenge.hints.length - 1" v-on:click="hint += 1">
@@ -79,9 +74,11 @@
 						<!-- Add button to revert to original FEEL expression if solution is being shown -->
 						<div class="mb-4" v-if="hint === challenge.hints.length">
 							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint -= 1; showOriginalExpression()">
-								<div>Undo Solution</div>
+								<div>Undo solution</div>
 							</button>
 						</div>
+
+						<h4 class="mb-2">Scenarios</h4>
 
 						<div class="progress mb-4">
 							<div class="progress-bar" v-bind:class="[progress === 1 ? 'bg-success' : 'bg-primary']" v-bind:style="{width: progress * 100 + '%'}"></div>
