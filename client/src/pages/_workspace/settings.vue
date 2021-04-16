@@ -7,7 +7,7 @@
 				</div>
 				<div class="card-body">
 					<configurator class="mb-2" v-model="serverConfiguration"></configurator>
-					<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="editWorkspace">Save Configuration</button>
+					<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="editWorkspace">Save configuration</button>
 
 					<h5 class="mb-2">Developer Mode</h5>
 					<p class="mb-2">The developer mode allows you to use features such as raw JSON in the builder. It is intended for developers and should be used with caution.</p>
@@ -24,7 +24,7 @@
 						</div>
 						<div class="card-body">
 							<div class="input-group">
-								<label class="custom-file-label" for="file">Select DMN Backup...</label>
+								<label class="custom-file-label" for="file">Select DMN backup...</label>
 								<input accept=".dtar" class="custom-file-input" id="file" name="file" type="file" v-on:change="importWorkspace">
 							</div>
 						</div>

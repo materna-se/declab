@@ -9,7 +9,7 @@
 						<span class="input-group-text">Playground</span>
 					</div>
 					<select class="form-control" ref="playground-select" v-on:change="loadPlayground($event.target.value)">
-						<option selected disabled hidden>Select Playground...</option>
+						<option selected disabled hidden>Select playground...</option>
 						<option v-for="(playground, key) in playgrounds" v-bind:value="key">{{playground.name}}</option>
 					</select>
 				</div>

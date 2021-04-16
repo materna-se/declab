@@ -1,10 +1,10 @@
 <template>
 	<div>
 		<h5 class="mb-2">Name</h5>
-		<input placeholder="Enter Name..." class="form-control mb-4" v-model="value.name">
+		<input placeholder="Enter name..." class="form-control mb-4" v-model="value.name">
 
 		<h5 class="mb-2">Description</h5>
-		<input placeholder="Enter Description..." class="form-control mb-4" v-model="value.description">
+		<input placeholder="Enter description..." class="form-control mb-4" v-model="value.description">
 
 		<h5 class="mb-2">Protection</h5>
 		<div class="d-flex">
@@ -25,7 +25,7 @@
 					</svg>
 				</button>
 			</div>
-			<input type="password" placeholder="Enter Password..." class="form-control flex-fill" v-model="value.token">
+			<input type="password" placeholder="Enter password..." class="form-control flex-fill" v-model="value.token">
 		</div>
 	</div>
 </template>

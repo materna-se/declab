@@ -2,12 +2,13 @@
 	<div>
 		<div class="d-flex align-items-center mb-2">
 			<h3 class="mb-0 mr-auto">Models</h3>
-
+			<!--
 			<div>
 				<button class="btn btn-block btn-outline-secondary" v-on:click="importSample">
-					Import Sample
+					Import sample
 				</button>
 			</div>
+			-->
 		</div>
 
 		<draggable v-model="importedModels" animation="150" draggable=".draggable" v-on:update="orderModels">

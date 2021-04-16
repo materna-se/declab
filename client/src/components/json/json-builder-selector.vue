@@ -1,6 +1,6 @@
 <template>
 	<div class="input-group mt-1">
-		<input class="form-control" placeholder="Enter Key..." v-model="key" v-if="mode === 'add' && value.type === 'object'">
+		<input class="form-control" placeholder="Enter key..." v-model="key" v-if="mode === 'add' && value.type === 'object'">
 		<div v-bind:class="[(mode === 'add' && value.type === 'object') ? 'input-group-append': 'btn-group ml-auto']">
 			<button type="button" class="btn btn-white" style="border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem" v-on:mouseenter="visible = true" v-on:mouseleave="visible = false">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">

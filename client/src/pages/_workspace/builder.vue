@@ -27,7 +27,7 @@
 								<span class="input-group-text">Template</span>
 							</div>
 							<select class="form-control" v-on:change="importInput(inputs[$event.target.value].value)">
-								<option selected disabled>Select Template...</option>
+								<option selected disabled>Select template...</option>
 								<option v-for="(input, key) in inputs" v-bind:value="key">{{input.name}}</option>
 							</select>
 						</div>
@@ -53,20 +53,20 @@
 
 				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
 					<div class="card-header" v-on:click="$set(model.result.visibleOutputs, key, model.result.visibleOutputs[key] !== true)">
-						<h5 class="mb-0">{{key}} <small>({{model.result.visibleOutputs[key] ? 'click to hide' : 'click to show'}})</small></h5>
+						<h5 class="mb-0">{{key}}<small>&ensp;({{model.result.visibleOutputs[key] ? 'click to hide' : 'click to show'}})</small></h5>
 					</div>
 					<div class="card-body" v-if="model.result.visibleOutputs[key]">
 						<h5 class="mb-2">Output</h5>
 						<json-builder class="mb-0" v-bind:template="output" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 
 						<div class="mt-4" v-if="model.result.context[key] !== undefined && Object.keys(model.result.context[key]).length !== 0">
-							<h5 class="mb-0" v-on:click="$set(model.result.visibleContexts, key, model.result.visibleContexts[key] !== true)">Context <small>({{model.result.visibleContexts[key] ? 'click to hide' : 'click to show'}})</small></h5>
+							<h5 class="mb-0" v-on:click="$set(model.result.visibleContexts, key, model.result.visibleContexts[key] !== true)">Context<small>&ensp;({{model.result.visibleContexts[key] ? 'click to hide' : 'click to show'}})</small></h5>
 							<json-builder class="mt-2" v-if="model.result.visibleContexts[key]" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 						</div>
 					</div>
 				</div>
 
-				<h4 class="mb-2 mt-3" v-on:click="accessLogVisible = !accessLogVisible">Access Log <small>({{accessLogVisible ? 'click to hide' : 'click to show'}})</small></h4>
+				<h4 class="mb-2 mt-3" v-on:click="accessLogVisible = !accessLogVisible">Access Log<small>&ensp;({{accessLogVisible ? 'click to hide' : 'click to show'}})</small></h4>
 				<access-log v-if="accessLogVisible" v-bind:entries="model.result.accessLog"></access-log>
 			</div>
 		</div>
