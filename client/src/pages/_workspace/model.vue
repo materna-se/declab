@@ -140,7 +140,7 @@
 			},
 
 			async importSample() {
-				const response = await fetch("./samples/sample.dtar");
+				const response = await fetch("./samples/elterngeld.dtar");
 				const blob = await response.blob();
 
 				await Network.importWorkspace(blob);

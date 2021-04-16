@@ -25,7 +25,7 @@
 	import Footer from "../components/footer";
 	import Authenticator from "../components/authenticator";
 
-	export default  {
+	export default {
 		components: {
 			"loading": Loading,
 			"dmn-header": Header,
