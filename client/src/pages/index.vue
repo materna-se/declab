@@ -15,7 +15,7 @@
 				<div class="card mb-4">
 					<div class="card-body">
 						<configurator class="mb-4" v-model="workspace"></configurator>
-						<button class="btn btn-block btn-outline-secondary" v-on:click="createWorkspace">Enter Workspace</button>
+						<button class="btn btn-block btn-outline-secondary" v-on:click="createWorkspace">Enter workspace</button>
 					</div>
 				</div>
 
@@ -27,7 +27,7 @@
 							</svg>
 						</span>
 					</div>
-					<input placeholder="Search Workspace..." class="form-control" v-model="query" v-on:keyup="getWorkspaces">
+					<input placeholder="Search workspace..." class="form-control" v-model="query" v-on:keyup="getWorkspaces">
 				</div>
 
 				<div class="list-group">

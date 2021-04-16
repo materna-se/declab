@@ -81,10 +81,10 @@
 								<div class="card-body">
 									<div class="mr-auto">
 										<h5 class="mb-2">{{scenario.name}}</h5>
-										<h6 class="mb-1">Input</h6>
+										<h6 class="mb-2">Input</h6>
 										<json-builder v-bind:template="scenario.input.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 										<hr>
-										<h6 class="mb-1">Output</h6>
+										<h6 class="mb-2">Output</h6>
 										<json-builder v-bind:template="scenario.output.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
 									</div>
 								</div>
@@ -153,10 +153,10 @@
 										<h5 class="mb-2">Name</h5>
 										<input class="form-control mb-4" v-model="scenario.name">
 
-										<h5 class="mb-1">Input</h5>
+										<h5 class="mb-2">Input</h5>
 										<json-builder class="mb-4" v-bind:template="scenario.input.template" v-bind:convert="true" v-bind:fixed-root="true" v-on:update:value="scenario.input.value = $event"/>
 
-										<h5 class="mb-1">Output</h5>
+										<h5 class="mb-2">Output</h5>
 										<json-builder v-bind:template="scenario.output.template" v-bind:convert="true" v-on:update:value="scenario.output.value = $event"/>
 									</div>
 								</div>

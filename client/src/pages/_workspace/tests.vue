@@ -33,9 +33,9 @@
 				</div>
 				<div class="list-group">
 					<template v-if="Object.keys(tests).length !== 0">
-						<div class="list-group-item list-group-item-action c-pointer" v-for="(test, uuid) in tests" v-bind:key="uuid" v-on:click.self="setViewMode(uuid)" v-bind:class="[test.equal === undefined ? '' : (test.equal ? 'bg-success text-white' : 'bg-danger text-white')]">
-							<span class="d-block float-left mr-4" v-on:click="setViewMode(uuid)">{{test.name}}</span>
-							<div class="float-right">
+						<div class="list-group-item list-group-item-action c-pointer" style="display: flex; align-items: center" v-for="(test, uuid) in tests" v-bind:key="uuid" v-on:click.self="setViewMode(uuid)" v-bind:class="[test.equal === undefined ? '' : (test.equal ? 'bg-success text-white' : 'bg-danger text-white')]">
+							<span class="d-block" style="margin-right: auto" v-on:click="setViewMode(uuid)">{{test.name}}</span>
+							<div>
 								<span class="badge badge-light badge-md d-block float-left mr-2" v-if="test.tps !== undefined">{{test.tps}} / s</span>
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setEditMode(uuid)">
 									<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
