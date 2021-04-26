@@ -1,4 +1,4 @@
-package de.materna.dmn.tester;
+package de.materna.dmn.tester.servlets;
 
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.exceptions.DefaultOptionsMethodExceptionMapper;
