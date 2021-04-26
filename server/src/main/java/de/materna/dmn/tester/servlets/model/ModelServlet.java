@@ -8,6 +8,7 @@ import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.Decision;
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.dmn.tester.sockets.managers.SessionManager;
 import de.materna.jdec.HybridDecisionSession;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.model.ImportResult;
@@ -82,6 +83,9 @@ public class ModelServlet {
 			configuration.serialize();
 
 			workspace.getAccessLog().writeMessage("Imported models", configuration.getModifiedDate());
+
+			// Notify all sessions.
+			SessionManager.getInstance().notify(workspaceUUID, "{\"type\": \"imported\"}");
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(importResult)).build();
 
