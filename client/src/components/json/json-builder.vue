@@ -28,6 +28,9 @@
 			convert: {
 				default: false
 			},
+			convertAfter: {
+				default: true
+			},
 			// Does not allow the structure to be changed
 			fixed: {
 				default: false
@@ -88,7 +91,7 @@
 			},
 			exportValue(value) {
 				this.cleanedValue = this.cleanValue(value);
-				this.$emit('update:value', this.cleanedValue);
+				this.$emit('update:value', this.convertAfter ? this.cleanedValue : value);
 
 				this.editedValue = JSON.stringify(this.cleanedValue);
 			},

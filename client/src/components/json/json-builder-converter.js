@@ -124,7 +124,7 @@ export default {
 
 		return {
 			type: update.type,
-			value: update.value,
+			value: update.value !== undefined ? update.value : existing.value,
 			options: update.options !== undefined ? update.options : existing.options,
 		};
 	},
