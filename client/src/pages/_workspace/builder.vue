@@ -258,7 +258,7 @@
 			async addInput() {
 				const uuid = await Network.addInput({
 					name: this.model.input.name,
-					value: this.model.input.value
+					value: Converter.clean(this.model.input.value)
 				});
 				await this.getInputs();
 				return uuid;

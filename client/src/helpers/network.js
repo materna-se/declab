@@ -20,6 +20,10 @@ export default {
 			else if (socketHost.startsWith("https://")) {
 				socketHost = "wss://" + socketHost.substring(7);
 			}
+			else {
+				// The host is passed as a relative path.
+				socketHost = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + socketHost;
+			}
 
 			if(this._socket !== null) {
 				this._socket.close();

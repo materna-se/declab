@@ -267,6 +267,10 @@
 				this.getTests();
 			},
 			async executeTests() {
+				if(this.mode === "VIEW") {
+					this.mode = "SELECT";
+				}
+
 				for (const key in this.tests) {
 					this.$delete(this.tests[key], "equal");
 					this.$delete(this.tests[key], "tps");
