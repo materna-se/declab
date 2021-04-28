@@ -89,6 +89,11 @@
 		},
 		async mounted() {
 			await this.getModel();
+
+			Network.addSocketListener(this.onSocket);
+		},
+		beforeDestroy() {
+			Network.removeSocketListener(this.onSocket);
 		},
 		data() {
 			return {
@@ -99,6 +104,12 @@
 			}
 		},
 		methods: {
+			async onSocket(e) {
+				const data = JSON.parse(e.data);
+				if(data.type === "imported") {
+					await this.getModel();
+				}
+			},
 			async getModel() {
 				const models = [];
 				const importedModels = [];

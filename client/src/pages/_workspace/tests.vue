@@ -160,6 +160,11 @@
 			await this.getInputs();
 			await this.getOutputs();
 			await this.getTests();
+
+			Network.addSocketListener(this.onSocket);
+		},
+		beforeDestroy() {
+			Network.removeSocketListener(this.onSocket);
 		},
 		data() {
 			return {
@@ -185,6 +190,13 @@
 			}
 		},
 		methods: {
+			async onSocket(e) {
+				const data = JSON.parse(e.data);
+				if(data.type === "imported") {
+					await this.executeTests();
+				}
+			},
+
 			//
 			// Inputs
 			//
