@@ -45,7 +45,7 @@ export default async function () {
 		],
 		env: {
 			DECLAB_HOST: (() => {
-				return process.env.DECLAB_HOST === undefined ? "http://127.0.0.1:8080/declab-" + process.env.npm_package_version + "/api" : process.env.DECLAB_HOST;
+				return process.env.DECLAB_HOST === undefined ? "http://127.0.0.1:8080/declab-" + process.env.npm_package_version : process.env.DECLAB_HOST;
 			})(),
 			DECLAB_VERSION: process.env.npm_package_version,
 			DECLAB_DEVELOPER_INFORMATION: developerInformation,
