@@ -3,19 +3,57 @@ import configuration from "./configuration";
 export default {
 	_vue: null,
 	_host: null,
+
 	_endpoint: null,
+	_socket: null,
 
 	setEndpoint(vue, host, workspace) {
 		this._vue = vue;
 		this._host = host;
-		this._endpoint = host + (workspace !== undefined ? "/workspaces/" + workspace : "");
+
+		this._endpoint = host + "/api" + (workspace !== undefined ? "/workspaces/" + workspace : "");
+		if (workspace !== undefined) {
+			let socketHost = host;
+			if (socketHost.startsWith("http://")) {
+				socketHost = "ws://" + socketHost.substring(7);
+			}
+			else if (socketHost.startsWith("https://")) {
+				socketHost = "wss://" + socketHost.substring(7);
+			}
+
+			if(this._socket !== null) {
+				this._socket.close();
+			}
+			this._socket = new WebSocket(socketHost + "/sockets/" + workspace);
+			this._socket.addEventListener("message", (e) => {
+				const data = JSON.parse(e.data);
+				if(data.type === "listeners") {
+					vue.store.commit("setListeners", data.data);
+				}
+			});
+		}
+	},
+
+	addSocketListener(callback) {
+		if (this._socket === null) {
+			return;
+		}
+
+		this._socket.addEventListener("message", callback);
+	},
+	removeSocketListener(callback) {
+		if (this._socket === null) {
+			return;
+		}
+
+		this._socket.removeEventListener("message", callback);
 	},
 
 	//
 	// Workspace
 	//
 	async createWorkspace(input) {
-		const response = await this._authorizedFetch(this._host + "/workspaces", {
+		const response = await this._authorizedFetch(this._endpoint + "/workspaces", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
@@ -28,7 +66,7 @@ export default {
 			query = undefined;
 		}
 
-		const response = await this._authorizedFetch(this._host + "/workspaces" + (query === undefined ? "" : ("?query=" + query)), {});
+		const response = await this._authorizedFetch(this._endpoint + "/workspaces" + (query === undefined ? "" : ("?query=" + query)), {});
 		return await response.json();
 	},
 
@@ -128,7 +166,7 @@ export default {
 	async addChallenge(challenge) {
 		const response = await this._authorizedFetch(this._endpoint + "/challenges", {
 			method: "POST",
-			headers: { "Content-Type": "application/json" },
+			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(challenge)
 		});
 
@@ -141,7 +179,7 @@ export default {
 	async editChallenge(uuid, challenge) {
 		await this._authorizedFetch(this._endpoint + "/challenges/" + uuid, {
 			method: "PUT",
-			headers: { "Content-Type": "application/json" },
+			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(challenge)
 		});
 	},
