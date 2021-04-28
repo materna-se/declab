@@ -37,7 +37,7 @@
 					<div class="col-12">
 						<div class="card card-borderless mb-2">
 							<div class="card-body p-0" style="overflow-x: auto">
-								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-on:update:value="model.input.value = $event; executeModel();"/>
+								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-bind:convert-after="false" v-on:update:value="model.input.value = $event; executeModel();"/>
 							</div>
 						</div>
 					</div>
@@ -144,7 +144,7 @@
 
 					input: {
 						name: null,
-						value: {},
+						value: Converter.enrich({}),
 						template: Converter.enrich({})
 					},
 
@@ -199,8 +199,22 @@
 				// After mounting vue, we fire an event so that the opener can send the current inputs.
 				window.dispatchEvent(new Event('aftermount'));
 			}
+
+			Network.addSocketListener(this.onSocket);
+		},
+		beforeDestroy() {
+			Network.removeSocketListener(this.onSocket);
 		},
 		methods: {
+			async onSocket(e) {
+				const data = JSON.parse(e.data);
+				if(data.type === "imported") {
+					const newInputs = {type: "object", value: await Network.getModelInputs()};
+					const currentInputs = this.model.input.value;
+
+					this.model.input.template = Converter.merge(currentInputs, newInputs);
+				}
+			},
 			//
 			// Model
 			//
@@ -218,7 +232,8 @@
 				}
 
 				try {
-					const result = await Network.executeModel(this.model.input.value);
+					const input = Converter.clean(this.model.input.value);
+					const result = await Network.executeModel(input === undefined ? {} : input);
 					this.model.result.outputs = result.outputs;
 					this.model.result.context = result.context;
 					this.model.result.accessLog = result.accessLog;
