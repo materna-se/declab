@@ -11,7 +11,8 @@ export default {
 		this._vue = vue;
 		this._host = host;
 
-		this._endpoint = host + "/api" + (workspace !== undefined ? "/workspaces/" + workspace : "");
+		this._endpoint = (host === "" ? "." : host) + "/api" + (workspace !== undefined ? "/workspaces/" + workspace : "");
+
 		if (workspace !== undefined) {
 			let socketHost = host;
 			if (socketHost.startsWith("http://")) {
@@ -22,7 +23,7 @@ export default {
 			}
 			else {
 				// The host is passed as a relative path.
-				socketHost = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + socketHost;
+				socketHost = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + location.pathname.substring(0, location.pathname.length - 1) + socketHost;
 			}
 
 			if(this._socket !== null) {

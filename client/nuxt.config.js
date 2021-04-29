@@ -28,10 +28,18 @@ export default async function () {
 				},
 				{
 					rel: 'icon',
-					href: '/favicon-32x32.png'
+					href: './favicon-32x32.png'
 				}
 			],
 			title: "declab"
+		},
+		build: {
+			// We need to configure publicPath in two contexts, nuxt seems to use both of them.
+			publicPath: './_nuxt/',
+			extend (config) {
+				config.output.publicPath = './_nuxt/'
+				return config;
+			}
 		},
 		ssr: false,
 		target: 'static',
