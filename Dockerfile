@@ -1,4 +1,4 @@
-FROM jboss/wildfly:17.0.1.Final
+FROM jboss/wildfly:23.0.1.Final
 
 ARG VERSION
 WORKDIR /opt/jboss/wildfly

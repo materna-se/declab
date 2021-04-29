@@ -2,9 +2,9 @@ version: 2
 jobs:
   build_client:
     docker:
-      - image: circleci/node:12.10.0-stretch
+      - image: circleci/node:14.16.1-stretch
     environment:
-      DECLAB_HOST: ./api
+      DECLAB_HOST: ""
     steps:
       - attach_workspace:
           at: ~/project
@@ -92,7 +92,7 @@ workflows:
       - build_client:
           filters:
             branches:
-              only: /^(?!.*(documentation).*).*$/
+              only: /.*/
             tags:
               only: /.*/
 
@@ -105,18 +105,18 @@ workflows:
             tags:
               only: /.*/
 
-      - test_server:
-          requires:
-            - build_server
-          filters:
-            branches:
-              only: /.*/
-            tags:
-              only: /.*/
+#      - test_server:
+#          requires:
+#            - build_server
+#          filters:
+#            branches:
+#              only: /.*/
+#            tags:
+#              only: /.*/
 
       - publish_release:
-          requires:
-            - test_server
+#          requires:
+#            - test_server
           filters:
             branches:
               ignore: /.*/
@@ -124,8 +124,8 @@ workflows:
               only: /.*/
 
       - publish_container:
-          requires:
-            - test_server
+#          requires:
+#            - test_server
           filters:
             branches:
               ignore: /.*/
