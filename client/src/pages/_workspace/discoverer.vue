@@ -71,7 +71,7 @@
 				</button>
 
 				<h5 class="mb-2">Discovery</h5>
-				<button class="btn btn-block btn-outline-secondary mb-4" :disabled="inputTemplateSelected === null || options.inputs.length != 2" v-on:click="startDiscovery()">
+				<button class="btn btn-block btn-outline-secondary mb-4" :disabled="inputTemplateSelected === null || options.inputs.length !== 2" v-on:click="startDiscovery()">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M8,5.14V19.14L19,12.14L8,5.14Z" fill="currentColor"/>
 					</svg>
@@ -382,8 +382,8 @@
 
 						if (i > 0) {
 							let outputValues = Object.values(output)
-							if (outputValues.length == 1) {
-								let text = document.createTextNode(outputValues[0]);
+							if (outputValues.length === 1) {
+								let text = document.createTextNode(JSON.stringify(outputValues[0][0]));
 								cell.appendChild(text);
 							}
 							cell.style.backgroundColor = colors[outputJson];
@@ -391,7 +391,7 @@
 						}
 						else {
 							let text = undefined;
-							if (output.length == 1) {
+							if (output.length === 1) {
 								text = document.createTextNode(output[0]);
 							}
 							else {

@@ -10,7 +10,6 @@ jobs:
           at: ~/project
       - run: git clone https://github.com/materna-se/declab.git
       - run: cd ./declab/client && npm install && npm run generate
-      - run: ls -la ./declab/server/src/main/webapp
       - persist_to_workspace:
           root: ~/project
           paths:

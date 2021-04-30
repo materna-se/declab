@@ -36,8 +36,10 @@ export default async function () {
 		build: {
 			// We need to configure publicPath in two contexts, nuxt seems to use both of them.
 			publicPath: './_nuxt/',
-			extend (config) {
-				config.output.publicPath = './_nuxt/'
+			extend (config, { isDev }) {
+				if(!isDev) {
+					config.output.publicPath = './_nuxt/'
+				}
 				return config;
 			}
 		},
@@ -63,16 +65,19 @@ export default async function () {
 }
 
 async function getDeveloperInformation() {
+	console.info("parsing server pom.xml...")
 	const declabPOM = XML.parse(FileSystem.readFileSync(Path.resolve(__dirname, "..", "server", "pom.xml")).toString());
 	const jDECVersion = declabPOM.dependencies.dependency.find((dependency) => {
 		return dependency.artifactId === "jdec";
 	}).version;
 
+	console.info("parsing maven-metadata.xml...")
 	const jDECRelease = XML.parse(await (await fetch("https://oss.sonatype.org/content/repositories/snapshots/com/github/materna-se/jdec/" + jDECVersion + "/maven-metadata.xml")).text());
 	const jDECReleaseVersion = jDECRelease.versioning.snapshotVersions.snapshotVersion.find((version) => {
 		return version.extension === "pom";
 	}).value;
 
+	console.info("parsing jDEC pom.xml...")
 	const jDECPOM = XML.parse(await (await fetch("https://oss.sonatype.org/content/repositories/snapshots/com/github/materna-se/jdec/" + jDECVersion + "/jdec-" + jDECReleaseVersion + ".pom")).text());
 	const droolsVersion = jDECPOM.dependencies.dependency.find((dependency) => {
 		return dependency.artifactId === "kie-dmn-core";
