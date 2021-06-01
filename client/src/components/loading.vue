@@ -29,8 +29,8 @@
 
 		border-radius: .25rem;
 
-		background: rgb(44, 103, 112);
-		box-shadow: 0 0 20px 0 rgba(44, 103, 112, 0.5);
+      background: rgb(57, 62, 70);
+      box-shadow: 0 0 20px 0 rgba(57, 62, 70, 0.5);
 
 		padding: 15px;
 
