@@ -1,6 +1,9 @@
+html {
+	font-size: 15px;
+}
+
 body {
 	font-family: "PT Sans", sans-serif;
-	font-size: 0.95rem;
 	background: #f6f6f8;
 }
 
