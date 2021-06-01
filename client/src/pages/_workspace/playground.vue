@@ -37,7 +37,22 @@
 				</div>
 			</div>
 			<div class="col-6">
-				<h3 class="mb-2">Output</h3>
+				<div class="d-flex align-items-center">
+					<h3 class="mb-2 mr-auto">Output</h3>
+					<div>
+						<div class="input-group mb-2">
+							<div class="input-group-prepend">
+								<span class="input-group-text">Engine</span>
+							</div>
+							<select class="form-control" v-model="engine" v-on:change="executeRaw">
+								<option value="DROOLS">Drools</option>
+								<option value="CAMUNDA">Camunda</option>
+								<option value="GOLDMAN">jDMN</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
 				<div class="row mb-2" v-if="alert.message !== null">
 					<div class="col-12">
 						<alert v-bind:alert="alert"/>
@@ -84,7 +99,7 @@
 		},
 		async mounted() {
 			await this.getPlaygrounds();
-			this.executeRaw();
+			this.executeRaw("");
 		},
 		data() {
 			return {
@@ -92,6 +107,8 @@
 					message: null,
 					state: null
 				},
+
+				engine: "DROOLS",
 
 				playgrounds: [],
 				playground: {
@@ -115,7 +132,7 @@
 			// Model
 			//
 			async executeRaw() {
-				const response = await Network.executeRaw(this.playground.expression, this.playground.context.value);
+				const response = await Network.executeRaw(this.playground.expression, this.playground.context.value, this.engine === "DROOLS" ? undefined : this.engine);
 				if (response.status !== 200) {
 					this.playground.output.outputs = null;
 					this.displayAlert("The output could not be calculated.", "danger");
