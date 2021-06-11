@@ -114,6 +114,10 @@
 							{
 								name: "Discoverer",
 								path: "discoverer"
+							},
+							{
+								name: "Importer",
+								path: "importer"
 							}
 						]
 					},
