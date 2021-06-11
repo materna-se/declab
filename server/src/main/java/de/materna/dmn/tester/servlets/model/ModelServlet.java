@@ -8,7 +8,9 @@ import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.Decision;
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.jdec.CamundaDecisionSession;
 import de.materna.dmn.tester.sockets.managers.SessionManager;
+import de.materna.jdec.GoldmanDecisionSession;
 import de.materna.jdec.HybridDecisionSession;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.model.ImportResult;
@@ -168,13 +170,25 @@ public class ModelServlet {
 	@Path("/model/execute/raw")
 	@Consumes("application/json")
 	@Produces("text/plain")
-	public Response calculateRawResult(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+	public Response calculateRawResult(@PathParam("workspace") String workspaceUUID, @QueryParam("engine") String engine, String body) throws IOException {
 		Decision decision = (Decision) SerializationHelper.getInstance().toClass(body, Decision.class);
 
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		HybridDecisionSession decisionSession = workspace.getDecisionSession();
 		try {
-			ExecutionResult executionResult = decisionSession.getDMNDecisionSession().executeExpression(decision.getExpression(), decision.getContext());
+			ExecutionResult executionResult;
+			switch (engine) {
+				case "DROOLS":
+				default:
+					executionResult = decisionSession.getDMNDecisionSession().executeExpression(decision.getExpression(), decision.getContext());
+					break;
+				case "CAMUNDA":
+					executionResult = new CamundaDecisionSession().executeExpression(decision.getExpression(), decision.getContext());
+					break;
+				case "GOLDMAN":
+					executionResult = new GoldmanDecisionSession().executeExpression(decision.getExpression(), decision.getContext());
+					break;
+			}
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(executionResult)).build();
 		}
 		catch (ModelImportException exception) {

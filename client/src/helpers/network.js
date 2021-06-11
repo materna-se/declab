@@ -142,7 +142,7 @@ export default {
 	},
 
 	async executeRaw(expression, context, engine) {
-		return await this._authorizedFetch(this._endpoint + "/model/execute/raw" + (engine === undefined ? "" : "?engine=" + engine), {
+		return await this._authorizedFetch(this._endpoint + "/model/execute/raw?engine=" + engine, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify({

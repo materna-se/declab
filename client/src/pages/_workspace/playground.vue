@@ -132,7 +132,7 @@
 			// Model
 			//
 			async executeRaw() {
-				const response = await Network.executeRaw(this.playground.expression, this.playground.context.value, this.engine === "DROOLS" ? undefined : this.engine);
+				const response = await Network.executeRaw(this.playground.expression, this.playground.context.value, this.engine);
 				if (response.status !== 200) {
 					this.playground.output.outputs = null;
 					this.displayAlert("The output could not be calculated.", "danger");
