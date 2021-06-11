@@ -82,6 +82,10 @@
 			<div class="card" v-on:drop="onDrop($event, 2)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
 				<code>Drag and drop models here!</code>
 			</div>
+			<h2>DMN 1.1 (Camunda) to DMN 1.2 (Kogito)</h2>
+			<div class="card" v-on:drop="onDrop($event, 4)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
+				<code>Drag and drop models here!</code>
+			</div>
 			<h2>DMN 1.2 (Kogito) to DMN 1.1 (ACTICO)</h2>
 			<div class="card" v-on:drop="onDrop($event, 1)" v-on:dragover="onDrag" v-on:dragenter="onDrag">
 				<code>Drag and drop models here!</code>
@@ -171,6 +175,11 @@
 					case 3: {
 						let rootElement = this.deserializeModel(content);
 						this.fixActicoDecisionServices(rootElement);
+						return this.serializeModel(rootElement);
+					}
+					case 4: {
+						let rootElement = this.deserializeModel(content);
+						this.fixCamundaVariable(rootElement);
 						return this.serializeModel(rootElement);
 					}
 				}
@@ -307,6 +316,31 @@
 					if (associationElement.querySelectorAll("sourceRef").length === 0 || associationElement.querySelectorAll("targetRef").length === 0) {
 						associationElement.remove();
 						this.logs.push("ACTICO Association " + associationElement.getAttribute("id") + " was fixed.");
+					}
+				}
+			},
+			fixCamundaVariable(rootElement) {
+				for (const typeElement of rootElement.querySelectorAll("*")) {
+					switch (typeElement.tagName) {
+						case "inputData":
+						case "decision": {
+							if (typeElement.getElementsByTagName("variable").length === 0) {
+								const variableElement = document.createElementNS("https://www.omg.org/spec/DMN/20191111/MODEL/", "variable");
+								variableElement.setAttribute("id", "_" + uuidv4());
+								variableElement.setAttribute("name", typeElement.getAttribute("name"));
+								typeElement.appendChild(variableElement);
+								this.logs.push("Camunda " + typeElement.tagName + " " + typeElement.getAttribute("name") + " was fixed (added variable).");
+							}
+							break;
+						}
+						case "inputEntry": {
+							const textElement = typeElement.getElementsByTagName("text")[0];
+							if (textElement.innerHTML === "") {
+								textElement.innerHTML = "-";
+								this.logs.push("Camunda " + typeElement.tagName + " " + typeElement.getAttribute("id") + " was fixed (added -).");
+							}
+							break;
+						}
 					}
 				}
 			}
