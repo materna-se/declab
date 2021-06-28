@@ -7,6 +7,7 @@ import de.materna.dmn.tester.servlets.filters.CSRFFilter;
 import de.materna.dmn.tester.servlets.filters.ReadAccessFilter;
 import de.materna.dmn.tester.servlets.filters.WriteAccessFilter;
 import de.materna.dmn.tester.servlets.challenges.ChallengeServlet;
+import de.materna.dmn.tester.servlets.challenges.ModelChallengeServlet;
 import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.dmn.tester.servlets.model.ModelServlet;
 import de.materna.dmn.tester.servlets.output.OutputServlet;
@@ -32,6 +33,7 @@ public class MainApplication extends Application {
 
 		singletons.add(new ModelServlet());
 		singletons.add(new ChallengeServlet());
+		singletons.add(new ModelChallengeServlet());
 		singletons.add(new PlaygroundServlet());
 		singletons.add(new InputServlet());
 		singletons.add(new OutputServlet());
