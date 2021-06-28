@@ -9,8 +9,9 @@ import javax.ws.rs.BadRequestException;
 public class Challenge {
 	public String name = "";
 	public String description;
+	public ChallengeType type;
 	public List<String> hints;
-	public String solution;
+	public Object solution;
 	public List<Scenario> scenarios;
 	
 	public Challenge() {
@@ -20,13 +21,21 @@ public class Challenge {
 	@JsonCreator
 	public Challenge(@JsonProperty(value = "name", required = true) String name,
 					 @JsonProperty(value = "description", required = true) String description,
+					 @JsonProperty(value = "type", required = false) ChallengeType type,
 					 @JsonProperty(value = "hints", required = true) List<String> hints,
-					 @JsonProperty(value = "solution", required = true) String solution,
+					 @JsonProperty(value = "solution", required = true) Object solution,
 					 @JsonProperty(value = "scenarios", required = true) List<Scenario> scenarios) {
 		if(name == null) throw new BadRequestException();
 		
 		this.name = name;
 		this.description = description;
+		
+		if (type == null) {
+			this.type = ChallengeType.FEEL;
+		} else {
+			this.type = type;
+		}
+		
 		this.hints = hints;
 		this.solution = solution;
 		this.scenarios = scenarios;
@@ -44,16 +53,22 @@ public class Challenge {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	public ChallengeType getType() {
+		return type;
+	}
+	public void setType(ChallengeType type) {
+		this.type = type;
+	}
 	public List<String> getHints() {
 		return hints;
 	}
 	public void setHints(List<String> hints) {
 		this.hints = hints;
 	}
-	public String getSolution() {
+	public Object getSolution() {
 		return solution;
 	}
-	public void setSolution(String solution) {
+	public void setSolution(Object solution) {
 		this.solution = solution;
 	}
 	public List<Scenario> getScenarios() {
@@ -61,5 +76,9 @@ public class Challenge {
 	}
 	public void setScenarios(List<Scenario> cases) {
 		this.scenarios = cases;
+	}
+	
+	public enum ChallengeType {
+		FEEL, DMN_MODEL
 	}
 }
