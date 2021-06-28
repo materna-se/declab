@@ -20,11 +20,23 @@
 						<h4 class="mb-2">{{challenge.name}}</h4>
 						<p class="mb-4">{{challenge.description}}</p>
 
-						<div class="card">
-							<div class="card-body">
-								<literal-expression v-model="expression" v-on:input="executeRaw"/>
+						<hr>
+						<template v-if="challenge.type === 'FEEL'">
+							<h4 style="text-align:center">FEEL</h4>
+
+							<div class="card">
+								<div class="card-body">
+									<literal-expression v-model="expression" v-on:input="executeRaw"/>
+								</div>
 							</div>
-						</div>
+						</template>
+						<template v-if="challenge.type === 'DMN_MODEL'">
+							<h4 style="text-align:center">DMN</h4>
+
+							<div class="card-body">
+								<model-select v-model="dmn_solution"/>
+							</div>
+						</template>
 					</div>
 
 					<div class="col-6 mb-4">
@@ -34,7 +46,7 @@
 						<!-- Button to show hints / solution -->
 						<div class="mb-4" v-if="hint === -1">
 							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0" v-if="challenge.hints.length > 0">Show hint</button>
-							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0; showSolution()" v-else>Show solution</button>
+							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0; showSolution()" v-else-if="challenge.type !== 'DMN_MODEL'">Show solution</button>
 						</div>
 
 						<!-- If hints exist, add left/right buttons to iterate over all hints -->
@@ -62,7 +74,7 @@
 											<path d="M4,15V9H12V4.16L19.84,12L12,19.84V15H4Z" fill="currentColor"/>
 										</svg>
 									</button>
-									<button class="btn btn-block btn-outline-secondary" style="text-align: center" v-else v-on:click="hint += 1; showSolution()">
+									<button class="btn btn-block btn-outline-secondary" style="text-align: center" v-else-if="challenge.type !== 'DMN_MODEL'" v-on:click="hint += 1; showSolution()">
 										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 											<path d="M10 3H14V14H10V3M10 21V17H14V21H10Z" fill="currentColor"/>
 										</svg>
@@ -129,6 +141,8 @@
 	import Alert from "../../components/alert/alert.vue";
 	import AlertHelper from "../../components/alert/alert-helper";
 	import EmptyCollectionComponent from "../../components/empty-collection.vue";
+	import Model from './model.vue';
+	import ModelSelect from "../../components/model_select.vue";
 
 	export default {
 		head() {
@@ -140,18 +154,41 @@
 			"alert": Alert,
 			"json-builder": JSONBuilder,
 			"literal-expression": LiteralExpression,
-			"empty-collection": EmptyCollectionComponent
+			"empty-collection": EmptyCollectionComponent,
+			"model": Model,
+			"model-select": ModelSelect
 		},
 		async mounted() {
 			await this.getChallenges();
+		},
+		watch: {
+			dmn_solution: {
+				handler: function (solution) {
+					//console.log(solution);
+					if (solution === null) {
+						return;
+					}
+
+					this.dmn_solution.models = solution.models;
+					this.dmn_solution.decisionService = solution.decisionService;
+					this.executeRaw();
+				},
+				deep: true
+			}
 		},
 		data() {
 			return {
 				mode: "SELECT",
 				order: false,
 				progress: 0,
+
 				expression: "",
 				expression_backup: "",
+
+				dmn_solution: {
+					models: [],
+					decisionService: null
+				},
 
 				challenge: null,
 				challenges: {},
@@ -165,6 +202,9 @@
 
 				this.expression = "";
 				this.expression_backup = "";
+
+				this.dmn_solution.models = [];
+				this.dmn_solution.decisionService = null;
 
 				this.mode = "VIEW";
 
@@ -189,9 +229,10 @@
 				this.mode = "SELECT";
 			},
 
-			//
-			// Model
-			//
+			async executeRawModel() {
+
+			},
+
 			async executeRaw() {
 				//Keep track of progress
 				let testsCompleted = 0;
@@ -202,17 +243,30 @@
 					scenario.output.equal = false;
 				}
 
+				this.progress = 0;
+
 				//Calculate results
 				for (const scenario of this.challenge.scenarios) {
 					scenario.output.equal = false;
 					let response;
 					try {
-						response = await Network.executeRaw(this.expression, scenario.input.value);
+						if (this.challenge.type === "FEEL") {
+							if (this.expression === null || this.expression === "") {
+								return;
+							}
+							response = await Network.executeRaw(this.expression, scenario.input.value);
+						} else if (this.challenge.type === "DMN_MODEL") {
+							if (this.dmn_solution.models.length === 0) {
+								return;
+							}
+							response = await Network.executeModelChallenge(this.dmn_solution.models, this.dmn_solution.decisionService, scenario.input.value);
+						}
 						if (response.status !== 200) {
 							throw new Error();
 						}
 					}
 					catch (e) {
+						//console.log(e);
 						scenario.output.calculated = null;
 						scenario.output.equal = false;
 						this.displayAlert(scenario, "The output could not be calculated.", "danger");
@@ -220,7 +274,13 @@
 					}
 
 					const result = await response.json();
-					scenario.output.calculated = result.outputs.main;
+
+					if (this.challenge.type === "FEEL") {
+						scenario.output.calculated = result.outputs.main;
+					} else if (this.challenge.type === "DMN_MODEL") {
+						scenario.output.calculated = result.outputs;
+					}
+
 					if (result.messages.length > 0) {
 						scenario.output.equal = false;
 						this.displayAlert(scenario, AlertHelper.buildList("The output was calculated, the following messages were returned:", result.messages), "warning");
@@ -257,7 +317,7 @@
 			showOriginalExpression() {
 				this.expression = JSON.parse(JSON.stringify(this.expression_backup));
 				this.executeRaw();
-			}
+			},
 		}
 	};
 </script>

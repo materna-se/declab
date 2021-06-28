@@ -69,8 +69,13 @@
 						</div>
 						<h5 class="mb-2">Solution</h5>
 						<div class="card mb-4">
-							<div class="card-body">
+							<div class="card-body" v-if="challenge.type === 'FEEL'">
 								<literal-expression v-model="challenge.solution" readonly="true"/>
+							</div>
+
+							<div class="card-body" v-if="challenge.type === 'DMN_MODEL'">
+								<h6 class="mb-2">Models</h6>
+								<model-select v-model="challenge.solution" readonly="true"/>
 							</div>
 						</div>
 
@@ -131,9 +136,28 @@
 						</button>
 
 						<h5 class="mb-2">Solution</h5>
+
 						<div class="card mb-4">
-							<div class="card-body">
+							<div class="input-group">
+								<div class="input-group-prepend">
+									<span class="input-group-text">Type</span>
+								</div>
+								<select class="form-control" v-model="challenge.type" v-on:change="changeChallengeType(challenge.type)">
+									<option v-if="challenge.type === null" selected disabled>Select type...</option>
+									<option>FEEL</option>
+									<option>DMN_MODEL</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="card mb-4">
+							<div class="card-body" v-if="challenge.type === 'FEEL'">
 								<literal-expression v-model="challenge.solution"/>
+							</div>
+
+							<div class="card-body" v-if="challenge.type === 'DMN_MODEL'">
+								<h6 class="mb-2">Models</h6>
+								<model-select v-model="challenge.solution"/>
 							</div>
 						</div>
 
@@ -142,22 +166,26 @@
 							<div class="card mb-4" v-for="(scenario, index) of challenge.scenarios">
 								<div class="card-body">
 									<div class="mr-auto">
-										<div class="float-right mt-2">
+										<div class="float-right mt-2 ml-2">
 											<button class="btn btn-block btn-outline-secondary" v-on:click="challenge.scenarios.splice(index, 1)">
 												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
 													<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 												</svg>
 											</button>
 										</div>
+										<div class="float-right mt-2 ml-2">
+											<button class="btn btn-block btn-outline-secondary" v-on:click="challenge.scenarios.splice(index, 0, JSON.parse(JSON.stringify(challenge.scenarios[index])))">
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
+													<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"/>
+												</svg>
+											</button>
+										</div>	
 										<div style="clear:both"></div>
 										<h5 class="mb-2">Name</h5>
 										<input class="form-control mb-4" v-model="scenario.name">
 
 										<h5 class="mb-2">Input</h5>
 										<json-builder class="mb-4" v-bind:template="scenario.input.template" v-bind:convert="true" v-bind:fixed-root="true" v-on:update:value="scenario.input.value = $event"/>
-
-										<h5 class="mb-2">Output</h5>
-										<json-builder v-bind:template="scenario.output.template" v-bind:convert="true" v-on:update:value="scenario.output.value = $event"/>
 									</div>
 								</div>
 							</div>
@@ -190,6 +218,8 @@
 	import LiteralExpression from "../../components/dmn/literal-expression.vue";
 	import JSONBuilder from "../../components/json/json-builder.vue";
 	import EmptyCollectionComponent from "../../components/empty-collection.vue";
+	import Model from './model.vue';
+	import ModelSelect from "../../components/model_select.vue";
 
 	export default {
 		head() {
@@ -201,6 +231,8 @@
 			"literal-expression": LiteralExpression,
 			"json-builder": JSONBuilder,
 			"empty-collection": EmptyCollectionComponent,
+			"model": Model,
+			"model-select": ModelSelect
 		},
 		async mounted() {
 			await this.getChallenges();
@@ -219,6 +251,7 @@
 					name: null,
 					decision: null,
 					hints: null,
+					type: "FEEL",
 					solution: null,
 					scenarios: null
 				}
@@ -247,6 +280,7 @@
 					name: this.challenge.name,
 					description: this.challenge.description,
 					hints: this.challenge.hints,
+					type: this.challenge.type,
 					solution: this.challenge.solution,
 					scenarios: this.challenge.scenarios
 				});
@@ -263,6 +297,7 @@
 					name: this.challenge.name,
 					description: this.challenge.description,
 					hints: this.challenge.hints,
+					type: this.challenge.type,
 					solution: this.challenge.solution,
 					scenarios: this.challenge.scenarios
 				});
@@ -303,6 +338,7 @@
 					name: null,
 					description: null,
 					hints: [],
+					type: "FEEL",
 					solution: null,
 					scenarios: []
 				};
@@ -316,6 +352,8 @@
 				this.challenge = JSON.parse(JSON.stringify(challenge));
 				this.challenge.uuid = uuid;
 
+				console.log(this.challenge);
+
 				this.mode = "EDIT";
 			},
 			setDuplicateMode(uuid) {
@@ -325,7 +363,71 @@
 				this.challenge = JSON.parse(JSON.stringify(challenge));
 
 				this.mode = "ADD";
-			}
+			},
+
+			duplicateScenario(uuid, index) {
+				let challenge = this.challenges[uuid];
+				let scenario = challenge.scenarios[index];
+
+				challenge.scenarios.append()
+			},
+
+			changeChallengeType(type) {
+				let challenge = this.challenge;
+
+				if (challenge.type === "FEEL") {
+					challenge.solution = "";
+				} else if (challenge.type === "DMN_MODEL") {
+					challenge.solution = {}
+				}
+			},
+
+			loadFile(file) {
+				return new Promise(resolve => {
+					const fileReader = new FileReader();
+					fileReader.addEventListener("load", async function (readerEvent) {
+						const file = readerEvent.target.result;
+
+						// Check if the file is starting with <. If it does, we'll expect it to be a .dmn file.
+						if (file.charAt(0) === "<") {
+							resolve({
+								name: file.match(/name="(.+?)"/)[1],
+								namespace: file.match(/namespace="(.+?)"/)[1],
+								source: file
+							});
+							return;
+						}
+
+						const namespace = file.match(/package (.+?);/)[1];
+						const name = file.match(/class (.+?) /)[1];
+						resolve({
+							name: name,
+							namespace: namespace + "." + name,
+							source: file
+						});
+					});
+					fileReader.readAsText(file, "UTF-8");
+				});
+			},
+
+			async onModelDragOver(e) {
+				e.preventDefault(); // See https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#droptargets.
+			},
+
+			async onAddModelsDrop(event) {
+				console.log("AA");
+
+				event.preventDefault();
+				if (event.dataTransfer.files.length === 0) {
+					return;
+				}
+
+				let challenge = this.challenge;
+
+				for (const file of event.dataTransfer.files) {
+					challenge.solution.push(await this.loadFile(file));
+				}
+			},
 		}
 	};
 </script>
