@@ -16,7 +16,13 @@
 				<div class="card">
 					<div class="card-header d-flex align-items-center">
 						<h4 class="mb-0 mr-auto">{{importedModel.name}}</h4>
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" v-on:click="deleteModel(index)">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" v-on:click="editModel(index)" class="c-pointer mr-2">
+							<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
+						</svg>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" v-on:click="downloadModel(index)" class="c-pointer mr-2">
+							<path d="M13 5v6h1.17L12 13.17 9.83 11H11V5h2m2-2H9v6H5l7 7 7-7h-4V3m4 15H5v2h14v-2z" fill="currentColor"/>
+						</svg>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" v-on:click="deleteModel(index)" class="c-pointer">
 							<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 						</svg>
 					</div>
@@ -60,11 +66,19 @@
 			<div class="mb-2" v-on:drop="onAddModelsDrop" v-on:dragover="onModelDragOver" v-on:dragenter="onModelDragOver">
 				<div class="card" style="height: 100%; min-height: 191px"> <!-- 191 is the height of a model without decisions, inputs and knowledge models -->
 					<div class="card-body text-muted d-flex justify-content-center align-items-center">
-						<div class="d-flex flex-column align-items-center">
-							<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" class="mb-2">
-								<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
-							</svg>
-							<p>Drag and drop models here!</p>
+						<div class="d-flex flex-row align-items-center">
+							<div class="d-flex flex-column align-items-center c-pointer pr-5 mr-5" style="border-right: 1px solid rgba(0, 0, 0, .125)" v-on:click="createModel">
+								<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" class="mb-2">
+									<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+								</svg>
+								<p>Create a new model by clicking here!</p>
+							</div>
+							<div class="d-flex flex-column align-items-center c-pointer">
+								<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" class="mb-2">
+									<path d="M1 12h9.76l-2.5-2.5 1.41-1.42L14.59 13l-4.92 4.92-1.41-1.42 2.5-2.5H1v-2m18-9a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2v-3h2v3h14V7H5v3H3V5a2 2 0 012-2h14z" fill="currentColor"/>
+								</svg>
+								<p>Import a model by dragging it here!</p>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -77,6 +91,7 @@
 	import Network from "../../helpers/network";
 	import draggable from 'vuedraggable'
 	import AlertHelper from "../../components/alert/alert-helper";
+	import {v4 as uuid} from 'uuid';
 
 	export default {
 		head() {
@@ -106,9 +121,22 @@
 		methods: {
 			async onSocket(e) {
 				const data = JSON.parse(e.data);
-				if(data.type === "imported") {
+				if (data.type === "imported") {
 					await this.getModel();
 				}
+			},
+			async createModel() {
+				const id = uuid().substring(0, 8);
+				const namespace = "https://kiegroup.org/dmn/" + id;
+				const name = "model-" + id;
+
+				this.models.push({
+					name: name,
+					namespace: namespace,
+					source: `<dmn:definitions xmlns:dmn="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns="${namespace}" xmlns:feel="http://www.omg.org/spec/DMN/20180521/FEEL/" xmlns:kie="http://www.drools.org/kie/dmn/1.2" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" name="${name}" typeLanguage="http://www.omg.org/spec/DMN/20180521/FEEL/" namespace="${namespace}"></dmn:definitions>`
+				});
+
+				await this.importModels();
 			},
 			async getModel() {
 				const models = [];
@@ -145,6 +173,21 @@
 				});
 
 				await this.getModel();
+			},
+			editModel(index) {
+				window.open(this.$router.resolve('/' + this.$route.params.workspace + '/editor/' + index).href, '_blank', 'noopener');
+			},
+			downloadModel(index) {
+				const model = this.models[index];
+
+				const element = document.createElement('a');
+				element.href = URL.createObjectURL(new Blob([model.source], {
+					type: "text/plain",
+				}));
+				element.download = model.name + ".dmn";
+				document.body.appendChild(element);
+				element.click();
+				element.remove();
 			},
 			deleteModel(index) {
 				this.$delete(this.models, index);
@@ -238,7 +281,7 @@
 					this.models.push(await this.loadFile(file));
 				}
 
-				this.importModels();
+				await this.importModels();
 			},
 			async onReplaceModelDrop(event, index) {
 				event.preventDefault();
@@ -248,7 +291,7 @@
 
 				this.models[index] = await this.loadFile(event.dataTransfer.files[0]);
 
-				this.importModels();
+				await this.importModels();
 			},
 			orderModels(e) {
 				this.models.splice(e.newIndex, 0, this.models.splice(e.oldIndex, 1)[0]);
