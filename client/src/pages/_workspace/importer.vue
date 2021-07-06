@@ -68,6 +68,7 @@
 	import XLSX from "xlsx";
 	import JSONBuilder from "@/components/json/json-builder";
 	import Network from "@/helpers/network";
+	import JSONPath from "jsonpath";
 
 	export default {
 		data() {
@@ -110,7 +111,7 @@
 				for (const row of this.rows) {
 					const input = {...this.inputContext};
 					for (const enabledInputColumn of this.enabledInputColumns) {
-						input[enabledInputColumn] = row[enabledInputColumn]
+						JSONPath.value(input, enabledInputColumn, JSON.parse(row[enabledInputColumn]));
 					}
 					//const input = row;
 					const result = await Network.executeModel(input);
@@ -121,11 +122,21 @@
 			async saveFile() {
 				const rows = [];
 				for (const resultEntry of this.result) {
-					const row = {...resultEntry.input};
-					for (const enabledOutputColumn of this.enabledOutputColumns) {
-						row[enabledOutputColumn] = resultEntry.output[enabledOutputColumn]
+					const row = {};
+					for (const enabledInputColumn of this.enabledInputColumns) {
+						const result = JSONPath.query(resultEntry.input, enabledInputColumn);
+						if(result.length === 0) {
+							continue;
+						}
+						row[enabledInputColumn] = JSON.stringify(result.length === 1 ? result[0] : result);
 					}
-					console.info(row);
+					for (const enabledOutputColumn of this.enabledOutputColumns) {
+						const result = JSONPath.query(resultEntry.output, enabledOutputColumn);
+						if(result.length === 0) {
+							continue;
+						}
+						row[enabledOutputColumn] = JSON.stringify(result.length === 1 ? result[0] : result);
+					}
 					rows.push(row);
 				}
 
