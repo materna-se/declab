@@ -22,6 +22,8 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 public class ChallengeExecutionHelper {
 	public static ArrayList<Scenario> calculateFEELExpression(String feelString, ArrayList<Scenario> scenarios) {
+		// Calculate a list of scenario outputs using a FEEL expression
+		
 		try {
 			Decision decision = new Decision();
 			decision.setExpression(feelString);
@@ -50,6 +52,10 @@ public class ChallengeExecutionHelper {
 	}
 	
 	public static ArrayList<Scenario> calculateModels(ArrayList<ModelMap> modelMaps, ArrayList<Scenario> scenarios, DecisionService decisionService) throws ModelNotFoundException, ModelImportException {
+		// Calculate a list of scenario outputs using any number of imported models
+		
+		// Import
+		
 		DMNDecisionSession dS = new DMNDecisionSession();
 		
 		for (ModelMap modelMap : modelMaps) {

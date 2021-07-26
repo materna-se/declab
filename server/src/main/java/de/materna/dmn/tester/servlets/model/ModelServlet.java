@@ -186,7 +186,7 @@ public class ModelServlet {
 	
 	@POST
 	@ReadAccess
-	@Path("model/anonymous")
+	@Path("/model/anonymous")
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response importModelsAnonymous(@PathParam("workspace") String workspaceUUID, String body) throws IOException {

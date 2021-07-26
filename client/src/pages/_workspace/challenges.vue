@@ -219,7 +219,7 @@
 	import JSONBuilder from "../../components/json/json-builder.vue";
 	import EmptyCollectionComponent from "../../components/empty-collection.vue";
 	import Model from './model.vue';
-	import ModelSelect from "../../components/model_select.vue";
+	import ModelSelect from "../../components/model-select.vue";
 
 	export default {
 		head() {
@@ -379,53 +379,6 @@
 					challenge.solution = "";
 				} else if (challenge.type === "DMN_MODEL") {
 					challenge.solution = {}
-				}
-			},
-
-			loadFile(file) {
-				return new Promise(resolve => {
-					const fileReader = new FileReader();
-					fileReader.addEventListener("load", async function (readerEvent) {
-						const file = readerEvent.target.result;
-
-						// Check if the file is starting with <. If it does, we'll expect it to be a .dmn file.
-						if (file.charAt(0) === "<") {
-							resolve({
-								name: file.match(/name="(.+?)"/)[1],
-								namespace: file.match(/namespace="(.+?)"/)[1],
-								source: file
-							});
-							return;
-						}
-
-						const namespace = file.match(/package (.+?);/)[1];
-						const name = file.match(/class (.+?) /)[1];
-						resolve({
-							name: name,
-							namespace: namespace + "." + name,
-							source: file
-						});
-					});
-					fileReader.readAsText(file, "UTF-8");
-				});
-			},
-
-			async onModelDragOver(e) {
-				e.preventDefault(); // See https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#droptargets.
-			},
-
-			async onAddModelsDrop(event) {
-				console.log("AA");
-
-				event.preventDefault();
-				if (event.dataTransfer.files.length === 0) {
-					return;
-				}
-
-				let challenge = this.challenge;
-
-				for (const file of event.dataTransfer.files) {
-					challenge.solution.push(await this.loadFile(file));
 				}
 			},
 		}

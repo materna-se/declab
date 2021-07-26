@@ -212,25 +212,13 @@ export default {
 	},
 
 	async executeModelChallengeList(models, decisionService, inputs) {
-		return await this._authorizedFetch(this._endpoint + "/challenges/execute_dmn", {
+		return await this._authorizedFetch(this._endpoint + "/challenges/execute_dmn_list", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				models: models,
 				decisionService: decisionService,
 				inputs: inputs
-			})
-		});
-	},
-
-	async executeModelChallenge(models, decisionService, input) {
-		return await this._authorizedFetch(this._endpoint + "/challenges/execute_dmn", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				models: models,
-				decisionService: decisionService,
-				input: input
 			})
 		});
 	},

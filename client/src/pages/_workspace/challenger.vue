@@ -34,7 +34,7 @@
 							<h4 style="text-align:center">DMN</h4>
 
 							<div class="card-body">
-								<model-select v-model="dmn_solution"/>
+								<model-select v-model="dmnSolution"/>
 							</div>
 						</template>
 					</div>
@@ -142,7 +142,7 @@
 	import AlertHelper from "../../components/alert/alert-helper";
 	import EmptyCollectionComponent from "../../components/empty-collection.vue";
 	import Model from './model.vue';
-	import ModelSelect from "../../components/model_select.vue";
+	import ModelSelect from "../../components/model-select.vue";
 
 	export default {
 		head() {
@@ -162,15 +162,15 @@
 			await this.getChallenges();
 		},
 		watch: {
-			dmn_solution: {
+			dmnSolution: {
 				handler: function (solution) {
 					//console.log(solution);
 					if (solution === null) {
 						return;
 					}
 
-					this.dmn_solution.models = solution.models;
-					this.dmn_solution.decisionService = solution.decisionService;
+					this.dmnSolution.models = solution.models;
+					this.dmnSolution.decisionService = solution.decisionService;
 					this.executeRaw();
 				},
 				deep: true
@@ -183,9 +183,9 @@
 				progress: 0,
 
 				expression: "",
-				expression_backup: "",
+				expressionBackup: "",
 
-				dmn_solution: {
+				dmnSolution: {
 					models: [],
 					decisionService: null
 				},
@@ -201,10 +201,10 @@
 				this.challenge = this.challenges[uuid];
 
 				this.expression = "";
-				this.expression_backup = "";
+				this.expressionBackup = "";
 
-				this.dmn_solution.models = [];
-				this.dmn_solution.decisionService = null;
+				this.dmnSolution.models = [];
+				this.dmnSolution.decisionService = null;
 
 				this.mode = "VIEW";
 
@@ -229,10 +229,6 @@
 				this.mode = "SELECT";
 			},
 
-			async executeRawModel() {
-
-			},
-
 			async executeRaw() {
 				//Keep track of progress
 				let testsCompleted = 0;
@@ -245,22 +241,47 @@
 
 				this.progress = 0;
 
+				let response;
+				let challengeResults;
+
+				// If DMN challenge, evaluate all scenarios using a single decision session
+				// to avoid the overhead of sending and importing models for every scenario
+				if (this.challenge.type === "DMN_MODEL") {
+					if (this.dmnSolution.models.length === 0) {
+						return;
+					}
+
+					let directInputs = []
+
+					for (const scenario of this.challenge.scenarios) {
+						directInputs.push(scenario.input.value);
+					}
+
+					response = await Network.executeModelChallengeList(this.dmnSolution.models, this.dmnSolution.decisionService, directInputs);
+
+					challengeResults = await response.json();
+				}
+
 				//Calculate results
+				let i = 0;
+
 				for (const scenario of this.challenge.scenarios) {
 					scenario.output.equal = false;
-					let response;
+
+					let result;
+
 					try {
 						if (this.challenge.type === "FEEL") {
 							if (this.expression === null || this.expression === "") {
 								return;
 							}
 							response = await Network.executeRaw(this.expression, scenario.input.value);
+
+							result = await response.json();
 						} else if (this.challenge.type === "DMN_MODEL") {
-							if (this.dmn_solution.models.length === 0) {
-								return;
-							}
-							response = await Network.executeModelChallenge(this.dmn_solution.models, this.dmn_solution.decisionService, scenario.input.value);
+							result = challengeResults[i];
 						}
+
 						if (response.status !== 200) {
 							throw new Error();
 						}
@@ -272,8 +293,6 @@
 						this.displayAlert(scenario, "The output could not be calculated.", "danger");
 						continue;
 					}
-
-					const result = await response.json();
 
 					if (this.challenge.type === "FEEL") {
 						scenario.output.calculated = result.outputs.main;
@@ -293,6 +312,8 @@
 					}
 
 					this.displayAlert(scenario, null, null);
+					
+					i++;
 				}
 
 				this.progress = testsCompleted / this.challenge.scenarios.length;
@@ -309,13 +330,13 @@
 			},
 
 			showSolution() {
-				this.expression_backup = JSON.parse(JSON.stringify(this.expression));
+				this.expressionBackup = JSON.parse(JSON.stringify(this.expression));
 				this.expression = this.challenge.solution;
 				this.executeRaw();
 			},
 
 			showOriginalExpression() {
-				this.expression = JSON.parse(JSON.stringify(this.expression_backup));
+				this.expression = JSON.parse(JSON.stringify(this.expressionBackup));
 				this.executeRaw();
 			},
 		}

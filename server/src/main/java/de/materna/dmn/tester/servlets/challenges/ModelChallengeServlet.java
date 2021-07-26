@@ -24,6 +24,7 @@ import de.materna.jdec.model.ImportResult;
 import de.materna.jdec.model.Model;
 import de.materna.jdec.serialization.SerializationHelper;
 
+
 @Path("/workspaces/{workspace}/")
 public class ModelChallengeServlet {
 	@POST
@@ -32,6 +33,10 @@ public class ModelChallengeServlet {
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response calculateModelChallengeList(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+		// Calculate a list of scenario outputs using a list of models to import
+		// It's important to calculate all scenarios in one request because the overhead of 
+		// importing all models for each scenario is significant
+		
 		try {
 			Map<String, Object> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 			});
@@ -44,7 +49,7 @@ public class ModelChallengeServlet {
 			
 			LinkedList<ExecutionResult> results = new LinkedList<ExecutionResult>();
 			
-			// Import model
+			// Import models (defined by name (unused), namespace and source XML)
 			ArrayList<Map<String, Object>> modelMaps = (ArrayList<Map<String, Object>>) params.get("models");
 			
 			for (Map<String, Object> modelMap : modelMaps) {
@@ -54,18 +59,20 @@ public class ModelChallengeServlet {
 				dS.importModel(modelNamespace, modelSource);
 			}
 			
+			// Get parsed models from decision session
 			List<Model> models = dS.getModels();
 
-			// Get inputs
+			// Get scenario inputs sent by client
 			ArrayList<Map<String, Object>> inputs = (ArrayList<Map<String, Object>>) params.get("inputs");
 			
-			// Execute
+			// Execute each scenario and store its results
+			
 			DecisionService decisionService = (DecisionService) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(params.get("decisionService")), DecisionService.class);
 			
 			for (Map<String, Object> input : inputs) {
 				ExecutionResult result;				
 				
-				if (decisionService.getName() == null || decisionService.getName().equals("")) {
+				if (decisionService == null || decisionService.getName() == null || decisionService.getName().equals("")) {
 					String ns = models.get(models.size() - 1).getNamespace();
 					result = dS.executeModel(ns, input);
 				} else {
@@ -76,56 +83,6 @@ public class ModelChallengeServlet {
 			}
 			
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(results)).build();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		}
-	}
-	
-	@POST
-	@ReadAccess
-	@Path("/challenges/execute_dmn")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public Response calculateModelChallenge(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
-		try {
-			Map<String, Object> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
-			});
-			
-			if (params.get("models") == null || params.get("input") == null) {
-				throw new IllegalArgumentException();
-			}
-			
-			DMNDecisionSession dS = new DMNDecisionSession();
-			
-			// Import model
-			ArrayList<Map<String, Object>> modelMaps = (ArrayList<Map<String, Object>>) params.get("models");
-			
-			for (Map<String, Object> modelMap : modelMaps) {
-				String modelNamespace = (String) modelMap.get("namespace");
-				String modelSource = (String) modelMap.get("source");
-				
-				dS.importModel(modelNamespace, modelSource);
-			}
-			
-			List<Model> models = dS.getModels();
-
-			// Get input
-			Map<String, Object> input = (Map<String, Object>) params.get("input");
-			
-			// Execute
-			ExecutionResult result;
-			
-			DecisionService decisionService = (DecisionService) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(params.get("decisionService")), DecisionService.class);
-			
-			if (decisionService == null || decisionService.getName() == null || decisionService.getName().equals("")) {
-				String ns = models.get(models.size() - 1).getNamespace();
-				result = dS.executeModel(ns, input);
-			} else {
-				result = dS.executeModel(decisionService.getNamespace(), decisionService.getName(), input);
-			}
-			
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(result)).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.BAD_REQUEST).build();

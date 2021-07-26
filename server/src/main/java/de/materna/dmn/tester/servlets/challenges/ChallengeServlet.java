@@ -73,15 +73,16 @@ public class ChallengeServlet {
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(challenge)).build();
 	}
 	
-	public Challenge calculateChallengeScenarios(Challenge challenge, Map<String, Object> params) throws ModelNotFoundException, ModelImportException {
+	private Challenge calculateChallengeScenarios(Challenge challenge, Map<String, Object> params) throws ModelNotFoundException, ModelImportException {
+		// This method is used to calculate the scenario outputs of a challenge from its inputs and its solution
 		ArrayList<Scenario> scenarios = (ArrayList<Scenario>) challenge.getScenarios();
 		
 		ChallengeType challengeType = challenge.getType();
 		
+		// Slightly different depending on challenge type
 		if (challengeType.equals(ChallengeType.FEEL)) {
 			String feelExpression = (String) params.get("solution");
 			
-			// Calculate scenario outputs
 			scenarios = ChallengeExecutionHelper.calculateFEELExpression(feelExpression, scenarios);
 			challenge.setScenarios(scenarios);
 		} else if (challengeType.equals(ChallengeType.DMN_MODEL)) {
@@ -91,7 +92,7 @@ public class ChallengeServlet {
 			
 			DecisionService decisionService = (DecisionService) solution.getDecisionService();
 			
-			// Calculate scenario outputs
+			// Use decision service if available
 			if (decisionService != null) {
 				scenarios = ChallengeExecutionHelper.calculateModels(modelMaps, scenarios, decisionService);
 			} else {
@@ -116,7 +117,7 @@ public class ChallengeServlet {
 			Map<String, Object> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 			});
 			
-			Challenge challenge = (Challenge) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(params), Challenge.class);
+			Challenge challenge = (Challenge) SerializationHelper.getInstance().toClass(body, Challenge.class);
 			
 			challenge = calculateChallengeScenarios(challenge, params);
 			
@@ -147,7 +148,7 @@ public class ChallengeServlet {
 		Map<String, Object> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 		});
 		
-		Challenge challenge = (Challenge) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(params), Challenge.class);
+		Challenge challenge = (Challenge) SerializationHelper.getInstance().toClass(body, Challenge.class);
 		
 		challenge = calculateChallengeScenarios(challenge, params);
 		

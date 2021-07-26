@@ -76,12 +76,11 @@
 <script>
 	import Network from "../helpers/network";
 	import draggable from 'vuedraggable'
-	import AlertHelper from "../components/alert/alert-helper";
+	import AlertHelper from "./alert/alert-helper";
 
 	export default {
 		head() {
 			return {
-				title: "declab - Model",
 			}
 		},
 		components: {
