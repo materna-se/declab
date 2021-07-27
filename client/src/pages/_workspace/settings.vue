@@ -179,7 +179,6 @@
 				const element = document.createElement('a');
 				element.href = URL.createObjectURL(blob);
 				element.download = this.serverConfiguration.name + ".dtar";
-
 				document.body.appendChild(element);
 				element.click();
 				element.remove();

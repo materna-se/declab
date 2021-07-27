@@ -1,5 +1,5 @@
 <template>
-	<nav class="navbar navbar-expand mb-4 p-0">
+	<nav class="navbar navbar-expand mb-3 p-0">
 		<!-- Manual / route -->
 		<router-link to="/" class="navbar-brand">
 			<span class="navbar-brand-primary">dec</span>
@@ -114,6 +114,10 @@
 							{
 								name: "Discoverer",
 								path: "discoverer"
+							},
+							{
+								name: "Importer",
+								path: "importer"
 							}
 						]
 					},

@@ -1,4 +1,5 @@
 import configuration from "./configuration";
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 export default {
 	_vue: null,
@@ -29,7 +30,7 @@ export default {
 			if(this._socket !== null) {
 				this._socket.close();
 			}
-			this._socket = new WebSocket(socketHost + "/sockets/" + workspace);
+			this._socket = new ReconnectingWebSocket(socketHost + "/sockets/" + workspace);
 			this._socket.addEventListener("message", (e) => {
 				const data = JSON.parse(e.data);
 				if(data.type === "listeners") {
