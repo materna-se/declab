@@ -378,7 +378,13 @@
 				if (challenge.type === "FEEL") {
 					challenge.solution = "";
 				} else if (challenge.type === "DMN_MODEL") {
-					challenge.solution = {}
+					challenge.solution = {
+						"models": [],
+						"decisionService": {
+							"name": null,
+							"namespace": null
+						}
+					}
 				}
 			},
 		}
