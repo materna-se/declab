@@ -28,6 +28,8 @@ import de.materna.dmn.tester.servlets.challenges.beans.Challenge.ChallengeType;
 import de.materna.dmn.tester.servlets.challenges.beans.DMNSolution;
 import de.materna.dmn.tester.servlets.challenges.beans.ModelMap;
 import de.materna.dmn.tester.servlets.challenges.beans.Scenario;
+import de.materna.dmn.tester.servlets.challenges.beans.FEELSolution;
+import de.materna.dmn.tester.servlets.challenges.beans.DMNSolution;
 import de.materna.dmn.tester.servlets.challenges.helpers.ChallengeExecutionHelper;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
@@ -73,7 +75,7 @@ public class ChallengeServlet {
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(challenge)).build();
 	}
 	
-	private Challenge calculateChallengeScenarios(Challenge challenge, Map<String, Object> params) throws ModelNotFoundException, ModelImportException {
+	private Challenge calculateChallengeScenarios(Challenge challenge) throws ModelNotFoundException, ModelImportException {
 		// This method is used to calculate the scenario outputs of a challenge from its inputs and its solution
 		ArrayList<Scenario> scenarios = (ArrayList<Scenario>) challenge.getScenarios();
 		
@@ -81,13 +83,14 @@ public class ChallengeServlet {
 		
 		// Slightly different depending on challenge type
 		if (challengeType.equals(ChallengeType.FEEL)) {
-			String feelExpression = (String) params.get("solution");
+			String feelExpression = (String) challenge.getSolution();
 			
 			scenarios = ChallengeExecutionHelper.calculateFEELExpression(feelExpression, scenarios);
 			challenge.setScenarios(scenarios);
 		} else if (challengeType.equals(ChallengeType.DMN_MODEL)) {
-			DMNSolution solution = (DMNSolution) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(params.get("solution")), DMNSolution.class);
-			
+			// Need to re-parse to avoid ClassCastException
+			DMNSolution solution = (DMNSolution) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(challenge.getSolution()), DMNSolution.class);
+						
 			ArrayList<ModelMap> modelMaps = solution.getModels();
 			
 			DecisionService decisionService = (DecisionService) solution.getDecisionService();
@@ -113,13 +116,10 @@ public class ChallengeServlet {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		String uuid = UUID.randomUUID().toString();
 		
-		try {
-			Map<String, Object> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
-			});
-			
+		try {			
 			Challenge challenge = (Challenge) SerializationHelper.getInstance().toClass(body, Challenge.class);
 			
-			challenge = calculateChallengeScenarios(challenge, params);
+			challenge = calculateChallengeScenarios(challenge);
 			
 			workspace.getChallengeManager().persistFile(uuid, challenge);
 
@@ -144,13 +144,10 @@ public class ChallengeServlet {
 		if (!challengeManager.getFiles().containsKey(challengeUUID)) {
 			throw new NotFoundException();
 		}
-
-		Map<String, Object> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
-		});
 		
 		Challenge challenge = (Challenge) SerializationHelper.getInstance().toClass(body, Challenge.class);
 		
-		challenge = calculateChallengeScenarios(challenge, params);
+		challenge = calculateChallengeScenarios(challenge);
 		
 		challengeManager.persistFile(challengeUUID, challenge);
 
