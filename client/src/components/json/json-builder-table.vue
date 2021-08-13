@@ -6,7 +6,7 @@
 		<div class="input-group" v-if="['string', 'date', 'time', 'dateTime'].includes(value.type)" v-bind:class="[value.value === value.template ? 'input-disabled' : null]">
 			<div class="input-group-prepend" v-on:click="exportPath(path)">
 				<span class="input-group-text">
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 11a2 2 0 0 1 2 2v4H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2m-2 2v2h2v-2H4m16 0v2h2v2h-2a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2v2h-2m-8-6v4h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V7h2m0 8h2v-2h-2v2z" fill="currentColor"/></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path d="M6 11a2 2 0 0 1 2 2v4H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2m-2 2v2h2v-2H4m16 0v2h2v2h-2a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2v2h-2m-8-6v4h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V7h2m0 8h2v-2h-2v2z" fill="currentColor"/></svg>
 				</span>
 			</div>
 			<input type="text" placeholder="Enter Value..." class="form-control" v-bind:value="value.value" v-bind:disabled="fixedValues" v-on:input="$set(value, 'value', $event.target.value === '' ? undefined : $event.target.value)">
@@ -14,7 +14,7 @@
 		<div class="input-group" v-else-if="value.type === 'number'" v-bind:class="[value.value === value.template ? 'input-disabled' : null]">
 			<div class="input-group-prepend" v-on:click="exportPath(path)">
 				<span class="input-group-text">
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 17V9H2V7h4v10H4m18-2a2 2 0 0 1-2 2h-4v-2h4v-2h-2v-2h2V9h-4V7h4a2 2 0 0 1 2 2v1.5a1.5 1.5 0 0 1-1.5 1.5 1.5 1.5 0 0 1 1.5 1.5V15m-8 0v2H8v-4a2 2 0 0 1 2-2h2V9H8V7h4a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2v2h4z" fill="currentColor"/></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path d="M4 17V9H2V7h4v10H4m18-2a2 2 0 0 1-2 2h-4v-2h4v-2h-2v-2h2V9h-4V7h4a2 2 0 0 1 2 2v1.5a1.5 1.5 0 0 1-1.5 1.5 1.5 1.5 0 0 1 1.5 1.5V15m-8 0v2H8v-4a2 2 0 0 1 2-2h2V9H8V7h4a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2v2h4z" fill="currentColor"/></svg>
 				</span>
 			</div>
 			<input type="number" placeholder="Enter Value..." class="form-control" v-bind:value="value.value" v-bind:disabled="fixedValues" v-on:input="$set(value, 'value', $event.target.value === '' ? undefined : Number($event.target.value))">
@@ -22,7 +22,7 @@
 		<div class="btn-group" v-else-if="value.type === 'boolean'" v-bind:class="[value.value === value.template ? 'input-disabled' : null]">
 			<div class="input-group-prepend" v-on:click="exportPath(path)">
 				<span class="input-group-text">
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18.11 7.93v8.14H23v-1.63h-3.26V7.93zM14 7.93a1.63 1.63 0 00-1.63 1.63v4.88A1.63 1.63 0 0014 16.07h1.63a1.63 1.63 0 001.63-1.63V9.56a1.63 1.63 0 00-1.63-1.63H14m0 1.63h1.63v4.88H14zM8.33 7.93A1.63 1.63 0 006.7 9.56v4.88a1.63 1.63 0 001.63 1.63H10a1.63 1.63 0 001.63-1.63V9.56A1.63 1.63 0 0010 7.93H8.33m0 1.63H10v4.88H8.33zM5.89 10.78V9.56a1.63 1.63 0 00-1.63-1.63H1v8.14h3.26a1.63 1.63 0 001.63-1.63v-1.22A1.25 1.25 0 004.67 12a1.25 1.25 0 001.22-1.22m-1.63 3.66H2.63v-1.63h1.63v1.63m0-3.25H2.63V9.56h1.63z" fill="currentColor"/></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path d="M18.11 7.93v8.14H23v-1.63h-3.26V7.93zM14 7.93a1.63 1.63 0 00-1.63 1.63v4.88A1.63 1.63 0 0014 16.07h1.63a1.63 1.63 0 001.63-1.63V9.56a1.63 1.63 0 00-1.63-1.63H14m0 1.63h1.63v4.88H14zM8.33 7.93A1.63 1.63 0 006.7 9.56v4.88a1.63 1.63 0 001.63 1.63H10a1.63 1.63 0 001.63-1.63V9.56A1.63 1.63 0 0010 7.93H8.33m0 1.63H10v4.88H8.33zM5.89 10.78V9.56a1.63 1.63 0 00-1.63-1.63H1v8.14h3.26a1.63 1.63 0 001.63-1.63v-1.22A1.25 1.25 0 004.67 12a1.25 1.25 0 001.22-1.22m-1.63 3.66H2.63v-1.63h1.63v1.63m0-3.25H2.63V9.56h1.63z" fill="currentColor"/></svg>
 				</span>
 			</div>
 			<button type="button" class="btn" v-bind:class="[value.value === undefined ? 'btn-secondary' : 'btn-white']" v-bind:disabled="fixedValues" v-on:click="$set(value, 'value', undefined)">
