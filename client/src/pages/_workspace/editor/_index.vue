@@ -54,6 +54,12 @@
 	import * as DmnEditor from "@kogito-tooling/kie-editors-standalone/dist/dmn"
 
 	export default {
+		head() {
+			const model = this.models[this.$route.params.index];
+			return {
+				title: "declab - Editor" + (model === undefined ? "" : (" for " + model.name)),
+			}
+		},
 		name: "editor",
 		data() {
 			return {
@@ -163,7 +169,7 @@
 	.import-result {
 		color: #495057;
 		background: #ffffff;
-		border: 1px solid rgba(0,0,0,.125);
+		border: 1px solid rgba(0, 0, 0, .125);
 		border-radius: 0.25rem;
 		padding: 6px 8px;
 		transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
