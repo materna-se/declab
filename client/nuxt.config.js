@@ -12,6 +12,9 @@ export default async function () {
 			dir: '../server/src/main/webapp',
 		},
 		head: {
+			htmlAttrs: {
+				lang: 'en'
+			},
 			meta: [
 				{
 					charset: 'utf-8'
