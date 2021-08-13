@@ -15,7 +15,7 @@
 				<div class="card mb-4">
 					<div class="card-body">
 						<configurator class="mb-4" v-model="workspace"></configurator>
-						<button class="btn btn-block btn-outline-secondary" v-on:click="createWorkspace">Enter workspace</button>
+						<button class="btn btn-block btn-outline-secondary" v-on:click="createWorkspace">Create and enter workspace</button>
 					</div>
 				</div>
 
@@ -32,7 +32,7 @@
 
 				<div class="list-group">
 					<template v-if="Object.keys(workspaces).length !== 0">
-						<div class="list-group-item list-group-item-action c-pointer d-flex align-items-center" v-for="(workspace, key) in workspaces" v-on:click="enterWorkspace(key)">
+						<div class="list-group-item list-group-item-action c-pointer d-flex align-items-center" v-for="(workspace, key) in workspaces" v-on:click="enterWorkspace(key)" v-on:keypress="simulateClick" tabindex="0">
 							<div class="mr-auto">
 								<p class="mb-0"><b>{{workspace.name}}</b></p>
 								<p class="mb-0">{{workspace.description}}</p>
@@ -123,24 +123,11 @@
 			//
 			// Helpers
 			//
-			/*
-			transformName(name) {
-				if (name === undefined || name === null) {
-					return name;
+			async simulateClick(event) {
+				if(event.keyCode === 13) {
+					event.target.click();
 				}
-
-				// The name should only contain lower case characters.
-				name = name.toLowerCase();
-				// The name should only contain basic latin characters.
-				name = deburr(name);
-				// The name should only contain a-z and 0-9. We'll replace other with dashes.
-				name = name.replace(/[^a-z0-9]+/g, "-");
-				// The name should not contain dashes at the beginning or end of the name or two dashes in a row.
-				name = name.replace(/^-|-$/g, '').replace(/-{2,}/g, "");
-
-				return name;
-			}
-			*/
+			},
 		},
 		async mounted() {
 			await this.getWorkspaces();
