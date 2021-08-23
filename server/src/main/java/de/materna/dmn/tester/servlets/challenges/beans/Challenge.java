@@ -25,7 +25,7 @@ public class Challenge {
 					 @JsonProperty(value = "hints", required = true) List<String> hints,
 					 @JsonProperty(value = "solution", required = true) Object solution,
 					 @JsonProperty(value = "scenarios", required = true) List<Scenario> scenarios) {
-		if(name == null) throw new BadRequestException();
+		if(name == null) name = "";
 		
 		this.name = name;
 		this.description = description;

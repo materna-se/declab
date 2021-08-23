@@ -79,7 +79,7 @@ public class ChallengeExecutionHelper {
 			
 			ExecutionResult executionResult;
 			
-			if (decisionService != null) {
+			if (decisionService != null && decisionService.getName() != null) {
 				executionResult = dS.executeModel(decisionService.getNamespace(), decisionService.getName(), scenario.getInput().getValue());
 			} else {
 				String ns = models.get(models.size() - 1).getNamespace();
