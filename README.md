@@ -58,7 +58,7 @@ In order to start the development server, the following command should be execut
 ```
 npm run dev
 ```
-Afterwards, the web server can be accessed at `http://127.0.0.1`.
+Afterwards, declab can be accessed at `http://127.0.0.1`.
 
 ### Production
 In order to start the production build, the following command should be executed:
@@ -89,6 +89,7 @@ the project can be built and executed by using the included Dockerfile.
 docker build -t declab:1.0.0 .
 docker run -p 127.0.0.1:8080:8080 declab:1.0.0 
 ```
+Afterwards, declab can be accessed at `http://127.0.0.1:8080`.
 
 ## License
 This project is available under the Apache License 2.0. Please refer to the [LICENSE.md](https://github.com/declab/LICENSE.md) for more detailed information.
