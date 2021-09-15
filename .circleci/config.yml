@@ -83,7 +83,7 @@ jobs:
       - attach_workspace:
           at: ~/project
       - setup_remote_docker
-      - run: cd ./declab && docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD} && docker build --build-arg VERSION=${CIRCLE_TAG} -t maternase/declab:${CIRCLE_TAG} . && docker push maternase/declab:${CIRCLE_TAG}
+      - run: cd ./declab && docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD} && docker build --build-arg VERSION=${CIRCLE_TAG} -t maternase/declab:${CIRCLE_TAG} -t maternase/declab:latest . && docker push maternase/declab:${CIRCLE_TAG} && docker push maternase/declab:latest
 
 workflows:
   version: 2
