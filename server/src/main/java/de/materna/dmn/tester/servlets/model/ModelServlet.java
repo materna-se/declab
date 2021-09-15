@@ -123,6 +123,9 @@ public class ModelServlet {
 		configuration.setDecisionService((Configuration.DecisionService) SerializationHelper.getInstance().toClass(body, Configuration.DecisionService.class));
 		configuration.serialize();
 
+		// Notify all sessions.
+		SessionManager.getInstance().notify(workspaceUUID, "{\"type\": \"imported\"}");
+
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 
@@ -180,7 +183,7 @@ public class ModelServlet {
 			switch (engine) {
 				case "DROOLS":
 				default:
-					executionResult = decisionSession.getDMNDecisionSession().executeExpression(decision.getExpression(), decision.getContext());
+					executionResult = workspace.getDecisionSession().getDMNDecisionSession().executeExpression(decision.getExpression(), decision.getContext());
 					break;
 				case "CAMUNDA":
 					executionResult = new CamundaDecisionSession().executeExpression(decision.getExpression(), decision.getContext());
