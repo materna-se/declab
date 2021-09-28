@@ -15,6 +15,11 @@ export default (context) => {
 		if(workspace !== currentWorkspace) {
 			Network.setEndpoint(vue, process.env.DECLAB_HOST, workspace);
 
+			if(workspace !== undefined) {
+				const workspaceConfiguration = await Network.getWorkspace();
+				vue.store.commit("setName", workspaceConfiguration.name);
+			}
+
 			currentWorkspace = workspace;
 		}
 

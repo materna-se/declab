@@ -1,4 +1,5 @@
 export const state = () => ({
+	name: null,
 	authentication: {
 		visible: false,
 		promise: null
@@ -15,6 +16,9 @@ export const state = () => ({
 });
 
 export const mutations = {
+	setName(state, name) {
+		state.name = name;
+	},
 	setLoading(state, loading) {
 		state.loading = loading;
 	},
