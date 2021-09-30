@@ -1,6 +1,6 @@
 {
 	"name": "declab",
-	"version": "2.6.0",
+	"version": "2.6.7",
 	"private": true,
 	"scripts": {
 		"dev": "nuxt",
@@ -9,7 +9,7 @@
 		"start": "nuxt start"
 	},
 	"dependencies": {
-		"@kogito-tooling/kie-editors-standalone": "^0.10.0",
+		"@kogito-tooling/kie-editors-standalone": "^0.13.0",
 		"bootstrap": "^4.6.0",
 		"core-js": "^3.11.0",
 		"d3": "^5.14.2",
