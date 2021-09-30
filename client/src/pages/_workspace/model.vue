@@ -27,37 +27,44 @@
 						</svg>
 					</div>
 					<div class="card-body" style="display: flex; flex-direction: row; padding-bottom: 0.75rem">
-						<div>
-							<template v-if="importedModel.decisions.length > 0">
-								<h5 class="mb-2" style="clear: both">Decisions</h5>
-								<div class="dmn dmn-decision mb-2 mr-2" v-for="decision of importedModel.decisions">
-									{{decision}}
-								</div>
-							</template>
-						</div>
-						<div>
-							<template v-if="importedModel.inputs.length > 0">
-								<h5 class="mb-2" style="clear: both">Inputs</h5>
-								<div class="dmn dmn-input mb-2 mr-2" v-for="input in importedModel.inputs">
-									{{input}}
-								</div>
-							</template>
-						</div>
-						<div>
-							<template v-if="importedModel.knowledgeModels.length > 0">
-								<h5 class="mb-2">Business Knowledge Models</h5>
-								<div class="dmn dmn-bkm mb-2 mr-2" v-for="knowledgeModel in importedModel.knowledgeModels">
-									{{knowledgeModel}}
-								</div>
-							</template>
-						</div>
-						<div>
-							<template v-if="importedModel.decisionServices.length > 0">
-								<h5 class="mb-2">Decision Services</h5>
-								<div class="dmn dmn-ds mb-2 mr-2" v-for="decisionSessionName in importedModel.decisionServices">
-									<span v-on:click="toggleDecisionService(decisionSessionName, importedModel.namespace)" v-bind:class="[isCurrentDecisionService(decisionSessionName, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionSessionName}}</span>
-								</div>
-							</template>
+						<template v-if="importedModel.successful">
+							<div>
+								<template v-if="importedModel.decisions.length > 0">
+									<h5 class="mb-2" style="clear: both">Decisions</h5>
+									<div class="dmn dmn-decision mb-2 mr-2" v-for="decision of importedModel.decisions">
+										{{decision}}
+									</div>
+								</template>
+							</div>
+							<div>
+								<template v-if="importedModel.inputs.length > 0">
+									<h5 class="mb-2" style="clear: both">Inputs</h5>
+									<div class="dmn dmn-input mb-2 mr-2" v-for="input in importedModel.inputs">
+										{{input}}
+									</div>
+								</template>
+							</div>
+							<div>
+								<template v-if="importedModel.knowledgeModels.length > 0">
+									<h5 class="mb-2">Business Knowledge Models</h5>
+									<div class="dmn dmn-bkm mb-2 mr-2" v-for="knowledgeModel in importedModel.knowledgeModels">
+										{{knowledgeModel}}
+									</div>
+								</template>
+							</div>
+							<div>
+								<template v-if="importedModel.decisionServices.length > 0">
+									<h5 class="mb-2">Decision Services</h5>
+									<div class="dmn dmn-ds mb-2 mr-2" v-for="decisionSessionName in importedModel.decisionServices">
+										<span v-on:click="toggleDecisionService(decisionSessionName, importedModel.namespace)" v-bind:class="[isCurrentDecisionService(decisionSessionName, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionSessionName}}</span>
+									</div>
+								</template>
+							</div>
+						</template>
+						<div style="width: 100%" v-else>
+							<p class="text-center text-muted mb-2">
+								<small>The import failed, no further information is available.</small>
+							</p>
 						</div>
 					</div>
 				</div>
@@ -75,7 +82,7 @@
 							</div>
 							<div class="d-flex flex-column align-items-center c-pointer">
 								<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" class="mb-2">
-									<path d="M1 12h9.76l-2.5-2.5 1.41-1.42L14.59 13l-4.92 4.92-1.41-1.42 2.5-2.5H1v-2m18-9a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2v-3h2v3h14V7H5v3H3V5a2 2 0 012-2h14z" fill="currentColor"/>
+									<path d="M20 18H4V8h16v10M12 6l-2-2H4a2 2 0 00-2 2v12a2 2 0 002 2h16c1.11 0 2-.89 2-2V8a2 2 0 00-2-2h-8m-1 8v-2h4V9l4 4-4 4v-3h-4z" fill="currentColor"/>
 								</svg>
 								<p>Import a model by dragging it here!</p>
 							</div>
@@ -115,13 +122,23 @@
 				models: [], // Only the raw models, contains only the information needed for the import.
 				importedModels: [], // Only the imported models, contains the information needed for the view.
 
-				decisionSession: null
+				decisionSession: null,
+
+				ignoreImportEvent: false,
 			}
 		},
 		methods: {
 			async onSocket(e) {
+				if (this.ignoreImportEvent) {
+					return;
+				}
+
 				const data = JSON.parse(e.data);
 				if (data.type === "imported") {
+					this.$store.commit("displayAlert", {
+						message: null,
+						state: null
+					});
 					await this.getModel();
 				}
 			},
@@ -154,6 +171,7 @@
 						decisions: model.decisions,
 						knowledgeModels: model.knowledgeModels,
 						decisionServices: model.decisionServices,
+						successful: model.successful,
 					});
 				}
 				this.models = models;
@@ -162,15 +180,21 @@
 				this.decisionSession = await Network.getDecisionSession();
 			},
 			async importModels() {
+				const vue = this;
+
 				this.$store.commit("displayAlert", null);
 
+				// We don't want to update ourselves after an import. Therefore, we intercept the import event.
+				this.ignoreImportEvent = true;
 				const result = await Network.importModels(this.models);
-
 				const resultAlert = this.getResultAlert(result);
 				this.$store.commit("displayAlert", {
 					message: AlertHelper.buildList(resultAlert.message, result.messages),
 					state: resultAlert.state
 				});
+				setTimeout(() => {
+					vue.ignoreImportEvent = false;
+				}, 1000);
 
 				await this.getModel();
 			},
