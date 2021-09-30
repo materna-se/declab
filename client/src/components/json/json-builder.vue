@@ -9,6 +9,15 @@
 	</div>
 </template>
 
+<style>
+	.input-builder table tr td:nth-child(1) span {
+		background: #c6ddfd;
+	}
+	.decision-builder table tr td:nth-child(1) span {
+		background: #fcf0a5;
+	}
+</style>
+
 <script>
 	import Configuration from "../../helpers/configuration";
 
