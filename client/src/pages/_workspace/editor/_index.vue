@@ -113,7 +113,7 @@
 				vue.importResult = vue.getResultAlert(result);
 				setTimeout(() => {
 					vue.ignoreImportEvent = false;
-				}, 500);
+				}, 1000);
 			});
 
 			Network.addSocketListener(this.onSocket);
@@ -123,11 +123,13 @@
 		},
 		methods: {
 			async onSocket(e) {
+				if (this.ignoreImportEvent) {
+					return;
+				}
+
 				const data = JSON.parse(e.data);
 				if (data.type === "imported") {
-					if (!this.ignoreImportEvent) {
-						location.reload();
-					}
+					location.reload();
 				}
 			},
 			getResultAlert(result) {
