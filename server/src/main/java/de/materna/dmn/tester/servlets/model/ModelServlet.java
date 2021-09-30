@@ -55,13 +55,14 @@ public class ModelServlet {
 	@Path("/model")
 	@Consumes("application/json")
 	public Response importModels(@PathParam("workspace") String workspaceUUID, String body) throws Exception {
-		List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<LinkedList<Map<String, String>>>() {
-		});
-
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-
 		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().lock();
+
 		try {
+			List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<LinkedList<Map<String, String>>>() {
+			});
+
+			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+
 			// Remove all old models and clear the decision session.
 			workspace.getModelManager().removeAllFiles();
 			workspace.clearDecisionSession();
@@ -105,8 +106,6 @@ public class ModelServlet {
 			// Update the configuration and add an access log entry.
 			configuration.setModifiedDate(System.currentTimeMillis());
 			configuration.serialize();
-
-			SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().unlock();
 
 			workspace.getAccessLog().writeMessage("Imported models", configuration.getModifiedDate());
 
