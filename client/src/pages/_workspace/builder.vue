@@ -20,7 +20,7 @@
 		<div class="d-flex">
 			<div class="mb-4" v-if="mode !== 2" style="flex: 1" v-bind:style="{'margin-right': mode === 0 ? '30px' : null}">
 				<div class="d-flex align-items-center mb-2">
-					<h4 class="mb-0 mr-auto">Input</h4>
+					<h4 class="mb-0 mr-auto">Input Context</h4>
 					<div>
 						<div class="input-group">
 							<div class="input-group-prepend">
@@ -33,18 +33,19 @@
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-12">
-						<div class="card card-borderless mb-2">
-							<div class="card-body p-0" style="overflow-x: auto">
-								<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-bind:convert-after="false" v-on:update:value="model.input.value = $event; executeModel();"/>
-							</div>
-						</div>
+				<div class="card card-borderless mb-2">
+					<div class="card-body p-0" style="overflow-x: auto">
+						<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-bind:convert-after="false" v-on:update:value="model.input.value = $event; executeModel();" class="input-builder"/>
+					</div>
+				</div>
+				<div class="card card-borderless mb-2">
+					<div class="card-body p-0" style="overflow-x: auto">
+						<json-builder v-bind:template="model.decisions.template" v-bind:fixed="true" v-bind:convert-after="false" v-on:update:value="model.decisions.value = $event; executeModel();" class="decision-builder"/>
 					</div>
 				</div>
 			</div>
 			<div class="mb-4" v-if="mode !== 1" style="flex: 1">
-				<h4 class="mb-2">Outputs</h4>
+				<h4 class="mb-2">Output Context</h4>
 				<div class="row mb-2" v-if="alert.message !== null">
 					<div class="col-12">
 						<alert v-bind:alert="alert"/>
@@ -53,7 +54,7 @@
 
 				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
 					<div class="card-header" v-on:click="$set(model.result.visibleOutputs, key, model.result.visibleOutputs[key] !== true)">
-						<h5 class="mb-0">{{key}}<small>&ensp;({{model.result.visibleOutputs[key] ? 'click to hide' : 'click to show'}})</small></h5>
+						<h5 class="mb-0">{{key}}&ensp;<small>({{model.result.visibleOutputs[key] ? 'click to hide' : 'click to show'}})</small></h5>
 					</div>
 					<div class="card-body" v-if="model.result.visibleOutputs[key]">
 						<h5 class="mb-2">Output</h5>
@@ -148,6 +149,11 @@
 						template: Converter.enrich({})
 					},
 
+					decisions: {
+						value: Converter.enrich({}),
+						template: Converter.enrich({})
+					},
+
 					result: {
 						outputs: {},
 						visibleOutputs: {},
@@ -209,17 +215,19 @@
 			async onSocket(e) {
 				const data = JSON.parse(e.data);
 				if(data.type === "imported") {
-					const newInputs = {type: "object", value: await Network.getModelInputs()};
-					const currentInputs = this.model.input.value;
+					const modelInputs = await Network.getModelInputs();
 
-					this.model.input.template = Converter.merge(currentInputs, newInputs);
+					this.model.input.template = Converter.merge(this.model.input.value, {type: "object", value: modelInputs.inputs});
+					this.model.decisions.template = Converter.merge(this.model.decisions.value, {type: "object", value: modelInputs.decisions});
 				}
 			},
 			//
 			// Model
 			//
 			async getModelInputs() {
-				this.model.input.template = await Network.getModelInputs();
+				const modelInputs = await Network.getModelInputs();
+				this.model.input.template = modelInputs.inputs;
+				this.model.decisions.template = modelInputs.decisions;
 			},
 			async executeModel() {
 				// If we have a detached worker, we don't want to calculate the results here.
@@ -232,7 +240,7 @@
 				}
 
 				try {
-					const input = Converter.clean(this.model.input.value);
+					const input = Converter.clean(Converter.merge(this.model.input.value, this.model.decisions.value));
 					const result = await Network.executeModel(input === undefined ? {} : input);
 					this.model.result.outputs = result.outputs;
 					this.model.result.context = result.context;
