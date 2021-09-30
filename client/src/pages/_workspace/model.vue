@@ -63,7 +63,7 @@
 						</template>
 						<div style="width: 100%" v-else>
 							<p class="text-center text-muted mb-2">
-								<small>The import failed, no further information is available.</small>
+								<small>The import of this model failed, no further information is available.</small>
 							</p>
 						</div>
 					</div>

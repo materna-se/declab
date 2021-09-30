@@ -1,7 +1,6 @@
 package de.materna.dmn.tester.servlets.model;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.Sets;
 import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.helpers.SynchronizationHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
@@ -56,65 +55,69 @@ public class ModelServlet {
 	@Path("/model")
 	@Consumes("application/json")
 	public Response importModels(@PathParam("workspace") String workspaceUUID, String body) throws Exception {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-
 		List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<LinkedList<Map<String, String>>>() {
 		});
 
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+
 		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().lock();
+		try {
+			// Remove all old models and clear the decision session.
+			workspace.getModelManager().removeAllFiles();
+			workspace.clearDecisionSession();
 
-		// Remove all old models and clear the decision session.
-		workspace.getModelManager().removeAllFiles();
-		workspace.clearDecisionSession();
+			boolean successful = true;
 
-		boolean successful = true;
+			ImportResult globalImportResult = new ImportResult();
 
-		ImportResult globalImportResult = new ImportResult();
+			List<Map<String, String>> importedModels = new LinkedList<>();
+			// Import the provided models, collect all import messages.
+			for (Map<String, String> model : models) {
+				try {
+					ImportResult importResult = workspace.getDecisionSession().importModel(model.get("namespace"), model.get("source"));
+					globalImportResult.getMessages().addAll(importResult.getMessages());
+				}
+				catch (ModelImportException exception) {
+					successful = false;
+					globalImportResult.getMessages().addAll(exception.getResult().getMessages());
+				}
 
-		List<Map<String, String>> importedModels = new LinkedList<>();
-		// Import the provided models, collect all import messages.
-		for (Map<String, String> model : models) {
-			try {
-				ImportResult importResult = workspace.getDecisionSession().importModel(model.get("namespace"), model.get("source"));
-				globalImportResult.getMessages().addAll(importResult.getMessages());
+				String uuid = UUID.randomUUID().toString();
+				workspace.getModelManager().persistFile(uuid, model.get("source"));
+				model.put("uuid", uuid);
+				model.remove("source");
+
+				importedModels.add(model);
 			}
-			catch (ModelImportException exception) {
-				successful = false;
-				globalImportResult.getMessages().addAll(exception.getResult().getMessages());
+
+			Configuration configuration = workspace.getConfig();
+			configuration.setModels(importedModels);
+
+			// Check if the configured decision service still exists.
+			Configuration.DecisionService decisionService = configuration.getDecisionService();
+			if (decisionService != null) {
+				if (configuration.getModels().size() == 0 || workspace.getDecisionSession().getModel(DroolsHelper.getMainModelNamespace(workspace)).getDecisionServices().stream().noneMatch(name -> name.equals(decisionService.getName()))) {
+					// If the decision service does not exist anymore, we will remove the reference from the configuration.
+					configuration.setDecisionService(null);
+				}
 			}
 
-			String uuid = UUID.randomUUID().toString();
-			workspace.getModelManager().persistFile(uuid, model.get("source"));
-			model.put("uuid", uuid);
-			model.remove("source");
+			// Update the configuration and add an access log entry.
+			configuration.setModifiedDate(System.currentTimeMillis());
+			configuration.serialize();
 
-			importedModels.add(model);
+			SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().unlock();
+
+			workspace.getAccessLog().writeMessage("Imported models", configuration.getModifiedDate());
+
+			// Notify all sessions.
+			SessionManager.getInstance().notify(workspaceUUID, "{\"type\": \"imported\"}");
+
+			return Response.status(successful ? Response.Status.OK : Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(globalImportResult)).build();
 		}
-
-		Configuration configuration = workspace.getConfig();
-		configuration.setModels(importedModels);
-
-		// Check if the configured decision service still exists.
-		Configuration.DecisionService decisionService = configuration.getDecisionService();
-		if (decisionService != null) {
-			if (configuration.getModels().size() == 0 || workspace.getDecisionSession().getModel(DroolsHelper.getMainModelNamespace(workspace)).getDecisionServices().stream().noneMatch(name -> name.equals(decisionService.getName()))) {
-				// If the decision service does not exist anymore, we will remove the reference from the configuration.
-				configuration.setDecisionService(null);
-			}
+		finally {
+			SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().unlock();
 		}
-
-		// Update the configuration and add an access log entry.
-		configuration.setModifiedDate(System.currentTimeMillis());
-		configuration.serialize();
-
-		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().unlock();
-
-		workspace.getAccessLog().writeMessage("Imported models", configuration.getModifiedDate());
-
-		// Notify all sessions.
-		SessionManager.getInstance().notify(workspaceUUID, "{\"type\": \"imported\"}");
-
-		return Response.status(successful ? Response.Status.OK : Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(globalImportResult)).build();
 	}
 
 	@GET
