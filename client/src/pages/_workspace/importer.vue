@@ -7,7 +7,7 @@
 		<div class="row">
 			<div class="col-4">
 				<h4 class="mb-2">Upload</h4>
-				<div class="card mb-4" v-on:drop="onDrop" v-on:dragover="onDragOver" v-on:dragenter="onDragOver">
+				<div class="card mb-4" @drop="onDrop" @dragover="onDragOver" @dragenter="onDragOver">
 					<div class="card-body text-muted">
 						<div class="d-flex flex-column align-items-center">
 							<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" class="mb-2">
@@ -18,33 +18,35 @@
 					</div>
 				</div>
 				<h5 class="mb-2">Input Columns</h5>
-				<select class="form-control mb-4" v-model="enabledInputColumns" v-on:change="execute" multiple>
-					<option v-for="availableColumn of availableColumns" v-bind:value="availableColumn">{{availableColumn}}</option>
+				<select class="form-control mb-4" v-model="enabledInputColumns" @change="execute" multiple>
+					<!-- eslint-disable-next-line vue/require-v-for-key -->
+					<option v-for="availableColumn of availableColumns" :value="availableColumn">{{availableColumn}}</option>
 				</select>
 
 				<h5 class="mb-2">Input Context</h5>
 				<div class="card mb-4">
 					<div class="card-body">
-						<json-builder v-bind:template="inputContextTemplate" v-bind:fixed-root="true" v-on:update:value="inputContext = $event; execute();"/>
+						<json-builder :template="inputContextTemplate" :fixed-root="true" @update:value="inputContext = $event; execute();"/>
 					</div>
 				</div>
 
 				<h5 class="mb-2">Output Columns</h5>
 				<select class="form-control mb-4" v-model="enabledOutputColumns" multiple>
-					<option v-for="availableColumn of availableColumns" v-bind:value="availableColumn">{{availableColumn}}</option>
+					<!-- eslint-disable-next-line vue/require-v-for-key -->
+					<option v-for="availableColumn of availableColumns" :value="availableColumn">{{availableColumn}}</option>
 				</select>
-				<button class="btn btn-block btn-outline-secondary" v-on:click="saveFile">Download</button>
+				<button class="btn btn-block btn-outline-secondary" @click="saveFile">Download</button>
 			</div>
 			<div class="col-8">
 				<h4 class="mb-2">Result</h4>
 
-				<div class="mb-3" v-for="(resultEntry, index) of result" v-bind:key="index">
+				<div class="mb-3" v-for="(resultEntry, index) of result" :key="index">
 					<div class="card">
 						<div class="card-body">
 							<div class="d-flex align-items-start mb-2">
 								<h5 class="mb-0 mr-auto">Row {{index + 1}}</h5>
 
-								<button class="btn btn-outline-secondary btn-sm" style="display:block" v-on:click="addTest(index)">
+								<button class="btn btn-outline-secondary btn-sm" style="display:block" @click="addTest(index)">
 									<svg style="width:24px;height:24px" viewBox="0 0 24 24">
 										<path fill="currentColor" d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"/>
 									</svg>
@@ -52,10 +54,10 @@
 							</div>
 
 							<h6 class="mb-2">Input</h6>
-							<json-builder class="mb-4" v-bind:template="resultEntry.input" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
+							<json-builder class="mb-4" :template="resultEntry.input" :convert="true" :fixed="true" :fixed-values="true"/>
 
 							<h6 class="mb-2">Output</h6>
-							<json-builder class="mb-0" v-bind:template="resultEntry.output" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
+							<json-builder class="mb-0" :template="resultEntry.output" :convert="true" :fixed="true" :fixed-values="true"/>
 						</div>
 					</div>
 				</div>

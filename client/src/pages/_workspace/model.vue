@@ -4,25 +4,25 @@
 			<h3 class="mb-0 mr-auto">Models</h3>
 			<!--
 			<div>
-				<button class="btn btn-block btn-outline-secondary" v-on:click="importSample">
+				<button class="btn btn-block btn-outline-secondary" @click="importSample">
 					Import sample
 				</button>
 			</div>
 			-->
 		</div>
 
-		<draggable v-model="importedModels" animation="150" draggable=".draggable" v-on:update="orderModels">
-			<div class="mb-2 draggable" v-on:drop="onReplaceModelDrop($event, index)" v-on:dragover="onModelDragOver" v-on:dragenter="onModelDragOver" v-for="(importedModel, index) of importedModels">
+		<draggable v-model="importedModels" animation="150" draggable=".draggable" @update="orderModels">
+			<div class="mb-2 draggable" @drop="onReplaceModelDrop($event, index)" @dragover="onModelDragOver" @dragenter="onModelDragOver" v-for="(importedModel, index) of importedModels" :key="importedModel.namespace">
 				<div class="card">
 					<div class="card-header d-flex align-items-center">
 						<h4 class="mb-0 mr-auto">{{importedModel.name}}</h4>
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" v-on:click="editModel(index)" class="c-pointer mr-2">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" @click="editModel(index)" class="c-pointer mr-2">
 							<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
 						</svg>
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" v-on:click="downloadModel(index)" class="c-pointer mr-2">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" @click="downloadModel(index)" class="c-pointer mr-2">
 							<path d="M13 5v6h1.17L12 13.17 9.83 11H11V5h2m2-2H9v6H5l7 7 7-7h-4V3m4 15H5v2h14v-2z" fill="currentColor"/>
 						</svg>
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" v-on:click="deleteModel(index)" class="c-pointer">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" @click="deleteModel(index)" class="c-pointer">
 							<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 						</svg>
 					</div>
@@ -31,7 +31,7 @@
 							<div>
 								<template v-if="importedModel.decisions.length > 0">
 									<h5 class="mb-2" style="clear: both">Decisions</h5>
-									<div class="dmn dmn-decision mb-2 mr-2" v-for="decision of importedModel.decisions">
+									<div class="dmn dmn-decision mb-2 mr-2" v-for="decision of importedModel.decisions" :key="decision">
 										{{decision}}
 									</div>
 								</template>
@@ -39,7 +39,7 @@
 							<div>
 								<template v-if="importedModel.inputs.length > 0">
 									<h5 class="mb-2" style="clear: both">Inputs</h5>
-									<div class="dmn dmn-input mb-2 mr-2" v-for="input in importedModel.inputs">
+									<div class="dmn dmn-input mb-2 mr-2" v-for="input in importedModel.inputs" :key="input">
 										{{input}}
 									</div>
 								</template>
@@ -47,7 +47,7 @@
 							<div>
 								<template v-if="importedModel.knowledgeModels.length > 0">
 									<h5 class="mb-2">Business Knowledge Models</h5>
-									<div class="dmn dmn-bkm mb-2 mr-2" v-for="knowledgeModel in importedModel.knowledgeModels">
+									<div class="dmn dmn-bkm mb-2 mr-2" v-for="knowledgeModel in importedModel.knowledgeModels" :key="knowledgeModel">
 										{{knowledgeModel}}
 									</div>
 								</template>
@@ -55,8 +55,8 @@
 							<div>
 								<template v-if="importedModel.decisionServices.length > 0">
 									<h5 class="mb-2">Decision Services</h5>
-									<div class="dmn dmn-ds mb-2 mr-2" v-for="decisionSessionName in importedModel.decisionServices">
-										<span v-on:click="toggleDecisionService(decisionSessionName, importedModel.namespace)" v-bind:class="[isCurrentDecisionService(decisionSessionName, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionSessionName}}</span>
+									<div class="dmn dmn-ds mb-2 mr-2" v-for="decisionService in importedModel.decisionServices" :key="decisionService">
+										<span @click="toggleDecisionService(decisionService, importedModel.namespace)" :class="[isCurrentDecisionService(decisionService, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionSessionName}}</span>
 									</div>
 								</template>
 							</div>
@@ -70,11 +70,11 @@
 				</div>
 			</div>
 
-			<div class="mb-2" v-on:drop="onAddModelsDrop" v-on:dragover="onModelDragOver" v-on:dragenter="onModelDragOver">
+			<div class="mb-2" @drop="onAddModelsDrop" @dragover="onModelDragOver" @dragenter="onModelDragOver">
 				<div class="card" style="height: 100%; min-height: 191px"> <!-- 191 is the height of a model without decisions, inputs and knowledge models -->
 					<div class="card-body text-muted d-flex justify-content-center align-items-center">
 						<div class="d-flex flex-row align-items-center">
-							<div class="d-flex flex-column align-items-center c-pointer pr-5 mr-5" style="border-right: 1px solid rgba(0, 0, 0, .125)" v-on:click="createModel">
+							<div class="d-flex flex-column align-items-center c-pointer pr-5 mr-5" style="border-right: 1px solid rgba(0, 0, 0, .125)" @click="createModel">
 								<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" class="mb-2">
 									<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
 								</svg>
