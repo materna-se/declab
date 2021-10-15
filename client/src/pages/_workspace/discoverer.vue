@@ -4,17 +4,17 @@
 		<div class="row">
 			<div class="col-4 mb-4">
 				<h5 class="mb-2">Input Template</h5>
-				<select id="form-inputs" class="form-control mb-4" v-model="inputTemplateSelected" v-on:change="initializeDiscovery()">
-					<option v-for="(input, uuid) in inputTemplates" v-bind:value="uuid">{{input.name}}</option>
+				<select id="form-inputs" class="form-control mb-4" v-model="inputTemplateSelected" @change="initializeDiscovery()">
+					<option v-for="(input, uuid) in inputTemplates" :key="uuid" :value="uuid">{{input.name}}</option>
 				</select>
 
 				<h5 class="mb-2">Input Selectors</h5>
 				<div class="list-group mb-2">
 					<template v-if="options.inputs.length !== 0">
-
+						<!-- eslint-disable-next-line vue/require-v-for-key -->
 						<div class="list-group-item" v-for="(inputOption, index) in options.inputs">
 							<div class="row mx-0 mb-2 flex-row">
-								<button class="btn btn-outline-secondary" v-on:click="toggleInputExpanded(index)">
+								<button class="btn btn-outline-secondary" @click="toggleInputExpanded(index)">
 									<svg v-if="!options.inputs[index]['expanded']" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
 										<path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" fill="currentColor"/>
 									</svg>
@@ -23,7 +23,7 @@
 									</svg>
 								</button>
 								<input class="form-control mb-0 mr-2 ml-2" placeholder="Enter JSONPath..." style="flex: 1" v-model="options.inputs[index]['selector']">
-								<button class="btn btn-outline-secondary" v-on:click="removeInput(index)">
+								<button class="btn btn-outline-secondary" @click="removeInput(index)">
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
 										<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 									</svg>
@@ -39,7 +39,7 @@
 					</div>
 				</div>
 
-				<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="options.inputs.push({'selector' : '', 'expression' : '', 'expanded' : false})">
+				<button class="btn btn-block btn-outline-secondary mb-4" @click="options.inputs.push({'selector' : '', 'expression' : '', 'expanded' : false})">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
 					</svg>
@@ -48,10 +48,11 @@
 				<h5 class="mb-2">Output Selectors</h5>
 				<div class="list-group mb-2">
 					<template v-if="options.outputs.length !== 0">
+						<!-- eslint-disable-next-line vue/require-v-for-key -->
 						<div class="list-group-item" v-for="(selector, index) in options.outputs">
 							<div class="row mx-0 flex-row">
 								<input class="form-control mb-0 mr-2" placeholder="Enter JSONPath..." style="flex: 1" v-model="options.outputs[index]">
-								<button class="btn btn-outline-secondary" v-on:click="options.outputs.splice(index, 1)">
+								<button class="btn btn-outline-secondary" @click="options.outputs.splice(index, 1)">
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
 										<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 									</svg>
@@ -64,14 +65,14 @@
 					</div>
 				</div>
 
-				<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="options.outputs.push('')">
+				<button class="btn btn-block btn-outline-secondary mb-4" @click="options.outputs.push('')">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
 					</svg>
 				</button>
 
 				<h5 class="mb-2">Discovery</h5>
-				<button class="btn btn-block btn-outline-secondary mb-4" :disabled="inputTemplateSelected === null || options.inputs.length !== 2" v-on:click="startDiscovery()">
+				<button class="btn btn-block btn-outline-secondary mb-4" :disabled="inputTemplateSelected === null || options.inputs.length !== 2" @click="startDiscovery()">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M8,5.14V19.14L19,12.14L8,5.14Z" fill="currentColor"/>
 					</svg>
@@ -80,10 +81,10 @@
 
 			<div class="col-8 mb-4" v-if="inputTemplateSelected !== null">
 				<h4 class="mb-2">Input <small>(click on nodes to add input selectors)</small></h4>
-				<json-builder class="mb-4" v-bind:template="options.inputTemplate" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true" v-on:update:path="addInput(convertPath($event));"/>
+				<json-builder class="mb-4" :template="options.inputTemplate" :fixed="true" :fixed-root="true" :fixed-values="true" :convert="true" @update:path="addInput(convertPath($event));"/>
 
 				<h4 class="mb-2">Output <small>(click on nodes to add output selectors)</small></h4>
-				<json-builder class="mb-4" v-bind:template="outputStruct" v-bind:fixed="true" v-bind:fixed-root="true" v-bind:fixed-values="true" v-bind:convert="true" v-on:update:path="toggleOutput(convertPath($event));"/>
+				<json-builder class="mb-4" :template="outputStruct" :fixed="true" :fixed-root="true" :fixed-values="true" :convert="true" @update:path="toggleOutput(convertPath($event));"/>
 
 				<h4 class="mb-2">Discovery</h4>
 				<div class="card">

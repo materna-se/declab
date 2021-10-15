@@ -3,14 +3,14 @@
 		<div class="d-flex align-items-center mb-2">
 			<h3 class="mb-0 mr-auto">Builder</h3>
 			<div class="mr-2">
-				<button class="btn btn-block btn-outline-secondary px-4" v-on:click="modalVisible = true">
+				<button class="btn btn-block btn-outline-secondary px-4" @click="modalVisible = true">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M15 9H5V5h10m-3 14a3 3 0 01-3-3 3 3 0 013-3 3 3 0 013 3 3 3 0 01-3 3m5-16H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z" fill="currentColor"/>
 					</svg>
 				</button>
 			</div>
 			<div>
-				<button class="btn btn-block btn-outline-secondary px-4" v-on:click="detachWorker">
+				<button class="btn btn-block btn-outline-secondary px-4" @click="detachWorker">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M8 12h9.76l-2.5-2.5 1.41-1.42L21.59 13l-4.92 4.92-1.41-1.42 2.5-2.5H8v-2m11-9a2 2 0 0 1 2 2v4.67l-2-2V7H5v12h14v-.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z" fill="currentColor"/>
 					</svg>
@@ -18,7 +18,7 @@
 			</div>
 		</div>
 		<div class="d-flex">
-			<div class="mb-4" v-if="mode !== 2" style="flex: 1" v-bind:style="{'margin-right': mode === 0 ? '30px' : null}">
+			<div class="mb-4" v-if="mode !== 2" style="flex: 1" :style="{'margin-right': mode === 0 ? '30px' : null}">
 				<div class="d-flex align-items-center mb-2">
 					<h4 class="mb-0 mr-auto">Input Context</h4>
 					<div>
@@ -26,21 +26,21 @@
 							<div class="input-group-prepend">
 								<span class="input-group-text">Template</span>
 							</div>
-							<select class="form-control" v-on:change="importInput(inputs[$event.target.value].value)">
+							<select class="form-control" @change="importInput(inputs[$event.target.value].value)">
 								<option selected disabled>Select template...</option>
-								<option v-for="(input, key) in inputs" v-bind:value="key">{{input.name}}</option>
+								<option v-for="(input, uuid) in inputs" :key="uuid" :value="uuid">{{input.name}}</option>
 							</select>
 						</div>
 					</div>
 				</div>
 				<div class="card card-borderless mb-2">
 					<div class="card-body p-0" style="overflow-x: auto">
-						<json-builder v-bind:template="model.input.template" v-bind:fixed="true" v-bind:convert-after="false" v-on:update:value="model.input.value = $event; executeModel();" class="input-builder"/>
+						<json-builder :template="model.input.template" :fixed="true" :convert-after="false" @update:value="model.input.value = $event; executeModel();" class="input-builder"/>
 					</div>
 				</div>
 				<div class="card card-borderless mb-2">
 					<div class="card-body p-0" style="overflow-x: auto">
-						<json-builder v-bind:template="model.decisions.template" v-bind:fixed="true" v-bind:convert-after="false" v-on:update:value="model.decisions.value = $event; executeModel();" class="decision-builder"/>
+						<json-builder :template="model.decisions.template" :fixed="true" :convert-after="false" @update:value="model.decisions.value = $event; executeModel();" class="decision-builder"/>
 					</div>
 				</div>
 			</div>
@@ -48,55 +48,55 @@
 				<h4 class="mb-2">Output Context</h4>
 				<div class="row mb-2" v-if="alert.message !== null">
 					<div class="col-12">
-						<alert v-bind:alert="alert"/>
+						<alert :alert="alert"/>
 					</div>
 				</div>
 
-				<div class="card mb-2" v-for="(output, key) in model.result.outputs">
-					<div class="card-header" v-on:click="$set(model.result.visibleOutputs, key, model.result.visibleOutputs[key] !== true)">
-						<h5 class="mb-0">{{key}}&ensp;<small>({{model.result.visibleOutputs[key] ? 'click to hide' : 'click to show'}})</small></h5>
+				<div class="card mb-2" v-for="(output, decisionName) in model.result.outputs" :key="decisionName">
+					<div class="card-header" @click="$set(model.result.visibleOutputs, decisionName, model.result.visibleOutputs[decisionName] !== true)">
+						<h5 class="mb-0">{{decisionName}}&ensp;<small>({{model.result.visibleOutputs[decisionName] ? 'click to hide' : 'click to show'}})</small></h5>
 					</div>
-					<div class="card-body" v-if="model.result.visibleOutputs[key]">
+					<div class="card-body" v-if="model.result.visibleOutputs[decisionName]">
 						<h5 class="mb-2">Output</h5>
-						<json-builder class="mb-0" v-bind:template="output" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
+						<json-builder class="mb-0" :template="output" :convert="true" :fixed="true" :fixed-values="true"/>
 
-						<div class="mt-4" v-if="model.result.context[key] !== undefined && Object.keys(model.result.context[key]).length !== 0">
-							<h5 class="mb-0" v-on:click="$set(model.result.visibleContexts, key, model.result.visibleContexts[key] !== true)">Context<small>&ensp;({{model.result.visibleContexts[key] ? 'click to hide' : 'click to show'}})</small></h5>
-							<json-builder class="mt-2" v-if="model.result.visibleContexts[key]" v-bind:template="model.result.context[key]" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
+						<div class="mt-4" v-if="model.result.context[decisionName] !== undefined && Object.keys(model.result.context[decisionName]).length !== 0">
+							<h5 class="mb-0" @click="$set(model.result.visibleContexts, decisionName, model.result.visibleContexts[decisionName] !== true)">Context<small>&ensp;({{model.result.visibleContexts[decisionName] ? 'click to hide' : 'click to show'}})</small></h5>
+							<json-builder class="mt-2" v-if="model.result.visibleContexts[decisionName]" :template="model.result.context[decisionName]" :convert="true" :fixed="true" :fixed-values="true"/>
 						</div>
 					</div>
 				</div>
 
-				<h4 class="mb-2 mt-3" v-on:click="accessLogVisible = !accessLogVisible">Access Log<small>&ensp;({{accessLogVisible ? 'click to hide' : 'click to show'}})</small></h4>
-				<access-log v-if="accessLogVisible" v-bind:entries="model.result.accessLog"></access-log>
+				<h4 class="mb-2 mt-3" @click="accessLogVisible = !accessLogVisible">Access Log<small>&ensp;({{accessLogVisible ? 'click to hide' : 'click to show'}})</small></h4>
+				<access-log v-if="accessLogVisible" :entries="model.result.accessLog"></access-log>
 			</div>
 		</div>
 
 		<template v-if="modalVisible">
 			<div class="modal-backdrop fade show"></div>
-			<div class="modal fade show" style="display: block" v-on:click.self="modalVisible = false">
+			<div class="modal fade show" style="display: block" @click.self="modalVisible = false">
 				<div class="modal-dialog modal-dialog-centered modal-lg">
 					<div class="modal-content p-4">
 						<div class="modal-body">
 							<h4 class="mb-4">Save Entities</h4>
-							<div class="mb-4" v-bind:class="[!hasTestName() ? 'input-disabled' : null]">
+							<div class="mb-4" :class="[!hasTestName() ? 'input-disabled' : null]">
 								<h5 class="mb-2">Test</h5>
 								<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.test.name">
 							</div>
-							<div class="mb-4" v-bind:class="[!hasInputName() ? 'input-disabled' : null]">
+							<div class="mb-4" :class="[!hasInputName() ? 'input-disabled' : null]">
 								<h5 class="mb-2">Input</h5>
 								<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.input.name">
 							</div>
 							<template v-if="Object.keys(model.result.outputs).length > 0">
 								<h5 class="mt-4 mb-2">Outputs</h5>
 								<div class="row">
-									<div class="col-6 mb-2" v-for="(output, key) in model.result.outputs" v-bind:class="[!hasOutputName(key) ? 'input-disabled' : null]">
-										<h6 class="mb-2">{{key}}</h6>
-										<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.result.name[key]">
+									<div class="col-6 mb-2" v-for="(output, uuid) in model.result.outputs" :key="uuid" :class="[!hasOutputName(uuid) ? 'input-disabled' : null]">
+										<h6 class="mb-2">{{uuid}}</h6>
+										<input type="text" class="form-control" placeholder="Enter Name..." v-model="model.result.name[uuid]">
 									</div>
 								</div>
 							</template>
-							<button class="btn btn-outline-secondary mt-4 w-100" v-on:click="saveEntities">Save Entities</button>
+							<button class="btn btn-outline-secondary mt-4 w-100" @click="saveEntities">Save Entities</button>
 						</div>
 					</div>
 				</div>

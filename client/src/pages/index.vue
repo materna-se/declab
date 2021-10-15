@@ -8,14 +8,14 @@
 
 				<div class="row mb-4" v-if="demoMode === true">
 					<div class="col-12">
-						<alert v-bind:alert="{message: 'Workspaces are hidden in the demo version. Please remember your workspace link if you want to continue working on it later!', state: 'info'}"/>
+						<alert :alert="{message: 'Workspaces are hidden in the demo version. Please remember your workspace link if you want to continue working on it later!', state: 'info'}"/>
 					</div>
 				</div>
 
 				<div class="card mb-4">
 					<div class="card-body">
 						<configurator class="mb-4" v-model="workspace"></configurator>
-						<button class="btn btn-block btn-outline-secondary" v-on:click="createWorkspace">Create and enter workspace</button>
+						<button class="btn btn-block btn-outline-secondary" @click="createWorkspace">Create and enter workspace</button>
 					</div>
 				</div>
 
@@ -27,12 +27,12 @@
 							</svg>
 						</span>
 					</div>
-					<input placeholder="Search workspace..." class="form-control" v-model="query" v-on:keyup="getWorkspaces">
+					<input placeholder="Search workspace..." class="form-control" v-model="query" @keyup="getWorkspaces">
 				</div>
 
 				<div class="list-group">
 					<template v-if="Object.keys(workspaces).length !== 0">
-						<div class="list-group-item list-group-item-action c-pointer d-flex align-items-center" v-for="(workspace, key) in workspaces" v-on:click="enterWorkspace(key)" v-on:keypress="simulateClick" tabindex="0">
+						<div class="list-group-item list-group-item-action c-pointer d-flex align-items-center" v-for="(workspace, uuid) in workspaces" :key="uuid" @click="enterWorkspace(uuid)" @keypress="simulateClick" tabindex="0">
 							<div class="mr-auto">
 								<p class="mb-0"><b>{{workspace.name}}</b></p>
 								<p class="mb-0">{{workspace.description}}</p>

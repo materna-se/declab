@@ -7,11 +7,11 @@
 				</div>
 				<div class="card-body">
 					<configurator class="mb-2" v-model="serverConfiguration"></configurator>
-					<button class="btn btn-block btn-outline-secondary mb-4" v-on:click="editWorkspace">Save configuration</button>
+					<button class="btn btn-block btn-outline-secondary mb-4" @click="editWorkspace">Save configuration</button>
 
 					<h5 class="mb-2">Developer Mode</h5>
 					<p class="mb-2">The developer mode allows you to use features such as raw JSON in the builder. It is intended for developers and should be used with caution.</p>
-					<input type="checkbox" v-model="clientConfiguration.developerMode" v-on:change="updateDeveloperMode">
+					<input type="checkbox" v-model="clientConfiguration.developerMode" @change="updateDeveloperMode">
 				</div>
 			</div>
 		</div>
@@ -25,7 +25,7 @@
 						<div class="card-body">
 							<div class="input-group">
 								<label class="custom-file-label" for="file">Select DMN backup...</label>
-								<input accept=".dtar" class="custom-file-input" id="file" name="file" type="file" v-on:change="importWorkspace">
+								<input accept=".dtar" class="custom-file-input" id="file" name="file" type="file" @change="importWorkspace">
 							</div>
 						</div>
 					</div>
@@ -36,7 +36,7 @@
 							<h4 class="mb-0">Export</h4>
 						</div>
 						<div class="card-body">
-							<button class="btn btn-block btn-outline-secondary" v-on:click="exportWorkspace">Export</button>
+							<button class="btn btn-block btn-outline-secondary" @click="exportWorkspace">Export</button>
 						</div>
 					</div>
 				</div>
@@ -47,13 +47,14 @@
 				</div>
 				<div class="card-body">
 					<p class="mb-2 text-danger">The deletion of workspaces is permanent and cannot be undone.</p>
-					<button class="btn btn-block btn-outline-danger" v-on:click="deleteWorkspace">Delete</button>
+					<button class="btn btn-block btn-outline-danger" @click="deleteWorkspace">Delete</button>
 				</div>
 			</div>
 		</div>
 		<div class="col-12">
 			<h4 class="mb-2">Access Log</h4>
 			<div class="list-group mb-4">
+				<!-- eslint-disable-next-line vue/require-v-for-key -->
 				<div class="list-group-item" v-for="entry of log">
 					<p class="mb-0"><b>{{entry.timestamp}}:</b> {{entry.message}}</p>
 				</div>
