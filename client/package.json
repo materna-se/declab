@@ -12,30 +12,30 @@
 		"@kogito-tooling/kie-editors-standalone": "^0.13.0",
 		"base-64": "^1.0.0",
 		"bootstrap": "^4.6.0",
-		"core-js": "^3.11.0",
+		"core-js": "^3.18.3",
 		"d3": "^5.14.2",
 		"diff-match-patch": "^1.0.5",
 		"jsonpath": "^1.1.1",
-		"jsonpath-plus": "^5.0.7",
+		"jsonpath-plus": "^6.0.1",
 		"lodash": "^4.17.21",
 		"monaco-editor": "^0.22.3",
-		"nuxt": "^2.15.1",
+		"nuxt": "^2.15.8",
 		"reconnecting-websocket": "^4.4.0",
-		"regenerator-runtime": "^0.13.7",
 		"timeago.js": "^4.0.2",
 		"uuid": "^8.3.2",
-		"v-tooltip": "^2.1.2",
-		"vue": "^2.6.12",
-		"vue-router": "^3.5.1",
+		"v-tooltip": "^2.1.3",
+		"vue": "^2.6.14",
+		"vue-router": "^3.5.2",
 		"vuedraggable": "^2.24.3",
-		"whatwg-fetch": "^3.6.1",
-		"xlsx": "^0.17.0"
+		"whatwg-fetch": "^3.6.2",
+		"xlsx": "^0.17.3"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.13.16",
+		"@babel/core": "^7.15.8",
 		"file-loader": "^6.2.0",
-		"node-fetch": "^2.6.1",
+		"node-fetch": "^3.0.0",
 		"pixl-xml": "^1.0.13",
-		"webpack": "^4.44.0"
+		"regenerator-runtime": "^0.13.9",
+		"webpack": "^4.46.0"
 	}
 }
