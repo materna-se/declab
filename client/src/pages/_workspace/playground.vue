@@ -100,6 +100,7 @@
 	import Alert from "../../components/alert/alert.vue";
 	import AlertHelper from "../../components/alert/alert-helper";
 	import Converter from "@/components/json/json-builder-converter";
+	import base64 from "base-64";
 
 	export default {
 		head() {
@@ -118,6 +119,11 @@
 			await this.getInputs();
 
 			await this.executeRaw("");
+
+			const context = this.$route.query.context;
+			if(context !== undefined) {
+				this.playground.context.template = JSON.parse(base64.decode(context));
+			}
 		},
 		data() {
 			return {
