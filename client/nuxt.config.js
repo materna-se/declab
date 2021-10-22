@@ -1,7 +1,6 @@
 const FileSystem = require("fs");
 const Path = require("path");
 const XML = require('pixl-xml');
-
 const fetch = require('node-fetch');
 
 export default async function () {
