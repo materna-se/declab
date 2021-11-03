@@ -102,15 +102,18 @@ export default {
 		return await response.json();
 	},
 
-	async importModels(models) {
-		const response = await this._authorizedFetch(this._endpoint + "/model", {
+	async importModels(models, context) {
+		const queryString = new URLSearchParams();
+		queryString.append("context", context);
+
+		const response = await this._authorizedFetch(this._endpoint + "/model?" + queryString.toString(), {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(models)
 		});
 
 		return {
-			successful: response.status !== 503,
+			successful: response.status !== 400,
 			messages: (await response.json()).messages
 		};
 	},

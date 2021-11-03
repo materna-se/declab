@@ -14,9 +14,9 @@
 					<path d="M18.4 10.6C16.55 9 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16a8.002 8.002 0 017.6-5.5c1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" fill="currentColor"/>
 				</svg>
 			</button>
-			<div class="import-result" v-bind:class="['import-result-' + importResult.state, importResult.state !== 'success' ? 'c-pointer' : null]" v-if="importResult !== null" v-on:click="importResult.state !== 'success' ? importResultOpened = true : null">
+			<div class="import-result" v-bind:class="['import-result-' + importResult.state, importResult.state !== 'success' && importResult.messages.length > 0 ? 'c-pointer' : null]" v-if="importResult !== null" v-on:click="importResult.state !== 'success' ? importResultOpened = true : null">
 				{{importResult.message}}&ensp;
-				<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" v-if="importResult.state !== 'success'">
+				<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" v-if="importResult.state !== 'success' && importResult.messages.length > 0">
 					<path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3m-2 16H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7z" fill="currentColor"/>
 				</svg>
 			</div>
@@ -52,6 +52,7 @@
 <script>
 	import Network from "../../../helpers/network";
 	import * as DmnEditor from "@kogito-tooling/kie-editors-standalone/dist/dmn"
+	import {v4 as uuid} from "uuid"
 
 	export default {
 		head() {
@@ -67,7 +68,7 @@
 				editor: null,
 				importResult: null,
 				importResultOpened: false,
-				ignoreImportEvent: false,
+				context: uuid()
 			}
 		},
 		async mounted() {
@@ -81,10 +82,16 @@
 				});
 			}
 
+			const model = this.models[this.$route.params.index];
+			if(model === undefined) {
+				await this.$router.push('/' + this.$route.params.workspace + "/model");
+				return;
+			}
+
 			this.editor = DmnEditor.open({
 				container: document.getElementById("editor"),
 				readOnly: false,
-				initialContent: Promise.resolve(this.models[this.$route.params.index].source),
+				initialContent: Promise.resolve(model.source),
 				resources: new Map(this.models.slice(0, this.$route.params.index).map((model, index) => {
 					return [
 						model.name + ".dmn",
@@ -96,10 +103,6 @@
 				}))
 			});
 			this.editor.subscribeToContentChanges(async (isDirty) => {
-				if (vue.ignoreImportEvent) {
-					return;
-				}
-
 				const content = await vue.editor.getContent();
 				vue.models[vue.$route.params.index] = {
 					name: content.match(/name="(.+?)"/)[1],
@@ -108,12 +111,18 @@
 				};
 
 				// We don't want to update ourselves after an import. Therefore, we intercept the import event.
-				vue.ignoreImportEvent = true;
-				const result = await Network.importModels(vue.models);
-				vue.importResult = vue.getResultAlert(result);
-				setTimeout(() => {
-					vue.ignoreImportEvent = false;
-				}, 1000);
+				try {
+					const result = await Network.importModels(vue.models, vue.context);
+					vue.importResult = vue.getResultAlert(result);
+				}
+				catch (e) {
+					console.error(e);
+					vue.importResult = vue.getResultAlert({
+						messages: [],
+						successful: false
+					});
+				}
+				vue.ignoreChangeEvent = false;
 			});
 
 			Network.addSocketListener(this.onSocket);
@@ -123,12 +132,8 @@
 		},
 		methods: {
 			async onSocket(e) {
-				if (this.ignoreImportEvent) {
-					return;
-				}
-
 				const data = JSON.parse(e.data);
-				if (data.type === "imported") {
+				if (data.type === "imported" && data.data !== this.context) {
 					location.reload();
 				}
 			},
