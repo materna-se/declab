@@ -6,23 +6,27 @@ export default (context) => {
 	const vue = context.app;
 	vue.router.beforeEach((to, from, next) => {
 		vue.store.commit("setLoading", true);
-		next();
-	});
-	vue.router.afterEach(async (to, from) => {
 		vue.store.commit("displayAlert", null);
 
 		const workspace = to.params.workspace;
-		if(workspace !== currentWorkspace) {
+		if (workspace !== currentWorkspace) {
 			Network.setEndpoint(vue, process.env.DECLAB_HOST, workspace);
 
-			if(workspace !== undefined) {
-				const workspaceConfiguration = await Network.getWorkspace();
-				vue.store.commit("setName", workspaceConfiguration.name);
+			if (workspace === undefined) {
+				vue.store.commit("setName", null);
+			}
+			else {
+				(async () => {
+					vue.store.commit("setName", (await Network.getWorkspace()).name);
+				})();
 			}
 
 			currentWorkspace = workspace;
 		}
 
+		next();
+	});
+	vue.router.afterEach((to, from) => {
 		setTimeout(() => vue.store.commit("setLoading", false), 500);
 	});
 }
