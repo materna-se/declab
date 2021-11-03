@@ -13,8 +13,14 @@
 	.input-builder table tr td:nth-child(1) span {
 		background: #c6ddfd;
 	}
+	.input-builder table table tr td:nth-child(1) span {
+		background: #e7ebee;
+	}
 	.decision-builder table tr td:nth-child(1) span {
 		background: #fcf0a5;
+	}
+	.decision-builder table table tr td:nth-child(1) span {
+		background: #e7ebee;
 	}
 </style>
 
