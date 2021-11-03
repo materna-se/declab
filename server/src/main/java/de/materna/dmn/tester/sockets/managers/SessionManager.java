@@ -1,5 +1,7 @@
 package de.materna.dmn.tester.sockets.managers;
 
+import de.materna.dmn.tester.helpers.SynchronizationHelper;
+
 import javax.websocket.Session;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,43 +16,72 @@ public class SessionManager {
 	private SessionManager() {
 	}
 
-	public void add(String workspace, Session session) {
-		List<Session> sessions = workspaceSessions.get(workspace);
-		if (sessions == null) {
-			sessions = new ArrayList<>();
-			workspaceSessions.put(workspace, sessions);
+	public void add(String workspaceUUID, Session session) {
+		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().lock();
+
+		try {
+			List<Session> sessions = workspaceSessions.get(workspaceUUID);
+			if (sessions == null) {
+				sessions = new ArrayList<>();
+				workspaceSessions.put(workspaceUUID, sessions);
+			}
+
+			sessions.add(session);
+
 		}
-
-		sessions.add(session);
-	}
-
-	public void remove(String workspace, Session session) {
-		List<Session> sessions = workspaceSessions.get(workspace);
-		if (sessions == null) {
-			return;
-		}
-
-		sessions.remove(session);
-	}
-
-	public void notify(String workspace, String message) {
-		List<Session> sessions = workspaceSessions.get(workspace);
-		if (sessions == null) {
-			return;
-		}
-
-		for (Session session : sessions) {
-			session.getAsyncRemote().sendText(message);
+		finally {
+			SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().unlock();
 		}
 	}
 
-	public int listeners(String workspace) {
-		List<Session> sessions = workspaceSessions.get(workspace);
-		if (sessions == null) {
-			return 0;
-		}
+	public void remove(String workspaceUUID, Session session) {
+		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().lock();
 
-		return sessions.size();
+		try {
+			List<Session> sessions = workspaceSessions.get(workspaceUUID);
+			if (sessions == null) {
+				return;
+			}
+
+			sessions.remove(session);
+		}
+		finally {
+			SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().unlock();
+		}
+	}
+
+	public void notify(String workspaceUUID, String message) {
+		SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().lock();
+
+		try {
+			List<Session> sessions = workspaceSessions.get(workspaceUUID);
+			if (sessions == null) {
+				return;
+			}
+
+			for (Session session : sessions) {
+				session.getAsyncRemote().sendText(message);
+			}
+		}
+		finally {
+			SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().unlock();
+		}
+	}
+
+	public int listeners(String workspaceUUID) {
+		SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().lock();
+
+		try {
+			List<Session> sessions = workspaceSessions.get(workspaceUUID);
+			if (sessions == null) {
+				return 0;
+			}
+
+			return sessions.size();
+		}
+		finally {
+			SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().unlock();
+		}
 	}
 
 	public static SessionManager getInstance() {

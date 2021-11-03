@@ -54,7 +54,7 @@ public class ModelServlet {
 	@WriteAccess
 	@Path("/model")
 	@Consumes("application/json")
-	public Response importModels(@PathParam("workspace") String workspaceUUID, String body) throws Exception {
+	public Response importModels(@PathParam("workspace") String workspaceUUID, @QueryParam("context") String context, String body) throws Exception {
 		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().lock();
 
 		try {
@@ -110,7 +110,7 @@ public class ModelServlet {
 			workspace.getAccessLog().writeMessage("Imported models", configuration.getModifiedDate());
 
 			// Notify all sessions.
-			SessionManager.getInstance().notify(workspaceUUID, "{\"type\": \"imported\"}");
+			SessionManager.getInstance().notify(workspaceUUID, "{\"type\": \"imported\", \"data\": " + SerializationHelper.getInstance().toJSON(context) + "}");
 
 			return Response.status(successful ? Response.Status.OK : Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(globalImportResult)).build();
 		}
