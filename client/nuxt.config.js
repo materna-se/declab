@@ -54,6 +54,7 @@ export default async function () {
 			'./plugins/tooltip',
 			'./plugins/draggable',
 			'./plugins/router',
+			'./plugins/infinite-loading',
 		],
 		env: {
 			DECLAB_HOST: (() => {
