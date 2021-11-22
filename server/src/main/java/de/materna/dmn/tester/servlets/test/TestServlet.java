@@ -24,13 +24,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Path("/workspaces/{workspace}")
+@Path("/workspaces/{workspace}/tests")
 public class TestServlet {
 	private static final Logger log = Logger.getLogger(TestServlet.class);
 
 	@GET
 	@ReadAccess
-	@Path("/tests")
 	@Produces("application/json")
 	public Response getTests(@PathParam("workspace") String workspaceUUID, @QueryParam("order") boolean order) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -45,7 +44,7 @@ public class TestServlet {
 
 	@GET
 	@ReadAccess
-	@Path("/tests/{uuid}")
+	@Path("/{uuid}")
 	@Produces("application/json")
 	public Response getTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -63,7 +62,6 @@ public class TestServlet {
 
 	@POST
 	@WriteAccess
-	@Path("/tests")
 	@Consumes("application/json")
 	public Response createTest(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -82,7 +80,7 @@ public class TestServlet {
 
 	@POST
 	@WriteAccess
-	@Path("/tests/{uuid}")
+	@Path("/{uuid}")
 	@Produces("application/json")
 	public Response runTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -110,7 +108,7 @@ public class TestServlet {
 
 	@PUT
 	@WriteAccess
-	@Path("/tests/{uuid}")
+	@Path("/{uuid}")
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response editTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID, String body) throws IOException {
@@ -133,7 +131,7 @@ public class TestServlet {
 
 	@DELETE
 	@WriteAccess
-	@Path("/tests/{uuid}")
+	@Path("/{uuid}")
 	public Response deleteTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();

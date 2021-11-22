@@ -16,13 +16,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Path("/workspaces/{workspace}")
+@Path("/workspaces/{workspace}/outputs")
 public class OutputServlet {
 	private static final Logger log = Logger.getLogger(OutputServlet.class);
 
 	@GET
 	@ReadAccess
-	@Path("/outputs")
 	@Produces("application/json")
 	public Response getOutputs(@PathParam("workspace") String workspaceUUID, @QueryParam("order") boolean order) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -37,7 +36,7 @@ public class OutputServlet {
 
 	@GET
 	@ReadAccess
-	@Path("/outputs/{uuid}")
+	@Path("/{uuid}")
 	@Produces("application/json")
 	public Response getOutput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String outputUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -55,14 +54,13 @@ public class OutputServlet {
 
 	@POST
 	@WriteAccess
-	@Path("/outputs")
 	@Consumes("application/json")
 	public Response createOutput(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		String uuid = UUID.randomUUID().toString();
 
 		PersistedOutput persistedOutput = (PersistedOutput) SerializationHelper.getInstance().toClass(body, PersistedOutput.class);
-		if(persistedOutput.getName() == null) {
+		if (persistedOutput.getName() == null) {
 			throw new BadRequestException("Output name can't be null.");
 		}
 		workspace.getOutputManager().persistFile(uuid, persistedOutput);
@@ -74,7 +72,7 @@ public class OutputServlet {
 
 	@PUT
 	@WriteAccess
-	@Path("/outputs/{uuid}")
+	@Path("/{uuid}")
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response editOutput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String outputUUID, String body) throws IOException {
@@ -85,7 +83,7 @@ public class OutputServlet {
 		}
 
 		PersistedOutput persistedOutput = (PersistedOutput) SerializationHelper.getInstance().toClass(body, PersistedOutput.class);
-		if(persistedOutput.getName() == null) {
+		if (persistedOutput.getName() == null) {
 			throw new BadRequestException("Output name can't be null.");
 		}
 		outputManager.persistFile(outputUUID, persistedOutput);
@@ -97,7 +95,7 @@ public class OutputServlet {
 
 	@DELETE
 	@WriteAccess
-	@Path("/outputs/{uuid}")
+	@Path("/{uuid}")
 	public Response deleteOutput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String outputUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		PersistenceDirectoryManager<PersistedOutput> outputManager = workspace.getOutputManager();

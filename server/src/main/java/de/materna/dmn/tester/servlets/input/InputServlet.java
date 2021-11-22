@@ -17,13 +17,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Path("/workspaces/{workspace}")
+@Path("/workspaces/{workspace}/inputs")
 public class InputServlet {
 	private static final Logger log = Logger.getLogger(InputServlet.class);
 
 	@GET
 	@ReadAccess
-	@Path("/inputs")
 	@Produces("application/json")
 	public Response getInputs(@PathParam("workspace") String workspaceUUID, @QueryParam("merge") boolean merge, @QueryParam("order") boolean order) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -39,7 +38,7 @@ public class InputServlet {
 
 	@GET
 	@ReadAccess
-	@Path("/inputs/{uuid}")
+	@Path("/{uuid}")
 	@Produces("application/json")
 	public Response getInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID, @QueryParam("merge") boolean merge) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -59,14 +58,13 @@ public class InputServlet {
 
 	@POST
 	@WriteAccess
-	@Path("/inputs")
 	@Consumes("application/json")
 	public Response createInput(@PathParam("workspace") String workspaceUUID, String body) throws IOException, RuntimeException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		String uuid = UUID.randomUUID().toString();
 
 		PersistedInput persistedInput = (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class);
-		if(persistedInput.getName() == null) {
+		if (persistedInput.getName() == null) {
 			throw new BadRequestException("Input name can't be null.");
 		}
 		workspace.getInputManager().persistFile(uuid, persistedInput);
@@ -78,7 +76,7 @@ public class InputServlet {
 
 	@PUT
 	@WriteAccess
-	@Path("/inputs/{uuid}")
+	@Path("/{uuid}")
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response editInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID, String body) throws IOException {
@@ -89,7 +87,7 @@ public class InputServlet {
 		}
 
 		PersistedInput persistedInput = (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class);
-		if(persistedInput.getName() == null) {
+		if (persistedInput.getName() == null) {
 			throw new BadRequestException("Input name can't be null.");
 		}
 		if (inputUUID.equals(persistedInput.getParent())) {
@@ -104,7 +102,7 @@ public class InputServlet {
 
 	@DELETE
 	@WriteAccess
-	@Path("/inputs/{uuid}")
+	@Path("/{uuid}")
 	public Response deleteInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();

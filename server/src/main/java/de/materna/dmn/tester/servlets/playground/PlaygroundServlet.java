@@ -16,13 +16,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Path("/workspaces/{workspace}")
+@Path("/workspaces/{workspace}/playgrounds")
 public class PlaygroundServlet {
 	private static final Logger log = Logger.getLogger(PlaygroundServlet.class);
 
 	@GET
 	@ReadAccess
-	@Path("/playgrounds")
 	@Produces("application/json")
 	public Response getPlaygrounds(@PathParam("workspace") String workspaceUUID, @QueryParam("order") boolean order) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -36,12 +35,12 @@ public class PlaygroundServlet {
 
 	@GET
 	@ReadAccess
-	@Path("/playgrounds/{uuid}")
+	@Path("/{uuid}")
 	@Produces("application/json")
 	public Response getPlayground(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String playgroundUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		if(!workspace.getPlaygroundManager().fileExists(playgroundUUID)) {
+		if (!workspace.getPlaygroundManager().fileExists(playgroundUUID)) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
@@ -51,7 +50,6 @@ public class PlaygroundServlet {
 
 	@POST
 	@WriteAccess
-	@Path("/playgrounds")
 	@Consumes("application/json")
 	public Response createPlayground(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -71,7 +69,7 @@ public class PlaygroundServlet {
 
 	@PUT
 	@WriteAccess
-	@Path("/playgrounds/{uuid}")
+	@Path("/{uuid}")
 	@Consumes("application/json")
 	public Response editPlayground(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String playgroundUUID, String body) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -92,7 +90,7 @@ public class PlaygroundServlet {
 
 	@DELETE
 	@WriteAccess
-	@Path("/playgrounds/{uuid}")
+	@Path("/{uuid}")
 	public Response deletePlayground(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String playgroundUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		PersistenceDirectoryManager<Playground> playgroundManager = workspace.getPlaygroundManager();
