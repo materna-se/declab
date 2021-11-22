@@ -27,44 +27,46 @@
 						</svg>
 					</div>
 					<div class="card-body" style="display: flex; flex-direction: row; padding-bottom: 0.75rem">
-						<template v-if="importedModel.successful">
-							<div>
-								<template v-if="importedModel.decisions.length > 0">
+						<div class="entity-container">
+							<template v-if="importedModel.successful">
+								<div class="entity">
 									<h5 class="mb-2" style="clear: both">Decisions</h5>
-									<div class="dmn dmn-decision mb-2 mr-2" v-for="decision of importedModel.decisions" :key="decision">
-										{{decision}}
-									</div>
-								</template>
-							</div>
-							<div>
-								<template v-if="importedModel.inputs.length > 0">
+									<template v-if="importedModel.decisions.length > 0">
+										<div class="dmn dmn-decision mb-2 mr-2" v-for="decision of importedModel.decisions" :key="decision">
+											{{decision}}
+										</div>
+									</template>
+								</div>
+								<div class="entity">
 									<h5 class="mb-2" style="clear: both">Inputs</h5>
-									<div class="dmn dmn-input mb-2 mr-2" v-for="input in importedModel.inputs" :key="input">
-										{{input}}
-									</div>
-								</template>
-							</div>
-							<div>
-								<template v-if="importedModel.knowledgeModels.length > 0">
+									<template v-if="importedModel.inputs.length > 0">
+										<div class="dmn dmn-input mb-2 mr-2" v-for="input in importedModel.inputs" :key="input">
+											{{input}}
+										</div>
+									</template>
+								</div>
+								<div class="entity">
 									<h5 class="mb-2">Business Knowledge Models</h5>
-									<div class="dmn dmn-bkm mb-2 mr-2" v-for="knowledgeModel in importedModel.knowledgeModels" :key="knowledgeModel">
-										{{knowledgeModel}}
-									</div>
-								</template>
-							</div>
-							<div>
-								<template v-if="importedModel.decisionServices.length > 0">
+									<template v-if="importedModel.knowledgeModels.length > 0">
+										<div class="dmn dmn-bkm mb-2 mr-2" v-for="knowledgeModel in importedModel.knowledgeModels" :key="knowledgeModel">
+											{{knowledgeModel}}
+										</div>
+									</template>
+								</div>
+								<div class="entity">
 									<h5 class="mb-2">Decision Services</h5>
-									<div class="dmn dmn-ds mb-2 mr-2" v-for="decisionService in importedModel.decisionServices" :key="decisionService">
-										<span @click="toggleDecisionService(decisionService, importedModel.namespace)" :class="[isCurrentDecisionService(decisionService, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionSessionName}}</span>
-									</div>
-								</template>
+									<template v-if="importedModel.decisionServices.length > 0">
+										<div class="dmn dmn-ds mb-2 mr-2" v-for="decisionService in importedModel.decisionServices" :key="decisionService">
+											<span @click="toggleDecisionService(decisionService, importedModel.namespace)" :class="[isCurrentDecisionService(decisionService, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionService}}</span>
+										</div>
+									</template>
+								</div>
+							</template>
+							<div class="entity" style="display: flex;align-items: center;justify-content: center" v-else>
+								<p class="text-center text-muted mb-2">
+									<small>The import of this model failed, no further information is available.</small>
+								</p>
 							</div>
-						</template>
-						<div style="width: 100%" v-else>
-							<p class="text-center text-muted mb-2">
-								<small>The import of this model failed, no further information is available.</small>
-							</p>
 						</div>
 					</div>
 				</div>
@@ -326,10 +328,26 @@
 </script>
 
 <style>
+	.entity-container {
+		display: flex;
+		width: 100%;
+	}
+
+	.entity {
+		flex-grow: 1;
+		flex-shrink: 0;
+		flex-basis: 0;
+		margin-right: 10px;
+	}
+
+	.entity:last-of-type {
+		margin-right: 0;
+	}
+
 	.dmn {
 		float: left;
 
-		padding: 0.5rem 1rem;
+		padding: 0.3rem 0.8rem;
 
 		border: 1px solid rgba(0, 0, 0, .125);
 	}
