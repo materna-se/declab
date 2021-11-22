@@ -7,6 +7,11 @@
 		<div class="row">
 			<div class="col-4">
 				<h4 class="mb-2">Upload</h4>
+
+				<div class="alert alert-info">
+					The selectors within the Excel file can be expressed using JSON path expressions. For example, if you want to set the <code>Age</code> inside the <code>Person</code> structure, the JSON path expression should be <code>$['Person']['Age']</code>. You can find more information in the respective specification: <a href="https://tools.ietf.org/id/draft-goessner-dispatch-jsonpath-00.html#name-overview-of-jsonpath-expres" target="_blank">JSONPath - XPath for JSON</a>
+				</div>
+
 				<div class="card mb-4" @drop="onDrop" @dragover="onDragOver" @dragenter="onDragOver">
 					<div class="card-body text-muted">
 						<div class="d-flex flex-column align-items-center">
