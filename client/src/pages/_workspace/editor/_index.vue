@@ -142,7 +142,6 @@
 			await this.importModel(model.source);
 
 			setInterval(() => {
-				console.info("hm", vue.importTime, vue.importResult);
 				if (vue.importResult === null) {
 					vue.importTime = null;
 					return;
