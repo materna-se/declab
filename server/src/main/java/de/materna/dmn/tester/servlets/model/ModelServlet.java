@@ -154,8 +154,9 @@ public class ModelServlet {
 		Configuration configuration = workspace.getConfig();
 		DMNModel mainModel = DroolsHelper.getMainModel(workspace);
 
+
+		Map<String, Object> context = new HashMap<>();
 		if (configuration.getDecisionService() == null) {
-			Map<String, Object> context = new HashMap<>();
 			context.put("inputs", workspace.getDecisionSession().getInputStructure(mainModel.getNamespace()));
 
 			Map<String, InputStructure> decisions = new HashMap<>();
@@ -163,12 +164,14 @@ public class ModelServlet {
 				decisions.put(decision.getName(), new InputStructure(decision.getResultType().getName()));
 			}
 			context.put("decisions", decisions);
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(context)).build();
 		}
-		// TODO: Handling for Decision Services is missing!
+		else {
+			context.put("inputs", workspace.getDecisionSession().getDMNDecisionSession().getInputStructure(mainModel.getNamespace(), configuration.getDecisionService().getName()));
+			context.put("decisions", Collections.emptyMap());
+		}
 
 		// TODO: Throw error if a decision service is selected on a Java decision model.
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getDMNDecisionSession().getInputStructure(mainModel.getNamespace(), configuration.getDecisionService().getName()))).build();
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(context)).build();
 	}
 
 	@POST
