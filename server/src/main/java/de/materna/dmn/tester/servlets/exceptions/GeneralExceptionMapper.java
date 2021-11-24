@@ -19,6 +19,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
 
 	@Override
 	public Response toResponse(Exception e) {
+		e.printStackTrace();
 		log.error(e);
 
 		//Default exceptions
