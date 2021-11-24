@@ -22,6 +22,14 @@
 	.decision-builder table table tr td:nth-child(1) span {
 		background: #e7ebee;
 	}
+
+	.json-builder tr td:nth-child(1) span {
+		white-space: initial;
+	}
+	.json-builder table tr td:nth-child(1) {
+		max-width: 50%;
+		width: auto;
+	}
 </style>
 
 <script>
