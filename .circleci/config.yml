@@ -2,7 +2,7 @@ version: 2
 jobs:
   build_client:
     docker:
-      - image: cimg/node:17.1.0
+      - image: cimg/node:16.13.0
     environment:
       DECLAB_HOST: ""
     steps:
