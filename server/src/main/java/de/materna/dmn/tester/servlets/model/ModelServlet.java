@@ -23,13 +23,12 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.*;
 
-@Path("/workspaces/{workspace}")
+@Path("/workspaces/{workspace}/model")
 public class ModelServlet {
 	private static final Logger log = Logger.getLogger(ModelServlet.class);
 
 	@GET
 	@ReadAccess
-	@Path("/model")
 	@Produces("application/json")
 	public Response getModels(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -52,7 +51,6 @@ public class ModelServlet {
 
 	@PUT
 	@WriteAccess
-	@Path("/model")
 	@Consumes("application/json")
 	public Response importModels(@PathParam("workspace") String workspaceUUID, @QueryParam("context") String context, String body) throws Exception {
 		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().lock();
@@ -122,8 +120,8 @@ public class ModelServlet {
 	@GET
 	@ReadAccess
 	@Produces("application/json")
-	@Path("/model/decision-session")
-	public Response getDecisionSession(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+	@Path("/decision-session")
+	public Response getDecisionSession(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getConfig().getDecisionService())).build();
@@ -132,7 +130,7 @@ public class ModelServlet {
 	@PUT
 	@WriteAccess
 	@Consumes("application/json")
-	@Path("/model/decision-session")
+	@Path("/decision-session")
 	public Response setDecisionSession(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
@@ -148,7 +146,7 @@ public class ModelServlet {
 
 	@GET
 	@ReadAccess
-	@Path("/model/inputs")
+	@Path("/inputs")
 	@Produces("application/json")
 	public Response getInputs(@PathParam("workspace") String workspaceUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -175,7 +173,7 @@ public class ModelServlet {
 
 	@POST
 	@ReadAccess
-	@Path("/model/execute")
+	@Path("/execute")
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response calculateModelResult(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
@@ -196,7 +194,7 @@ public class ModelServlet {
 
 	@POST
 	@ReadAccess
-	@Path("/model/execute/raw")
+	@Path("/execute/raw")
 	@Consumes("application/json")
 	@Produces("text/plain")
 	public Response calculateRawResult(@PathParam("workspace") String workspaceUUID, @QueryParam("engine") String engine, String body) throws IOException {

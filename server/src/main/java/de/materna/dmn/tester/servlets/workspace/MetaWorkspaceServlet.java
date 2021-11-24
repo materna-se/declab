@@ -20,7 +20,6 @@ public class MetaWorkspaceServlet {
 	private static final Logger log = Logger.getLogger(MetaWorkspaceServlet.class);
 
 	@GET
-	@Path("")
 	@Produces("application/json")
 	public Response getWorkspaces(@QueryParam("query") String query) throws IOException {
 		Map<String, Workspace> unsortedWorkspaces = query == null ? WorkspaceManager.getInstance().getAll() : WorkspaceManager.getInstance().search(query);
@@ -32,7 +31,6 @@ public class MetaWorkspaceServlet {
 	}
 
 	@POST
-	@Path("")
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response createWorkspace(String body) throws Exception {
