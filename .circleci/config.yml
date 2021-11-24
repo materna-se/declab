@@ -2,7 +2,7 @@ version: 2
 jobs:
   build_client:
     docker:
-      - image: circleci/node:14.16.1-stretch
+      - image: cimg/node:17.1.0
     environment:
       DECLAB_HOST: ""
     steps:
