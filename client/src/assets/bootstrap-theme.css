@@ -185,3 +185,31 @@ small {
 	text-align: left;
 	font-family: "Source Code Pro", monospace;
 }
+
+.scrollbar {
+	overflow-y: auto;
+	scrollbar-width: thin;
+}
+
+/* width */
+::-webkit-scrollbar {
+	width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	background: #f0f0f0;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: #cdcdcd;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: #a6a6a6;
+}
+::-webkit-scrollbar-thumb:active {
+	background: #606060;
+}

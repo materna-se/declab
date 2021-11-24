@@ -1,7 +1,6 @@
 const FileSystem = require("fs");
 const Path = require("path");
 const XML = require('pixl-xml');
-
 const fetch = require('node-fetch');
 
 export default async function () {
@@ -55,6 +54,7 @@ export default async function () {
 			'./plugins/tooltip',
 			'./plugins/draggable',
 			'./plugins/router',
+			'./plugins/infinite-loading',
 		],
 		env: {
 			DECLAB_HOST: (() => {

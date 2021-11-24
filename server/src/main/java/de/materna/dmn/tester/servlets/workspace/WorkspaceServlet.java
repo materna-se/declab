@@ -141,7 +141,6 @@ public class WorkspaceServlet {
 
 	@DELETE
 	@WriteAccess
-	@Path("")
 	public Response deleteWorkspace(@PathParam("workspace") String workspaceUUID) throws IOException {
 		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
 		if (!workspaceManager.has(workspaceUUID)) {
