@@ -103,11 +103,14 @@
 				importTime: null,
 				importResult: null,
 				importResultOpened: false,
-				context: uuid()
+				context: uuid(),
+				debouncedImportModel: null
 			}
 		},
 		async mounted() {
 			const vue = this;
+
+			this.debouncedImportModel = _.debounce(this.importModel, 1000);
 
 			for (const model of await Network.getModel()) {
 				this.models.push({
@@ -138,11 +141,11 @@
 				}))
 			});
 			this.editor.subscribeToContentChanges(async (isDirty) => {
-				vue.importModel(await this.editor.getContent());
+				vue.debouncedImportModel(await this.editor.getContent());
 			});
 
 			// We will import the model once to get feedback on the health.
-			await this.importModel(model.source);
+			await this.debouncedImportModel(model.source);
 
 			setInterval(() => {
 				if (vue.importResult === null) {
@@ -150,7 +153,7 @@
 					return;
 				}
 
-				vue.importTime = dayjs.unix(vue.importResult.time).fromNow()
+				vue.importTime = dayjs.unix(vue.importResult.time).fromNow();
 			}, 1000);
 
 			Network.addSocketListener(this.onSocket);
