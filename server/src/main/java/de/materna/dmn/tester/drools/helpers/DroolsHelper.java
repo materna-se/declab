@@ -30,8 +30,13 @@ public class DroolsHelper extends de.materna.jdec.dmn.DroolsHelper {
 			try {
 				workspace.getDecisionSession().importModel(model.get("namespace"), modelFiles.get(model.get("uuid")));
 			}
-			catch (ModelImportException e) {
-				log.warn("Import of model " + model.get("namespace") + " failed: " + e.getResult().getMessages());
+			catch (Exception e) {
+				if(e instanceof ModelImportException) {
+					log.warn("Import of model " + model.get("namespace") + " failed!" + ((ModelImportException) e).getResult().getMessages());
+				}
+				else {
+					log.warn("Import of model " + model.get("namespace") + " failed!", e);
+				}
 			}
 		}
 	}
