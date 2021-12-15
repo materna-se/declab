@@ -61,6 +61,7 @@
 	import dayjs from "dayjs"
 	import dayjsRelativeTimePlugin from "dayjs/plugin/relativeTime"
 	import dayjsUpdateLocalePlugin from "dayjs/plugin/updateLocale"
+	import _ from "lodash"
 
 	dayjs.extend(dayjsRelativeTimePlugin);
 	dayjs.extend(dayjsUpdateLocalePlugin);
