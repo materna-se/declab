@@ -9,8 +9,8 @@ import org.jboss.resteasy.spi.DefaultOptionsMethodException;
 @Provider
 public class DefaultOptionsMethodExceptionMapper implements ExceptionMapper<DefaultOptionsMethodException> {
 	@Override
-    public Response toResponse(DefaultOptionsMethodException e) {
-		//Used by JAX-RS to return OPTIONS, leave this be.
-        return e.getResponse();
-    }
+	public Response toResponse(DefaultOptionsMethodException e) {
+		// Used by JAX-RS to return OPTIONS, leave this be.
+		return e.getResponse();
+	}
 }

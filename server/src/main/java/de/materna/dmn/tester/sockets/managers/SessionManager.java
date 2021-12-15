@@ -1,12 +1,13 @@
 package de.materna.dmn.tester.sockets.managers;
 
-import de.materna.dmn.tester.helpers.SynchronizationHelper;
-
-import javax.websocket.Session;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.websocket.Session;
+
+import de.materna.dmn.tester.helpers.SynchronizationHelper;
 
 public class SessionManager {
 	private static SessionManager instance;
@@ -27,9 +28,7 @@ public class SessionManager {
 			}
 
 			sessions.add(session);
-
-		}
-		finally {
+		} finally {
 			SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().unlock();
 		}
 	}
@@ -44,8 +43,7 @@ public class SessionManager {
 			}
 
 			sessions.remove(session);
-		}
-		finally {
+		} finally {
 			SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().unlock();
 		}
 	}
@@ -62,8 +60,7 @@ public class SessionManager {
 			for (Session session : sessions) {
 				session.getAsyncRemote().sendText(message);
 			}
-		}
-		finally {
+		} finally {
 			SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().unlock();
 		}
 	}
@@ -78,8 +75,7 @@ public class SessionManager {
 			}
 
 			return sessions.size();
-		}
-		finally {
+		} finally {
 			SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().unlock();
 		}
 	}

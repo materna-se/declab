@@ -16,8 +16,8 @@ public class PersistedOutput extends Output {
 
 	@JsonCreator
 	public PersistedOutput(@JsonProperty(value = "name", required = true) String name,
-						   @JsonProperty(value = "decision", required = true) String decision,
-						   @JsonProperty(value = "value", required = true) JsonNode value) {
+			@JsonProperty(value = "decision", required = true) String decision,
+			@JsonProperty(value = "value", required = true) JsonNode value) {
 		super(value);
 
 		this.name = name;
@@ -39,7 +39,7 @@ public class PersistedOutput extends Output {
 	public void setDecision(String decision) {
 		this.decision = decision;
 	}
-	
+
 	@Override
 	public void fromJSON(String json) {
 		PersistedOutput temp = (PersistedOutput) SerializationHelper.getInstance().toClass(json, PersistedOutput.class);

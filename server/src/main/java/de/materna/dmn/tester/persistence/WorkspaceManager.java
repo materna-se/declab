@@ -1,23 +1,30 @@
 package de.materna.dmn.tester.persistence;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
+
+import javax.ws.rs.NotFoundException;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.kie.dmn.api.core.DMNModel;
+
 import de.materna.dmn.tester.helpers.HashingHelper;
 import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.DMNDecisionSession;
 import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-import org.kie.dmn.api.core.DMNModel;
-
-import javax.ws.rs.NotFoundException;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.Map.Entry;
 
 public class WorkspaceManager {
 	private static final Logger log = Logger.getLogger(WorkspaceManager.class);
@@ -57,21 +64,21 @@ public class WorkspaceManager {
 		for (File subdir : dir.listFiles()) {
 			try {
 				index(subdir.getName());
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				log.error("Could not index workspace " + subdir.getName(), e);
 			}
 		}
 	}
 
 	public void index(String workspaceUUID) throws Exception {
-		//Upgrade path from version 0 to 1
+		// Upgrade path from version 0 to 1
 		PersistenceFileManager configManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
 		if (!configManager.fileExists()) {
 			log.info("Workspace " + workspaceUUID + " needs to be upgraded from version 0 to 1.");
 
 			String generatedUUID = UUID.randomUUID().toString();
-			Files.move(configManager.getPath().getParent(), Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", generatedUUID));
+			Files.move(configManager.getPath().getParent(),
+					Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", generatedUUID));
 
 			// Create configuration.json
 			configManager = new PersistenceFileManager(generatedUUID, "configuration.json");
@@ -87,22 +94,26 @@ public class WorkspaceManager {
 			workspaceUUID = generatedUUID;
 		}
 
-		Configuration configuration = (Configuration) SerializationHelper.getInstance().toClass(configManager.getFile(), Configuration.class);
-		//Upgrade path from version 1 to 2
+		Configuration configuration = (Configuration) SerializationHelper.getInstance().toClass(configManager.getFile(),
+				Configuration.class);
+		// Upgrade path from version 1 to 2
 		if (configuration.getVersion() == 1) {
 			log.info("Workspace " + workspaceUUID + " needs to be upgraded from version 1 to 2.");
 
-			// Check if the workspace has any models. If it does, we will move it to the new models directory.
+			// Check if the workspace has any models. If it does, we will move it to the new
+			// models directory.
 			PersistenceFileManager modelFileManager = new PersistenceFileManager(workspaceUUID, "model.dmn");
 			if (modelFileManager.fileExists()) {
 				// Models are no longer called model.dmn, they are identified by an UUID.
 				String modelUUID = UUID.randomUUID().toString();
 
 				// Update the reference to the moved model file.
-				PersistenceDirectoryManager<String> modelDirectoryManager = new PersistenceDirectoryManager<>(workspaceUUID, "models", String.class, "dmn");
+				PersistenceDirectoryManager<String> modelDirectoryManager = new PersistenceDirectoryManager<>(
+						workspaceUUID, "models", String.class, "dmn");
 				modelDirectoryManager.persistFile(modelUUID, modelFileManager.getFile());
 
-				// Import model into a temporarily created decision session in order to obtain namespace and name.
+				// Import model into a temporarily created decision session in order to obtain
+				// namespace and name.
 				DMNDecisionSession decisionSession = new DMNDecisionSession();
 				decisionSession.importModel("main", modelFileManager.getFile());
 				DMNModel importedModel = decisionSession.getRuntime().getModels().get(0);
@@ -145,7 +156,8 @@ public class WorkspaceManager {
 	}
 
 	public void remove(String uuid) throws IOException {
-		FileUtils.deleteDirectory(Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", uuid).toFile());
+		FileUtils.deleteDirectory(
+				Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", uuid).toFile());
 		workspaces.remove(uuid);
 	}
 }

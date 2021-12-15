@@ -1,12 +1,14 @@
 package de.materna.dmn.tester.servlets.test.beans;
 
+import org.apache.log4j.Logger;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
+
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.log4j.Logger;
 
 public class TestResultOutput extends Serializable {
 	private static final Logger log = Logger.getLogger(TestResultOutput.class);
@@ -22,10 +24,10 @@ public class TestResultOutput extends Serializable {
 
 	@JsonCreator
 	public TestResultOutput(@JsonProperty(value = "uuid", required = true) String uuid,
-							@JsonProperty(value = "name", required = true) String name,
-							@JsonProperty(value = "decision", required = true) String decision,
-							@JsonProperty(value = "expected", required = true) JsonNode expected,
-							@JsonProperty(value = "calculated", required = true) JsonNode calculated) {
+			@JsonProperty(value = "name", required = true) String name,
+			@JsonProperty(value = "decision", required = true) String decision,
+			@JsonProperty(value = "expected", required = true) JsonNode expected,
+			@JsonProperty(value = "calculated", required = true) JsonNode calculated) {
 		this.uuid = uuid;
 		this.name = name;
 		this.decision = decision;
@@ -70,8 +72,10 @@ public class TestResultOutput extends Serializable {
 		}, calculated);
 	}
 
+	@Override
 	public void fromJSON(String json) {
-		TestResultOutput temp = (TestResultOutput) SerializationHelper.getInstance().toClass(json, TestResultOutput.class);
+		TestResultOutput temp = (TestResultOutput) SerializationHelper.getInstance().toClass(json,
+				TestResultOutput.class);
 		this.expected = temp.getExpected();
 		this.calculated = temp.getCalculated();
 	}

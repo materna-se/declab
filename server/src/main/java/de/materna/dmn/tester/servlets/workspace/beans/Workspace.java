@@ -1,5 +1,9 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+
 import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
@@ -9,15 +13,12 @@ import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.playground.beans.Playground;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.jdec.HybridDecisionSession;
-import org.apache.log4j.Logger;
-
-import java.io.IOException;
 
 public class Workspace {
 	private static final Logger log = Logger.getLogger(Workspace.class);
 
 	private PersistenceDirectoryManager<Challenge> challengeManager;
-	
+
 	private PersistenceDirectoryManager<String> modelManager;
 	private PersistenceDirectoryManager<Playground> playgroundManager;
 
@@ -50,7 +51,7 @@ public class Workspace {
 
 		DroolsHelper.importModels(this);
 	}
-	
+
 	public PersistenceDirectoryManager<Challenge> getChallengeManager() {
 		return challengeManager;
 	}

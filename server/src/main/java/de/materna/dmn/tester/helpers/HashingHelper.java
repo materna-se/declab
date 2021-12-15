@@ -1,10 +1,10 @@
 package de.materna.dmn.tester.helpers;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.bouncycastle.jcajce.provider.digest.SHA3;
-
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.bouncycastle.jcajce.provider.digest.SHA3;
 
 public class HashingHelper {
 	private static HashingHelper instance;
@@ -28,7 +28,8 @@ public class HashingHelper {
 	}
 
 	public String getSaltedHash(String token, String salt) {
-		return byteArrayToHexString(messageDigest.digest(ArrayUtils.addAll(token.getBytes(StandardCharsets.UTF_8), hexStringToByteArray(salt))));
+		return byteArrayToHexString(messageDigest
+				.digest(ArrayUtils.addAll(token.getBytes(StandardCharsets.UTF_8), hexStringToByteArray(salt))));
 	}
 
 	private String byteArrayToHexString(byte[] byteArray) {
@@ -44,7 +45,8 @@ public class HashingHelper {
 
 		byte[] byteArray = new byte[hexStringLength / 2];
 		for (int i = 0; i < hexStringLength; i += 2) {
-			byteArray[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) + Character.digit(hexString.charAt(i + 1), 16));
+			byteArray[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+					+ Character.digit(hexString.charAt(i + 1), 16));
 		}
 		return byteArray;
 	}

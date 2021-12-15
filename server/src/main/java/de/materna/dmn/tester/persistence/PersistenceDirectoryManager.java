@@ -1,8 +1,5 @@
 package de.materna.dmn.tester.persistence;
 
-import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -13,6 +10,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.apache.log4j.Logger;
+
+import de.materna.jdec.serialization.SerializationHelper;
+
 public class PersistenceDirectoryManager<T> {
 	private static final Logger log = Logger.getLogger(PersistenceDirectoryManager.class);
 
@@ -20,10 +21,12 @@ public class PersistenceDirectoryManager<T> {
 	private Class<T> entityClass;
 	private String extension;
 
-	public PersistenceDirectoryManager(String workspace, String entity, Class<T> entityClass, String extension) throws IOException {
+	public PersistenceDirectoryManager(String workspace, String entity, Class<T> entityClass, String extension)
+			throws IOException {
 		directory = Paths.get(System.getProperty("jboss.server.data.dir"), "dmn", "workspaces", workspace, entity);
 
-		// We can't identify the generic type at runtime, so we need to save it for serialization
+		// We can't identify the generic type at runtime, so we need to save it for
+		// serialization
 		this.entityClass = entityClass;
 		this.extension = extension;
 	}
@@ -38,8 +41,7 @@ public class PersistenceDirectoryManager<T> {
 					String key = path.getFileName().toString().split("\\.")[0];
 					try {
 						files.put(key, getFile(key));
-					}
-					catch (IOException e) {
+					} catch (IOException e) {
 						log.error(path.getFileName() + " cannot be read: ", e);
 					}
 				});
@@ -50,11 +52,11 @@ public class PersistenceDirectoryManager<T> {
 	}
 
 	public T getFile(String key) throws IOException {
-		String content = new String(Files.readAllBytes(Paths.get(directory.toString(), key + "." + extension)), StandardCharsets.UTF_8);
+		String content = new String(Files.readAllBytes(Paths.get(directory.toString(), key + "." + extension)),
+				StandardCharsets.UTF_8);
 		if (entityClass == String.class) {
 			return (T) content;
-		}
-		else {
+		} else {
 			return (T) SerializationHelper.getInstance().toClass(content, entityClass);
 		}
 	}
@@ -66,10 +68,11 @@ public class PersistenceDirectoryManager<T> {
 	public void persistFile(String key, T value) throws IOException {
 		Files.createDirectories(directory);
 		if (entityClass == String.class) {
-			Files.write(Paths.get(directory.toString(), key + "." + extension), ((String) value).getBytes(StandardCharsets.UTF_8));
-		}
-		else {
-			Files.write(Paths.get(directory.toString(), key + "." + extension), SerializationHelper.getInstance().toJSON(value).getBytes(StandardCharsets.UTF_8));
+			Files.write(Paths.get(directory.toString(), key + "." + extension),
+					((String) value).getBytes(StandardCharsets.UTF_8));
+		} else {
+			Files.write(Paths.get(directory.toString(), key + "." + extension),
+					SerializationHelper.getInstance().toJSON(value).getBytes(StandardCharsets.UTF_8));
 		}
 	}
 
@@ -86,8 +89,7 @@ public class PersistenceDirectoryManager<T> {
 					try {
 						// We need to remove the file extension.
 						removeFile(path.getFileName().toString().split("\\.")[0]);
-					}
-					catch (IOException e) {
+					} catch (IOException e) {
 						log.error(path.getFileName() + " cannot be deleted: ", e);
 					}
 				});
@@ -103,8 +105,7 @@ public class PersistenceDirectoryManager<T> {
 					Path path = iterator.next();
 					try {
 						getFile(path.getFileName().toString().split("\\.")[0]);
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						throw new IOException(path.getFileName() + " cannot be verified: ", e);
 					}
 				}

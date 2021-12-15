@@ -1,12 +1,13 @@
 package de.materna.dmn.tester.servlets.input.beans;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import de.materna.dmn.tester.helpers.Serializable;
-import de.materna.jdec.serialization.SerializationHelper;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import de.materna.dmn.tester.helpers.Serializable;
+import de.materna.jdec.serialization.SerializationHelper;
 
 public class Input extends Serializable {
 	protected Map<String, Object> value = new LinkedHashMap<>();
@@ -27,6 +28,7 @@ public class Input extends Serializable {
 		this.value = value;
 	}
 
+	@Override
 	public void fromJSON(String json) {
 		Input temp = (Input) SerializationHelper.getInstance().toClass(json, Input.class);
 		this.value = temp.getValue();

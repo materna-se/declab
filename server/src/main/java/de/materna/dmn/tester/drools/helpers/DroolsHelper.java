@@ -1,14 +1,14 @@
 package de.materna.dmn.tester.drools.helpers;
 
-import de.materna.dmn.tester.persistence.WorkspaceManager;
-import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
-import de.materna.jdec.model.ModelImportException;
-import org.apache.log4j.Logger;
-import org.kie.dmn.api.core.DMNModel;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.kie.dmn.api.core.DMNModel;
+
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.jdec.model.ModelImportException;
 
 public class DroolsHelper extends de.materna.jdec.dmn.DroolsHelper {
 	private static final Logger log = Logger.getLogger(DroolsHelper.class);
@@ -19,7 +19,8 @@ public class DroolsHelper extends de.materna.jdec.dmn.DroolsHelper {
 
 	public static DMNModel getMainModel(Workspace workspace) {
 		String mainModelNamespace = getMainModelNamespace(workspace);
-		return workspace.getDecisionSession().getDMNDecisionSession().getRuntime().getModels().stream().filter(dmnModel -> dmnModel.getNamespace().equals(mainModelNamespace)).findAny().get();
+		return workspace.getDecisionSession().getDMNDecisionSession().getRuntime().getModels().stream()
+				.filter(dmnModel -> dmnModel.getNamespace().equals(mainModelNamespace)).findAny().get();
 	}
 
 	public static void importModels(Workspace workspace) throws IOException {
@@ -29,8 +30,7 @@ public class DroolsHelper extends de.materna.jdec.dmn.DroolsHelper {
 		for (Map<String, String> model : models) {
 			try {
 				workspace.getDecisionSession().importModel(model.get("namespace"), modelFiles.get(model.get("uuid")));
-			}
-			catch (ModelImportException e) {
+			} catch (ModelImportException e) {
 				log.warn("Import of model " + model.get("namespace") + " failed: " + e.getResult().getMessages());
 			}
 		}

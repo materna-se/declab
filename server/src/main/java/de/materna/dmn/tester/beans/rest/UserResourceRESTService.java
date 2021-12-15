@@ -35,16 +35,15 @@ public class UserResourceRESTService {
 
 	private final static String PATH = "./declab/img/";
 
-    @GET
-    @Path("/{filename}")
-    @Produces("image/jpg")
-    public Response showUserImageTag(@PathParam("filename") String filename) {
-    	String filepath = PATH+filename;
-    	try {
-			return Response.ok(
-					Files.readAllBytes(Paths.get(filepath))).build();
+	@GET
+	@Path("/{filename}")
+	@Produces("image/jpg")
+	public Response showUserImageTag(@PathParam("filename") String filename) {
+		String filepath = PATH + filename;
+		try {
+			return Response.ok(Files.readAllBytes(Paths.get(filepath))).build();
 		} catch (IOException e) {
 			return Response.status(404).build();
 		}
-    }
+	}
 }
