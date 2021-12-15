@@ -2,17 +2,11 @@ package de.materna.dmn.tester.servlets;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import org.apache.log4j.Logger;
-
-import de.materna.dmn.tester.beans.Database;
-import de.materna.dmn.tester.beans.User;
-import de.materna.dmn.tester.beans.repositories.UserRepository;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.challenges.ChallengeServlet;
 import de.materna.dmn.tester.servlets.exceptions.DefaultOptionsMethodExceptionMapper;
@@ -32,7 +26,6 @@ import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
 public class MainApplication extends Application {
 	private Set<Object> singletons = new HashSet<>();
 	private Set<Class<?>> classes = new HashSet<>();
-	private static final Logger log = Logger.getLogger(MainApplication.class);
 
 	public MainApplication() throws IOException {
 		// Before we initialize the endpoints, we'll initialize all workspaces.
@@ -53,14 +46,6 @@ public class MainApplication extends Application {
 
 		classes.add(DefaultOptionsMethodExceptionMapper.class);
 		classes.add(GeneralExceptionMapper.class);
-		
-//		Database db = new Database();
-//		db.connect();
-/*		User newUser = new User();
-		UserRepository ur = new UserRepository();
-		ur.save(newUser);
-		Optional<User> loaded = ur.findByUuid(0);
-		boolean stop = true;*/
 	}
 
 	@Override
