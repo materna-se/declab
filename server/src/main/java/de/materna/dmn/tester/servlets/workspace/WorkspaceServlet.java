@@ -11,7 +11,8 @@ import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import javax.ws.rs.*;
@@ -32,7 +33,7 @@ import java.util.zip.ZipOutputStream;
 
 @Path("/workspaces/{workspace}")
 public class WorkspaceServlet {
-	private static final Logger log = Logger.getLogger(WorkspaceServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(WorkspaceServlet.class);
 
 	@GET
 	@Path("/public")
@@ -187,7 +188,7 @@ public class WorkspaceServlet {
 						zipOutputStream.closeEntry();
 					}
 					catch (Exception e) {
-						log.error(e);
+						log.error(e.getMessage(), e);
 					}
 				});
 			}

@@ -1,7 +1,8 @@
 package de.materna.dmn.tester.persistence;
 
 import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class PersistenceDirectoryManager<T> {
-	private static final Logger log = Logger.getLogger(PersistenceDirectoryManager.class);
+	private static final Logger log = LoggerFactory.getLogger(PersistenceDirectoryManager.class);
 
 	private Path directory;
 	private Class<T> entityClass;

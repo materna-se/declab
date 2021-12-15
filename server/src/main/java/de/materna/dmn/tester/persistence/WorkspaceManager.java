@@ -7,7 +7,8 @@ import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.DMNDecisionSession;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.kie.dmn.api.core.DMNModel;
 
 import javax.ws.rs.NotFoundException;
@@ -20,7 +21,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class WorkspaceManager {
-	private static final Logger log = Logger.getLogger(WorkspaceManager.class);
+	private static final Logger log = LoggerFactory.getLogger(WorkspaceManager.class);
 	private static WorkspaceManager instance;
 
 	private Map<String, Workspace> workspaces = new HashMap<>();

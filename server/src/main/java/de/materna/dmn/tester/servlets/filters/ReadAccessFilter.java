@@ -4,7 +4,8 @@ import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.helpers.AccessFilterHelper;
 import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -18,7 +19,7 @@ import java.io.IOException;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class ReadAccessFilter implements ContainerRequestFilter {
-	private static final Logger log = Logger.getLogger(ReadAccessFilter.class);
+	private static final Logger log = LoggerFactory.getLogger(ReadAccessFilter.class);
 	private static WorkspaceManager workspaceManager;
 
 	public ReadAccessFilter() throws IOException {

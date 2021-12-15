@@ -4,13 +4,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class AccessLog extends Serializable {
-	private static final Logger logger = Logger.getLogger(AccessLog.class);
+	private static final Logger logger = LoggerFactory.getLogger(AccessLog.class);
 
 	private final int logLength = 1000;
 	private PersistenceFileManager fileManager;

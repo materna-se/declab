@@ -14,7 +14,8 @@ import de.materna.jdec.CamundaDecisionSession;
 import de.materna.jdec.GoldmanDecisionSession;
 import de.materna.jdec.model.*;
 import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.ast.DecisionNode;
 
@@ -25,7 +26,7 @@ import java.util.*;
 
 @Path("/workspaces/{workspace}/model")
 public class ModelServlet {
-	private static final Logger log = Logger.getLogger(ModelServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(ModelServlet.class);
 
 	@GET
 	@ReadAccess

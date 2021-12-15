@@ -6,10 +6,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestResultOutput extends Serializable {
-	private static final Logger log = Logger.getLogger(TestResultOutput.class);
+	private static final Logger log = LoggerFactory.getLogger(TestResultOutput.class);
 
 	private String uuid;
 	private String name;

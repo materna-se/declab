@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import de.materna.jdec.model.ModelNotFoundException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -15,12 +16,12 @@ import java.nio.file.NoSuchFileException;
 
 @Provider
 public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
-	private static final Logger log = Logger.getLogger(GeneralExceptionMapper.class);
+	private static final Logger log = LoggerFactory.getLogger(GeneralExceptionMapper.class);
 
 	@Override
 	public Response toResponse(Exception e) {
 		e.printStackTrace();
-		log.error(e);
+		log.error(e.getMessage(), e);
 
 		//Default exceptions
 		if (e instanceof NotAllowedException)

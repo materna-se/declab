@@ -8,7 +8,8 @@ import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration;
 import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -17,7 +18,7 @@ import java.util.*;
 
 @Path("/workspaces")
 public class MetaWorkspaceServlet {
-	private static final Logger log = Logger.getLogger(MetaWorkspaceServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(MetaWorkspaceServlet.class);
 
 	@GET
 	@Produces("application/json")

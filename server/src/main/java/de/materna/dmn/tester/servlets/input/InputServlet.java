@@ -8,7 +8,8 @@ import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 @Path("/workspaces/{workspace}/inputs")
 public class InputServlet {
-	private static final Logger log = Logger.getLogger(InputServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(InputServlet.class);
 
 	@GET
 	@ReadAccess

@@ -9,12 +9,13 @@ import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.playground.beans.Playground;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.jdec.HybridDecisionSession;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class Workspace {
-	private static final Logger log = Logger.getLogger(Workspace.class);
+	private static final Logger log = LoggerFactory.getLogger(Workspace.class);
 
 	private PersistenceDirectoryManager<Challenge> challengeManager;
 	

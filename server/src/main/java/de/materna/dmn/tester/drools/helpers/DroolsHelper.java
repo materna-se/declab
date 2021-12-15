@@ -3,7 +3,8 @@ package de.materna.dmn.tester.drools.helpers;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.model.ModelImportException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.kie.dmn.api.core.DMNModel;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DroolsHelper extends de.materna.jdec.dmn.DroolsHelper {
-	private static final Logger log = Logger.getLogger(DroolsHelper.class);
+	private static final Logger log = LoggerFactory.getLogger(DroolsHelper.class);
 
 	public static String getMainModelNamespace(Workspace workspace) {
 		return workspace.getConfig().getModels().get(workspace.getConfig().getModels().size() - 1).get("namespace");

@@ -15,7 +15,8 @@ import de.materna.dmn.tester.servlets.test.beans.TestResultOutput;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -26,7 +27,7 @@ import java.util.UUID;
 
 @Path("/workspaces/{workspace}/tests")
 public class TestServlet {
-	private static final Logger log = Logger.getLogger(TestServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(TestServlet.class);
 
 	@GET
 	@ReadAccess
