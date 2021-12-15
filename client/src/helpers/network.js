@@ -118,6 +118,22 @@ export default {
 		};
 	},
 
+	async importModelsAnonymous(models) {
+		const response = await this._authorizedFetch(this._endpoint + "/model/anonymous", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(models)
+		});
+
+		const responseJSON = await response.json();
+
+		return {
+			successful: response.status === 200,
+			messages: responseJSON.results.messages,
+			importedModels: responseJSON.models
+		};
+	},
+
 	async getDecisionSession() {
 		const response = await this._authorizedFetch(this._endpoint + "/model/decision-session", {});
 		return await response.json();
@@ -196,6 +212,18 @@ export default {
 	async deleteChallenge(uuid) {
 		await this._authorizedFetch(this._endpoint + "/challenges/" + uuid, {
 			method: "DELETE"
+		});
+	},
+
+	async executeModelChallengeList(models, decisionService, inputs) {
+		return await this._authorizedFetch(this._endpoint + "/challenges/execute_dmn_list", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				models: models,
+				decisionService: decisionService,
+				inputs: inputs
+			})
 		});
 	},
 
