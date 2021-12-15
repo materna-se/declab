@@ -16,7 +16,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.User;
-import de.materna.dmn.tester.beans.repositories.filter.FilterUser;
+import de.materna.dmn.tester.beans.repositories.filter.UserFilter;
 
 @ApplicationScoped
 public class UserRepository {
@@ -32,13 +32,13 @@ public class UserRepository {
 		return Optional.ofNullable(user);
 	}
 
-	public List<User> findByFilter(FilterUser... filterArray) {
+	public List<User> findByFilter(UserFilter... filterArray) {
 		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
 		CriteriaQuery<User> cquery = cbuilder.createQuery(User.class);
 		Root<User> userRoot = cquery.from(User.class);
 		cquery.select(userRoot);
 		List<Predicate> predicates = new ArrayList<>();
-		for (FilterUser filter : filterArray) {
+		for (UserFilter filter : filterArray) {
 			predicates.add(filter.toPredicate(userRoot, cquery, cbuilder));
 		}
 		cquery.where(predicates.toArray(new Predicate[predicates.size()]));
