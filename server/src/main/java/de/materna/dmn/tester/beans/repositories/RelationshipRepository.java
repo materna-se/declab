@@ -16,7 +16,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.Relationship;
-import de.materna.dmn.tester.beans.repositories.filter.FilterRelationship;
+import de.materna.dmn.tester.beans.repositories.filter.RelationshipFilter;
 
 @ApplicationScoped
 public class RelationshipRepository {
@@ -32,13 +32,13 @@ public class RelationshipRepository {
 		return Optional.ofNullable(relationship);
 	}
 
-	public List<Relationship> findByFilter(FilterRelationship... filterArray) {
+	public List<Relationship> findByFilter(RelationshipFilter... filterArray) {
 		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
 		CriteriaQuery<Relationship> cquery = cbuilder.createQuery(Relationship.class);
 		Root<Relationship> relationshipRoot = cquery.from(Relationship.class);
 		cquery.select(relationshipRoot);
 		List<Predicate> predicates = new ArrayList<>();
-		for (FilterRelationship filter : filterArray) {
+		for (RelationshipFilter filter : filterArray) {
 			predicates.add(filter.toPredicate(relationshipRoot, cquery, cbuilder));
 		}
 		cquery.where(predicates.toArray(new Predicate[predicates.size()]));
