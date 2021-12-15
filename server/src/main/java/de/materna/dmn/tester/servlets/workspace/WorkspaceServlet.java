@@ -1,22 +1,5 @@
 package de.materna.dmn.tester.servlets.workspace;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import de.materna.dmn.tester.helpers.HashingHelper;
-import de.materna.dmn.tester.persistence.WorkspaceManager;
-import de.materna.dmn.tester.servlets.filters.ReadAccess;
-import de.materna.dmn.tester.servlets.filters.WriteAccess;
-import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
-import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
-import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
-import de.materna.jdec.serialization.SerializationHelper;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +13,34 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import de.materna.dmn.tester.helpers.HashingHelper;
+import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.dmn.tester.servlets.filters.ReadAccess;
+import de.materna.dmn.tester.servlets.filters.WriteAccess;
+import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
+import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.jdec.serialization.SerializationHelper;
+
 @Path("/workspaces/{workspace}")
 public class WorkspaceServlet {
 	private static final Logger log = Logger.getLogger(WorkspaceServlet.class);
@@ -37,7 +48,8 @@ public class WorkspaceServlet {
 	@GET
 	@Path("/public")
 	@Produces("application/json")
-	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
+	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID)
+			throws RuntimeException, IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		Configuration configuration = workspace.getConfig();
 
@@ -48,7 +60,8 @@ public class WorkspaceServlet {
 	@WriteAccess
 	@Path("/config")
 	@Produces("application/json")
-	public Response getWorkspaceConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
+	public Response getWorkspaceConfig(@PathParam("workspace") String workspaceUUID)
+			throws RuntimeException, IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		Configuration configuration = workspace.getConfig();
 
@@ -59,9 +72,11 @@ public class WorkspaceServlet {
 	@WriteAccess
 	@Path("/config")
 	@Consumes("application/json")
-	public Response editWorkspaceConfig(@PathParam("workspace") String workspaceUUID, String body) throws RuntimeException, IOException {
-		HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, String>>() {
-		});
+	public Response editWorkspaceConfig(@PathParam("workspace") String workspaceUUID, String body)
+			throws RuntimeException, IOException {
+		HashMap<String, String> params = SerializationHelper.getInstance().toClass(body,
+				new TypeReference<HashMap<String, String>>() {
+				});
 
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		Configuration configuration = workspace.getConfig();
@@ -131,7 +146,8 @@ public class WorkspaceServlet {
 	@WriteAccess
 	@Path("/log")
 	@Produces("application/json")
-	public Response getWorkspaceAccessLog(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
+	public Response getWorkspaceAccessLog(@PathParam("workspace") String workspaceUUID)
+			throws RuntimeException, IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 		workspace.getAccessLog().writeMessage("Accessed log", System.currentTimeMillis());
@@ -160,57 +176,68 @@ public class WorkspaceServlet {
 			try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
 				Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).filter(path -> !Files.isDirectory(path)).forEach(path -> {
-					try {
-						if (path.endsWith("access.log")) {
-							return;
-						}
+				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString()))
+						.filter(path -> !Files.isDirectory(path)).forEach(path -> {
+							try {
+								if (path.endsWith("access.log")) {
+									return;
+								}
 
-						if (path.endsWith("configuration.json")) {
-							Configuration clonedConfiguration = (Configuration) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(workspace.getConfig()), Configuration.class);
-							// Trim cloned configuration.
-							clonedConfiguration.setAccess(Access.PUBLIC);
-							clonedConfiguration.setToken(null);
-							clonedConfiguration.setSalt(null);
-							clonedConfiguration.setCreatedDate(0L);
-							clonedConfiguration.setModifiedDate(0L);
+								if (path.endsWith("configuration.json")) {
+									Configuration clonedConfiguration = (Configuration) SerializationHelper
+											.getInstance()
+											.toClass(SerializationHelper.getInstance().toJSON(workspace.getConfig()),
+													Configuration.class);
+									// Trim cloned configuration.
+									clonedConfiguration.setAccess(Access.PUBLIC);
+									clonedConfiguration.setToken(null);
+									clonedConfiguration.setSalt(null);
+									clonedConfiguration.setCreatedDate(0L);
+									clonedConfiguration.setModifiedDate(0L);
 
-							// Write trimmed copy of configuration
-							zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
-							zipOutputStream.write(SerializationHelper.getInstance().toJSON(clonedConfiguration).getBytes(StandardCharsets.UTF_8));
-							zipOutputStream.closeEntry();
-							return;
-						}
+									// Write trimmed copy of configuration
+									zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
+									zipOutputStream.write(SerializationHelper.getInstance().toJSON(clonedConfiguration)
+											.getBytes(StandardCharsets.UTF_8));
+									zipOutputStream.closeEntry();
+									return;
+								}
 
-						zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
-						zipOutputStream.write(Files.readAllBytes(path));
-						zipOutputStream.closeEntry();
-					}
-					catch (Exception e) {
-						log.error(e);
-					}
-				});
+								zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
+								zipOutputStream.write(Files.readAllBytes(path));
+								zipOutputStream.closeEntry();
+							} catch (Exception e) {
+								log.error(e);
+							}
+						});
 			}
 		};
 
-		return Response.status(Response.Status.OK).header("Content-Disposition", "attachment; filename=\"" + workspaceUUID + ".dtar\"").entity(streamingOutput).build();
+		return Response.status(Response.Status.OK)
+				.header("Content-Disposition", "attachment; filename=\"" + workspaceUUID + ".dtar\"")
+				.entity(streamingOutput).build();
 	}
 
 	@PUT
 	@WriteAccess
 	@Path("/backup")
 	@Consumes("multipart/form-data")
-	public Response importWorkspace(@PathParam("workspace") String workspaceUUID, MultipartFormDataInput multipartFormDataInput) throws Exception {
+	public Response importWorkspace(@PathParam("workspace") String workspaceUUID,
+			MultipartFormDataInput multipartFormDataInput) throws Exception {
 		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
 		Workspace workspace = workspaceManager.get(workspaceUUID);
 
 		java.nio.file.Path rootPath = workspace.getTestManager().getDirectory().getParent();
 
-		// Recursively delete all files in workspace folder except for the configuration file and the access log.
-		Files.walk(Paths.get(rootPath.toString())).sorted(Comparator.reverseOrder()).filter(path -> !path.endsWith("configuration.json") && !path.endsWith("access.log")).map(java.nio.file.Path::toFile).forEach(File::delete);
+		// Recursively delete all files in workspace folder except for the configuration
+		// file and the access log.
+		Files.walk(Paths.get(rootPath.toString())).sorted(Comparator.reverseOrder())
+				.filter(path -> !path.endsWith("configuration.json") && !path.endsWith("access.log"))
+				.map(java.nio.file.Path::toFile).forEach(File::delete);
 
 		// Iterate over all entries in the .zip archive and add them to the workspace.
-		try (InputStream inputStream = multipartFormDataInput.getFormDataMap().get("backup").get(0).getBody(InputStream.class, null)) {
+		try (InputStream inputStream = multipartFormDataInput.getFormDataMap().get("backup").get(0)
+				.getBody(InputStream.class, null)) {
 			try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
 				while (true) {
 					ZipEntry zipEntry = zipInputStream.getNextEntry();
@@ -224,7 +251,9 @@ public class WorkspaceServlet {
 
 					if (zipEntry.getName().endsWith("configuration.json")) {
 						Configuration currentConfiguration = workspace.getConfig();
-						Configuration importConfiguration = (Configuration) SerializationHelper.getInstance().toClass(new String(IOUtils.toByteArray(zipInputStream), StandardCharsets.UTF_8), Configuration.class);
+						Configuration importConfiguration = (Configuration) SerializationHelper.getInstance().toClass(
+								new String(IOUtils.toByteArray(zipInputStream), StandardCharsets.UTF_8),
+								Configuration.class);
 						// Model import order needs to be merged with the current configuration.
 						if (importConfiguration.getVersion() == 2) {
 							currentConfiguration.setModels(importConfiguration.getModels());
@@ -236,8 +265,7 @@ public class WorkspaceServlet {
 
 					Files.write(entityPath, IOUtils.toByteArray(zipInputStream));
 				}
-			}
-			catch (JsonMappingException e) {
+			} catch (JsonMappingException e) {
 				return Response.status(Response.Status.BAD_REQUEST).build();
 			}
 		}
