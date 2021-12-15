@@ -7,6 +7,6 @@ import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.Relationship;
 
-public interface FilterRelationship {
+public interface RelationshipFilter {
 	public Predicate toPredicate(Root<Relationship> root, CriteriaQuery<Relationship> cq, CriteriaBuilder cb);
 }
