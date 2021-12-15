@@ -7,6 +7,6 @@ import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.User;
 
-public interface FilterUser {
+public interface UserFilter {
 	public Predicate toPredicate(Root<User> root, CriteriaQuery<User> cq, CriteriaBuilder cb);
 }
