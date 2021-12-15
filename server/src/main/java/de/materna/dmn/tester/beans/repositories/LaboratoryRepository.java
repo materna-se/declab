@@ -25,14 +25,14 @@ public class LaboratoryRepository {
 	private EntityManager em = entityManagerFactory.createEntityManager();
 	private EntityTransaction transaction = em.getTransaction();
 
-	public Optional<Laboratory> findByUuid(String uuid) {
+	public Laboratory loadByUuid(String uuid) {
 		transaction.begin();
 		Laboratory Laboratory = em.find(Laboratory.class, uuid);
 		transaction.commit();
-		return Optional.ofNullable(Laboratory);
+		return Optional.ofNullable(Laboratory).get();
 	}
 
-	public List<Laboratory> findByFilter(LaboratoryFilter... filterArray) {
+	public List<Laboratory> loadByFilter(LaboratoryFilter... filterArray) {
 		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
 		CriteriaQuery<Laboratory> cquery = cbuilder.createQuery(Laboratory.class);
 		Root<Laboratory> LaboratoryRoot = cquery.from(Laboratory.class);
@@ -49,7 +49,6 @@ public class LaboratoryRepository {
 
 	public void save(Laboratory laboratory) {
 		transaction.begin();
-
 		em.persist(laboratory);
 		transaction.commit();
 	}

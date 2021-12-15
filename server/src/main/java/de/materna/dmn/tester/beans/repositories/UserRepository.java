@@ -25,14 +25,14 @@ public class UserRepository {
 	private EntityManager em = entityManagerFactory.createEntityManager();
 	private EntityTransaction transaction = em.getTransaction();
 
-	public Optional<User> findByUuid(String uuid) {
+	public User loadByUuid(String uuid) {
 		transaction.begin();
 		User user = em.find(User.class, uuid);
 		transaction.commit();
-		return Optional.ofNullable(user);
+		return Optional.ofNullable(user).get();
 	}
 
-	public List<User> findByFilter(UserFilter... filterArray) {
+	public List<User> loadByFilter(UserFilter... filterArray) {
 		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
 		CriteriaQuery<User> cquery = cbuilder.createQuery(User.class);
 		Root<User> userRoot = cquery.from(User.class);
@@ -49,7 +49,6 @@ public class UserRepository {
 
 	public void save(User user) {
 		transaction.begin();
-
 		em.persist(user);
 		transaction.commit();
 	}

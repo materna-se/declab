@@ -25,14 +25,14 @@ public class WorkspaceRepository {
 	private EntityManager em = entityManagerFactory.createEntityManager();
 	private EntityTransaction transaction = em.getTransaction();
 
-	public Optional<Workspace> findByUuid(String uuid) {
+	public Workspace loadByUuid(String uuid) {
 		transaction.begin();
 		Workspace Workspace = em.find(Workspace.class, uuid);
 		transaction.commit();
-		return Optional.ofNullable(Workspace);
+		return Optional.ofNullable(Workspace).get();
 	}
 
-	public List<Workspace> findByFilter(WorkspaceFilter... filterArray) {
+	public List<Workspace> loadByFilter(WorkspaceFilter... filterArray) {
 		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
 		CriteriaQuery<Workspace> cquery = cbuilder.createQuery(Workspace.class);
 		Root<Workspace> WorkspaceRoot = cquery.from(Workspace.class);
@@ -49,7 +49,6 @@ public class WorkspaceRepository {
 
 	public void save(Workspace workspace) {
 		transaction.begin();
-
 		em.persist(workspace);
 		transaction.commit();
 	}
