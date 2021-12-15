@@ -1,14 +1,15 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import de.materna.dmn.tester.persistence.PersistenceFileManager;
-import de.materna.jdec.serialization.SerializationHelper;
-
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import de.materna.dmn.tester.persistence.PersistenceFileManager;
+import de.materna.jdec.serialization.SerializationHelper;
 
 public class Configuration extends PublicConfiguration {
 	private PersistenceFileManager fileManager;
@@ -103,16 +104,16 @@ public class Configuration extends PublicConfiguration {
 
 	@Override
 	public void fromJSON(String body) {
-		Configuration temp = (Configuration) SerializationHelper.getInstance().toClass(body, Configuration.class);
-		this.version = temp.getVersion();
-		this.name = temp.getName();
-		this.description = temp.getDescription();
-		this.createdDate = temp.getCreatedDate();
-		this.modifiedDate = temp.getModifiedDate();
-		this.access = temp.getAccess();
-		this.token = temp.getToken();
-		this.salt = temp.getSalt();
-		this.models = temp.getModels();
+		Configuration config = (Configuration) SerializationHelper.getInstance().toClass(body, Configuration.class);
+		this.version = config.getVersion();
+		this.name = config.getName();
+		this.description = config.getDescription();
+		this.createdDate = config.getCreatedDate();
+		this.modifiedDate = config.getModifiedDate();
+		this.access = config.getAccess();
+		this.token = config.getToken();
+		this.salt = config.getSalt();
+		this.models = config.getModels();
 	}
 
 	public static class DecisionService {
