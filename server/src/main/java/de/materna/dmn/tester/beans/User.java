@@ -1,5 +1,6 @@
 package de.materna.dmn.tester.beans;
 
+import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -32,6 +33,8 @@ public class User {
 	private String password;
 	@Column(name = "IMAGEID")
 	private String imageId;
+	@Column(name = "REGISTRATIONDATE", nullable = false)
+	private Date registrationDate;
 
 	public User(String email, String username, String firstName, String lastName, String password, String imageId) {
 		this.uuid = UUID.randomUUID().toString();
@@ -41,6 +44,7 @@ public class User {
 		this.lastName = lastName;
 		this.password = password;
 		this.imageId = imageId;
+		this.registrationDate = new Date();
 	}
 
 	public String getUuid() {
@@ -90,4 +94,9 @@ public class User {
 	public void setImageId(String imageId) {
 		this.imageId = imageId;
 	}
+
+	public Date getRegistrationDate() {
+		return registrationDate;
+	}
+
 }
