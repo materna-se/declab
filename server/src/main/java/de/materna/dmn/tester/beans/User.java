@@ -1,6 +1,6 @@
 package de.materna.dmn.tester.beans;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -12,39 +12,39 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
 @Entity
-@Table(name = "USERS", uniqueConstraints = { @UniqueConstraint(columnNames = { "UUID", "EMAIL" }), })
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = { "uuid" }))
 public class User {
 	@Id
-	@Column(name = "UUID", unique = true, nullable = false)
+	@Column(name = "uuid", unique = true, nullable = false)
 	private String uuid;
-	@Column(name = "EMAIL", unique = true, nullable = false)
+	@Column(name = "email", unique = true, nullable = false)
 	@Email(message = "Email address must be valid")
 	@NotEmpty(message = "E-Mail cannot be empty")
 	private String email;
-	@Column(name = "USERNAME", nullable = false)
+	@Column(name = "userName", nullable = false)
 	@NotEmpty(message = "Username cannot be empty")
-	private String username;
-	@Column(name = "FIRSTNAME")
+	private String userName;
+	@Column(name = "firstName")
 	private String firstName;
-	@Column(name = "LASTNAME")
+	@Column(name = "lastName")
 	private String lastName;
-	@Column(name = "PASSWORD", nullable = false)
+	@Column(name = "password", nullable = false)
 	@NotEmpty(message = "Password cannot be empty")
 	private String password;
-	@Column(name = "IMAGEID")
+	@Column(name = "imageId")
 	private String imageId;
-	@Column(name = "REGISTRATIONDATE", nullable = false)
-	private Date registrationDate;
+	@Column(name = "registrationDateTime")
+	private LocalDateTime registrationDateTime;
 
-	public User(String email, String username, String firstName, String lastName, String password, String imageId) {
+	public User(String email, String userName, String firstName, String lastName, String password, String imageId) {
 		this.uuid = UUID.randomUUID().toString();
+		this.registrationDateTime = LocalDateTime.now();
 		this.email = email;
-		this.username = username;
+		this.userName = userName;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.password = password;
 		this.imageId = imageId;
-		this.registrationDate = new Date();
 	}
 
 	public String getUuid() {
@@ -55,12 +55,20 @@ public class User {
 		return email;
 	}
 
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
 	public String getUsername() {
-		return username;
+		return userName;
 	}
 
 	public void setUsername(String username) {
-		this.username = username;
+		this.userName = username;
 	}
 
 	public String getFirstName() {
@@ -95,8 +103,7 @@ public class User {
 		this.imageId = imageId;
 	}
 
-	public Date getRegistrationDate() {
-		return registrationDate;
+	public LocalDateTime getRegistrationDateTime() {
+		return registrationDateTime;
 	}
-
 }

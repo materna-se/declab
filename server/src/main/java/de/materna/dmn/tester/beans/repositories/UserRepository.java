@@ -14,9 +14,11 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.xml.registry.JAXRException;
 
 import de.materna.dmn.tester.beans.User;
 import de.materna.dmn.tester.beans.repositories.filter.UserFilter;
+import de.materna.dmn.tester.beans.repositories.filter.userfilter.EmailFilter;
 
 @ApplicationScoped
 public class UserRepository {
@@ -25,14 +27,22 @@ public class UserRepository {
 	private EntityManager em = entityManagerFactory.createEntityManager();
 	private EntityTransaction transaction = em.getTransaction();
 
-	public User loadByUuid(String uuid) {
+	public User findByUuid(String uuid) {
 		transaction.begin();
 		User user = em.find(User.class, uuid);
 		transaction.commit();
 		return Optional.ofNullable(user).get();
 	}
 
-	public List<User> loadByFilter(UserFilter... filterArray) {
+	public User findByEmail(String email) throws JAXRException {
+		List<User> usersFound = findByFilter(new EmailFilter(email));
+		if (usersFound.size() == 1) {
+			return usersFound.get(0);
+		}
+		return null;
+	}
+
+	public List<User> findByFilter(UserFilter... filterArray) {
 		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
 		CriteriaQuery<User> cquery = cbuilder.createQuery(User.class);
 		Root<User> userRoot = cquery.from(User.class);
@@ -47,10 +57,20 @@ public class UserRepository {
 		return query.getResultList();
 	}
 
-	public void save(User user) {
+	public boolean save(User user) {
 		transaction.begin();
 		em.persist(user);
 		transaction.commit();
+		return findByUuid(user.getUuid()) != null;
+	}
+
+	public boolean save(String email, String userName, String firstName, String lastName, String password,
+			String imageId) throws JAXRException {
+		if (findByEmail(email) == null) {
+			User user = new User(email, userName, firstName, lastName, password, imageId);
+			return save(user);
+		}
+		return false;
 	}
 
 	public void delete(User user) {

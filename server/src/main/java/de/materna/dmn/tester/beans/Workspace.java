@@ -12,15 +12,15 @@ import javax.validation.constraints.NotEmpty;
 import de.materna.dmn.tester.enums.VisabilityType;
 
 @Entity
-@Table(name = "WORKSPACE", uniqueConstraints = { @UniqueConstraint(columnNames = { "UUID" }), })
+@Table(name = "workspace", uniqueConstraints = @UniqueConstraint(columnNames = { "uuid" }))
 public class Workspace {
 	@Id
-	@Column(name = "UUID", unique = true, nullable = false)
+	@Column(name = "uuid", unique = true, nullable = false)
 	private String uuid;
-	@Column(name = "NAME")
+	@Column(name = "name")
 	@NotEmpty(message = "The name of the Workspace cannot be empty")
 	private String name;
-	@Column(name = "VISABILITY")
+	@Column(name = "visability")
 	private VisabilityType visability;
 
 	public Workspace() {

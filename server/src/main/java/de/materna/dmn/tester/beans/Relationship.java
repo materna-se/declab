@@ -10,18 +10,18 @@ import javax.persistence.Table;
 import de.materna.dmn.tester.enums.RelationshipType;
 
 @Entity
-@Table(name = "RELATIONSHIP")
+@Table(name = "relationship")
 public class Relationship {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(name = "USER")
+	@Column(name = "user")
 	private String user;
-	@Column(name = "LABORATORY")
+	@Column(name = "laboratory")
 	private String laboratory;
-	@Column(name = "WORKPLACE")
+	@Column(name = "workspace")
 	private String workplace;
-	@Column(name = "TYPE")
+	@Column(name = "type")
 	private RelationshipType type;
 
 	public Relationship() {
