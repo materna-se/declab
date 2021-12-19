@@ -16,7 +16,6 @@ import java.util.UUID;
 import javax.ws.rs.NotFoundException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.kie.dmn.api.core.DMNModel;
 
 import de.materna.dmn.tester.helpers.HashingHelper;
@@ -27,7 +26,6 @@ import de.materna.jdec.DMNDecisionSession;
 import de.materna.jdec.serialization.SerializationHelper;
 
 public class WorkspaceManager {
-	private static final Logger log = LoggerFactory.getLogger(WorkspaceManager.class);
 	private static WorkspaceManager instance;
 
 	private Map<String, Workspace> workspaces = new HashMap<>();
@@ -65,7 +63,7 @@ public class WorkspaceManager {
 			try {
 				index(subdir.getName());
 			} catch (Exception e) {
-				log.error("Could not index workspace " + subdir.getName(), e);
+				System.err.println("Could not index workspace " + subdir.getName() + " " + e);
 			}
 		}
 	}
@@ -74,7 +72,7 @@ public class WorkspaceManager {
 		// Upgrade path from version 0 to 1
 		PersistenceFileManager configManager = new PersistenceFileManager(workspaceUUID, "configuration.json");
 		if (!configManager.fileExists()) {
-			log.info("Workspace " + workspaceUUID + " needs to be upgraded from version 0 to 1.");
+			System.out.println("Workspace " + workspaceUUID + " needs to be upgraded from version 0 to 1.");
 
 			String generatedUUID = UUID.randomUUID().toString();
 			Files.move(configManager.getPath().getParent(),
@@ -98,7 +96,7 @@ public class WorkspaceManager {
 				Configuration.class);
 		// Upgrade path from version 1 to 2
 		if (configuration.getVersion() == 1) {
-			log.info("Workspace " + workspaceUUID + " needs to be upgraded from version 1 to 2.");
+			System.out.println("Workspace " + workspaceUUID + " needs to be upgraded from version 1 to 2.");
 
 			// Check if the workspace has any models. If it does, we will move it to the new
 			// models directory.

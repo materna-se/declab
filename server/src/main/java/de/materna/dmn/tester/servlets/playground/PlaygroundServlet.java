@@ -17,8 +17,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
-
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
@@ -29,7 +27,6 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/workspaces/{workspace}/playgrounds")
 public class PlaygroundServlet {
-	private static final Logger log = LoggerFactory.getLogger(PlaygroundServlet.class);
 
 	@GET
 	@ReadAccess

@@ -10,12 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
-
 import de.materna.jdec.serialization.SerializationHelper;
 
 public class PersistenceDirectoryManager<T> {
-	private static final Logger log = LoggerFactory.getLogger(PersistenceDirectoryManager.class);
 
 	private Path directory;
 	private Class<T> entityClass;
@@ -42,7 +39,7 @@ public class PersistenceDirectoryManager<T> {
 					try {
 						files.put(key, getFile(key));
 					} catch (IOException e) {
-						log.error(path.getFileName() + " cannot be read: ", e);
+						System.err.println(path.getFileName() + " cannot be read: " + e);
 					}
 				});
 			}
@@ -51,6 +48,7 @@ public class PersistenceDirectoryManager<T> {
 		return files;
 	}
 
+	@SuppressWarnings("unchecked")
 	public T getFile(String key) throws IOException {
 		String content = new String(Files.readAllBytes(Paths.get(directory.toString(), key + "." + extension)),
 				StandardCharsets.UTF_8);
@@ -90,7 +88,7 @@ public class PersistenceDirectoryManager<T> {
 						// We need to remove the file extension.
 						removeFile(path.getFileName().toString().split("\\.")[0]);
 					} catch (IOException e) {
-						log.error(path.getFileName() + " cannot be deleted: ", e);
+						System.out.println(path.getFileName() + " cannot be deleted: " + e);
 					}
 				});
 			}

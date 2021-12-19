@@ -1,6 +1,7 @@
 package de.materna.dmn.tester.servlets.model;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,7 +19,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
 import org.kie.dmn.api.core.DMNModel;
 import org.kie.dmn.api.core.ast.DecisionNode;
 
@@ -46,8 +46,6 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/workspaces/{workspace}/model")
 public class ModelServlet {
-	private static final Logger log = LoggerFactory.getLogger(ModelServlet.class);
-
 	@GET
 	@ReadAccess
 	@Produces("application/json")
@@ -183,7 +181,6 @@ public class ModelServlet {
 		Configuration configuration = workspace.getConfig();
 		DMNModel mainModel = DroolsHelper.getMainModel(workspace);
 
-
 		Map<String, Object> context = new HashMap<>();
 		if (configuration.getDecisionService() == null) {
 			context.put("inputs", workspace.getDecisionSession().getInputStructure(mainModel.getNamespace()));
@@ -193,9 +190,9 @@ public class ModelServlet {
 				decisions.put(decision.getName(), new InputStructure(decision.getResultType().getName()));
 			}
 			context.put("decisions", decisions);
-		}
-		else {
-			context.put("inputs", workspace.getDecisionSession().getDMNDecisionSession().getInputStructure(mainModel.getNamespace(), configuration.getDecisionService().getName()));
+		} else {
+			context.put("inputs", workspace.getDecisionSession().getDMNDecisionSession()
+					.getInputStructure(mainModel.getNamespace(), configuration.getDecisionService().getName()));
 			context.put("decisions", Collections.emptyMap());
 		}
 
@@ -269,9 +266,11 @@ public class ModelServlet {
 	@Path("/model/anonymous")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public Response importModelsAnonymous(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
-		List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<LinkedList<Map<String, String>>>() {
-		});
+	public Response importModelsAnonymous(@PathParam("workspace") String workspaceUUID, String body)
+			throws IOException {
+		List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body,
+				new TypeReference<LinkedList<Map<String, String>>>() {
+				});
 
 		DMNDecisionSession ds = new DMNDecisionSession();
 
@@ -281,7 +280,8 @@ public class ModelServlet {
 			List<Map<String, String>> importedModels = new LinkedList<>();
 			// Import the provided models, collect all import messages.
 			for (Map<String, String> model : models) {
-				importResult.getMessages().addAll(ds.importModel(model.get("namespace"), model.get("source")).getMessages());
+				importResult.getMessages()
+						.addAll(ds.importModel(model.get("namespace"), model.get("source")).getMessages());
 				importedModels.add(model);
 			}
 
@@ -290,15 +290,16 @@ public class ModelServlet {
 			responseMap.put("results", importResult);
 			responseMap.put("models", ds.getModels());
 
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(responseMap)).build();
-		}
-		catch (ModelImportException exception) {
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(responseMap))
+					.build();
+		} catch (ModelImportException exception) {
 			HashMap<String, Object> responseMap = new HashMap<String, Object>();
 
 			responseMap.put("results", exception.getResult());
 			responseMap.put("models", new ArrayList<Model>());
 
-			return Response.status(Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(responseMap)).build();
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(SerializationHelper.getInstance().toJSON(responseMap)).build();
 		}
 	}
 }

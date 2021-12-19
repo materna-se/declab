@@ -12,20 +12,16 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.core.JsonParseException;
 
 import de.materna.jdec.model.ModelNotFoundException;
 
 @Provider
 public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
-	private static final Logger log = LoggerFactory.getLogger(GeneralExceptionMapper.class);
-
 	@Override
 	public Response toResponse(Exception e) {
 		e.printStackTrace();
-		log.error(e.getMessage(), e);
+		System.err.println(e.getMessage() + " " + e);
 
 		// Default exceptions
 		if (e instanceof NotAllowedException)

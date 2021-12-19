@@ -1,6 +1,7 @@
 package de.materna.dmn.tester.servlets.challenges;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -72,8 +73,10 @@ public class ChallengeServlet {
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(challenge)).build();
 	}
 
-	private Challenge calculateChallengeScenarios(Challenge challenge) throws ModelNotFoundException, ModelImportException {
-		// This method is used to calculate the scenario outputs of a challenge from its inputs and its solution
+	private Challenge calculateChallengeScenarios(Challenge challenge)
+			throws ModelNotFoundException, ModelImportException {
+		// This method is used to calculate the scenario outputs of a challenge from its
+		// inputs and its solution
 		ArrayList<Scenario> scenarios = (ArrayList<Scenario>) challenge.getScenarios();
 
 		ChallengeType challengeType = challenge.getType();
@@ -84,20 +87,19 @@ public class ChallengeServlet {
 
 			scenarios = ChallengeExecutionHelper.calculateFEELExpression(feelExpression, scenarios);
 			challenge.setScenarios(scenarios);
-		}
-		else if (challengeType.equals(ChallengeType.DMN_MODEL)) {
+		} else if (challengeType.equals(ChallengeType.DMN_MODEL)) {
 			// Need to re-parse to avoid ClassCastException
-			DMNSolution solution = (DMNSolution) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(challenge.getSolution()), DMNSolution.class);
+			DMNSolution solution = (DMNSolution) SerializationHelper.getInstance()
+					.toClass(SerializationHelper.getInstance().toJSON(challenge.getSolution()), DMNSolution.class);
 
 			ArrayList<ModelMap> modelMaps = solution.getModels();
 
-			DecisionService decisionService = (DecisionService) solution.getDecisionService();
+			DecisionService decisionService = solution.getDecisionService();
 
 			// Use decision service if available
 			if (decisionService != null) {
 				scenarios = ChallengeExecutionHelper.calculateModels(modelMaps, scenarios, decisionService);
-			}
-			else {
+			} else {
 				scenarios = ChallengeExecutionHelper.calculateModels(modelMaps, scenarios);
 			}
 
@@ -125,8 +127,7 @@ public class ChallengeServlet {
 			workspace.getAccessLog().writeMessage("Created challenge" + uuid, System.currentTimeMillis());
 
 			return Response.status(Response.Status.CREATED).entity(uuid).build();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}

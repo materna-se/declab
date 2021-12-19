@@ -16,8 +16,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import de.materna.dmn.tester.helpers.HashingHelper;
@@ -30,7 +28,6 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/workspaces")
 public class MetaWorkspaceServlet {
-	private static final Logger log = LoggerFactory.getLogger(MetaWorkspaceServlet.class);
 
 	@GET
 	@Produces("application/json")

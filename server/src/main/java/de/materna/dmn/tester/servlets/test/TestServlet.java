@@ -18,8 +18,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.materna.dmn.tester.drools.helpers.DroolsHelper;
@@ -39,7 +37,6 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/workspaces/{workspace}/tests")
 public class TestServlet {
-	private static final Logger log = LoggerFactory.getLogger(TestServlet.class);
 
 	@GET
 	@ReadAccess

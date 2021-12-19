@@ -1,7 +1,5 @@
 package de.materna.dmn.tester.servlets.test.beans;
 
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,7 +9,6 @@ import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
 
 public class TestResultOutput extends Serializable {
-	private static final Logger log = LoggerFactory.getLogger(TestResultOutput.class);
 
 	private String uuid;
 	private String name;

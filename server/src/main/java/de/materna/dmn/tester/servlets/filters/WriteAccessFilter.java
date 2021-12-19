@@ -9,8 +9,6 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.log4j.Logger;
-
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.helpers.AccessFilterHelper;
 import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
@@ -20,7 +18,6 @@ import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class WriteAccessFilter implements ContainerRequestFilter {
-	private static final Logger log = LoggerFactory.getLogger(WriteAccessFilter.class);
 	private static WorkspaceManager workspaceManager;
 
 	public WriteAccessFilter() throws IOException {
