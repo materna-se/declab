@@ -9,6 +9,7 @@ import javax.ws.rs.core.Application;
 
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.challenges.ChallengeServlet;
+import de.materna.dmn.tester.servlets.challenges.ModelChallengeServlet;
 import de.materna.dmn.tester.servlets.exceptions.DefaultOptionsMethodExceptionMapper;
 import de.materna.dmn.tester.servlets.exceptions.GeneralExceptionMapper;
 import de.materna.dmn.tester.servlets.filters.CSRFFilter;
@@ -33,6 +34,7 @@ public class MainApplication extends Application {
 
 		singletons.add(new ModelServlet());
 		singletons.add(new ChallengeServlet());
+		singletons.add(new ModelChallengeServlet());
 		singletons.add(new PlaygroundServlet());
 		singletons.add(new InputServlet());
 		singletons.add(new OutputServlet());

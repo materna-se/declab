@@ -30,7 +30,7 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/workspaces/{workspace}/outputs")
 public class OutputServlet {
-	private static final Logger log = Logger.getLogger(OutputServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(OutputServlet.class);
 
 	@GET
 	@ReadAccess

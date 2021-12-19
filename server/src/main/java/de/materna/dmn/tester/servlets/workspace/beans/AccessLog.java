@@ -12,7 +12,7 @@ import de.materna.dmn.tester.persistence.PersistenceFileManager;
 import de.materna.jdec.serialization.SerializationHelper;
 
 public class AccessLog extends Serializable {
-	private static final Logger logger = Logger.getLogger(AccessLog.class);
+	private static final Logger logger = LoggerFactory.getLogger(AccessLog.class);
 
 	private final int logLength = 1000;
 	private PersistenceFileManager fileManager;

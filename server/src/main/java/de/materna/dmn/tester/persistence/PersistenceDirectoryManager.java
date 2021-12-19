@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 import de.materna.jdec.serialization.SerializationHelper;
 
 public class PersistenceDirectoryManager<T> {
-	private static final Logger log = Logger.getLogger(PersistenceDirectoryManager.class);
+	private static final Logger log = LoggerFactory.getLogger(PersistenceDirectoryManager.class);
 
 	private Path directory;
 	private Class<T> entityClass;

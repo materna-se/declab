@@ -20,7 +20,7 @@ import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class WriteAccessFilter implements ContainerRequestFilter {
-	private static final Logger log = Logger.getLogger(WriteAccessFilter.class);
+	private static final Logger log = LoggerFactory.getLogger(WriteAccessFilter.class);
 	private static WorkspaceManager workspaceManager;
 
 	public WriteAccessFilter() throws IOException {

@@ -39,7 +39,7 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/workspaces/{workspace}/tests")
 public class TestServlet {
-	private static final Logger log = Logger.getLogger(TestServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(TestServlet.class);
 
 	@GET
 	@ReadAccess

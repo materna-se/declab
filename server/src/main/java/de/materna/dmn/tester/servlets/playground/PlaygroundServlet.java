@@ -29,7 +29,7 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/workspaces/{workspace}/playgrounds")
 public class PlaygroundServlet {
-	private static final Logger log = Logger.getLogger(PlaygroundServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(PlaygroundServlet.class);
 
 	@GET
 	@ReadAccess

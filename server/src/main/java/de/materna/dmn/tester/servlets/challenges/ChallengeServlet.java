@@ -20,9 +20,17 @@ import javax.ws.rs.core.Response;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.challenges.beans.Challenge;
+import de.materna.dmn.tester.servlets.challenges.beans.Challenge.ChallengeType;
+import de.materna.dmn.tester.servlets.challenges.beans.DMNSolution;
+import de.materna.dmn.tester.servlets.challenges.beans.ModelMap;
+import de.materna.dmn.tester.servlets.challenges.beans.Scenario;
+import de.materna.dmn.tester.servlets.challenges.helpers.ChallengeExecutionHelper;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
 import de.materna.dmn.tester.servlets.filters.WriteAccess;
+import de.materna.dmn.tester.servlets.workspace.beans.Configuration.DecisionService;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.jdec.model.ModelImportException;
+import de.materna.jdec.model.ModelNotFoundException;
 import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/workspaces/{workspace}/challenges")
@@ -64,6 +72,41 @@ public class ChallengeServlet {
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(challenge)).build();
 	}
 
+	private Challenge calculateChallengeScenarios(Challenge challenge) throws ModelNotFoundException, ModelImportException {
+		// This method is used to calculate the scenario outputs of a challenge from its inputs and its solution
+		ArrayList<Scenario> scenarios = (ArrayList<Scenario>) challenge.getScenarios();
+
+		ChallengeType challengeType = challenge.getType();
+
+		// Slightly different depending on challenge type
+		if (challengeType.equals(ChallengeType.FEEL)) {
+			String feelExpression = (String) challenge.getSolution();
+
+			scenarios = ChallengeExecutionHelper.calculateFEELExpression(feelExpression, scenarios);
+			challenge.setScenarios(scenarios);
+		}
+		else if (challengeType.equals(ChallengeType.DMN_MODEL)) {
+			// Need to re-parse to avoid ClassCastException
+			DMNSolution solution = (DMNSolution) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(challenge.getSolution()), DMNSolution.class);
+
+			ArrayList<ModelMap> modelMaps = solution.getModels();
+
+			DecisionService decisionService = (DecisionService) solution.getDecisionService();
+
+			// Use decision service if available
+			if (decisionService != null) {
+				scenarios = ChallengeExecutionHelper.calculateModels(modelMaps, scenarios, decisionService);
+			}
+			else {
+				scenarios = ChallengeExecutionHelper.calculateModels(modelMaps, scenarios);
+			}
+
+			challenge.setScenarios(scenarios);
+		}
+
+		return challenge;
+	}
+
 	@POST
 	@WriteAccess
 	@Consumes("application/json")
@@ -72,13 +115,21 @@ public class ChallengeServlet {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		String uuid = UUID.randomUUID().toString();
 
-		Challenge bean = (Challenge) SerializationHelper.getInstance().toClass(body, Challenge.class);
+		try {
+			Challenge challenge = (Challenge) SerializationHelper.getInstance().toClass(body, Challenge.class);
 
-		workspace.getChallengeManager().persistFile(uuid, bean);
+			challenge = calculateChallengeScenarios(challenge);
 
-		workspace.getAccessLog().writeMessage("Created challenge" + uuid, System.currentTimeMillis());
+			workspace.getChallengeManager().persistFile(uuid, challenge);
 
-		return Response.status(Response.Status.CREATED).entity(uuid).build();
+			workspace.getAccessLog().writeMessage("Created challenge" + uuid, System.currentTimeMillis());
+
+			return Response.status(Response.Status.CREATED).entity(uuid).build();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
 	}
 
 	@PUT
@@ -96,6 +147,8 @@ public class ChallengeServlet {
 		}
 
 		Challenge challenge = (Challenge) SerializationHelper.getInstance().toClass(body, Challenge.class);
+
+		challenge = calculateChallengeScenarios(challenge);
 
 		challengeManager.persistFile(challengeUUID, challenge);
 

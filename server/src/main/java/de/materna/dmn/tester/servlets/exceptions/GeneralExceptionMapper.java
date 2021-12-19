@@ -20,11 +20,12 @@ import de.materna.jdec.model.ModelNotFoundException;
 
 @Provider
 public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
-	private static final Logger log = Logger.getLogger(GeneralExceptionMapper.class);
+	private static final Logger log = LoggerFactory.getLogger(GeneralExceptionMapper.class);
 
 	@Override
 	public Response toResponse(Exception e) {
-		log.error(e);
+		e.printStackTrace();
+		log.error(e.getMessage(), e);
 
 		// Default exceptions
 		if (e instanceof NotAllowedException)

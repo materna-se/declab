@@ -1,5 +1,23 @@
 package de.materna.dmn.tester.servlets.workspace;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import de.materna.dmn.tester.helpers.HashingHelper;
+import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.dmn.tester.servlets.filters.ReadAccess;
+import de.materna.dmn.tester.servlets.filters.WriteAccess;
+import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
+import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.jdec.serialization.SerializationHelper;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +61,7 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/workspaces/{workspace}")
 public class WorkspaceServlet {
-	private static final Logger log = Logger.getLogger(WorkspaceServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(WorkspaceServlet.class);
 
 	@GET
 	@Path("/public")
@@ -176,40 +194,36 @@ public class WorkspaceServlet {
 			try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
 				Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString()))
-						.filter(path -> !Files.isDirectory(path)).forEach(path -> {
-							try {
-								if (path.endsWith("access.log")) {
-									return;
-								}
+				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).filter(path -> !Files.isDirectory(path)).forEach(path -> {
+					try {
+						if (path.endsWith("access.log")) {
+							return;
+						}
 
-								if (path.endsWith("configuration.json")) {
-									Configuration clonedConfiguration = (Configuration) SerializationHelper
-											.getInstance()
-											.toClass(SerializationHelper.getInstance().toJSON(workspace.getConfig()),
-													Configuration.class);
-									// Trim cloned configuration.
-									clonedConfiguration.setAccess(Access.PUBLIC);
-									clonedConfiguration.setToken(null);
-									clonedConfiguration.setSalt(null);
-									clonedConfiguration.setCreatedDate(0L);
-									clonedConfiguration.setModifiedDate(0L);
+						if (path.endsWith("configuration.json")) {
+							Configuration clonedConfiguration = (Configuration) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(workspace.getConfig()), Configuration.class);
+							// Trim cloned configuration.
+							clonedConfiguration.setAccess(Access.PUBLIC);
+							clonedConfiguration.setToken(null);
+							clonedConfiguration.setSalt(null);
+							clonedConfiguration.setCreatedDate(0L);
+							clonedConfiguration.setModifiedDate(0L);
 
-									// Write trimmed copy of configuration
-									zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
-									zipOutputStream.write(SerializationHelper.getInstance().toJSON(clonedConfiguration)
-											.getBytes(StandardCharsets.UTF_8));
-									zipOutputStream.closeEntry();
-									return;
-								}
+							// Write trimmed copy of configuration
+							zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
+							zipOutputStream.write(SerializationHelper.getInstance().toJSON(clonedConfiguration).getBytes(StandardCharsets.UTF_8));
+							zipOutputStream.closeEntry();
+							return;
+						}
 
-								zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
-								zipOutputStream.write(Files.readAllBytes(path));
-								zipOutputStream.closeEntry();
-							} catch (Exception e) {
-								log.error(e);
-							}
-						});
+						zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
+						zipOutputStream.write(Files.readAllBytes(path));
+						zipOutputStream.closeEntry();
+					}
+					catch (Exception e) {
+						log.error(e.getMessage(), e);
+					}
+				});
 			}
 		};
 

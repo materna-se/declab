@@ -34,6 +34,7 @@ import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.dmn.tester.sockets.managers.SessionManager;
 import de.materna.jdec.CamundaDecisionSession;
+import de.materna.jdec.DMNDecisionSession;
 import de.materna.jdec.GoldmanDecisionSession;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.model.ImportResult;
@@ -45,7 +46,7 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/workspaces/{workspace}/model")
 public class ModelServlet {
-	private static final Logger log = Logger.getLogger(ModelServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(ModelServlet.class);
 
 	@GET
 	@ReadAccess
@@ -182,8 +183,9 @@ public class ModelServlet {
 		Configuration configuration = workspace.getConfig();
 		DMNModel mainModel = DroolsHelper.getMainModel(workspace);
 
+
+		Map<String, Object> context = new HashMap<>();
 		if (configuration.getDecisionService() == null) {
-			Map<String, Object> context = new HashMap<>();
 			context.put("inputs", workspace.getDecisionSession().getInputStructure(mainModel.getNamespace()));
 
 			Map<String, InputStructure> decisions = new HashMap<>();
@@ -191,16 +193,14 @@ public class ModelServlet {
 				decisions.put(decision.getName(), new InputStructure(decision.getResultType().getName()));
 			}
 			context.put("decisions", decisions);
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(context))
-					.build();
 		}
-		// TODO: Handling for Decision Services is missing!
+		else {
+			context.put("inputs", workspace.getDecisionSession().getDMNDecisionSession().getInputStructure(mainModel.getNamespace(), configuration.getDecisionService().getName()));
+			context.put("decisions", Collections.emptyMap());
+		}
 
 		// TODO: Throw error if a decision service is selected on a Java decision model.
-		return Response.status(Response.Status.OK)
-				.entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getDMNDecisionSession()
-						.getInputStructure(mainModel.getNamespace(), configuration.getDecisionService().getName())))
-				.build();
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(context)).build();
 	}
 
 	@POST
@@ -261,6 +261,44 @@ public class ModelServlet {
 		} catch (ModelImportException exception) {
 			return Response.status(Response.Status.BAD_REQUEST)
 					.entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
+		}
+	}
+
+	@POST
+	@ReadAccess
+	@Path("/model/anonymous")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public Response importModelsAnonymous(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+		List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<LinkedList<Map<String, String>>>() {
+		});
+
+		DMNDecisionSession ds = new DMNDecisionSession();
+
+		try {
+			ImportResult importResult = new ImportResult();
+
+			List<Map<String, String>> importedModels = new LinkedList<>();
+			// Import the provided models, collect all import messages.
+			for (Map<String, String> model : models) {
+				importResult.getMessages().addAll(ds.importModel(model.get("namespace"), model.get("source")).getMessages());
+				importedModels.add(model);
+			}
+
+			HashMap<String, Object> responseMap = new HashMap<String, Object>();
+
+			responseMap.put("results", importResult);
+			responseMap.put("models", ds.getModels());
+
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(responseMap)).build();
+		}
+		catch (ModelImportException exception) {
+			HashMap<String, Object> responseMap = new HashMap<String, Object>();
+
+			responseMap.put("results", exception.getResult());
+			responseMap.put("models", new ArrayList<Model>());
+
+			return Response.status(Response.Status.BAD_REQUEST).entity(SerializationHelper.getInstance().toJSON(responseMap)).build();
 		}
 	}
 }

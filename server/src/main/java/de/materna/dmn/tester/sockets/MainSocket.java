@@ -1,6 +1,7 @@
 package de.materna.dmn.tester.sockets;
 
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.PathParam;
@@ -24,5 +25,10 @@ public class MainSocket {
 		sessionManager.remove(workspace, session);
 		sessionManager.notify(workspace,
 				"{\"type\": \"listeners\", \"data\": " + sessionManager.listeners(workspace) + "}");
+	}
+
+	@OnError
+	public void onError(Session session, Throwable throwable) {
+		System.out.println("onError" + throwable.getMessage());
 	}
 }

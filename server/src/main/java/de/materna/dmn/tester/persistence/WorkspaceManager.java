@@ -27,7 +27,7 @@ import de.materna.jdec.DMNDecisionSession;
 import de.materna.jdec.serialization.SerializationHelper;
 
 public class WorkspaceManager {
-	private static final Logger log = Logger.getLogger(WorkspaceManager.class);
+	private static final Logger log = LoggerFactory.getLogger(WorkspaceManager.class);
 	private static WorkspaceManager instance;
 
 	private Map<String, Workspace> workspaces = new HashMap<>();

@@ -15,7 +15,7 @@ import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.jdec.HybridDecisionSession;
 
 public class Workspace {
-	private static final Logger log = Logger.getLogger(Workspace.class);
+	private static final Logger log = LoggerFactory.getLogger(Workspace.class);
 
 	private PersistenceDirectoryManager<Challenge> challengeManager;
 

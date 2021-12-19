@@ -61,16 +61,20 @@
 	import dayjs from "dayjs"
 	import dayjsRelativeTimePlugin from "dayjs/plugin/relativeTime"
 	import dayjsUpdateLocalePlugin from "dayjs/plugin/updateLocale"
+	import _ from "lodash"
 
 	dayjs.extend(dayjsRelativeTimePlugin);
-	dayjs.extend(dayjsUpdateLocalePlugin)
+	dayjs.extend(dayjsUpdateLocalePlugin);
 
 	dayjs.updateLocale('en', {
 		relativeTime: {
 			future: "in %s",
 			past: "%s ago",
 			s: function (number, withoutSuffix, key, isFuture) {
-				return number + (number === 1 ? " second" : " seconds");
+				if(number > 10) {
+					number = Math.floor(Math.round(number / 10) * 10);
+				}
+				return number + " second" + (number === 1 ? "" : "s");
 			},
 			m: "a minute",
 			mm: "%d minutes",
@@ -100,11 +104,14 @@
 				importTime: null,
 				importResult: null,
 				importResultOpened: false,
-				context: uuid()
+				context: uuid(),
+				debouncedImportModel: null
 			}
 		},
 		async mounted() {
 			const vue = this;
+
+			this.debouncedImportModel = _.debounce(this.importModel, 1000);
 
 			for (const model of await Network.getModel()) {
 				this.models.push({
@@ -135,11 +142,11 @@
 				}))
 			});
 			this.editor.subscribeToContentChanges(async (isDirty) => {
-				vue.importModel(await this.editor.getContent());
+				vue.debouncedImportModel(await this.editor.getContent());
 			});
 
 			// We will import the model once to get feedback on the health.
-			await this.importModel(model.source);
+			await this.debouncedImportModel(model.source);
 
 			setInterval(() => {
 				if (vue.importResult === null) {
@@ -147,7 +154,7 @@
 					return;
 				}
 
-				vue.importTime = dayjs.unix(vue.importResult.time).fromNow()
+				vue.importTime = dayjs.unix(vue.importResult.time).fromNow();
 			}, 1000);
 
 			Network.addSocketListener(this.onSocket);
@@ -184,7 +191,7 @@
 			getResultAlert(result) {
 				if (result.successful && result.messages.length === 0) {
 					return {
-						message: "The model doesn't contain any errors.",
+						message: "The model does not contain any errors.",
 						messages: result.messages,
 						state: "success",
 						time: dayjs().unix()
@@ -201,7 +208,7 @@
 				}
 
 				return {
-					message: "The model contains " + result.messages.length + " " + (result.messages.length === 1 ? "warning" : "warnings") + ", execution isn't possible.",
+					message: "The model contains " + result.messages.length + " " + (result.messages.length === 1 ? "warning" : "warnings") + ", execution is not possible.",
 					messages: result.messages,
 					state: "danger",
 					time: dayjs().unix()

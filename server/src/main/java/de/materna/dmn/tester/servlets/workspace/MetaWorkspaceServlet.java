@@ -30,7 +30,7 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/workspaces")
 public class MetaWorkspaceServlet {
-	private static final Logger log = Logger.getLogger(MetaWorkspaceServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(MetaWorkspaceServlet.class);
 
 	@GET
 	@Produces("application/json")
