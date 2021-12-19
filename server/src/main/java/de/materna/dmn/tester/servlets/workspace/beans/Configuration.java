@@ -1,14 +1,15 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import de.materna.dmn.tester.persistence.PersistenceFileManager;
-import de.materna.jdec.serialization.SerializationHelper;
-
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import de.materna.dmn.tester.persistence.PersistenceFileManager;
+import de.materna.jdec.serialization.SerializationHelper;
 
 public class Configuration extends PublicConfiguration {
 	private PersistenceFileManager fileManager;

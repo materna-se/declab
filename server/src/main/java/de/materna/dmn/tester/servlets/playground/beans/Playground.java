@@ -14,16 +14,16 @@ public class Playground extends Serializable {
 	public String description;
 	public String expression;
 	protected Map<String, ?> context = new LinkedHashMap<>();
-	
+
 	public Playground() {
-		
+
 	}
 
 	@JsonCreator
 	public Playground(@JsonProperty(value = "name", required = true) String name,
-					  @JsonProperty(value = "description", required = true) String description,
-					  @JsonProperty(value = "expression", required = true) String expression,
-					  @JsonProperty(value = "context", required = true) Map<String, ?> context) {
+			@JsonProperty(value = "description", required = true) String description,
+			@JsonProperty(value = "expression", required = true) String expression,
+			@JsonProperty(value = "context", required = true) Map<String, ?> context) {
 		this.name = name;
 		this.description = description;
 		this.expression = expression;
@@ -61,7 +61,8 @@ public class Playground extends Serializable {
 	public void setContext(Map<String, ?> context) {
 		this.context = context;
 	}
-	
+
+	@Override
 	public void fromJSON(String json) {
 		Playground temp = (Playground) SerializationHelper.getInstance().toClass(json, Playground.class);
 		this.name = temp.getName();

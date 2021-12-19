@@ -1,14 +1,16 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import de.materna.dmn.tester.helpers.Serializable;
-import de.materna.dmn.tester.persistence.PersistenceFileManager;
-import de.materna.jdec.serialization.SerializationHelper;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import com.fasterxml.jackson.core.type.TypeReference;
+
+import de.materna.dmn.tester.helpers.Serializable;
+import de.materna.dmn.tester.persistence.PersistenceFileManager;
+import de.materna.jdec.serialization.SerializationHelper;
 
 public class AccessLog extends Serializable {
 	private static final Logger logger = LoggerFactory.getLogger(AccessLog.class);
@@ -51,8 +53,7 @@ public class AccessLog extends Serializable {
 		// Serializing the access log is not so important, we'll catch io exceptions.
 		try {
 			fileManager.persistFile(toJSON());
-		}
-		catch (IOException exception) {
+		} catch (IOException exception) {
 			logger.error("Serialization failed: ", exception);
 		}
 	}

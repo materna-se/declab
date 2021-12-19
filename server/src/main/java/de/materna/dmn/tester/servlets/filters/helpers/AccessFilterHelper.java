@@ -1,14 +1,15 @@
 package de.materna.dmn.tester.servlets.filters.helpers;
 
-import de.materna.dmn.tester.helpers.HashingHelper;
-import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import java.net.MalformedURLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.container.ContainerRequestContext;
-import java.net.MalformedURLException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import de.materna.dmn.tester.helpers.HashingHelper;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 
 public class AccessFilterHelper {
 	private static final String AUTHENTICATION_SCHEME = "Bearer";
@@ -23,15 +24,14 @@ public class AccessFilterHelper {
 			}
 
 			return matcher.group(1);
-		}
-		catch (MalformedURLException e) {
+		} catch (MalformedURLException e) {
 			throw new BadRequestException();
 		}
 	}
 
 	/**
-	 * Checks if the Authorization header is valid.
-	 * It must not be null and must be prefixed with "Bearer ".
+	 * Checks if the Authorization header is valid. It must not be null and must be
+	 * prefixed with "Bearer ".
 	 *
 	 * @param authorizationHeader Authorization Header
 	 */

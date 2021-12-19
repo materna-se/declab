@@ -1,5 +1,26 @@
 package de.materna.dmn.tester.servlets.input;
 
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.materna.dmn.tester.helpers.MergingHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
@@ -8,15 +29,6 @@ import de.materna.dmn.tester.servlets.filters.WriteAccess;
 import de.materna.dmn.tester.servlets.input.beans.PersistedInput;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @Path("/workspaces/{workspace}/inputs")
 public class InputServlet {
@@ -25,14 +37,18 @@ public class InputServlet {
 	@GET
 	@ReadAccess
 	@Produces("application/json")
-	public Response getInputs(@PathParam("workspace") String workspaceUUID, @QueryParam("merge") boolean merge, @QueryParam("order") boolean order) throws IOException {
+	public Response getInputs(@PathParam("workspace") String workspaceUUID, @QueryParam("merge") boolean merge,
+			@QueryParam("order") boolean order) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 
-		Map<String, PersistedInput> unsortedInputs = merge ? enrichInputMap(inputManager, inputManager.getFiles()) : inputManager.getFiles();
+		Map<String, PersistedInput> unsortedInputs = merge ? enrichInputMap(inputManager, inputManager.getFiles())
+				: inputManager.getFiles();
 
 		Map<String, PersistedInput> sortedInputs = new LinkedHashMap<>();
-		unsortedInputs.entrySet().stream().sorted(Map.Entry.comparingByValue((o1, o2) -> (order ? -1 : 1) * o1.getName().compareTo(o2.getName()))).forEach(entry -> sortedInputs.put(entry.getKey(), entry.getValue()));
+		unsortedInputs.entrySet().stream()
+				.sorted(Map.Entry.comparingByValue((o1, o2) -> (order ? -1 : 1) * o1.getName().compareTo(o2.getName())))
+				.forEach(entry -> sortedInputs.put(entry.getKey(), entry.getValue()));
 
 		return Response.status(Response.Status.OK).entity(sortedInputs).build();
 	}
@@ -41,7 +57,8 @@ public class InputServlet {
 	@ReadAccess
 	@Path("/{uuid}")
 	@Produces("application/json")
-	public Response getInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID, @QueryParam("merge") boolean merge) throws IOException {
+	public Response getInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID,
+			@QueryParam("merge") boolean merge) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 
@@ -54,17 +71,20 @@ public class InputServlet {
 
 		workspace.getAccessLog().writeMessage("Accessed input " + inputUUID, System.currentTimeMillis());
 
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(enrichedInput)).build();
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(enrichedInput))
+				.build();
 	}
 
 	@POST
 	@WriteAccess
 	@Consumes("application/json")
-	public Response createInput(@PathParam("workspace") String workspaceUUID, String body) throws IOException, RuntimeException {
+	public Response createInput(@PathParam("workspace") String workspaceUUID, String body)
+			throws IOException, RuntimeException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		String uuid = UUID.randomUUID().toString();
 
-		PersistedInput persistedInput = (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class);
+		PersistedInput persistedInput = (PersistedInput) SerializationHelper.getInstance().toClass(body,
+				PersistedInput.class);
 		if (persistedInput.getName() == null) {
 			throw new BadRequestException("Input name can't be null.");
 		}
@@ -80,14 +100,16 @@ public class InputServlet {
 	@Path("/{uuid}")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public Response editInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID, String body) throws IOException {
+	public Response editInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID,
+			String body) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 		if (!inputManager.getFiles().containsKey(inputUUID)) {
 			throw new NotFoundException();
 		}
 
-		PersistedInput persistedInput = (PersistedInput) SerializationHelper.getInstance().toClass(body, PersistedInput.class);
+		PersistedInput persistedInput = (PersistedInput) SerializationHelper.getInstance().toClass(body,
+				PersistedInput.class);
 		if (persistedInput.getName() == null) {
 			throw new BadRequestException("Input name can't be null.");
 		}
@@ -104,7 +126,8 @@ public class InputServlet {
 	@DELETE
 	@WriteAccess
 	@Path("/{uuid}")
-	public Response deleteInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID) throws IOException {
+	public Response deleteInput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String inputUUID)
+			throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 
@@ -113,7 +136,8 @@ public class InputServlet {
 			throw new NotFoundException(String.format("Can't find input with uuid %s.", inputUUID));
 		}
 		if (isInputInherited(inputManager, inputUUID)) {
-			throw new BadRequestException(String.format("Input with uuid %s is inherited and can't be deleted.", inputUUID));
+			throw new BadRequestException(
+					String.format("Input with uuid %s is inherited and can't be deleted.", inputUUID));
 		}
 
 		inputManager.removeFile(inputUUID);
@@ -123,7 +147,8 @@ public class InputServlet {
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 
-	private boolean isInputInherited(PersistenceDirectoryManager<PersistedInput> inputManager, String inputUUID) throws IOException {
+	private boolean isInputInherited(PersistenceDirectoryManager<PersistedInput> inputManager, String inputUUID)
+			throws IOException {
 		for (PersistedInput input : inputManager.getFiles().values()) {
 			if (inputUUID.equals(input.getParent())) {
 				return true;
@@ -134,9 +159,11 @@ public class InputServlet {
 	}
 
 	/**
-	 * Resolves the entire inheritance of multiple inputs to return a deep merged result.
+	 * Resolves the entire inheritance of multiple inputs to return a deep merged
+	 * result.
 	 */
-	public static Map<String, PersistedInput> enrichInputMap(PersistenceDirectoryManager<PersistedInput> inputManager, Map<String, PersistedInput> input) throws IOException {
+	public static Map<String, PersistedInput> enrichInputMap(PersistenceDirectoryManager<PersistedInput> inputManager,
+			Map<String, PersistedInput> input) throws IOException {
 		Map<String, PersistedInput> enrichedInput = new LinkedHashMap<>();
 
 		for (Map.Entry<String, PersistedInput> entry : input.entrySet()) {
@@ -149,13 +176,16 @@ public class InputServlet {
 	/**
 	 * Resolves the entire inheritance of an input to return a deep merged result.
 	 */
-	public static PersistedInput enrichInput(PersistenceDirectoryManager<PersistedInput> inputManager, PersistedInput input) throws IOException {
+	@SuppressWarnings("unchecked")
+	public static PersistedInput enrichInput(PersistenceDirectoryManager<PersistedInput> inputManager,
+			PersistedInput input) throws IOException {
 		if (input.getParent() == null) {
 			return input;
 		}
 
 		PersistedInput parentInput = enrichInput(inputManager, inputManager.getFile(input.getParent()));
 
-		return new PersistedInput(input.getName(), input.getParent(), (Map<String, Object>) MergingHelper.merge(parentInput.getValue(), input.getValue()));
+		return new PersistedInput(input.getName(), input.getParent(),
+				(Map<String, Object>) MergingHelper.merge(parentInput.getValue(), input.getValue()));
 	}
 }

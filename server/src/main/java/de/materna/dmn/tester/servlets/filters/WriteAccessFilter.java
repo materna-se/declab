@@ -1,11 +1,6 @@
 package de.materna.dmn.tester.servlets.filters;
 
-import de.materna.dmn.tester.persistence.WorkspaceManager;
-import de.materna.dmn.tester.servlets.filters.helpers.AccessFilterHelper;
-import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
-import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -13,7 +8,14 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.dmn.tester.servlets.filters.helpers.AccessFilterHelper;
+import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 
 @WriteAccess
 @Provider
@@ -33,6 +35,7 @@ public class WriteAccessFilter implements ContainerRequestFilter {
 			return;
 		}
 
-		AccessFilterHelper.validateAuthorizationHeader(workspace, requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
+		AccessFilterHelper.validateAuthorizationHeader(workspace,
+				requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
 	}
 }

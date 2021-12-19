@@ -1,6 +1,7 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.materna.dmn.tester.helpers.Serializable;
 import de.materna.jdec.serialization.SerializationHelper;
 
@@ -53,8 +54,10 @@ public class PublicConfiguration extends Serializable {
 		this.access = mode;
 	}
 
+	@Override
 	public void fromJSON(String json) {
-		PublicConfiguration publicConfiguration = (PublicConfiguration) SerializationHelper.getInstance().toClass(json, PublicConfiguration.class);
+		PublicConfiguration publicConfiguration = (PublicConfiguration) SerializationHelper.getInstance().toClass(json,
+				PublicConfiguration.class);
 		this.version = publicConfiguration.getVersion();
 		this.name = publicConfiguration.getName();
 		this.description = publicConfiguration.getDescription();

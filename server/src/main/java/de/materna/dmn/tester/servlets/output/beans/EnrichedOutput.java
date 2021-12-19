@@ -18,7 +18,7 @@ public class EnrichedOutput extends PersistedOutput {
 	public String getUUID() {
 		return uuid;
 	}
-	
+
 	@Override
 	public void fromJSON(String json) {
 		EnrichedOutput temp = (EnrichedOutput) SerializationHelper.getInstance().toClass(json, EnrichedOutput.class);
