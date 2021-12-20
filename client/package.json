@@ -11,9 +11,8 @@
 	"dependencies": {
 		"@kogito-tooling/kie-editors-standalone": "^0.15.0",
 		"base-64": "^1.0.0",
-		"bootstrap": "^4.6.0",
+		"bootstrap": "^4.6.1",
 		"core-js": "^3.18.3",
-		"d3": "^5.14.2",
 		"dayjs": "^1.10.7",
 		"diff-match-patch": "^1.0.5",
 		"jsonpath": "^1.1.1",
