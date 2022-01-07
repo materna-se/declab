@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans.repositories;
+package de.materna.dmn.tester.beans.laboratory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +14,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-
-import de.materna.dmn.tester.beans.Laboratory;
-import de.materna.dmn.tester.beans.repositories.filter.LaboratoryFilter;
 
 @ApplicationScoped
 public class LaboratoryRepository {

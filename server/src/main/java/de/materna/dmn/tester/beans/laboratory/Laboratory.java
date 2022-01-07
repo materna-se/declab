@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans;
+package de.materna.dmn.tester.beans.laboratory;
 
 import java.util.UUID;
 
