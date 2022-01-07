@@ -2,8 +2,6 @@ package de.materna.dmn.tester.servlets.challenges.beans;
 
 import java.util.List;
 
-import javax.ws.rs.BadRequestException;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,18 +16,18 @@ public class Challenge {
 	public List<Scenario> scenarios;
 
 	public Challenge() {
-
 	}
 
 	@JsonCreator
 	public Challenge(@JsonProperty(value = "name", required = true) String name,
-					 @JsonProperty(value = "description", required = true) String description,
-					 @JsonProperty(value = "type", required = false) ChallengeType type,
-					 @JsonProperty(value = "hints", required = true) List<String> hints,
-					 @JsonProperty(value = "solution", required = true) Object solution,
-					 @JsonProperty(value = "scenarios", required = true) List<Scenario> scenarios) {
-		if(name == null) name = "";
-		
+			@JsonProperty(value = "description", required = true) String description,
+			@JsonProperty(value = "type", required = false) ChallengeType type,
+			@JsonProperty(value = "hints", required = true) List<String> hints,
+			@JsonProperty(value = "solution", required = true) Object solution,
+			@JsonProperty(value = "scenarios", required = true) List<Scenario> scenarios) {
+		if (name == null)
+			name = "";
+
 		this.name = name;
 		this.description = description;
 
@@ -59,12 +57,15 @@ public class Challenge {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
 	public ChallengeType getType() {
 		return type;
 	}
+
 	public void setType(ChallengeType type) {
 		this.type = type;
 	}
+
 	public List<String> getHints() {
 		return hints;
 	}
@@ -72,9 +73,11 @@ public class Challenge {
 	public void setHints(List<String> hints) {
 		this.hints = hints;
 	}
+
 	public Object getSolution() {
 		return solution;
 	}
+
 	public void setSolution(Object solution) {
 		this.solution = solution;
 	}
