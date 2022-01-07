@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans;
+package de.materna.dmn.tester.beans.relationship;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
