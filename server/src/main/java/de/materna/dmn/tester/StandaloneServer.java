@@ -12,7 +12,8 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
-import de.materna.dmn.tester.beans.repositories.UserRepository;
+import de.materna.dmn.tester.beans.user.User;
+import de.materna.dmn.tester.beans.user.UserRepository;
 import de.materna.dmn.tester.servlets.MainApplication;
 import de.materna.dmn.tester.sockets.MainSocket;
 
@@ -21,12 +22,11 @@ public class StandaloneServer {
 	public static void main(String[] args) throws Exception {
 		UserRepository userRepository = new UserRepository();
 
-		boolean savedGeorg = userRepository.save("georg.wolffgang@materna.de", "Shazzarr", "Georg", "Wolffgang", "pass",
-				"bild1.jpg");
-		System.out.println("Saved new user Georg: " + savedGeorg);
-		boolean savedMike = userRepository.save("mike.myers@materna.de", "Mikey", "Mike", "Myers", "päswoad",
-				"bild2.jpg");
-		System.out.println("Saved new user Mike: " + savedMike);
+		User userGeorg = userRepository.register("georg.wolffgang@materna.de", "Shazzarr", "password", "Georg",
+				"Wolffgang");
+		System.out.println("Saved new user Georg: " + userGeorg);
+		User userMike = userRepository.register("mike.myers@materna.de", "Mikey", "päswoad", "Mike", "Myers");
+		System.out.println("Saved new user Mike: " + userMike);
 
 		System.setProperty("jboss.server.data.dir", "c:\\Users\\gwolffga\\declab");
 		System.setProperty("jboss.server.webapp.dir", "c:\\Users\\gwolffga\\declab\\server\\src\\main\\webapp");
