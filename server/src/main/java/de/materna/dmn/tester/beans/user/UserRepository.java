@@ -16,6 +16,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.xml.registry.JAXRException;
 
+import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
+import de.materna.dmn.tester.beans.sessiontoken.SessionTokenRepository;
 import de.materna.dmn.tester.beans.user.filter.EmailFilter;
 import de.materna.dmn.tester.beans.user.filter.UsernameFilter;
 
@@ -41,6 +43,11 @@ public class UserRepository {
 	public User findByUsername(String username) {
 		List<User> usersFound = findByFilter(new UsernameFilter(username));
 		return usersFound.size() == 1 ? usersFound.get(0) : null;
+	}
+
+	public User findByToken(String tokenString) {
+		SessionToken token = new SessionTokenRepository().findByToken(tokenString);
+		return findByUuid(token.getUserUuid());
 	}
 
 	public List<User> findByFilter(UserFilter... filterArray) {

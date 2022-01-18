@@ -48,8 +48,6 @@ public class User {
 	@Column(name = "hash", nullable = false)
 	@NotEmpty(message = "Password cannot be empty")
 	private byte[] hash;
-	@Column(name = "imageid")
-	private String imageid;
 	@Column(name = "registration")
 	private LocalDateTime registrationDateTime;
 
@@ -64,7 +62,6 @@ public class User {
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.hash = createHash(password);
-		this.imageid = username + ".jpg";
 	}
 
 	public String getUuid() {
@@ -107,14 +104,6 @@ public class User {
 		this.hash = hash;
 	}
 
-	public String getImageid() {
-		return imageid;
-	}
-
-	public void setImageid(String imageid) {
-		this.imageid = imageid;
-	}
-
 	public LocalDateTime getRegistrationDateTime() {
 		return registrationDateTime;
 	}
@@ -122,5 +111,4 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
 }

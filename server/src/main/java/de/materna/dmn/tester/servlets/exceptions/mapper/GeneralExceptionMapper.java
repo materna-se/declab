@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.servlets.exceptions;
+package de.materna.dmn.tester.servlets.exceptions.mapper;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;

@@ -9,8 +9,8 @@ import javax.ws.rs.core.Application;
 
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.challenges.ChallengeServlet;
-import de.materna.dmn.tester.servlets.exceptions.DefaultOptionsMethodExceptionMapper;
-import de.materna.dmn.tester.servlets.exceptions.GeneralExceptionMapper;
+import de.materna.dmn.tester.servlets.exceptions.mapper.DefaultOptionsMethodExceptionMapper;
+import de.materna.dmn.tester.servlets.exceptions.mapper.GeneralExceptionMapper;
 import de.materna.dmn.tester.servlets.filters.CSRFFilter;
 import de.materna.dmn.tester.servlets.filters.ReadAccessFilter;
 import de.materna.dmn.tester.servlets.filters.WriteAccessFilter;
