@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.servlets.exceptions;
+package de.materna.dmn.tester.servlets.exceptions.mapper;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
