@@ -11,9 +11,9 @@ import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.commons.io.IOUtils;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -61,7 +61,7 @@ public class WorkspaceServlet {
 	@Path("/config")
 	@Consumes("application/json")
 	public Response editWorkspaceConfig(@PathParam("workspace") String workspaceUUID, String body) throws RuntimeException, IOException {
-		HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, String>>() {
+		HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<>() {
 		});
 
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
@@ -201,7 +201,7 @@ public class WorkspaceServlet {
 	@WriteAccess
 	@Path("/backup")
 	@Consumes("multipart/form-data")
-	public Response importWorkspace(@PathParam("workspace") String workspaceUUID, MultipartFormDataInput multipartFormDataInput) throws Exception {
+	public Response importWorkspace(@PathParam("workspace") String workspaceUUID, FormDataMultiPart multiPart) throws Exception {
 		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
 		Workspace workspace = workspaceManager.get(workspaceUUID);
 
@@ -211,7 +211,7 @@ public class WorkspaceServlet {
 		Files.walk(Paths.get(rootPath.toString())).sorted(Comparator.reverseOrder()).filter(path -> !path.endsWith("configuration.json") && !path.endsWith("access.log")).map(java.nio.file.Path::toFile).forEach(File::delete);
 
 		// Iterate over all entries in the .zip archive and add them to the workspace.
-		try (InputStream inputStream = multipartFormDataInput.getFormDataMap().get("backup").get(0).getBody(InputStream.class, null)) {
+		try (InputStream inputStream = multiPart.getField("backup").getValueAs(InputStream.class)) {
 			try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
 				while (true) {
 					ZipEntry zipEntry = zipInputStream.getNextEntry();

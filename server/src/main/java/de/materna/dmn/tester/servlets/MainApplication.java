@@ -1,13 +1,12 @@
 package de.materna.dmn.tester.servlets;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
-import de.materna.dmn.tester.servlets.exceptions.DefaultOptionsMethodExceptionMapper;
 import de.materna.dmn.tester.servlets.exceptions.GeneralExceptionMapper;
 import de.materna.dmn.tester.servlets.filters.CSRFFilter;
 import de.materna.dmn.tester.servlets.filters.ReadAccessFilter;
 import de.materna.dmn.tester.servlets.filters.WriteAccessFilter;
 import de.materna.dmn.tester.servlets.challenges.ChallengeServlet;
-import de.materna.dmn.tester.servlets.challenges.ModelChallengeServlet;
 import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.dmn.tester.servlets.model.ModelServlet;
 import de.materna.dmn.tester.servlets.output.OutputServlet;
@@ -15,6 +14,7 @@ import de.materna.dmn.tester.servlets.playground.PlaygroundServlet;
 import de.materna.dmn.tester.servlets.test.TestServlet;
 import de.materna.dmn.tester.servlets.workspace.MetaWorkspaceServlet;
 import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -43,8 +43,9 @@ public class MainApplication extends Application {
 		classes.add(CSRFFilter.class);
 		classes.add(ReadAccessFilter.class);
 		classes.add(WriteAccessFilter.class);
-		
-		classes.add(DefaultOptionsMethodExceptionMapper.class);
+		classes.add(MultiPartFeature.class);
+		classes.add(JacksonJsonProvider.class);
+
 		classes.add(GeneralExceptionMapper.class);
 	}
 
