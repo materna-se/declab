@@ -1,0 +1,16 @@
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="DEBUG">
+		<appender-ref ref="STDOUT" />
+	</root>
+
+	<logger name="org.kie.api.internal.utils.ServiceDiscoveryImpl" level="WARN"/>
+	<logger name="org.eclipse.aether.internal" level="WARN"/>
+	<logger name="org.appformer.maven" level="WARN"/>
+	<logger name="org.eclipse.jetty" level="WARN"/>
+</configuration>
