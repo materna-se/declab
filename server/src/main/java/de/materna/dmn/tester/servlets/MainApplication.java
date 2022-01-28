@@ -33,7 +33,6 @@ public class MainApplication extends Application {
 
 		singletons.add(new ModelServlet());
 		singletons.add(new ChallengeServlet());
-		singletons.add(new ModelChallengeServlet());
 		singletons.add(new PlaygroundServlet());
 		singletons.add(new InputServlet());
 		singletons.add(new OutputServlet());
