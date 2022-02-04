@@ -2,6 +2,7 @@ package de.materna.dmn.tester.servlets.workspace;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.ibm.websphere.jaxrs20.multipart.IMultipartBody;
 import de.materna.dmn.tester.helpers.HashingHelper;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
 import de.materna.dmn.tester.servlets.filters.ReadAccess;
@@ -13,7 +14,6 @@ import de.materna.jdec.serialization.SerializationHelper;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -201,7 +201,7 @@ public class WorkspaceServlet {
 	@WriteAccess
 	@Path("/backup")
 	@Consumes("multipart/form-data")
-	public Response importWorkspace(@PathParam("workspace") String workspaceUUID, MultipartFormDataInput multipartFormDataInput) throws Exception {
+	public Response importWorkspace(@PathParam("workspace") String workspaceUUID, IMultipartBody multipartBody) throws Exception {
 		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
 		Workspace workspace = workspaceManager.get(workspaceUUID);
 
@@ -211,7 +211,7 @@ public class WorkspaceServlet {
 		Files.walk(Paths.get(rootPath.toString())).sorted(Comparator.reverseOrder()).filter(path -> !path.endsWith("configuration.json") && !path.endsWith("access.log")).map(java.nio.file.Path::toFile).forEach(File::delete);
 
 		// Iterate over all entries in the .zip archive and add them to the workspace.
-		try (InputStream inputStream = multipartFormDataInput.getFormDataMap().get("backup").get(0).getBody(InputStream.class, null)) {
+		try (InputStream inputStream = multipartBody.getAttachment("backup").getDataHandler().getInputStream()) {
 			try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
 				while (true) {
 					ZipEntry zipEntry = zipInputStream.getNextEntry();
