@@ -9,7 +9,7 @@ jobs:
       - attach_workspace:
           at: ~/project
       - run: git clone https://github.com/materna-se/declab.git
-      - run: cd ./declab git checkout master
+      - run: cd ./declab && git checkout master
       - run: cd ./declab/client && npm install && npm run generate
       - persist_to_workspace:
           root: ~/project
@@ -24,10 +24,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/project
-      - run: cd ./declab git checkout master
+      - run: cd ./declab && git checkout master
       - run: cd ./declab/server && mvn package -P war -Dmaven.test.skip=true
       - run: ls ./declab/server/target
-      - run: cd ./declab git checkout master-portable
+      - run: cd ./declab && git checkout master-portable
       - run: cd ./declab/server && mvn package -P jar -Dmaven.test.skip=true
       - run: ls ./declab/server/target
       - persist_to_workspace:
