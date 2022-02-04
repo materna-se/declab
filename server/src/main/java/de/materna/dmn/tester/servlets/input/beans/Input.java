@@ -27,6 +27,7 @@ public class Input extends Serializable {
 		this.value = value;
 	}
 
+	@Override
 	public void fromJSON(String json) {
 		Input temp = (Input) SerializationHelper.getInstance().toClass(json, Input.class);
 		this.value = temp.getValue();

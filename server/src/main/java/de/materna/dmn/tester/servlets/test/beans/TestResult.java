@@ -33,6 +33,7 @@ public class TestResult extends Serializable {
 		return true;
 	}
 
+	@Override
 	public void fromJSON(String json) {
 		TestResult temp = (TestResult) SerializationHelper.getInstance().toClass(json, TestResult.class);
 		this.outputs = temp.getOutputs();
