@@ -36,7 +36,7 @@ public class StandaloneServer {
 		log.info("Let's start...");
 		log.info("We'll use the detected Java version \"{}\".", System.getProperty("java.version"));
 
-		URI resourcePath = StandaloneServer.class.getClassLoader().getResource("index.html").toURI();
+		URI resourcePath = StandaloneServer.class.getClassLoader().getResource("logback.xml").toURI();
 		URI normalizedResourcePath = new URI(resourcePath.toString().substring(0, resourcePath.toString().length() - 10));
 		log.info("We'll load all resources from the directory \"{}\".", normalizedResourcePath);
 
@@ -61,7 +61,7 @@ public class StandaloneServer {
 			log.info("The configuration couldn't be loaded: \"{}\".", e.getMessage());
 		}
 
-		String homeDirectory = properties.getProperty("persistence.artifact-directory", Paths.get(System.getProperty("user.home"), ".declab").toString());
+		String homeDirectory = properties.getProperty("persistence.directory", Paths.get(System.getProperty("user.home"), ".declab").toString());
 		log.info("We'll use the home directory \"{}\" to persist the workspaces.", homeDirectory);
 		System.setProperty("jboss.server.data.dir", homeDirectory);
 
