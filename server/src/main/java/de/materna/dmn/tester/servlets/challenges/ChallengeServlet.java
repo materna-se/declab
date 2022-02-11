@@ -79,7 +79,7 @@ public class ChallengeServlet {
 
 			ArrayList<ModelMap> modelMaps = solution.getModels();
 
-			DecisionService decisionService = (DecisionService) solution.getDecisionService();
+			DecisionService decisionService = solution.getDecisionService();
 
 			// Use decision service if available
 			if (decisionService != null) {

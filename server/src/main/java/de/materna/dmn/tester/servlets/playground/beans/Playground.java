@@ -61,7 +61,8 @@ public class Playground extends Serializable {
 	public void setContext(Map<String, ?> context) {
 		this.context = context;
 	}
-	
+
+	@Override
 	public void fromJSON(String json) {
 		Playground temp = (Playground) SerializationHelper.getInstance().toClass(json, Playground.class);
 		this.name = temp.getName();

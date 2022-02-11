@@ -53,6 +53,7 @@ public class PublicConfiguration extends Serializable {
 		this.access = mode;
 	}
 
+	@Override
 	public void fromJSON(String json) {
 		PublicConfiguration publicConfiguration = (PublicConfiguration) SerializationHelper.getInstance().toClass(json, PublicConfiguration.class);
 		this.version = publicConfiguration.getVersion();

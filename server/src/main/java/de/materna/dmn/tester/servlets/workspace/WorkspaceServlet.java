@@ -61,7 +61,7 @@ public class WorkspaceServlet {
 	@Path("/config")
 	@Consumes("application/json")
 	public Response editWorkspaceConfig(@PathParam("workspace") String workspaceUUID, String body) throws RuntimeException, IOException {
-		HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<>() {
+		HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, String>>() {
 		});
 
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
