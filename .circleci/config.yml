@@ -87,7 +87,11 @@ jobs:
       - run: cd ./declab/server/target && mv ./jdk-11.0.14.1+1-jre ./jre
       - run: cd ./declab/server/target && rm ./OpenJDK11U-jre_x64_linux_hotspot_11.0.14.1_1.tar.gz
       - run: cd ./declab/server/target && zip -r ../declab-${CIRCLE_TAG}-windows.zip ./jre ./declab-${CIRCLE_TAG}.exe
-      - run: cd ./declab/server && ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -recreate -replace ${CIRCLE_TAG} ./target/declab-${CIRCLE_TAG}.war ./target/declab-${CIRCLE_TAG}.jar ./target/declab-${CIRCLE_TAG}-windows.zip
+      - run: mkdir ./release
+      - run: mv ./target/declab-${CIRCLE_TAG}.war ./release/
+      - run: mv ./target/declab-${CIRCLE_TAG}.jar ./release/
+      - run: mv ./target/declab-${CIRCLE_TAG}-windows.zip ./release/
+      - run: cd ./declab/server && ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -recreate -replace ${CIRCLE_TAG} ./release
 
   publish_container:
     docker:
