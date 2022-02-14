@@ -28,9 +28,9 @@ jobs:
       - attach_workspace:
           at: ~/project
       - run: cd ./declab && git checkout master
-      - run: cd ./declab/server && mvn package -P war -Dmaven.test.skip=true
+      - run: cd ./declab/server && mvn package -Dmaven.test.skip=true
       - run: cd ./declab && git checkout master-portable
-      - run: cd ./declab/server && mvn package -P jar -Dmaven.test.skip=true
+      - run: cd ./declab/server && mvn package -Dmaven.test.skip=true
       - persist_to_workspace:
           root: ~/project
           paths:
