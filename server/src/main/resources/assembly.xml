@@ -7,7 +7,7 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
 		<fileSet>
-			<directory>../build/jre11</directory>
+			<directory>../build/jre</directory>
 			<outputDirectory>/jre</outputDirectory>
 		</fileSet>
 	</fileSets>
