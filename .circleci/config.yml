@@ -31,7 +31,7 @@ jobs:
       - run: cd ./declab && git checkout master
       - run: cd ./declab/server && mvn package -Dmaven.test.skip=true
       # The java version requires that the client files are placed under ./resources/.
-      - run: cd ./declab/server/src/main && mv -r ./webapp/* ./resources/
+      - run: cd ./declab/server/src/main && mv ./webapp/* ./resources/
       - run: cd ./declab && git checkout master-portable
       - run: cd ./declab/server && mvn package -Dmaven.test.skip=true
       - persist_to_workspace:
