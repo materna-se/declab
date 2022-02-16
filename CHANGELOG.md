@@ -3,11 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased](https://github.com/materna-se/declab/compare/2.7.0...master) - 2022
 
-Since the first version, declab has been developed exclusively for the application server JBoss and the open source distribution WildFly. With the release of declab 2.8.0, this will change, from now on, every version of declab will be released in two different variants.
+Since the first version, declab has been developed exclusively for the application server JBoss and the open source distribution WildFly. With the release of declab 2.8.0, this will change. From now on, every version of declab will be released in two different variants.
 
-The first variant for the application server JBoss and the open source distribution WildFly is of course still in focus and will receive all future updates. However, it will no longer be the variant on which all development is performed until the release of a new version.
+The first variant for the application server JBoss and the open source distribution WildFly is of course still in focus and will receive all future updates. However, it will no longer be the variant on which all development until the release of a new version is performed.
 
-The second variant, which will be released from now on as well, is named declab Portable and was created with the motivation to enable the uncomplicated use of declab even for experts who do not have an easy way to set up an application server. It runs entirely on the user's own computer. From now on, it will be the variant on which all development will be performed until the release of a new version. The variant is released as a .zip archive together with the Java Runtime Engine in version 11. By double-clicking on the application, it opens as a console and displays the state of the application and any potential warnings.
+The second variant, which will be released from now on as well, is named declab Portable and was created with the motivation to enable the uncomplicated use of declab even for experts who do not have an easy way to set up an application server. It runs entirely on the user's own computer. From now on, it will be the variant on which all development until the release of a new version is performed. The variant is released as a .zip archive together with the Java Runtime Engine in version 11. By double-clicking on the application, it opens as a console and displays the state of the application and any potential warnings that occur during use.
 
 ![](./docs/changelog-2.8.0-portable.png)
 

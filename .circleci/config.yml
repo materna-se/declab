@@ -11,8 +11,8 @@ jobs:
           at: ~/project
       - run: git clone https://github.com/materna-se/declab.git
       - run: cd ./declab && git checkout master
-      #- run: cd ./declab/client && npm install
-      #- run: cd ./declab/client && npm run generate
+      - run: cd ./declab/client && npm install
+      - run: cd ./declab/client && npm run generate
       - persist_to_workspace:
           root: ~/project
           paths:
@@ -28,9 +28,9 @@ jobs:
       - attach_workspace:
           at: ~/project
       - run: cd ./declab && git checkout master
-      - run: cd ./declab/server && mvn package -P war -Dmaven.test.skip=true
+      - run: cd ./declab/server && mvn package -Dmaven.test.skip=true
       - run: cd ./declab && git checkout master-portable
-      - run: cd ./declab/server && mvn package -P jar -Dmaven.test.skip=true
+      - run: cd ./declab/server && mvn package -Dmaven.test.skip=true
       - persist_to_workspace:
           root: ~/project
           paths:
@@ -86,12 +86,13 @@ jobs:
       - run: cd ./declab/server/target && tar -xvzf ./OpenJDK11U-jre_x64_linux_hotspot_11.0.14.1_1.tar.gz
       - run: cd ./declab/server/target && mv ./jdk-11.0.14.1+1-jre ./jre
       - run: cd ./declab/server/target && rm ./OpenJDK11U-jre_x64_linux_hotspot_11.0.14.1_1.tar.gz
-      - run: cd ./declab/server/target && zip -r ../declab-${CIRCLE_TAG}-windows.zip ./jre ./declab-${CIRCLE_TAG}.exe
-      - run: mkdir ./release
-      - run: mv ./target/declab-${CIRCLE_TAG}.war ./release/
-      - run: mv ./target/declab-${CIRCLE_TAG}.jar ./release/
-      - run: mv ./target/declab-${CIRCLE_TAG}-windows.zip ./release/
-      - run: cd ./declab/server && ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -recreate -replace ${CIRCLE_TAG} ./release
+      - run: cd ./declab/server/target && zip -r ./declab-${CIRCLE_TAG}-windows.zip ./jre ./declab-${CIRCLE_TAG}.exe
+      - run: mkdir ./declab/server/target/release
+      - run: mv ./declab/server/target/declab-${CIRCLE_TAG}.war ./declab/server/target/release/declab-${CIRCLE_TAG}-jboss.war
+      - run: mv ./declab/server/target/declab-${CIRCLE_TAG}.jar ./declab/server/target/release/declab-${CIRCLE_TAG}-linux.jar
+      - run: mv ./declab/server/target/declab-${CIRCLE_TAG}-windows.zip ./declab/server/target/release/
+      - run: ls -la ./declab/server/target
+      - run: cd ./declab/server/target && ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -recreate -replace ${CIRCLE_TAG} ./release
 
   publish_container:
     docker:
@@ -122,14 +123,14 @@ workflows:
             tags:
               only: /.*/
 
-#      - test_server:
-#          requires:
-#            - build_server
-#          filters:
-#            branches:
-#              only: /.*/
-#            tags:
-#              only: /.*/
+      #      - test_server:
+      #          requires:
+      #            - build_server
+      #          filters:
+      #            branches:
+      #              only: /.*/
+      #            tags:
+      #              only: /.*/
 
       - publish_release:
           requires:
