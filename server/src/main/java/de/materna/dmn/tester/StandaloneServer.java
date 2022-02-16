@@ -36,7 +36,7 @@ public class StandaloneServer {
 		log.info("Let's start...");
 		log.info("We'll use the detected Java version \"{}\".", System.getProperty("java.version"));
 
-		URI resourcePath = StandaloneServer.class.getClassLoader().getResource("logback.xml").toURI();
+		URI resourcePath = StandaloneServer.class.getClassLoader().getResource("index.html").toURI();
 		URI normalizedResourcePath = new URI(resourcePath.toString().substring(0, resourcePath.toString().length() - 10));
 		log.info("We'll load all resources from the directory \"{}\".", normalizedResourcePath);
 
