@@ -161,29 +161,41 @@ public class WorkspaceServlet {
 			try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
 				Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).filter(path -> !Files.isDirectory(path)).forEach(path -> {
+				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).forEach(path -> {
 					try {
+						String relativePath = getRelativePath(path, workspaceUUID);
+						if(relativePath == null) {
+							return;
+						}
+
+						if (Files.isDirectory(path)) {
+							zipOutputStream.putNextEntry(new ZipEntry(relativePath + "/"));
+							zipOutputStream.closeEntry();
+							return;
+						}
+
 						if (path.endsWith("access.log")) {
+							// We don't want to export the access log.
 							return;
 						}
 
 						if (path.endsWith("configuration.json")) {
+							// We don't want to export all key-value pairs of the configuration.
+
 							Configuration clonedConfiguration = (Configuration) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(workspace.getConfig()), Configuration.class);
-							// Trim cloned configuration.
 							clonedConfiguration.setAccess(Access.PUBLIC);
 							clonedConfiguration.setToken(null);
 							clonedConfiguration.setSalt(null);
 							clonedConfiguration.setCreatedDate(0L);
 							clonedConfiguration.setModifiedDate(0L);
 
-							// Write trimmed copy of configuration
-							zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
+							zipOutputStream.putNextEntry(new ZipEntry(relativePath));
 							zipOutputStream.write(SerializationHelper.getInstance().toJSON(clonedConfiguration).getBytes(StandardCharsets.UTF_8));
 							zipOutputStream.closeEntry();
 							return;
 						}
 
-						zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
+						zipOutputStream.putNextEntry(new ZipEntry(relativePath));
 						zipOutputStream.write(Files.readAllBytes(path));
 						zipOutputStream.closeEntry();
 					}
@@ -221,6 +233,12 @@ public class WorkspaceServlet {
 
 					// If the directory for the entity does not exist yet, it will be created.
 					java.nio.file.Path entityPath = rootPath.resolve(zipEntry.getName());
+					if(zipEntry.isDirectory()) {
+						Files.createDirectories(entityPath);
+						continue;
+					}
+
+					// Normally, the parent directory should already exist. We'll check it anyway.
 					Files.createDirectories(entityPath.getParent());
 
 					if (zipEntry.getName().endsWith("configuration.json")) {
@@ -253,7 +271,16 @@ public class WorkspaceServlet {
 
 	private String getRelativePath(java.nio.file.Path path, String workspaceName) {
 		String pathName = path.getFileName().toString();
+		// If we walk through the workspace directory, one entry is the workspace directory itself.
+		// We don't want to add an entry for that.
+		if (pathName.equals(workspaceName)) {
+			return null;
+		}
+
+		System.out.println("getRelativePath: pathName " + pathName);
 		String parentPathName = path.getParent().getFileName().toString();
+		System.out.println("getRelativePath: parentPathName " + parentPathName);
+		// We've reached the destination, we can return the path.
 		if (parentPathName.equals(workspaceName)) {
 			return pathName;
 		}
