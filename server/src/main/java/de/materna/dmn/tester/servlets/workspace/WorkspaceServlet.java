@@ -221,6 +221,12 @@ public class WorkspaceServlet {
 
 					// If the directory for the entity does not exist yet, it will be created.
 					java.nio.file.Path entityPath = rootPath.resolve(zipEntry.getName());
+					if(zipEntry.isDirectory()) {
+						Files.createDirectories(entityPath);
+						continue;
+					}
+
+					// Normally, the parent directory should already exist. We'll check it anyway.
 					Files.createDirectories(entityPath.getParent());
 
 					if (zipEntry.getName().endsWith("configuration.json")) {
