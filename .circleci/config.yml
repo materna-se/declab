@@ -82,10 +82,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/project
-      - run: cd ./declab/server/target && wget https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.14.1%2B1/OpenJDK11U-jre_x64_linux_hotspot_11.0.14.1_1.tar.gz
-      - run: cd ./declab/server/target && tar -xvzf ./OpenJDK11U-jre_x64_linux_hotspot_11.0.14.1_1.tar.gz
+      - run: cd ./declab/server/target && wget https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.14.1%2B1/OpenJDK11U-jre_x64_windows_hotspot_11.0.14.1_1.zip
+      - run: cd ./declab/server/target && tar -xvzf ./OpenJDK11U-jre_x64_windows_hotspot_11.0.14.1_1.zip
       - run: cd ./declab/server/target && mv ./jdk-11.0.14.1+1-jre ./jre
-      - run: cd ./declab/server/target && rm ./OpenJDK11U-jre_x64_linux_hotspot_11.0.14.1_1.tar.gz
+      - run: cd ./declab/server/target && rm ./OpenJDK11U-jre_x64_windows_hotspot_11.0.14.1_1.zip
       - run: cd ./declab/server/target && zip -r ./declab-${CIRCLE_TAG}-windows.zip ./jre ./declab-${CIRCLE_TAG}.exe
       - run: mkdir ./declab/server/target/release
       - run: mv ./declab/server/target/declab-${CIRCLE_TAG}.war ./declab/server/target/release/declab-${CIRCLE_TAG}-jboss.war

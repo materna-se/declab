@@ -230,12 +230,12 @@
 								<windowTitle/>
 							</singleInstance>
 							<jre>
-								<path>jre</path>
+								<path>./jre;%JAVA_HOME%;%PATH%</path>
 								<bundledJre64Bit>true</bundledJre64Bit>
 								<bundledJreAsFallback>false</bundledJreAsFallback>
-								<minVersion>9</minVersion>
+								<minVersion>11</minVersion>
 								<maxVersion/>
-								<jdkPreference>jdkOnly</jdkPreference>
+								<jdkPreference>preferJre</jdkPreference>
 								<runtimeBits>64</runtimeBits>
 							</jre>
 							<versionInfo>
