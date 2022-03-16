@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="d-flex align-items-center mb-2">
-			<div class="import-result mr-2" v-if="models.length > 0">
+			<div class="import-result me-2" v-if="models.length > 0">
 				<b>{{models[$route.params.index].name}}</b> ({{models[$route.params.index].namespace}})
 			</div>
 			<button class="btn btn-outline-secondary" v-on:click="editor.undo()">
@@ -9,7 +9,7 @@
 					<path d="M12.5 8c-2.65 0-5.05 1-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" fill="currentColor"/>
 				</svg>
 			</button>
-			<button class="btn btn-outline-secondary mr-2" v-on:click="editor.redo()">
+			<button class="btn btn-outline-secondary me-2" v-on:click="editor.redo()">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
 					<path d="M18.4 10.6C16.55 9 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16a8.002 8.002 0 017.6-5.5c1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" fill="currentColor"/>
 				</svg>
@@ -17,16 +17,16 @@
 			<div class="import-result" style="display: flex; align-items: center" v-bind:class="['import-result-' + importResult.state, importResult.state !== 'success' && importResult.messages.length > 0 ? 'c-pointer' : null]" v-if="importResult !== null" v-on:click="importResult.state !== 'success' ? importResultOpened = true : null">
 				<span style="line-height: 1;">{{importResult.message}}</span>
 				<div style="height: 24px">
-					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" class="ml-1" v-if="importResult.state !== 'success' && importResult.messages.length > 0">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" class="ms-1" v-if="importResult.state !== 'success' && importResult.messages.length > 0">
 						<path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3m-2 16H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7z" fill="currentColor"/>
 					</svg>
 				</div>
 			</div>
-			<div class="import-result ml-auto c-pointer" style="display: flex; align-items: center" v-on:click="editor.markAsSaved()">
+			<div class="import-result ms-auto c-pointer" style="display: flex; align-items: center" v-on:click="editor.markAsSaved()">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
 					<path d="m10 4 2 2h8a2 2 0 0 1 2 2v3.5a6.99 6.99 0 0 0-2-.5V8H4v10h9c.07.7.24 1.38.5 2H4a2 2 0 0 1-2-2V6c0-1.11.89-2 2-2h6m9 8v1.5a4 4 0 0 1 4 4c0 .82-.25 1.58-.67 2.21l-1.09-1.09c.17-.34.26-.72.26-1.12A2.5 2.5 0 0 0 19 15v1.5l-2.25-2.25-.03-.03c.06-.05.13-.09 2.28-2.22m0 11v-1.5a4 4 0 0 1-4-4c0-.82.25-1.58.67-2.21l1.09 1.09c-.17.34-.26.72-.26 1.12A2.5 2.5 0 0 0 19 20v-1.5l2.25 2.25.03.03c-.06.05-.13.09-2.28 2.22Z" fill="currentColor"/>
 				</svg>
-				<span class="ml-1" style="line-height: 1;" v-if="importTime !== null">The model was last synchronized {{importTime}}.</span>
+				<span class="ms-1" style="line-height: 1;" v-if="importTime !== null">The model was last synchronized {{importTime}}.</span>
 			</div>
 		</div>
 		<div id="editor">

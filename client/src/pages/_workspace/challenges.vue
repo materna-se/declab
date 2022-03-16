@@ -27,12 +27,12 @@
 				<div class="list-group">
 					<template v-if="Object.keys(challenges).length !== 0">
 						<div class="list-group-item list-group-item-action c-pointer" v-for="(challenge, uuid) in challenges" v-bind:key="uuid" v-on:click.self="setViewMode(uuid)">
-							<span class="d-block float-left mr-4" v-on:click="setViewMode(uuid)">{{challenge.name}}</span>
+							<span class="d-block float-left me-4" v-on:click="setViewMode(uuid)">{{challenge.name}}</span>
 							<div class="float-right">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setEditMode(uuid)">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left me-2" v-on:click="setEditMode(uuid)">
 									<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
 								</svg>
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" v-on:click="setDuplicateMode(uuid)">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left me-2" v-on:click="setDuplicateMode(uuid)">
 									<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"/>
 								</svg>
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left" v-on:click="deleteChallenge(uuid)">
@@ -59,7 +59,7 @@
 							<template v-if="challenge.hints.length !== 0">
 								<!-- eslint-disable-next-line vue/require-v-for-key -->
 								<div class="list-group-item" v-for="hint in challenge.hints">
-									<div class="mr-auto">
+									<div class="me-auto">
 										<p class="mb-0">{{hint}}</p>
 									</div>
 								</div>
@@ -86,7 +86,7 @@
 							<!-- eslint-disable-next-line vue/require-v-for-key -->
 							<div class="card mb-4" v-for="scenario of challenge.scenarios">
 								<div class="card-body">
-									<div class="mr-auto">
+									<div class="me-auto">
 										<h5 class="mb-2">{{scenario.name}}</h5>
 										<h6 class="mb-2">Input</h6>
 										<json-builder v-bind:template="scenario.input.value" v-bind:convert="true" v-bind:fixed="true" v-bind:fixed-values="true"/>
@@ -118,7 +118,7 @@
 								<!-- eslint-disable-next-line vue/require-v-for-key -->
 								<div class="list-group-item" v-for="(hint, index) in challenge.hints">
 									<div class="row mx-0 flex-row">
-										<input class="form-control mb-0 mr-2" style="flex: 1" v-model="challenge.hints[index]">
+										<input class="form-control mb-0 me-2" style="flex: 1" v-model="challenge.hints[index]">
 										<button class="btn btn-outline-secondary" v-on:click="challenge.hints.splice(index, 1)">
 											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
 												<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
@@ -142,10 +142,8 @@
 
 						<div class="card mb-4">
 							<div class="input-group">
-								<div class="input-group-prepend">
-									<span class="input-group-text">Type</span>
-								</div>
-								<select class="form-control" v-model="challenge.type" v-on:change="changeChallengeType(challenge.type)">
+								<span class="input-group-text">Type</span>
+								<select class="form-select" v-model="challenge.type" v-on:change="changeChallengeType(challenge.type)">
 									<option v-if="challenge.type === null" selected disabled>Select type...</option>
 									<option>FEEL</option>
 									<option>DMN_MODEL</option>
@@ -169,15 +167,15 @@
 							<!-- eslint-disable-next-line vue/require-v-for-key -->
 							<div class="card mb-4" v-for="(scenario, index) of challenge.scenarios">
 								<div class="card-body">
-									<div class="mr-auto">
-										<div class="float-right mt-2 ml-2">
+									<div class="me-auto">
+										<div class="float-right mt-2 ms-2">
 											<button class="btn btn-block btn-outline-secondary" v-on:click="challenge.scenarios.splice(index, 1)">
 												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
 													<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 												</svg>
 											</button>
 										</div>
-										<div class="float-right mt-2 ml-2">
+										<div class="float-right mt-2 ms-2">
 											<button class="btn btn-block btn-outline-secondary" v-on:click="challenge.scenarios.splice(index, 0, JSON.parse(JSON.stringify(challenge.scenarios[index])))">
 												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
 													<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"/>
@@ -381,7 +379,8 @@
 
 				if (challenge.type === "FEEL") {
 					challenge.solution = "";
-				} else if (challenge.type === "DMN_MODEL") {
+				}
+				else if (challenge.type === "DMN_MODEL") {
 					challenge.solution = {
 						"models": [],
 						"decisionService": {

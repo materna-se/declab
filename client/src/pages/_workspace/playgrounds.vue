@@ -27,12 +27,12 @@
 				<div class="list-group">
 					<template v-if="Object.keys(playgrounds).length !== 0">
 						<div class="list-group-item list-group-item-action c-pointer" v-for="(playground, uuid) in playgrounds" :key="uuid" @click.self="setViewMode(uuid)">
-							<span class="d-block float-left mr-4" @click="setViewMode(uuid)">{{playground.name}}</span>
+							<span class="d-block float-left me-4" @click="setViewMode(uuid)">{{playground.name}}</span>
 							<div class="float-right">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" @click="setEditMode(uuid)">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left me-2" @click="setEditMode(uuid)">
 									<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
 								</svg>
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" @click="setDuplicateMode(uuid)">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left me-2" @click="setDuplicateMode(uuid)">
 									<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"/>
 								</svg>
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left" @click="deletePlayground(uuid)">

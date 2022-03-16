@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="d-flex align-items-center mb-2">
-			<h3 class="mb-0 mr-auto">Importer</h3>
+			<h3 class="mb-0 me-auto">Importer</h3>
 		</div>
 
 		<div class="row">
@@ -49,7 +49,7 @@
 					<div class="card">
 						<div class="card-body">
 							<div class="d-flex align-items-start mb-2">
-								<h5 class="mb-0 mr-auto">Row {{index + 1}}</h5>
+								<h5 class="mb-0 me-auto">Row {{index + 1}}</h5>
 
 								<button class="btn btn-outline-secondary btn-sm" style="display:block" @click="addTest(index)">
 									<svg style="width:24px;height:24px" viewBox="0 0 24 24">

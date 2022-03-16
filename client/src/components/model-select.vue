@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="d-flex align-items-center mb-2">
-			<!--<h3 class="mb-0 mr-auto">Models</h3>-->
+			<!--<h3 class="mb-0 me-auto">Models</h3>-->
 			<!--
 			<div>
 				<button class="btn btn-block btn-outline-secondary" v-on:click="importSample">
@@ -15,7 +15,7 @@
 			<div class="mb-2 draggable" v-on:drop="onReplaceModelDrop($event, index)" v-on:dragover="onModelDragOver" v-on:dragenter="onModelDragOver" v-for="(importedModel, index) of importedModels">
 				<div class="card">
 					<div class="card-header d-flex align-items-center">
-						<h4 class="mb-0 mr-auto">{{importedModel.name}}</h4>
+						<h4 class="mb-0 me-auto">{{importedModel.name}}</h4>
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" v-if="!readonly" v-on:click="deleteModel(index)">
 							<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 						</svg>
@@ -24,7 +24,7 @@
 						<div>
 							<template v-if="importedModel.decisions.length > 0">
 								<h5 class="mb-2" style="clear: both">Decisions</h5>
-								<div class="dmn dmn-decision mb-2 mr-2" v-for="decision of importedModel.decisions">
+								<div class="dmn dmn-decision mb-2 me-2" v-for="decision of importedModel.decisions">
 									{{decision}}
 								</div>
 							</template>
@@ -32,7 +32,7 @@
 						<div>
 							<template v-if="importedModel.inputs.length > 0">
 								<h5 class="mb-2" style="clear: both">Inputs</h5>
-								<div class="dmn dmn-input mb-2 mr-2" v-for="input in importedModel.inputs">
+								<div class="dmn dmn-input mb-2 me-2" v-for="input in importedModel.inputs">
 									{{input}}
 								</div>
 							</template>
@@ -40,7 +40,7 @@
 						<div>
 							<template v-if="importedModel.knowledgeModels.length > 0">
 								<h5 class="mb-2">Business Knowledge Models</h5>
-								<div class="dmn dmn-bkm mb-2 mr-2" v-for="knowledgeModel in importedModel.knowledgeModels">
+								<div class="dmn dmn-bkm mb-2 me-2" v-for="knowledgeModel in importedModel.knowledgeModels">
 									{{knowledgeModel}}
 								</div>
 							</template>
@@ -48,7 +48,7 @@
 						<div>
 							<template v-if="importedModel.decisionServices.length > 0">
 								<h5 class="mb-2">Decision Services</h5>
-								<div class="dmn dmn-ds mb-2 mr-2" v-for="decisionServiceName in importedModel.decisionServices">
+								<div class="dmn dmn-ds mb-2 me-2" v-for="decisionServiceName in importedModel.decisionServices">
 									<span v-on:click="toggleDecisionService(decisionServiceName, importedModel.namespace)" v-bind:class="[isCurrentDecisionService(decisionServiceName, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionServiceName}}</span>
 								</div>
 							</template>

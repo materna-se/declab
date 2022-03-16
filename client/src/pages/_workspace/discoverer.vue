@@ -22,7 +22,7 @@
 										<path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" fill="currentColor"/>
 									</svg>
 								</button>
-								<input class="form-control mb-0 mr-2 ml-2" placeholder="Enter JSONPath..." style="flex: 1" v-model="options.inputs[index]['selector']">
+								<input class="form-control mb-0 me-2 ms-2" placeholder="Enter JSONPath..." style="flex: 1" v-model="options.inputs[index]['selector']">
 								<button class="btn btn-outline-secondary" @click="removeInput(index)">
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
 										<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
@@ -51,7 +51,7 @@
 						<!-- eslint-disable-next-line vue/require-v-for-key -->
 						<div class="list-group-item" v-for="(selector, index) in options.outputs">
 							<div class="row mx-0 flex-row">
-								<input class="form-control mb-0 mr-2" placeholder="Enter JSONPath..." style="flex: 1" v-model="options.outputs[index]">
+								<input class="form-control mb-0 me-2" placeholder="Enter JSONPath..." style="flex: 1" v-model="options.outputs[index]">
 								<button class="btn btn-outline-secondary" @click="options.outputs.splice(index, 1)">
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
 										<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>

@@ -1,8 +1,8 @@
 <template>
 	<div class="container-fluid">
 		<div class="d-flex align-items-center mb-2">
-			<h3 class="mb-0 mr-auto">Builder</h3>
-			<div class="mr-2">
+			<h3 class="mb-0 me-auto">Builder</h3>
+			<div class="me-2">
 				<button class="btn btn-block btn-outline-secondary px-4" @click="modalVisible = true">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M15 9H5V5h10m-3 14a3 3 0 01-3-3 3 3 0 013-3 3 3 0 013 3 3 3 0 01-3 3m5-16H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z" fill="currentColor"/>
@@ -20,13 +20,11 @@
 		<div class="d-flex">
 			<div class="mb-4" v-if="mode !== 2" style="flex: 1" :style="{'margin-right': mode === 0 ? '30px' : null}">
 				<div class="d-flex align-items-center mb-2">
-					<h4 class="mb-0 mr-auto">Input Context</h4>
+					<h4 class="mb-0 me-auto">Input Context</h4>
 					<div>
 						<div class="input-group">
-							<div class="input-group-prepend">
-								<span class="input-group-text">Template</span>
-							</div>
-							<select class="form-control" @change="importInput(inputs[$event.target.value].value)">
+							<span class="input-group-text">Template</span>
+							<select class="form-select" @change="importInput(inputs[$event.target.value].value)">
 								<option selected disabled>Select template...</option>
 								<option v-for="(input, uuid) in inputs" :key="uuid" :value="uuid">{{input.name}}</option>
 							</select>
@@ -63,8 +61,8 @@
 						<div class="mt-4" v-if="model.result.context[decisionName] !== undefined && Object.keys(model.result.context[decisionName]).length !== 0">
 							<h5 class="d-flex align-items-center mb-0" @click="$set(model.result.visibleContexts, decisionName, model.result.visibleContexts[decisionName] !== true)">
 								Context
-								<small class="mr-auto">&ensp;({{model.result.visibleContexts[decisionName] ? 'click to hide' : 'click to show'}})</small>
-								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="d-block c-pointer" @click="copyToPlayground(model.result.context[decisionName])" v-tooltip="{content: 'Copy to Playground'}" >
+								<small class="me-auto">&ensp;({{model.result.visibleContexts[decisionName] ? 'click to hide' : 'click to show'}})</small>
+								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="d-block c-pointer" @click="copyToPlayground(model.result.context[decisionName])" v-tooltip="{content: 'Copy to Playground'}">
 									<path d="M8 12h9.76l-2.5-2.5 1.41-1.42L21.59 13l-4.92 4.92-1.41-1.42 2.5-2.5H8v-2m11-9a2 2 0 0 1 2 2v4.67l-2-2V7H5v12h14v-.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z" fill="currentColor"/>
 								</svg>
 							</h5>
@@ -221,7 +219,7 @@
 		methods: {
 			async onSocket(e) {
 				const data = JSON.parse(e.data);
-				if(data.type === "imported") {
+				if (data.type === "imported") {
 					const modelInputs = await Network.getModelInputs();
 
 					this.model.input.template = Converter.merge(this.model.input.value, {type: "object", value: modelInputs.inputs});
@@ -376,7 +374,7 @@
 				this.model.input.template = Converter.merge(currentInput, templateInput);
 			},
 			copyToPlayground(context) {
-				const url = this.$router.resolve({ path: 'playground', query: { context: base64.encode(JSON.stringify(context)) }});
+				const url = this.$router.resolve({path: 'playground', query: {context: base64.encode(JSON.stringify(context))}});
 				window.open(url.href, '_blank');
 			},
 		}

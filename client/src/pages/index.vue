@@ -20,20 +20,18 @@
 				</div>
 
 				<div class="input-group mb-2">
-					<div class="input-group-prepend">
 						<span class="input-group-text">
 							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
 								<path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z" fill="currentColor"/>
 							</svg>
 						</span>
-					</div>
 					<input placeholder="Search workspace..." class="form-control" v-model="query" @keyup="getWorkspaces">
 				</div>
 
 				<div class="list-group">
 					<template v-if="Object.keys(workspaces).length !== 0">
 						<div class="list-group-item list-group-item-action c-pointer d-flex align-items-center" v-for="(workspace, uuid) in workspaces" :key="uuid" @click="enterWorkspace(uuid)" @keypress="simulateClick" tabindex="0">
-							<div class="mr-auto">
+							<div class="me-auto">
 								<p class="mb-0"><b>{{workspace.name}}</b></p>
 								<p class="mb-0">{{workspace.description}}</p>
 							</div>
@@ -124,7 +122,7 @@
 			// Helpers
 			//
 			async simulateClick(event) {
-				if(event.keyCode === 13) {
+				if (event.keyCode === 13) {
 					event.target.click();
 				}
 			},

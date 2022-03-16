@@ -7,7 +7,7 @@
 		</router-link>
 
 		<!-- Builder for all custom routes -->
-		<ul class="navbar-nav mr-auto">
+		<ul class="navbar-nav me-auto">
 			<li class="nav-item dropdown" v-if="$route.params.workspace !== undefined" v-on:mouseenter="route.visible = true" v-for="route of routes" v-bind:key="route.name" v-on:mouseleave="route.visible = false">
 				<a href="#" class="nav-link dropdown-toggle">{{route.name}}</a>
 				<div class="dropdown-menu" v-bind:class="{'show': route.visible}">
