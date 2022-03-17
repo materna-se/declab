@@ -15,12 +15,12 @@
 				</div>
 				<input placeholder="Name..." class="form-control me-2" style="display:block;flex:1" :value="playground.name" @keyup="playground.name = $event.target.value">
 				<input placeholder="Description..." class="form-control me-2" style="display:block;flex:1" :value="playground.description" @keyup="playground.description = $event.target.value">
-				<button class="btn btn-outline-secondary me-2" style="display:block" @click="savePlayground" aria-label="Save playground">
+				<button class="btn btn-outline-primary me-2" style="display:block" @click="savePlayground" aria-label="Save playground">
 					<svg style="width:24px;height:24px" viewBox="0 0 24 24">
 						<path fill="currentColor" d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"/>
 					</svg>
 				</button>
-				<button class="btn btn-outline-secondary" style="display:block" @click="resetPlayground" aria-label="Reset playground">
+				<button class="btn btn-outline-primary" style="display:block" @click="resetPlayground" aria-label="Reset playground">
 					<svg style="width:24px;height:24px" viewBox="0 0 24 24">
 						<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"/>
 					</svg>

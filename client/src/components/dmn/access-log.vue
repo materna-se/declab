@@ -1,7 +1,7 @@
 <template>
 	<ul class="list-group">
 		<li class="list-group-item" v-for="entry of entries">
-			<h5 class="mb-3" style="display: flex; align-items: center"><small><span class="badge badge-secondary" style="line-height: inherit">{{entry.accessType}}</span>&ensp;</small>{{entry.name}}</h5>
+			<h5 class="mb-3" style="display: flex; align-items: center"><small><span class="badge badge-primary" style="line-height: inherit">{{entry.accessType}}</span>&ensp;</small>{{entry.name}}</h5>
 
 			<h6 class="d-flex align-items-center mb-3" v-on:click="entryContextVisible = !entryContextVisible">
 				Entry Context

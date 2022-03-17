@@ -7,7 +7,7 @@
 				</div>
 				<div class="card-body">
 					<configurator class="mb-2" v-model="serverConfiguration"></configurator>
-					<button class="btn btn-block btn-outline-secondary mb-4" @click="editWorkspace">Save configuration</button>
+					<button class="btn btn-block btn-outline-primary mb-4" @click="editWorkspace">Save configuration</button>
 
 					<h5 class="mb-2">Developer Mode</h5>
 					<p class="mb-2">The developer mode allows you to use features such as raw JSON in the builder. It is intended for developers and should be used with caution.</p>
@@ -36,7 +36,7 @@
 							<h4 class="mb-0">Export</h4>
 						</div>
 						<div class="card-body">
-							<button class="btn btn-block btn-outline-secondary" @click="exportWorkspace">Export</button>
+							<button class="btn btn-block btn-outline-primary" @click="exportWorkspace">Export</button>
 						</div>
 					</div>
 				</div>

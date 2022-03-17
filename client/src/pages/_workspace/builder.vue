@@ -3,14 +3,14 @@
 		<div class="d-flex align-items-center mb-2">
 			<h3 class="mb-0 me-auto">Builder</h3>
 			<div class="me-2">
-				<button class="btn btn-block btn-outline-secondary px-4" @click="modalVisible = true">
+				<button class="btn btn-block btn-outline-primary px-4" @click="modalVisible = true">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M15 9H5V5h10m-3 14a3 3 0 01-3-3 3 3 0 013-3 3 3 0 013 3 3 3 0 01-3 3m5-16H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z" fill="currentColor"/>
 					</svg>
 				</button>
 			</div>
 			<div>
-				<button class="btn btn-block btn-outline-secondary px-4" @click="detachWorker">
+				<button class="btn btn-block btn-outline-primary px-4" @click="detachWorker">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M8 12h9.76l-2.5-2.5 1.41-1.42L21.59 13l-4.92 4.92-1.41-1.42 2.5-2.5H8v-2m11-9a2 2 0 0 1 2 2v4.67l-2-2V7H5v12h14v-.67l2-2V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14z" fill="currentColor"/>
 					</svg>
@@ -100,7 +100,7 @@
 									</div>
 								</div>
 							</template>
-							<button class="btn btn-outline-secondary mt-4 w-100" @click="saveEntities">Save Entities</button>
+							<button class="btn btn-outline-primary mt-4 w-100" @click="saveEntities">Save Entities</button>
 						</div>
 					</div>
 				</div>

@@ -45,8 +45,8 @@
 
 						<!-- Button to show hints / solution -->
 						<div class="mb-4" v-if="hint === -1">
-							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0" v-if="challenge.hints.length > 0">Show hint</button>
-							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint = 0; showSolution()" v-else-if="challenge.type !== 'DMN_MODEL'">Show solution</button>
+							<button class="btn btn-block btn-outline-primary" style="text-align:center" v-on:click="hint = 0" v-if="challenge.hints.length > 0">Show hint</button>
+							<button class="btn btn-block btn-outline-primary" style="text-align:center" v-on:click="hint = 0; showSolution()" v-else-if="challenge.type !== 'DMN_MODEL'">Show solution</button>
 						</div>
 
 						<!-- If hints exist, add left/right buttons to iterate over all hints -->
@@ -55,7 +55,7 @@
 							<div class="container" style="display: flex">
 								<!-- Left button -->
 								<div class="me-2" v-if="hint > 0">
-									<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint -= 1">
+									<button class="btn btn-block btn-outline-primary" style="text-align:center" v-on:click="hint -= 1">
 										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 											<path d="M20,9V15H12V19.84L4.16,12L12,4.16V9H20Z" fill="currentColor"/>
 										</svg>
@@ -69,12 +69,12 @@
 
 								<!-- Right button -->
 								<div class="ms-2" v-if="hint < challenge.hints.length">
-									<button class="btn btn-block btn-outline-secondary" style="text-align: center" v-if="hint >= 0 && hint < challenge.hints.length - 1" v-on:click="hint += 1">
+									<button class="btn btn-block btn-outline-primary" style="text-align: center" v-if="hint >= 0 && hint < challenge.hints.length - 1" v-on:click="hint += 1">
 										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 											<path d="M4,15V9H12V4.16L19.84,12L12,19.84V15H4Z" fill="currentColor"/>
 										</svg>
 									</button>
-									<button class="btn btn-block btn-outline-secondary" style="text-align: center" v-else-if="challenge.type !== 'DMN_MODEL'" v-on:click="hint += 1; showSolution()">
+									<button class="btn btn-block btn-outline-primary" style="text-align: center" v-else-if="challenge.type !== 'DMN_MODEL'" v-on:click="hint += 1; showSolution()">
 										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 											<path d="M10 3H14V14H10V3M10 21V17H14V21H10Z" fill="currentColor"/>
 										</svg>
@@ -85,7 +85,7 @@
 
 						<!-- Add button to revert to original FEEL expression if solution is being shown -->
 						<div class="mb-4" v-if="hint === challenge.hints.length">
-							<button class="btn btn-block btn-outline-secondary" style="text-align:center" v-on:click="hint -= 1; showOriginalExpression()">
+							<button class="btn btn-block btn-outline-primary" style="text-align:center" v-on:click="hint -= 1; showOriginalExpression()">
 								<div>Undo solution</div>
 							</button>
 						</div>

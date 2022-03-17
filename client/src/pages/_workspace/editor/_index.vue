@@ -4,12 +4,12 @@
 			<div class="import-result me-2" v-if="models.length > 0">
 				<b>{{models[$route.params.index].name}}</b> ({{models[$route.params.index].namespace}})
 			</div>
-			<button class="btn btn-outline-secondary" v-on:click="editor.undo()">
+			<button class="btn btn-outline-primary" v-on:click="editor.undo()">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
 					<path d="M12.5 8c-2.65 0-5.05 1-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" fill="currentColor"/>
 				</svg>
 			</button>
-			<button class="btn btn-outline-secondary me-2" v-on:click="editor.redo()">
+			<button class="btn btn-outline-primary me-2" v-on:click="editor.redo()">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
 					<path d="M18.4 10.6C16.55 9 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16a8.002 8.002 0 017.6-5.5c1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" fill="currentColor"/>
 				</svg>

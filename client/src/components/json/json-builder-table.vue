@@ -19,17 +19,17 @@
 				<span class="input-group-text" v-on:click="exportPath(path)">
 					<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path d="M18.11 7.93v8.14H23v-1.63h-3.26V7.93zM14 7.93a1.63 1.63 0 00-1.63 1.63v4.88A1.63 1.63 0 0014 16.07h1.63a1.63 1.63 0 001.63-1.63V9.56a1.63 1.63 0 00-1.63-1.63H14m0 1.63h1.63v4.88H14zM8.33 7.93A1.63 1.63 0 006.7 9.56v4.88a1.63 1.63 0 001.63 1.63H10a1.63 1.63 0 001.63-1.63V9.56A1.63 1.63 0 0010 7.93H8.33m0 1.63H10v4.88H8.33zM5.89 10.78V9.56a1.63 1.63 0 00-1.63-1.63H1v8.14h3.26a1.63 1.63 0 001.63-1.63v-1.22A1.25 1.25 0 004.67 12a1.25 1.25 0 001.22-1.22m-1.63 3.66H2.63v-1.63h1.63v1.63m0-3.25H2.63V9.56h1.63z" fill="currentColor"/></svg>
 				</span>
-			<button type="button" class="btn" v-bind:class="[value.value === undefined ? 'btn-secondary' : 'btn-white']" v-bind:disabled="fixedValues" v-on:click="$set(value, 'value', undefined)">
+			<button type="button" class="btn" v-bind:class="[value.value === undefined ? 'btn-primary' : 'btn-white']" v-bind:disabled="fixedValues" v-on:click="$set(value, 'value', undefined)">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 					<path d="M19 3H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 2v14H5V5h14z" fill="currentColor"/>
 				</svg>
 			</button>
-			<button type="button" class="btn" v-bind:class="[value.value === true ? 'btn-secondary' : 'btn-white']" v-bind:disabled="fixedValues" v-on:click="$set(value, 'value', true)">
+			<button type="button" class="btn" v-bind:class="[value.value === true ? 'btn-primary' : 'btn-white']" v-bind:disabled="fixedValues" v-on:click="$set(value, 'value', true)">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 					<path d="M19 19H5V5h10V3H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8h-2m-11.09-.92L6.5 11.5 11 16 21 6l-1.41-1.42L11 13.17l-3.09-3.09z" fill="currentColor"/>
 				</svg>
 			</button>
-			<button type="button" class="btn" v-bind:class="[value.value === false ? 'btn-secondary' : 'btn-white']" v-bind:disabled="fixedValues" v-on:click="$set(value, 'value', false)">
+			<button type="button" class="btn" v-bind:class="[value.value === false ? 'btn-primary' : 'btn-white']" v-bind:disabled="fixedValues" v-on:click="$set(value, 'value', false)">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 					<path d="M19 19V5H5v14h14m0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-2 8v2H7v-2h10z" fill="currentColor"/>
 				</svg>

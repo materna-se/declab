@@ -4,7 +4,7 @@
 			<!--<h3 class="mb-0 me-auto">Models</h3>-->
 			<!--
 			<div>
-				<button class="btn btn-block btn-outline-secondary" v-on:click="importSample">
+				<button class="btn btn-block btn-outline-primary" v-on:click="importSample">
 					Import samples
 				</button>
 			</div>

@@ -14,17 +14,17 @@
 						<!-- eslint-disable-next-line vue/require-v-for-key -->
 						<div class="list-group-item" v-for="(inputOption, index) in options.inputs">
 							<div class="row mx-0 mb-2 flex-row">
-								<button class="btn btn-outline-secondary" @click="toggleInputExpanded(index)">
-									<svg v-if="!options.inputs[index]['expanded']" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
+								<button class="btn btn-outline-primary" @click="toggleInputExpanded(index)">
+									<svg v-if="!options.inputs[index]['expanded']" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start">
 										<path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" fill="currentColor"/>
 									</svg>
-									<svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
+									<svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start">
 										<path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" fill="currentColor"/>
 									</svg>
 								</button>
 								<input class="form-control mb-0 me-2 ms-2" placeholder="Enter JSONPath..." style="flex: 1" v-model="options.inputs[index]['selector']">
-								<button class="btn btn-outline-secondary" @click="removeInput(index)">
-									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
+								<button class="btn btn-outline-primary" @click="removeInput(index)">
+									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start">
 										<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 									</svg>
 								</button>
@@ -39,7 +39,7 @@
 					</div>
 				</div>
 
-				<button class="btn btn-block btn-outline-secondary mb-4" @click="options.inputs.push({'selector' : '', 'expression' : '', 'expanded' : false})">
+				<button class="btn btn-block btn-outline-primary mb-4" @click="options.inputs.push({'selector' : '', 'expression' : '', 'expanded' : false})">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
 					</svg>
@@ -52,8 +52,8 @@
 						<div class="list-group-item" v-for="(selector, index) in options.outputs">
 							<div class="row mx-0 flex-row">
 								<input class="form-control mb-0 me-2" placeholder="Enter JSONPath..." style="flex: 1" v-model="options.outputs[index]">
-								<button class="btn btn-outline-secondary" @click="options.outputs.splice(index, 1)">
-									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left">
+								<button class="btn btn-outline-primary" @click="options.outputs.splice(index, 1)">
+									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start">
 										<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 									</svg>
 								</button>
@@ -65,14 +65,14 @@
 					</div>
 				</div>
 
-				<button class="btn btn-block btn-outline-secondary mb-4" @click="options.outputs.push('')">
+				<button class="btn btn-block btn-outline-primary mb-4" @click="options.outputs.push('')">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
 					</svg>
 				</button>
 
 				<h5 class="mb-2">Discovery</h5>
-				<button class="btn btn-block btn-outline-secondary mb-4" :disabled="inputTemplateSelected === null || options.inputs.length !== 2" @click="startDiscovery()">
+				<button class="btn btn-block btn-outline-primary mb-4" :disabled="inputTemplateSelected === null || options.inputs.length !== 2" @click="startDiscovery()">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M8,5.14V19.14L19,12.14L8,5.14Z" fill="currentColor"/>
 					</svg>

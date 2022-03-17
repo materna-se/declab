@@ -4,7 +4,7 @@
 			<h3 class="mb-0 me-auto">Models</h3>
 			<!--
 			<div>
-				<button class="btn btn-block btn-outline-secondary" @click="importSample">
+				<button class="btn btn-block btn-outline-primary" @click="importSample">
 					Import sample
 				</button>
 			</div>
