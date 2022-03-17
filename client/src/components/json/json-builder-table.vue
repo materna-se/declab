@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div style="overflow-x: auto">
 		<!--
 		Display value based on the data type.
 		-->
@@ -46,7 +46,7 @@
 				<tbody>
 				<tr v-for="(childValue, childKey) in value.value">
 					<td class="td-minimize bg-light">
-						<span class="input-group-text input-group-text-disabled w-100" v-on:click="exportPath([...path, childKey])">{{childKey}}</span>
+						<span class="input-group-text input-group-text-disabled w-100" v-on:click="exportPath([...path, childKey])" v-html="breakKey(childKey)"></span>
 					</td>
 					<td>
 						<json-builder-table v-bind:path="[...path, childKey]" v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues" v-on:update:path="exportPath($event)"/>
@@ -131,6 +131,9 @@ j
 			exportPath(path) {
 				this.$emit('update:path', path);
 			},
+			breakKey(key) {
+				return key.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/_/g, "_<wbr/>");
+			}
 		}
 	}
 </script>
