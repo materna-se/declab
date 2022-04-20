@@ -28,18 +28,6 @@ public class Laboratory {
 	public Laboratory() {
 	}
 
-	public Laboratory(String name) {
-		this(name, "", VisabilityType.PRIVATE);
-	}
-
-	public Laboratory(String name, String description) {
-		this(name, description, VisabilityType.PRIVATE);
-	}
-
-	public Laboratory(String name, VisabilityType visability) {
-		this(name, "", visability);
-	}
-
 	public Laboratory(String name, String description, VisabilityType visability) {
 		this.uuid = UUID.randomUUID().toString();
 		this.name = name;

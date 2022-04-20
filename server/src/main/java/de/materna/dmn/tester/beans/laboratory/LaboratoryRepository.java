@@ -15,6 +15,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import de.materna.dmn.tester.enums.VisabilityType;
+
 @ApplicationScoped
 public class LaboratoryRepository {
 
@@ -22,14 +24,14 @@ public class LaboratoryRepository {
 	private EntityManager em = entityManagerFactory.createEntityManager();
 	private EntityTransaction transaction = em.getTransaction();
 
-	public Laboratory loadByUuid(String uuid) {
+	public Laboratory findByUuid(String uuid) {
 		transaction.begin();
 		Laboratory Laboratory = em.find(Laboratory.class, uuid);
 		transaction.commit();
 		return Optional.ofNullable(Laboratory).get();
 	}
 
-	public List<Laboratory> loadByFilter(LaboratoryFilter... filterArray) {
+	public List<Laboratory> findByFilter(LaboratoryFilter... filterArray) {
 		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
 		CriteriaQuery<Laboratory> cquery = cbuilder.createQuery(Laboratory.class);
 		Root<Laboratory> LaboratoryRoot = cquery.from(Laboratory.class);
@@ -44,10 +46,16 @@ public class LaboratoryRepository {
 		return query.getResultList();
 	}
 
-	public void save(Laboratory laboratory) {
+	public Laboratory save(Laboratory laboratory) {
 		transaction.begin();
 		em.persist(laboratory);
 		transaction.commit();
+		return findByUuid(laboratory.getUuid()) != null ? laboratory : null;
+	}
+
+	public Laboratory create(String name, String description, VisabilityType visability) {
+		Laboratory laboratory = new Laboratory(name, description, visability);
+		return save(laboratory);
 	}
 
 	public void delete(Laboratory laboratory) {
