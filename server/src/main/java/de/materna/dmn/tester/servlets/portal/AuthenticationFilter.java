@@ -1,7 +1,7 @@
 package de.materna.dmn.tester.servlets.portal;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -14,17 +14,16 @@ import javax.ws.rs.ext.Provider;
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
 import de.materna.dmn.tester.beans.sessiontoken.SessionTokenRepository;
 import de.materna.dmn.tester.interfaces.Secured;
-import de.materna.dmn.tester.servlets.exceptions.authorization.AuthorizationFailureException;
 import de.materna.dmn.tester.servlets.exceptions.authorization.SessionTokenExpiredException;
-import de.materna.dmn.tester.servlets.exceptions.authorization.SessionTokenNotFoundException;
+import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
 
 @Secured
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter {
 
-	private static final String REALM = "example";
-	private static final String AUTHENTICATION_SCHEME = "declab";
+	private static final String REALM = "declab";
+	private static final String AUTHENTICATION_SCHEME = "Bearer";
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -36,7 +35,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		try {
 			String tokenString = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
 			validateToken(tokenString);
-		} catch (AuthorizationFailureException e) {
+		} catch (SessionTokenNotFoundException | SessionTokenExpiredException e) {
 			abortWithUnauthorized(requestContext);
 		}
 	}
@@ -55,7 +54,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		SessionToken token = new SessionTokenRepository().findByToken(tokenString);
 		if (token == null)
 			throw new SessionTokenNotFoundException("SessionToken not found : " + tokenString);
-		if (token.getExpiration().isBefore(LocalDateTime.now())) {
+		if (token.getExpiration().isBefore(LocalDate.now())) {
 			throw new SessionTokenExpiredException("SessionToken expired : " + tokenString);
 		}
 	}
