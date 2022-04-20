@@ -28,18 +28,6 @@ public class Workspace {
 	public Workspace() {
 	}
 
-	public Workspace(String name) {
-		this(name, "", VisabilityType.PRIVATE);
-	}
-
-	public Workspace(String name, String description) {
-		this(name, description, VisabilityType.PRIVATE);
-	}
-
-	public Workspace(String name, VisabilityType visability) {
-		this(name, "", visability);
-	}
-
 	public Workspace(String name, String description, VisabilityType visability) {
 		this.uuid = UUID.randomUUID().toString();
 		this.name = name;
