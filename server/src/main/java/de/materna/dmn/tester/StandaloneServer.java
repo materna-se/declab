@@ -13,14 +13,14 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import de.materna.dmn.tester.beans.user.User;
-import de.materna.dmn.tester.beans.user.UserRepository;
+import de.materna.dmn.tester.beans.user.repository.hibernate.h2.impl.UserHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.servlets.MainApplication;
 import de.materna.dmn.tester.sockets.MainSocket;
 
 public class StandaloneServer {
 
 	public static void main(String[] args) throws Exception {
-		UserRepository userRepository = new UserRepository();
+		UserHibernateH2RepositoryImpl userRepository = new UserHibernateH2RepositoryImpl();
 
 		User userGeorg = userRepository.register("georg.wolffgang@materna.de", "Shazzarr", "password", "Georg",
 				"Wolffgang");
