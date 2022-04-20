@@ -1,6 +1,7 @@
 package de.materna.dmn.tester.beans.sessiontoken;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,16 +22,16 @@ public class SessionToken {
 	private Long id;
 	@Column(name = "user")
 	@NotNull
-	private String userUuid;
+	private UUID userUuid;
 	@Column(name = "token", unique = true)
 	@NotNull
 	private String token;
 	@Column(name = "initiation")
-	private LocalDateTime initiation;
+	private LocalDate initiation;
 	@Column(name = "expiration")
-	private LocalDateTime expiration;
+	private LocalDate expiration;
 	@Column(name = "update")
-	private LocalDateTime lastUpdate;
+	private LocalDate lastUpdate;
 
 	public SessionToken() {
 	}
@@ -39,7 +40,7 @@ public class SessionToken {
 		this(user.getUuid(), token);
 	}
 
-	public SessionToken(String userUuid, String token) {
+	public SessionToken(UUID userUuid, String token) {
 		this.userUuid = userUuid;
 		this.token = token;
 	}
@@ -48,7 +49,7 @@ public class SessionToken {
 		return id;
 	}
 
-	public String getUserUuid() {
+	public UUID getUserUuid() {
 		return userUuid;
 	}
 
@@ -56,23 +57,23 @@ public class SessionToken {
 		return token;
 	}
 
-	public LocalDateTime getInitiation() {
+	public LocalDate getInitiation() {
 		return initiation;
 	}
 
-	public LocalDateTime getExpiration() {
+	public LocalDate getExpiration() {
 		return expiration;
 	}
 
-	public void setExpiration(LocalDateTime expiration) {
+	public void setExpiration(LocalDate expiration) {
 		this.expiration = expiration;
 	}
 
-	public LocalDateTime getLastUpdate() {
+	public LocalDate getLastUpdate() {
 		return lastUpdate;
 	}
 
-	public void setLastUpdate(LocalDateTime lastUpdate) {
+	public void setLastUpdate(LocalDate lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
 }
