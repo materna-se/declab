@@ -1,10 +1,11 @@
-package de.materna.dmn.tester.beans.sessiontoken;
+package de.materna.dmn.tester.beans.sessiontoken.repository.hibernate.h2.impl;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
@@ -18,17 +19,28 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.xml.registry.JAXRException;
 
+import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
+import de.materna.dmn.tester.beans.sessiontoken.SessionTokenComparator;
+import de.materna.dmn.tester.beans.sessiontoken.SessionTokenFilter;
 import de.materna.dmn.tester.beans.sessiontoken.filter.TokenFilter;
 import de.materna.dmn.tester.beans.sessiontoken.filter.UserUuidFilter;
+import de.materna.dmn.tester.beans.sessiontoken.repository.hibernate.h2.SessionTokenHibernateH2Repository;
 import de.materna.dmn.tester.beans.user.User;
 
 @ApplicationScoped
-public class SessionTokenRepository {
+public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenHibernateH2Repository {
 
 	private EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
 	private EntityManager em = entityManagerFactory.createEntityManager();
 	private EntityTransaction transaction = em.getTransaction();
 
+	@Override
+	public List<SessionToken> findAllByUserUuid(UUID userUuid) {
+		List<SessionToken> tokensFound = findByFilter(new UserUuidFilter(userUuid));
+		return tokensFound;
+	}
+
+	@Override
 	public SessionToken findById(long id) {
 		transaction.begin();
 		SessionToken token = em.find(SessionToken.class, id);
@@ -36,22 +48,20 @@ public class SessionTokenRepository {
 		return Optional.ofNullable(token).get();
 	}
 
-	public List<SessionToken> findByUserUuid(String userUuid) {
-		List<SessionToken> tokensFound = findByFilter(new UserUuidFilter(userUuid));
-		return tokensFound;
-	}
-
+	@Override
 	public SessionToken findCurrentByUser(User user) {
 		return findCurrentByUserUuid(user.getUuid());
 	}
 
-	public SessionToken findCurrentByUserUuid(String userUuid) {
-		List<SessionToken> tokens = findByUserUuid(userUuid);
+	@Override
+	public SessionToken findCurrentByUserUuid(UUID userUuid) {
+		List<SessionToken> tokens = findAllByUserUuid(userUuid);
 		Collections.sort(tokens, new SessionTokenComparator());
 		return tokens.get(0);
 	}
 
-	public SessionToken findByToken(String tokenString) {
+	@Override
+	public SessionToken findBySessionToken(String tokenString) {
 		List<SessionToken> tokens = findByFilter(new TokenFilter(tokenString));
 		return tokens.size() == 1 ? tokens.get(0) : null;
 	}
@@ -71,25 +81,29 @@ public class SessionTokenRepository {
 		return query.getResultList();
 	}
 
-	public SessionToken save(SessionToken token) {
+	@Override
+	public SessionToken put(SessionToken token) {
 		transaction.begin();
 		em.persist(token);
 		transaction.commit();
 		return findById(token.getId()) != null ? token : null;
 	}
 
+	@Override
 	public SessionToken update(long id) throws JAXRException {
-		return save(findById(id));
+		return put(findById(id));
 	}
 
+	@Override
 	public SessionToken update(SessionToken token) throws JAXRException {
 		if (token != null) {
-			token.setLastUpdate(LocalDateTime.now());
-			return save(token);
+			token.setLastUpdate(LocalDate.now());
+			return put(token);
 		}
 		return null;
 	}
 
+	@Override
 	public boolean delete(SessionToken token) {
 		transaction.begin();
 		em.remove(em.contains(token) ? token : em.merge(token));
