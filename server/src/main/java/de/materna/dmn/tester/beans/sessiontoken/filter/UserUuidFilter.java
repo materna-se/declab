@@ -1,5 +1,7 @@
 package de.materna.dmn.tester.beans.sessiontoken.filter;
 
+import java.util.UUID;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -10,9 +12,9 @@ import de.materna.dmn.tester.beans.sessiontoken.SessionTokenFilter;
 
 public class UserUuidFilter implements SessionTokenFilter {
 
-	String userUuid;
+	UUID userUuid;
 
-	public UserUuidFilter(String userUuid) {
+	public UserUuidFilter(UUID userUuid) {
 		this.userUuid = userUuid;
 	}
 
