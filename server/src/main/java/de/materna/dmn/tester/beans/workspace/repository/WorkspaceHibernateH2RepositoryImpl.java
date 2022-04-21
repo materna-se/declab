@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -16,10 +15,9 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.workspace.Workspace;
-import de.materna.dmn.tester.beans.workspace.WorkspaceFilter;
+import de.materna.dmn.tester.interfaces.filters.WorkspaceFilter;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 
-@ApplicationScoped
 public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 
 	private EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
