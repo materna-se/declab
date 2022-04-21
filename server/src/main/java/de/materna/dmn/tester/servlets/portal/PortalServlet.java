@@ -10,12 +10,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.materna.dmn.tester.beans.laboratory.Laboratory;
-import de.materna.dmn.tester.beans.laboratory.LaboratoryRepository;
+import de.materna.dmn.tester.beans.laboratory.repository.LaboratoryHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
-import de.materna.dmn.tester.beans.sessiontoken.SessionTokenRepository;
+import de.materna.dmn.tester.beans.sessiontoken.repository.SessionTokenHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.user.User;
-import de.materna.dmn.tester.beans.user.repository.hibernate.h2.impl.UserHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.user.repository.UserHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.enums.VisabilityType;
+import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
+import de.materna.dmn.tester.interfaces.repositories.UserRepository;
 import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.UserNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.registration.EmailInUseException;
@@ -27,8 +29,8 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/portal")
 public class PortalServlet {
-	UserHibernateH2RepositoryImpl userRepository = new UserHibernateH2RepositoryImpl();
-	SessionTokenRepository sessionTokenRepository = new SessionTokenRepository();
+	UserRepository userRepository = new UserHibernateH2RepositoryImpl();
+	SessionTokenRepository sessionTokenRepository = new SessionTokenHibernateH2RepositoryImpl();
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -36,7 +38,7 @@ public class PortalServlet {
 	public Response login(String body) {
 		LoginRequest loginRequest = (LoginRequest) SerializationHelper.getInstance().toClass(body, LoginRequest.class);
 		User user = userRepository.findByUsername(loginRequest.getUsername());
-		if (user != null && user.getHash().equals(User.createHash(loginRequest.getPassword()))) {
+		if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
 			String uuid = UUID.randomUUID().toString();
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(uuid)).build();
 		}
@@ -68,7 +70,7 @@ public class PortalServlet {
 				.toClass(body, CreateLaboratoryRequest.class);
 
 		String tokenString = createLaboratoryRequest.getTokenString();
-		SessionToken token = sessionTokenRepository.findByToken(tokenString);
+		SessionToken token = sessionTokenRepository.findBySessionToken(tokenString);
 
 		if (token == null)
 			throw new SessionTokenNotFoundException("SessionToken not found by String : " + tokenString);
@@ -82,7 +84,7 @@ public class PortalServlet {
 		String description = createLaboratoryRequest.getDescription();
 		VisabilityType visability = createLaboratoryRequest.getVisability();
 
-		Laboratory newLaboratory = new LaboratoryRepository().create(name, description, visability);
+		Laboratory newLaboratory = new LaboratoryHibernateH2RepositoryImpl().create(name, description, visability);
 		return newLaboratory != null
 				? Response.status(Response.Status.CREATED)
 						.entity(SerializationHelper.getInstance().toJSON(newLaboratory)).build()

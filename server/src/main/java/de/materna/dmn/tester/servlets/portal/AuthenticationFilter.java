@@ -12,7 +12,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
-import de.materna.dmn.tester.beans.sessiontoken.SessionTokenRepository;
+import de.materna.dmn.tester.beans.sessiontoken.repository.SessionTokenHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.interfaces.Secured;
 import de.materna.dmn.tester.servlets.exceptions.authorization.SessionTokenExpiredException;
 import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
@@ -51,7 +51,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 	}
 
 	private void validateToken(String tokenString) throws SessionTokenNotFoundException, SessionTokenExpiredException {
-		SessionToken token = new SessionTokenRepository().findByToken(tokenString);
+		SessionToken token = new SessionTokenHibernateH2RepositoryImpl().findBySessionToken(tokenString);
 		if (token == null)
 			throw new SessionTokenNotFoundException("SessionToken not found : " + tokenString);
 		if (token.getExpiration().isBefore(LocalDate.now())) {
