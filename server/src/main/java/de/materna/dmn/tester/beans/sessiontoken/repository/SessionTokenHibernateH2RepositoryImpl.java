@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans.sessiontoken.repository.hibernate.h2.impl;
+package de.materna.dmn.tester.beans.sessiontoken.repository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -24,10 +23,9 @@ import de.materna.dmn.tester.beans.sessiontoken.SessionTokenComparator;
 import de.materna.dmn.tester.beans.sessiontoken.SessionTokenFilter;
 import de.materna.dmn.tester.beans.sessiontoken.filter.TokenFilter;
 import de.materna.dmn.tester.beans.sessiontoken.filter.UserUuidFilter;
-import de.materna.dmn.tester.beans.sessiontoken.repository.hibernate.h2.SessionTokenHibernateH2Repository;
 import de.materna.dmn.tester.beans.user.User;
+import de.materna.dmn.tester.interfaces.repositories.hibernate.h2.SessionTokenHibernateH2Repository;
 
-@ApplicationScoped
 public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenHibernateH2Repository {
 
 	private EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");

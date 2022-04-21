@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans.sessiontoken.repository;
+package de.materna.dmn.tester.interfaces.repositories;
 
 import java.util.List;
 import java.util.UUID;
