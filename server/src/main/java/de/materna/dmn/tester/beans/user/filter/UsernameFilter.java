@@ -6,7 +6,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.user.User;
-import de.materna.dmn.tester.beans.user.UserFilter;
+import de.materna.dmn.tester.interfaces.filters.UserFilter;
 
 public class UsernameFilter implements UserFilter {
 

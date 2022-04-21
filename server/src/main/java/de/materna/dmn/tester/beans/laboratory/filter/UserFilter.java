@@ -6,7 +6,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.laboratory.Laboratory;
-import de.materna.dmn.tester.beans.laboratory.LaboratoryFilter;
+import de.materna.dmn.tester.interfaces.filters.LaboratoryFilter;
 
 public class UserFilter implements LaboratoryFilter {
 
