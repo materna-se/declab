@@ -4,16 +4,16 @@ import java.util.UUID;
 
 import de.materna.dmn.tester.enums.VisabilityType;
 
-public class CreateLaboratoryRequest {
+public class CreateWorkspaceRequest {
 	private UUID sessionTokenUuid;
 	private String name;
 	private String description;
 	private VisabilityType visability;
 
-	public CreateLaboratoryRequest() {
+	public CreateWorkspaceRequest() {
 	}
 
-	public CreateLaboratoryRequest(String name, String description, UUID sessionTokenUuid, VisabilityType visability) {
+	public CreateWorkspaceRequest(String name, String description, UUID sessionTokenUuid, VisabilityType visability) {
 		this.name = name;
 		this.description = description;
 		this.sessionTokenUuid = sessionTokenUuid;

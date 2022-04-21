@@ -15,6 +15,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.workspace.Workspace;
+import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.filters.WorkspaceFilter;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 
@@ -33,10 +34,17 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	@Override
-	public void put(Workspace workspace) {
+	public Workspace put(Workspace workspace) {
 		transaction.begin();
 		em.persist(workspace);
 		transaction.commit();
+		return findByUuid(workspace.getUuid()) != null ? workspace : null;
+	}
+
+	@Override
+	public Workspace create(String name, String description, VisabilityType visability) {
+		Workspace workspace = new Workspace(name, description, visability);
+		return put(workspace);
 	}
 
 	@Override
@@ -46,7 +54,7 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 		transaction.commit();
 	}
 
-	public List<Workspace> loadByFilter(WorkspaceFilter... filterArray) {
+	public List<Workspace> findByFilter(WorkspaceFilter... filterArray) {
 		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
 		CriteriaQuery<Workspace> cquery = cbuilder.createQuery(Workspace.class);
 		Root<Workspace> WorkspaceRoot = cquery.from(Workspace.class);
