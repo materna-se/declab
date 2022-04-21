@@ -8,7 +8,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
-import de.materna.dmn.tester.beans.sessiontoken.SessionTokenFilter;
+import de.materna.dmn.tester.interfaces.filters.SessionTokenFilter;
 
 public class UserUuidFilter implements SessionTokenFilter {
 
