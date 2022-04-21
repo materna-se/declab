@@ -19,9 +19,9 @@ import javax.xml.registry.JAXRException;
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
 import de.materna.dmn.tester.beans.sessiontoken.repository.SessionTokenHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.user.User;
-import de.materna.dmn.tester.beans.user.UserFilter;
 import de.materna.dmn.tester.beans.user.filter.EmailFilter;
 import de.materna.dmn.tester.beans.user.filter.UsernameFilter;
+import de.materna.dmn.tester.interfaces.filters.UserFilter;
 import de.materna.dmn.tester.interfaces.repositories.UserRepository;
 
 public class UserHibernateH2RepositoryImpl implements UserRepository {
@@ -61,8 +61,8 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public User findBySessionToken(String tokenString) {
-		SessionToken token = new SessionTokenHibernateH2RepositoryImpl().findBySessionToken(tokenString);
+	public User findBySessionToken(UUID tokenUuid) {
+		SessionToken token = new SessionTokenHibernateH2RepositoryImpl().findByUuid(tokenUuid);
 		return findByUuid(token.getUserUuid());
 	}
 

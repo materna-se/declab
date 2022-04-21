@@ -3,6 +3,7 @@ package de.materna.dmn.tester.beans.laboratory.repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -15,8 +16,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.laboratory.Laboratory;
-import de.materna.dmn.tester.beans.laboratory.LaboratoryFilter;
 import de.materna.dmn.tester.enums.VisabilityType;
+import de.materna.dmn.tester.interfaces.filters.LaboratoryFilter;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
 
 public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository {
@@ -36,9 +37,9 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	}
 
 	@Override
-	public Laboratory findByUuid(String uuid) {
+	public Laboratory findByUuid(UUID laboratoryUuid) {
 		transaction.begin();
-		Laboratory Laboratory = em.find(Laboratory.class, uuid);
+		Laboratory Laboratory = em.find(Laboratory.class, laboratoryUuid);
 		transaction.commit();
 		return Optional.ofNullable(Laboratory).get();
 	}

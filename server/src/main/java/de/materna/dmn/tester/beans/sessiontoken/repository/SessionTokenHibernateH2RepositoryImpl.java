@@ -20,10 +20,9 @@ import javax.xml.registry.JAXRException;
 
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
 import de.materna.dmn.tester.beans.sessiontoken.SessionTokenComparator;
-import de.materna.dmn.tester.beans.sessiontoken.SessionTokenFilter;
-import de.materna.dmn.tester.beans.sessiontoken.filter.TokenFilter;
 import de.materna.dmn.tester.beans.sessiontoken.filter.UserUuidFilter;
 import de.materna.dmn.tester.beans.user.User;
+import de.materna.dmn.tester.interfaces.filters.SessionTokenFilter;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
 
 public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenRepository {
@@ -33,17 +32,27 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	private EntityTransaction transaction = em.getTransaction();
 
 	@Override
+	public List<SessionToken> findAll() {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<SessionToken> cq = cb.createQuery(SessionToken.class);
+		Root<SessionToken> rootEntry = cq.from(SessionToken.class);
+		CriteriaQuery<SessionToken> all = cq.select(rootEntry);
+		TypedQuery<SessionToken> allQuery = em.createQuery(all);
+		return allQuery.getResultList();
+	}
+
+	@Override
 	public List<SessionToken> findAllByUserUuid(UUID userUuid) {
 		List<SessionToken> tokensFound = findByFilter(new UserUuidFilter(userUuid));
 		return tokensFound;
 	}
 
 	@Override
-	public SessionToken findById(long id) {
+	public SessionToken findByUuid(UUID tokenUuid) {
 		transaction.begin();
-		SessionToken token = em.find(SessionToken.class, id);
+		SessionToken sessionToken = em.find(SessionToken.class, tokenUuid);
 		transaction.commit();
-		return Optional.ofNullable(token).get();
+		return Optional.ofNullable(sessionToken).get();
 	}
 
 	@Override
@@ -56,12 +65,6 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 		List<SessionToken> tokens = findAllByUserUuid(userUuid);
 		Collections.sort(tokens, new SessionTokenComparator());
 		return tokens.get(0);
-	}
-
-	@Override
-	public SessionToken findBySessionToken(String tokenString) {
-		List<SessionToken> tokens = findByFilter(new TokenFilter(tokenString));
-		return tokens.size() == 1 ? tokens.get(0) : null;
 	}
 
 	public List<SessionToken> findByFilter(SessionTokenFilter... filterArray) {
@@ -84,12 +87,7 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 		transaction.begin();
 		em.persist(token);
 		transaction.commit();
-		return findById(token.getId()) != null ? token : null;
-	}
-
-	@Override
-	public SessionToken update(long id) throws JAXRException {
-		return put(findById(id));
+		return findByUuid(token.getUuid()) != null ? token : null;
 	}
 
 	@Override
@@ -102,10 +100,10 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	}
 
 	@Override
-	public boolean delete(SessionToken token) {
+	public boolean delete(SessionToken sessionToken) {
 		transaction.begin();
-		em.remove(em.contains(token) ? token : em.merge(token));
+		em.remove(em.contains(sessionToken) ? sessionToken : em.merge(sessionToken));
 		transaction.commit();
-		return findById(token.getId()) == null;
+		return findByUuid(sessionToken.getUuid()) == null;
 	}
 }
