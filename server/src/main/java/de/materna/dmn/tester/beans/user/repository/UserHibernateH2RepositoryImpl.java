@@ -22,9 +22,9 @@ import de.materna.dmn.tester.beans.user.User;
 import de.materna.dmn.tester.beans.user.UserFilter;
 import de.materna.dmn.tester.beans.user.filter.EmailFilter;
 import de.materna.dmn.tester.beans.user.filter.UsernameFilter;
-import de.materna.dmn.tester.interfaces.repositories.hibernate.h2.UserHibernateH2Repository;
+import de.materna.dmn.tester.interfaces.repositories.UserRepository;
 
-public class UserHibernateH2RepositoryImpl implements UserHibernateH2Repository {
+public class UserHibernateH2RepositoryImpl implements UserRepository {
 
 	private EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
 	private EntityManager em = entityManagerFactory.createEntityManager();

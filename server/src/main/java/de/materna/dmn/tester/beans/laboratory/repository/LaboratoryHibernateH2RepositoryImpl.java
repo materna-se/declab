@@ -17,9 +17,9 @@ import javax.persistence.criteria.Root;
 import de.materna.dmn.tester.beans.laboratory.Laboratory;
 import de.materna.dmn.tester.beans.laboratory.LaboratoryFilter;
 import de.materna.dmn.tester.enums.VisabilityType;
-import de.materna.dmn.tester.interfaces.repositories.hibernate.h2.LaboratoryHibernateH2Repository;
+import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
 
-public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryHibernateH2Repository {
+public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository {
 
 	private EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
 	private EntityManager em = entityManagerFactory.createEntityManager();
