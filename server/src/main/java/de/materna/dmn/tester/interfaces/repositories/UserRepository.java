@@ -11,13 +11,13 @@ public interface UserRepository {
 
 	List<User> findAll();
 
-	User findByUuid(UUID uuid);
+	User findByUuid(UUID userUuid);
 
 	User findByEmail(String email);
 
 	User findByUsername(String username);
 
-	User findBySessionToken(String tokenString);
+	User findBySessionToken(UUID tokenUuid);
 
 	User put(User user);
 

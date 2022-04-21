@@ -12,21 +12,19 @@ import de.materna.dmn.tester.beans.user.User;
 @ApplicationScoped
 public interface SessionTokenRepository {
 
-	public List<SessionToken> findAllByUserUuid(UUID userUuid);
+	List<SessionToken> findAll();
 
-	public SessionToken findById(long id);
+	List<SessionToken> findAllByUserUuid(UUID userUuid);
 
-	public SessionToken findCurrentByUser(User user);
+	SessionToken findByUuid(UUID tokenUuid);
 
-	public SessionToken findCurrentByUserUuid(UUID userUuid);
+	SessionToken findCurrentByUser(User user);
 
-	public SessionToken findBySessionToken(String tokenString);
+	SessionToken findCurrentByUserUuid(UUID userUuid);
 
-	public SessionToken put(SessionToken token);
+	SessionToken put(SessionToken token);
 
-	public SessionToken update(long id) throws JAXRException;
+	SessionToken update(SessionToken token) throws JAXRException;
 
-	public SessionToken update(SessionToken token) throws JAXRException;
-
-	public boolean delete(SessionToken token);
+	boolean delete(SessionToken token);
 }
