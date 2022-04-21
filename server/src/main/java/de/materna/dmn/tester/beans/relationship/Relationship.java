@@ -1,5 +1,7 @@
 package de.materna.dmn.tester.beans.relationship;
 
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,38 +18,38 @@ public class Relationship {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Column(name = "user")
-	private String user;
+	private UUID user;
 	@Column(name = "laboratory")
-	private String laboratory;
+	private UUID laboratory;
 	@Column(name = "workspace")
-	private String workplace;
+	private UUID workplace;
 	@Column(name = "type")
 	private RelationshipType type;
 
 	public Relationship() {
 	}
 
-	public String getUser() {
+	public UUID getUser() {
 		return user;
 	}
 
-	public void setUser(String user) {
+	public void setUser(UUID user) {
 		this.user = user;
 	}
 
-	public String getLaboratory() {
+	public UUID getLaboratory() {
 		return laboratory;
 	}
 
-	public void setLaboratory(String laboratory) {
+	public void setLaboratory(UUID laboratory) {
 		this.laboratory = laboratory;
 	}
 
-	public String getWorkplace() {
+	public UUID getWorkplace() {
 		return workplace;
 	}
 
-	public void setWorkplace(String workplace) {
+	public void setWorkplace(UUID workplace) {
 		this.workplace = workplace;
 	}
 
