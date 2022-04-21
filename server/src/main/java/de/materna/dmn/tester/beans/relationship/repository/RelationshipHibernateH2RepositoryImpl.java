@@ -46,7 +46,7 @@ public class RelationshipHibernateH2RepositoryImpl implements RelationshipReposi
 		transaction.commit();
 	}
 
-	public List<Relationship> loadByFilter(RelationshipFilter... filterArray) {
+	public List<Relationship> findByFilter(RelationshipFilter... filterArray) {
 		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
 		CriteriaQuery<Relationship> cquery = cbuilder.createQuery(Relationship.class);
 		Root<Relationship> relationshipRoot = cquery.from(Relationship.class);
