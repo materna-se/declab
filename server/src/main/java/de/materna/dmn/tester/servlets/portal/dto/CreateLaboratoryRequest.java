@@ -1,9 +1,11 @@
 package de.materna.dmn.tester.servlets.portal.dto;
 
+import java.util.UUID;
+
 import de.materna.dmn.tester.enums.VisabilityType;
 
 public class CreateLaboratoryRequest {
-	private String tokenString;
+	private UUID tokenUuid;
 	private String name;
 	private String description;
 	private VisabilityType visability;
@@ -11,11 +13,19 @@ public class CreateLaboratoryRequest {
 	public CreateLaboratoryRequest() {
 	}
 
-	public CreateLaboratoryRequest(String name, String description, String tokenString, VisabilityType visability) {
+	public CreateLaboratoryRequest(String name, String description, UUID tokenUuid, VisabilityType visability) {
 		this.name = name;
 		this.description = description;
-		this.tokenString = tokenString;
+		this.tokenUuid = tokenUuid;
 		this.visability = visability;
+	}
+
+	public UUID getTokenUuid() {
+		return tokenUuid;
+	}
+
+	public void setTokenUuid(UUID tokenUuid) {
+		this.tokenUuid = tokenUuid;
 	}
 
 	public String getName() {
@@ -32,14 +42,6 @@ public class CreateLaboratoryRequest {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getTokenString() {
-		return tokenString;
-	}
-
-	public void setTokenString(String tokenString) {
-		this.tokenString = tokenString;
 	}
 
 	public VisabilityType getVisability() {

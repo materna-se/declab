@@ -69,11 +69,11 @@ public class PortalServlet {
 		CreateLaboratoryRequest createLaboratoryRequest = (CreateLaboratoryRequest) SerializationHelper.getInstance()
 				.toClass(body, CreateLaboratoryRequest.class);
 
-		String tokenString = createLaboratoryRequest.getTokenString();
-		SessionToken token = sessionTokenRepository.findBySessionToken(tokenString);
+		UUID tokenUuid = createLaboratoryRequest.getTokenUuid();
+		SessionToken token = sessionTokenRepository.findByUuid(tokenUuid);
 
 		if (token == null)
-			throw new SessionTokenNotFoundException("SessionToken not found by String : " + tokenString);
+			throw new SessionTokenNotFoundException("SessionToken not found by String : " + tokenUuid);
 
 		User owner = userRepository.findByUuid(token.getUserUuid());
 
