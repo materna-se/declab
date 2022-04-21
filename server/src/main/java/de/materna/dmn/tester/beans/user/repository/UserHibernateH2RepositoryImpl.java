@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans.user.repository.hibernate.h2.impl;
+package de.materna.dmn.tester.beans.user.repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +17,12 @@ import javax.persistence.criteria.Root;
 import javax.xml.registry.JAXRException;
 
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
-import de.materna.dmn.tester.beans.sessiontoken.repository.hibernate.h2.impl.SessionTokenHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.sessiontoken.repository.SessionTokenHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.user.User;
 import de.materna.dmn.tester.beans.user.UserFilter;
 import de.materna.dmn.tester.beans.user.filter.EmailFilter;
 import de.materna.dmn.tester.beans.user.filter.UsernameFilter;
-import de.materna.dmn.tester.beans.user.repository.hibernate.h2.UserHibernateH2Repository;
+import de.materna.dmn.tester.interfaces.repositories.hibernate.h2.UserHibernateH2Repository;
 
 public class UserHibernateH2RepositoryImpl implements UserHibernateH2Repository {
 
