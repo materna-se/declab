@@ -6,7 +6,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.workspace.Workspace;
-import de.materna.dmn.tester.beans.workspace.WorkspaceFilter;
+import de.materna.dmn.tester.interfaces.filters.WorkspaceFilter;
 
 public class UserUuidFilter implements WorkspaceFilter {
 
