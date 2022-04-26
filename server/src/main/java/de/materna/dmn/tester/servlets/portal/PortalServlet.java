@@ -20,8 +20,10 @@ import de.materna.dmn.tester.beans.user.repository.UserHibernateH2RepositoryImpl
 import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.beans.workspace.repository.WorkspaceHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.enums.VisabilityType;
+import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
 import de.materna.dmn.tester.interfaces.repositories.UserRepository;
+import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.UserNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.registration.EmailInUseException;
@@ -36,6 +38,8 @@ import de.materna.jdec.serialization.SerializationHelper;
 public class PortalServlet {
 	private final UserRepository userRepository = new UserHibernateH2RepositoryImpl();
 	private final SessionTokenRepository sessionTokenRepository = new SessionTokenHibernateH2RepositoryImpl();
+	private final LaboratoryRepository laboratoryRepository = new LaboratoryHibernateH2RepositoryImpl();
+	private final WorkspaceRepository workspaceRepository = new WorkspaceHibernateH2RepositoryImpl();
 
 	@POST
 	@Path("/login")
@@ -45,7 +49,7 @@ public class PortalServlet {
 		final LoginRequest loginRequest = (LoginRequest) SerializationHelper.getInstance().toClass(body,
 				LoginRequest.class);
 		final User user = userRepository.findByUsername(loginRequest.getUsername());
-		if ((user != null) && user.getPassword().equals(BCrypt.hashpw(loginRequest.getPassword(), user.getSalt()))) {
+		if (user != null && user.getPassword().equals(BCrypt.hashpw(loginRequest.getPassword(), user.getSalt()))) {
 			final SessionToken sessionToken = new SessionToken(user);
 			sessionTokenRepository.put(sessionToken);
 			return Response.status(Response.Status.OK)
@@ -64,12 +68,14 @@ public class PortalServlet {
 		final String username = registerRequest.getUsername();
 		final String email = registerRequest.getEmail();
 		final String password = registerRequest.getPassword();
+
 		if (userRepository.findByUsername(username) != null) {
 			throw new UsernameInUseException("The username is already in use : " + username);
 		}
 		if (userRepository.findByEmail(registerRequest.getEmail()) != null) {
 			throw new EmailInUseException("The email is already in use : " + email);
 		}
+
 		final User newUser = userRepository.register(email, username, password);
 		return newUser != null
 				? Response.status(Response.Status.CREATED).entity(SerializationHelper.getInstance().toJSON(newUser))
@@ -81,28 +87,27 @@ public class PortalServlet {
 		final CreateLaboratoryRequest createLaboratoryRequest = (CreateLaboratoryRequest) SerializationHelper
 				.getInstance().toClass(body, CreateLaboratoryRequest.class);
 
-		final UUID tokenUuid = createLaboratoryRequest.getSessionTokenUuid();
-		final SessionToken sessionToken = sessionTokenRepository.findByUuid(tokenUuid);
+		final UUID sessionTokenUuid = createLaboratoryRequest.getSessionTokenUuid();
+		final SessionToken sessionToken = sessionTokenRepository.findByUuid(sessionTokenUuid);
 
 		if (sessionToken == null) {
-			throw new SessionTokenNotFoundException("SessionToken not found by String : " + tokenUuid);
+			throw new SessionTokenNotFoundException("SessionToken not found by string : " + sessionTokenUuid);
 		}
 
 		final User owner = userRepository.findByUuid(sessionToken.getUserUuid());
 
 		if (owner == null) {
-			throw new UserNotFoundException("User not found by uuid : " + sessionToken.getUserUuid());
+			throw new UserNotFoundException("User not found by session token : " + sessionToken.getUserUuid());
 		}
 
 		final String name = createLaboratoryRequest.getName();
 		final String description = createLaboratoryRequest.getDescription();
 		final VisabilityType visability = createLaboratoryRequest.getVisability();
 
-		final Laboratory newLaboratory = new LaboratoryHibernateH2RepositoryImpl().create(name, description,
-				visability);
+		final Laboratory newLaboratory = laboratoryRepository.create(name, description, visability);
 		return newLaboratory != null
 				? Response.status(Response.Status.CREATED)
-						.entity(SerializationHelper.getInstance().toJSON(newLaboratory)).build()
+						.entity(SerializationHelper.getInstance().toJSON(newLaboratory.getUuid())).build()
 				: Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
@@ -114,24 +119,23 @@ public class PortalServlet {
 		final SessionToken sessionToken = sessionTokenRepository.findByUuid(tokenUuid);
 
 		if (sessionToken == null) {
-			throw new SessionTokenNotFoundException("SessionToken not found by String : " + tokenUuid);
+			throw new SessionTokenNotFoundException("SessionToken not found by string : " + tokenUuid);
 		}
 
 		final User owner = userRepository.findByUuid(sessionToken.getUserUuid());
 
 		if (owner == null) {
-			throw new UserNotFoundException("User not found by uuid : " + sessionToken.getUserUuid());
+			throw new UserNotFoundException("User not found by session token : " + sessionToken.getUserUuid());
 		}
 
 		final String name = createWorkspaceRequest.getName();
 		final String description = createWorkspaceRequest.getDescription();
 		final VisabilityType visability = createWorkspaceRequest.getVisability();
 
-		final Workspace newWorkspace = new WorkspaceHibernateH2RepositoryImpl().create(name, description, visability);
+		final Workspace newWorkspace = workspaceRepository.create(name, description, visability);
 		return newWorkspace != null
 				? Response.status(Response.Status.CREATED)
-						.entity(SerializationHelper.getInstance().toJSON(newWorkspace)).build()
+						.entity(SerializationHelper.getInstance().toJSON(newWorkspace.getUuid())).build()
 				: Response.status(Response.Status.NOT_MODIFIED).build();
 	}
-
 }
