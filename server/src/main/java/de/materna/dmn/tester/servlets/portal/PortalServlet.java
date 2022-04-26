@@ -34,8 +34,8 @@ import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/portal")
 public class PortalServlet {
-	UserRepository userRepository = new UserHibernateH2RepositoryImpl();
-	SessionTokenRepository sessionTokenRepository = new SessionTokenHibernateH2RepositoryImpl();
+	private final UserRepository userRepository = new UserHibernateH2RepositoryImpl();
+	private final SessionTokenRepository sessionTokenRepository = new SessionTokenHibernateH2RepositoryImpl();
 
 	@POST
 	@Path("/login")
@@ -48,11 +48,11 @@ public class PortalServlet {
 		// -> user.getSalt()
 		if (user != null && user.getPassword()
 				.equals(BCrypt.hashpw(loginRequest.getPassword(), "$2a$10$uFCpSmJSWBm00LNHVOZD/O"))) {
-			final String uuid = UUID.randomUUID().toString();
 
-			// Save session token
-
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(uuid)).build();
+			final SessionToken sessionToken = new SessionToken(user);
+			sessionTokenRepository.put(sessionToken);
+			return Response.status(Response.Status.OK)
+					.entity(SerializationHelper.getInstance().toJSON(sessionToken.getUuid())).build();
 		}
 		return Response.status(Response.Status.UNAUTHORIZED).build();
 	}
