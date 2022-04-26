@@ -50,16 +50,16 @@ public class ModelServlet {
 	@ReadAccess
 	@Produces("application/json")
 	public Response getModels(@PathParam("workspace") String workspaceUUID) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		List<Model> models = new LinkedList<>();
+		final List<Model> models = new LinkedList<>();
 
-		for (Map<String, String> model : workspace.getConfig().getModels()) {
-			String namespace = model.get("namespace");
+		for (final Map<String, String> model : workspace.getConfig().getModels()) {
+			final String namespace = model.get("namespace");
 			try {
 				models.add(workspace.getDecisionSession().getModel(namespace));
-			} catch (ModelNotFoundException e) {
-				String source = workspace.getModelManager().getFile(model.get("uuid")); // TODO: IOException?
+			} catch (final ModelNotFoundException e) {
+				final String source = workspace.getModelManager().getFile(model.get("uuid")); // TODO: IOException?
 				models.add(new Model(namespace, model.get("name"), source, Collections.emptySet(),
 						Collections.emptySet(), Collections.emptySet(), Collections.emptySet(), false));
 			}
@@ -76,11 +76,11 @@ public class ModelServlet {
 		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().lock();
 
 		try {
-			List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body,
+			final List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body,
 					new TypeReference<LinkedList<Map<String, String>>>() {
 					});
 
-			Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+			final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 			// Remove all old models and clear the decision session.
 			workspace.getModelManager().removeAllFiles();
@@ -88,21 +88,21 @@ public class ModelServlet {
 
 			boolean successful = true;
 
-			ImportResult globalImportResult = new ImportResult();
+			final ImportResult globalImportResult = new ImportResult();
 
-			List<Map<String, String>> importedModels = new LinkedList<>();
+			final List<Map<String, String>> importedModels = new LinkedList<>();
 			// Import the provided models, collect all import messages.
-			for (Map<String, String> model : models) {
+			for (final Map<String, String> model : models) {
 				try {
-					ImportResult importResult = workspace.getDecisionSession().importModel(model.get("namespace"),
+					final ImportResult importResult = workspace.getDecisionSession().importModel(model.get("namespace"),
 							model.get("source"));
 					globalImportResult.getMessages().addAll(importResult.getMessages());
-				} catch (ModelImportException exception) {
+				} catch (final ModelImportException exception) {
 					successful = false;
 					globalImportResult.getMessages().addAll(exception.getResult().getMessages());
 				}
 
-				String uuid = UUID.randomUUID().toString();
+				final String uuid = UUID.randomUUID().toString();
 				workspace.getModelManager().persistFile(uuid, model.get("source"));
 				model.put("uuid", uuid);
 				model.remove("source");
@@ -110,19 +110,17 @@ public class ModelServlet {
 				importedModels.add(model);
 			}
 
-			Configuration configuration = workspace.getConfig();
+			final Configuration configuration = workspace.getConfig();
 			configuration.setModels(importedModels);
 
 			// Check if the configured decision service still exists.
-			Configuration.DecisionService decisionService = configuration.getDecisionService();
-			if (decisionService != null) {
-				if (configuration.getModels().size() == 0 || workspace.getDecisionSession()
-						.getModel(DroolsHelper.getMainModelNamespace(workspace)).getDecisionServices().stream()
-						.noneMatch(name -> name.equals(decisionService.getName()))) {
-					// If the decision service does not exist anymore, we will remove the reference
-					// from the configuration.
-					configuration.setDecisionService(null);
-				}
+			final Configuration.DecisionService decisionService = configuration.getDecisionService();
+			if ((decisionService != null) && (configuration.getModels().size() == 0 || workspace.getDecisionSession()
+					.getModel(DroolsHelper.getMainModelNamespace(workspace)).getDecisionServices().stream()
+					.noneMatch(name -> name.equals(decisionService.getName())))) {
+				// If the decision service does not exist anymore, we will remove the reference
+				// from the configuration.
+				configuration.setDecisionService(null);
 			}
 
 			// Update the configuration and add an access log entry.
@@ -147,7 +145,7 @@ public class ModelServlet {
 	@Produces("application/json")
 	@Path("/decision-session")
 	public Response getDecisionSession(@PathParam("workspace") String workspaceUUID) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 		return Response.status(Response.Status.OK)
 				.entity(SerializationHelper.getInstance().toJSON(workspace.getConfig().getDecisionService())).build();
@@ -158,9 +156,9 @@ public class ModelServlet {
 	@Consumes("application/json")
 	@Path("/decision-session")
 	public Response setDecisionSession(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		Configuration configuration = workspace.getConfig();
+		final Configuration configuration = workspace.getConfig();
 		configuration.setDecisionService((Configuration.DecisionService) SerializationHelper.getInstance().toClass(body,
 				Configuration.DecisionService.class));
 		configuration.serialize();
@@ -176,17 +174,17 @@ public class ModelServlet {
 	@Path("/inputs")
 	@Produces("application/json")
 	public Response getInputs(@PathParam("workspace") String workspaceUUID) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		Configuration configuration = workspace.getConfig();
-		DMNModel mainModel = DroolsHelper.getMainModel(workspace);
+		final Configuration configuration = workspace.getConfig();
+		final DMNModel mainModel = DroolsHelper.getMainModel(workspace);
 
-		Map<String, Object> context = new HashMap<>();
+		final Map<String, Object> context = new HashMap<>();
 		if (configuration.getDecisionService() == null) {
 			context.put("inputs", workspace.getDecisionSession().getInputStructure(mainModel.getNamespace()));
 
-			Map<String, InputStructure> decisions = new HashMap<>();
-			for (DecisionNode decision : mainModel.getDecisions()) {
+			final Map<String, InputStructure> decisions = new HashMap<>();
+			for (final DecisionNode decision : mainModel.getDecisions()) {
 				decisions.put(decision.getName(), new InputStructure(decision.getResultType().getName()));
 			}
 			context.put("decisions", decisions);
@@ -206,14 +204,14 @@ public class ModelServlet {
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response calculateModelResult(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body,
+		final Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body,
 				new TypeReference<HashMap<String, Object>>() {
 				});
 
-		Configuration configuration = workspace.getConfig();
-		String mainModelNamespace = DroolsHelper.getMainModelNamespace(workspace);
+		final Configuration configuration = workspace.getConfig();
+		final String mainModelNamespace = DroolsHelper.getMainModelNamespace(workspace);
 
 		if (configuration.getDecisionService() == null) {
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance()
@@ -233,9 +231,9 @@ public class ModelServlet {
 	@Produces("text/plain")
 	public Response calculateRawResult(@PathParam("workspace") String workspaceUUID,
 			@QueryParam("engine") String engine, String body) throws IOException {
-		Decision decision = (Decision) SerializationHelper.getInstance().toClass(body, Decision.class);
+		final Decision decision = (Decision) SerializationHelper.getInstance().toClass(body, Decision.class);
 
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		try {
 			ExecutionResult executionResult;
 			switch (engine) {
@@ -255,7 +253,7 @@ public class ModelServlet {
 			}
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(executionResult))
 					.build();
-		} catch (ModelImportException exception) {
+		} catch (final ModelImportException exception) {
 			return Response.status(Response.Status.BAD_REQUEST)
 					.entity(SerializationHelper.getInstance().toJSON(exception.getResult())).build();
 		}
@@ -268,32 +266,32 @@ public class ModelServlet {
 	@Produces("application/json")
 	public Response importModelsAnonymous(@PathParam("workspace") String workspaceUUID, String body)
 			throws IOException {
-		List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body,
+		final List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body,
 				new TypeReference<LinkedList<Map<String, String>>>() {
 				});
 
-		DMNDecisionSession ds = new DMNDecisionSession();
+		final DMNDecisionSession ds = new DMNDecisionSession();
 
 		try {
-			ImportResult importResult = new ImportResult();
+			final ImportResult importResult = new ImportResult();
 
-			List<Map<String, String>> importedModels = new LinkedList<>();
+			final List<Map<String, String>> importedModels = new LinkedList<>();
 			// Import the provided models, collect all import messages.
-			for (Map<String, String> model : models) {
+			for (final Map<String, String> model : models) {
 				importResult.getMessages()
 						.addAll(ds.importModel(model.get("namespace"), model.get("source")).getMessages());
 				importedModels.add(model);
 			}
 
-			HashMap<String, Object> responseMap = new HashMap<String, Object>();
+			final HashMap<String, Object> responseMap = new HashMap<>();
 
 			responseMap.put("results", importResult);
 			responseMap.put("models", ds.getModels());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(responseMap))
 					.build();
-		} catch (ModelImportException exception) {
-			HashMap<String, Object> responseMap = new HashMap<String, Object>();
+		} catch (final ModelImportException exception) {
+			final HashMap<String, Object> responseMap = new HashMap<>();
 
 			responseMap.put("results", exception.getResult());
 			responseMap.put("models", new ArrayList<Model>());

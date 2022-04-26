@@ -40,7 +40,7 @@ public class Decision extends Serializable {
 
 	@Override
 	public void fromJSON(String json) {
-		Decision temp = (Decision) SerializationHelper.getInstance().toClass(json, Decision.class);
+		final Decision temp = (Decision) SerializationHelper.getInstance().toClass(json, Decision.class);
 		this.expression = temp.getExpression();
 		this.context = temp.getContext();
 	}

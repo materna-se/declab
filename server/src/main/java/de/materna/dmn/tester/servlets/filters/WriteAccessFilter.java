@@ -26,7 +26,7 @@ public class WriteAccessFilter implements ContainerRequestFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) {
-		Workspace workspace = workspaceManager.get(AccessFilterHelper.matchPath(requestContext));
+		final Workspace workspace = workspaceManager.get(AccessFilterHelper.matchPath(requestContext));
 		if (workspace.getConfig().getAccess() == Access.PUBLIC) {
 			return;
 		}

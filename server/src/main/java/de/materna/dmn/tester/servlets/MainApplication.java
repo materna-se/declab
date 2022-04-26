@@ -25,8 +25,8 @@ import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
 
 @ApplicationPath("/api")
 public class MainApplication extends Application {
-	private Set<Object> singletons = new HashSet<>();
-	private Set<Class<?>> classes = new HashSet<>();
+	private final Set<Object> singletons = new HashSet<>();
+	private final Set<Class<?>> classes = new HashSet<>();
 
 	public MainApplication() throws IOException {
 		// Before we initialize the endpoints, we'll initialize all workspaces.

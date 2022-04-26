@@ -56,8 +56,8 @@ public class PublicConfiguration extends Serializable {
 
 	@Override
 	public void fromJSON(String json) {
-		PublicConfiguration publicConfiguration = (PublicConfiguration) SerializationHelper.getInstance().toClass(json,
-				PublicConfiguration.class);
+		final PublicConfiguration publicConfiguration = (PublicConfiguration) SerializationHelper.getInstance()
+				.toClass(json, PublicConfiguration.class);
 		this.version = publicConfiguration.getVersion();
 		this.name = publicConfiguration.getName();
 		this.description = publicConfiguration.getDescription();

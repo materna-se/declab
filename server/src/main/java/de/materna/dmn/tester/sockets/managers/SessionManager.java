@@ -37,7 +37,7 @@ public class SessionManager {
 		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().lock();
 
 		try {
-			List<Session> sessions = workspaceSessions.get(workspaceUUID);
+			final List<Session> sessions = workspaceSessions.get(workspaceUUID);
 			if (sessions == null) {
 				return;
 			}
@@ -52,12 +52,12 @@ public class SessionManager {
 		SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().lock();
 
 		try {
-			List<Session> sessions = workspaceSessions.get(workspaceUUID);
+			final List<Session> sessions = workspaceSessions.get(workspaceUUID);
 			if (sessions == null) {
 				return;
 			}
 
-			for (Session session : sessions) {
+			for (final Session session : sessions) {
 				session.getAsyncRemote().sendText(message);
 			}
 		} finally {
@@ -69,7 +69,7 @@ public class SessionManager {
 		SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().lock();
 
 		try {
-			List<Session> sessions = workspaceSessions.get(workspaceUUID);
+			final List<Session> sessions = workspaceSessions.get(workspaceUUID);
 			if (sessions == null) {
 				return 0;
 			}

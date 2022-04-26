@@ -10,18 +10,18 @@ import javax.ws.rs.ext.Provider;
 public class CSRFFilter implements ContainerResponseFilter {
 	@Override
 	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-		MultivaluedMap<String, Object> responseHeaders = responseContext.getHeaders();
-		MultivaluedMap<String, String> requestHeaders = requestContext.getHeaders();
+		final MultivaluedMap<String, Object> responseHeaders = responseContext.getHeaders();
+		final MultivaluedMap<String, String> requestHeaders = requestContext.getHeaders();
 
 		responseHeaders.putSingle("Access-Control-Allow-Origin", "*");
 
-		if (requestContext.getMethod().equals("OPTIONS")) {
-			String requestedMethods = requestHeaders.getFirst("Access-Control-Request-Method");
+		if ("OPTIONS".equals(requestContext.getMethod())) {
+			final String requestedMethods = requestHeaders.getFirst("Access-Control-Request-Method");
 			if (requestedMethods != null) {
 				responseHeaders.putSingle("Access-Control-Allow-Methods", requestedMethods);
 			}
 
-			String requestedHeaders = requestHeaders.getFirst("Access-Control-Request-Headers");
+			final String requestedHeaders = requestHeaders.getFirst("Access-Control-Request-Headers");
 			if (requestedHeaders != null) {
 				responseHeaders.putSingle("Access-Control-Allow-Headers", requestedHeaders);
 			}

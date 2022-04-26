@@ -16,15 +16,15 @@ public class Scenario {
 	public Output output;
 
 	public Scenario() {
-
 	}
 
 	@JsonCreator
 	public Scenario(@JsonProperty(value = "name", required = true) String name,
 			@JsonProperty(value = "input", required = true) Input input,
 			@JsonProperty(value = "output", required = true) Output output) {
-		if (name == null)
+		if (name == null) {
 			throw new BadRequestException();
+		}
 
 		this.name = name;
 		this.input = input;

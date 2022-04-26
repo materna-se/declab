@@ -34,11 +34,11 @@ public class OutputServlet {
 	@Produces("application/json")
 	public Response getOutputs(@PathParam("workspace") String workspaceUUID, @QueryParam("order") boolean order)
 			throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		Map<String, PersistedOutput> unsortedOutputs = workspace.getOutputManager().getFiles();
+		final Map<String, PersistedOutput> unsortedOutputs = workspace.getOutputManager().getFiles();
 
-		Map<String, PersistedOutput> sortedOutputs = new LinkedHashMap<>();
+		final Map<String, PersistedOutput> sortedOutputs = new LinkedHashMap<>();
 		unsortedOutputs.entrySet().stream()
 				.sorted(Map.Entry.comparingByValue((o1, o2) -> (order ? -1 : 1) * o1.getName().compareTo(o2.getName())))
 				.forEach(entry -> sortedOutputs.put(entry.getKey(), entry.getValue()));
@@ -52,10 +52,10 @@ public class OutputServlet {
 	@Produces("application/json")
 	public Response getOutput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String outputUUID)
 			throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<PersistedOutput> outputManager = workspace.getOutputManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<PersistedOutput> outputManager = workspace.getOutputManager();
 
-		PersistedOutput output = outputManager.getFile(outputUUID);
+		final PersistedOutput output = outputManager.getFile(outputUUID);
 		if (output == null) {
 			throw new NotFoundException();
 		}
@@ -69,10 +69,10 @@ public class OutputServlet {
 	@WriteAccess
 	@Consumes("application/json")
 	public Response createOutput(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		String uuid = UUID.randomUUID().toString();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final String uuid = UUID.randomUUID().toString();
 
-		PersistedOutput persistedOutput = (PersistedOutput) SerializationHelper.getInstance().toClass(body,
+		final PersistedOutput persistedOutput = (PersistedOutput) SerializationHelper.getInstance().toClass(body,
 				PersistedOutput.class);
 		if (persistedOutput.getName() == null) {
 			throw new BadRequestException("Output name can't be null.");
@@ -91,13 +91,13 @@ public class OutputServlet {
 	@Produces("application/json")
 	public Response editOutput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String outputUUID,
 			String body) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<PersistedOutput> outputManager = workspace.getOutputManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<PersistedOutput> outputManager = workspace.getOutputManager();
 		if (!outputManager.getFiles().containsKey(outputUUID)) {
 			throw new NotFoundException();
 		}
 
-		PersistedOutput persistedOutput = (PersistedOutput) SerializationHelper.getInstance().toClass(body,
+		final PersistedOutput persistedOutput = (PersistedOutput) SerializationHelper.getInstance().toClass(body,
 				PersistedOutput.class);
 		if (persistedOutput.getName() == null) {
 			throw new BadRequestException("Output name can't be null.");
@@ -114,8 +114,8 @@ public class OutputServlet {
 	@Path("/{uuid}")
 	public Response deleteOutput(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String outputUUID)
 			throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<PersistedOutput> outputManager = workspace.getOutputManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<PersistedOutput> outputManager = workspace.getOutputManager();
 		if (!outputManager.getFiles().containsKey(outputUUID)) {
 			throw new NotFoundException();
 		}

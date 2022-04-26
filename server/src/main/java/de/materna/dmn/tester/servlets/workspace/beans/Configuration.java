@@ -94,7 +94,7 @@ public class Configuration extends PublicConfiguration {
 
 	@JsonIgnore
 	public PublicConfiguration getPublicConfig() {
-		PublicConfiguration publicConfiguration = new PublicConfiguration();
+		final PublicConfiguration publicConfiguration = new PublicConfiguration();
 		publicConfiguration.setVersion(this.version);
 		publicConfiguration.setName(this.name);
 		publicConfiguration.setDescription(this.description);
@@ -104,7 +104,8 @@ public class Configuration extends PublicConfiguration {
 
 	@Override
 	public void fromJSON(String body) {
-		Configuration config = (Configuration) SerializationHelper.getInstance().toClass(body, Configuration.class);
+		final Configuration config = (Configuration) SerializationHelper.getInstance().toClass(body,
+				Configuration.class);
 		this.version = config.getVersion();
 		this.name = config.getName();
 		this.description = config.getDescription();

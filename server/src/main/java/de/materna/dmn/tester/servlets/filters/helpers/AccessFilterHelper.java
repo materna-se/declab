@@ -18,13 +18,13 @@ public class AccessFilterHelper {
 
 	public static String matchPath(ContainerRequestContext requestContext) {
 		try {
-			Matcher matcher = pattern.matcher(requestContext.getUriInfo().getRequestUri().toURL().getPath());
+			final Matcher matcher = pattern.matcher(requestContext.getUriInfo().getRequestUri().toURL().getPath());
 			if (!matcher.find()) {
 				throw new BadRequestException();
 			}
 
 			return matcher.group(1);
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			throw new BadRequestException();
 		}
 	}
@@ -45,9 +45,9 @@ public class AccessFilterHelper {
 			throw new NotAuthorizedException("The authorization header doesn't include a bearer token.");
 		}
 
-		String authorizationToken = authorizationHeader.substring(AUTHENTICATION_SCHEME.length() + 1);
-		String salt = workspace.getConfig().getSalt();
-		String tokenHash = HashingHelper.getInstance().getSaltedHash(authorizationToken, salt);
+		final String authorizationToken = authorizationHeader.substring(AUTHENTICATION_SCHEME.length() + 1);
+		final String salt = workspace.getConfig().getSalt();
+		final String tokenHash = HashingHelper.getInstance().getSaltedHash(authorizationToken, salt);
 		if (!tokenHash.equals(workspace.getConfig().getToken())) {
 			throw new NotAuthorizedException("The authorization token is not valid.");
 		}

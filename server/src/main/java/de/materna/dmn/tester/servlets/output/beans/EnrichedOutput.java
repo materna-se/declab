@@ -6,7 +6,6 @@ public class EnrichedOutput extends PersistedOutput {
 	private String uuid;
 
 	public EnrichedOutput() {
-		super();
 	}
 
 	public EnrichedOutput(String uuid, PersistedOutput persistedOutput) {
@@ -21,7 +20,8 @@ public class EnrichedOutput extends PersistedOutput {
 
 	@Override
 	public void fromJSON(String json) {
-		EnrichedOutput temp = (EnrichedOutput) SerializationHelper.getInstance().toClass(json, EnrichedOutput.class);
+		final EnrichedOutput temp = (EnrichedOutput) SerializationHelper.getInstance().toClass(json,
+				EnrichedOutput.class);
 		this.value = temp.getValue();
 		this.name = temp.getName();
 		this.decision = temp.getDecision();

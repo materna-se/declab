@@ -30,7 +30,7 @@ public class Input extends Serializable {
 
 	@Override
 	public void fromJSON(String json) {
-		Input temp = (Input) SerializationHelper.getInstance().toClass(json, Input.class);
+		final Input temp = (Input) SerializationHelper.getInstance().toClass(json, Input.class);
 		this.value = temp.getValue();
 	}
 }

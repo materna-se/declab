@@ -43,11 +43,11 @@ public class TestServlet {
 	@Produces("application/json")
 	public Response getTests(@PathParam("workspace") String workspaceUUID, @QueryParam("order") boolean order)
 			throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		Map<String, PersistedTest> unsortedTests = workspace.getTestManager().getFiles();
+		final Map<String, PersistedTest> unsortedTests = workspace.getTestManager().getFiles();
 
-		Map<String, PersistedTest> sortedTests = new LinkedHashMap<>();
+		final Map<String, PersistedTest> sortedTests = new LinkedHashMap<>();
 		unsortedTests.entrySet().stream()
 				.sorted(Map.Entry.comparingByValue((o1, o2) -> (order ? -1 : 1) * o1.getName().compareTo(o2.getName())))
 				.forEach(entry -> sortedTests.put(entry.getKey(), entry.getValue()));
@@ -62,10 +62,10 @@ public class TestServlet {
 	@Produces("application/json")
 	public Response getTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID)
 			throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
-		PersistedTest test = testManager.getFile(testUUID);
+		final PersistedTest test = testManager.getFile(testUUID);
 		if (test == null) {
 			throw new NotFoundException();
 		}
@@ -79,10 +79,10 @@ public class TestServlet {
 	@WriteAccess
 	@Consumes("application/json")
 	public Response createTest(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		String uuid = UUID.randomUUID().toString();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final String uuid = UUID.randomUUID().toString();
 
-		PersistedTest persistedTest = (PersistedTest) SerializationHelper.getInstance().toClass(body,
+		final PersistedTest persistedTest = (PersistedTest) SerializationHelper.getInstance().toClass(body,
 				PersistedTest.class);
 		if (persistedTest.getName() == null) {
 			throw new BadRequestException("Test name can't be null.");
@@ -100,25 +100,25 @@ public class TestServlet {
 	@Produces("application/json")
 	public Response runTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID)
 			throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 
-		PersistedTest test = workspace.getTestManager().getFile(testUUID);
+		final PersistedTest test = workspace.getTestManager().getFile(testUUID);
 		if (test == null) {
 			throw new NotFoundException();
 		}
 
-		Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
+		final Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
 
-		ExecutionResult executionResult = workspace.getDecisionSession().executeModel(
+		final ExecutionResult executionResult = workspace.getDecisionSession().executeModel(
 				DroolsHelper.getMainModelNamespace(workspace),
 				InputServlet.enrichInput(inputManager, inputManager.getFile(test.getInput())).getValue());
-		Map<String, Object> calculatedOutputs = executionResult.getOutputs();
+		final Map<String, Object> calculatedOutputs = executionResult.getOutputs();
 
-		Map<String, TestResultOutput> comparedOutputs = new LinkedHashMap<>();
-		for (String outputUUID : test.getOutputs()) {
-			PersistedOutput expectedOutput = expectedOutputs.get(outputUUID);
-			JsonNode calculatedOutputValue = SerializationHelper.getInstance().getJSONMapper()
+		final Map<String, TestResultOutput> comparedOutputs = new LinkedHashMap<>();
+		for (final String outputUUID : test.getOutputs()) {
+			final PersistedOutput expectedOutput = expectedOutputs.get(outputUUID);
+			final JsonNode calculatedOutputValue = SerializationHelper.getInstance().getJSONMapper()
 					.valueToTree(calculatedOutputs.get(expectedOutput.getDecision()));
 
 			comparedOutputs.put(expectedOutput.getDecision(), new TestResultOutput(outputUUID, expectedOutput.getName(),
@@ -134,13 +134,13 @@ public class TestServlet {
 	@Produces("application/json")
 	public Response editTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID,
 			String body) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 		if (!testManager.getFiles().containsKey(testUUID)) {
 			throw new NotFoundException();
 		}
 
-		PersistedTest persistedTest = (PersistedTest) SerializationHelper.getInstance().toClass(body,
+		final PersistedTest persistedTest = (PersistedTest) SerializationHelper.getInstance().toClass(body,
 				PersistedTest.class);
 		if (persistedTest.getName() == null) {
 			throw new BadRequestException("Test name can't be null.");
@@ -157,8 +157,8 @@ public class TestServlet {
 	@Path("/{uuid}")
 	public Response deleteTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID)
 			throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<PersistedTest> testManager = workspace.getTestManager();
 
 		if (!testManager.getFiles().containsKey(testUUID)) {
 			throw new NotFoundException();

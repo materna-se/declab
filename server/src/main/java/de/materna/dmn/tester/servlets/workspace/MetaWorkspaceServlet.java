@@ -32,10 +32,10 @@ public class MetaWorkspaceServlet {
 	@GET
 	@Produces("application/json")
 	public Response getWorkspaces(@QueryParam("query") String query) throws IOException {
-		Map<String, Workspace> unsortedWorkspaces = query == null ? WorkspaceManager.getInstance().getAll()
+		final Map<String, Workspace> unsortedWorkspaces = query == null ? WorkspaceManager.getInstance().getAll()
 				: WorkspaceManager.getInstance().search(query);
 
-		Map<String, PublicConfiguration> sortedWorkspaces = new LinkedHashMap<>();
+		final Map<String, PublicConfiguration> sortedWorkspaces = new LinkedHashMap<>();
 		unsortedWorkspaces.entrySet().stream()
 				.sorted(Comparator.comparing(entry -> entry.getValue().getConfig().getName()))
 				.forEach(entry -> sortedWorkspaces.put(entry.getKey(), entry.getValue().getConfig().getPublicConfig()));
@@ -48,20 +48,20 @@ public class MetaWorkspaceServlet {
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response createWorkspace(String body) throws Exception {
-		HashMap<String, String> params = SerializationHelper.getInstance().toClass(body,
+		final HashMap<String, String> params = SerializationHelper.getInstance().toClass(body,
 				new TypeReference<HashMap<String, String>>() {
 				});
 
-		String uuid = UUID.randomUUID().toString();
+		final String uuid = UUID.randomUUID().toString();
 
-		Workspace workspace = new Workspace(uuid);
-		Configuration configuration = workspace.getConfig();
+		final Workspace workspace = new Workspace(uuid);
+		final Configuration configuration = workspace.getConfig();
 		configuration.setVersion(2);
 		configuration.setSalt(HashingHelper.getInstance().generateSalt());
 
 		// The name is required, we will the reject the request if the value is not
 		// valid.
-		String name = params.get("name");
+		final String name = params.get("name");
 		if (name == null || name.length() == 0) {
 			throw new BadRequestException();
 		}
@@ -69,7 +69,7 @@ public class MetaWorkspaceServlet {
 
 		// The description is optional, we will set it if the value is valid.
 		if (params.containsKey("description")) {
-			String description = params.get("description");
+			final String description = params.get("description");
 			if (description == null) {
 				throw new BadRequestException();
 			}
@@ -78,7 +78,7 @@ public class MetaWorkspaceServlet {
 
 		// The token is optional if the access mode is set to public.
 		if (params.containsKey("token")) {
-			String token = params.get("token");
+			final String token = params.get("token");
 			if (token == null || token.length() == 0) {
 				throw new BadRequestException();
 			}
@@ -87,7 +87,7 @@ public class MetaWorkspaceServlet {
 
 		// The access mode is required, we will the reject the request if the value is
 		// not valid.
-		Access access = Access.valueOf(params.get("access"));
+		final Access access = Access.valueOf(params.get("access"));
 		if (access != Access.PUBLIC && configuration.getToken() == null) {
 			throw new BadRequestException();
 		}

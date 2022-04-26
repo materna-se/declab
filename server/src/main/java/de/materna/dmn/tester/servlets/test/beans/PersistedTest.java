@@ -63,7 +63,7 @@ public class PersistedTest extends Serializable {
 
 	@Override
 	public void fromJSON(String json) {
-		PersistedTest temp = (PersistedTest) SerializationHelper.getInstance().toClass(json, PersistedTest.class);
+		final PersistedTest temp = (PersistedTest) SerializationHelper.getInstance().toClass(json, PersistedTest.class);
 		this.name = temp.getName();
 		this.description = temp.getDescription();
 		this.input = temp.getInput();

@@ -22,24 +22,24 @@ import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
 
 public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository {
 
-	private EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
-	private EntityManager em = entityManagerFactory.createEntityManager();
-	private EntityTransaction transaction = em.getTransaction();
+	private final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
+	private final EntityManager em = entityManagerFactory.createEntityManager();
+	private final EntityTransaction transaction = em.getTransaction();
 
 	@Override
 	public List<Laboratory> findAll() {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Laboratory> cq = cb.createQuery(Laboratory.class);
-		Root<Laboratory> rootEntry = cq.from(Laboratory.class);
-		CriteriaQuery<Laboratory> all = cq.select(rootEntry);
-		TypedQuery<Laboratory> allQuery = em.createQuery(all);
+		final CriteriaBuilder cb = em.getCriteriaBuilder();
+		final CriteriaQuery<Laboratory> cq = cb.createQuery(Laboratory.class);
+		final Root<Laboratory> rootEntry = cq.from(Laboratory.class);
+		final CriteriaQuery<Laboratory> all = cq.select(rootEntry);
+		final TypedQuery<Laboratory> allQuery = em.createQuery(all);
 		return allQuery.getResultList();
 	}
 
 	@Override
 	public Laboratory findByUuid(UUID laboratoryUuid) {
 		transaction.begin();
-		Laboratory Laboratory = em.find(Laboratory.class, laboratoryUuid);
+		final Laboratory Laboratory = em.find(Laboratory.class, laboratoryUuid);
 		transaction.commit();
 		return Optional.ofNullable(Laboratory).get();
 	}
@@ -54,7 +54,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 
 	@Override
 	public Laboratory create(String name, String description, VisabilityType visability) {
-		Laboratory laboratory = new Laboratory(name, description, visability);
+		final Laboratory laboratory = new Laboratory(name, description, visability);
 		return put(laboratory);
 	}
 
@@ -66,17 +66,17 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	}
 
 	public List<Laboratory> findByFilter(LaboratoryFilter... filterArray) {
-		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
-		CriteriaQuery<Laboratory> cquery = cbuilder.createQuery(Laboratory.class);
-		Root<Laboratory> LaboratoryRoot = cquery.from(Laboratory.class);
+		final CriteriaBuilder cbuilder = em.getCriteriaBuilder();
+		final CriteriaQuery<Laboratory> cquery = cbuilder.createQuery(Laboratory.class);
+		final Root<Laboratory> LaboratoryRoot = cquery.from(Laboratory.class);
 		cquery.select(LaboratoryRoot);
-		List<Predicate> predicates = new ArrayList<>();
-		for (LaboratoryFilter filter : filterArray) {
+		final List<Predicate> predicates = new ArrayList<>();
+		for (final LaboratoryFilter filter : filterArray) {
 			predicates.add(filter.toPredicate(LaboratoryRoot, cquery, cbuilder));
 		}
 		cquery.where(predicates.toArray(new Predicate[predicates.size()]));
 
-		TypedQuery<Laboratory> query = em.createQuery(cquery);
+		final TypedQuery<Laboratory> query = em.createQuery(cquery);
 		return query.getResultList();
 	}
 }

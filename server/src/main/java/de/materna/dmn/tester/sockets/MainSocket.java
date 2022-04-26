@@ -13,7 +13,7 @@ import de.materna.dmn.tester.sockets.managers.SessionManager;
 public class MainSocket {
 	@OnOpen
 	public void onOpen(@PathParam("workspace") String workspace, Session session) {
-		SessionManager sessionManager = SessionManager.getInstance();
+		final SessionManager sessionManager = SessionManager.getInstance();
 		sessionManager.add(workspace, session);
 		sessionManager.notify(workspace,
 				"{\"type\": \"listeners\", \"data\": " + sessionManager.listeners(workspace) + "}");
@@ -21,7 +21,7 @@ public class MainSocket {
 
 	@OnClose
 	public void onClose(@PathParam("workspace") String workspace, Session session) {
-		SessionManager sessionManager = SessionManager.getInstance();
+		final SessionManager sessionManager = SessionManager.getInstance();
 		sessionManager.remove(workspace, session);
 		sessionManager.notify(workspace,
 				"{\"type\": \"listeners\", \"data\": " + sessionManager.listeners(workspace) + "}");

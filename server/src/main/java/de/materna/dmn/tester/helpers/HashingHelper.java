@@ -8,7 +8,7 @@ import org.bouncycastle.jcajce.provider.digest.SHA3;
 
 public class HashingHelper {
 	private static HashingHelper instance;
-	private SHA3.Digest512 messageDigest;
+	private final SHA3.Digest512 messageDigest;
 
 	private HashingHelper() {
 		messageDigest = new SHA3.Digest512();
@@ -22,7 +22,7 @@ public class HashingHelper {
 	}
 
 	public String generateSalt() {
-		byte[] saltBytes = new byte[64];
+		final byte[] saltBytes = new byte[64];
 		new SecureRandom().nextBytes(saltBytes);
 		return byteArrayToHexString(saltBytes);
 	}
@@ -33,17 +33,17 @@ public class HashingHelper {
 	}
 
 	private String byteArrayToHexString(byte[] byteArray) {
-		StringBuilder stringBuilder = new StringBuilder();
-		for (byte bxte : byteArray) {
+		final StringBuilder stringBuilder = new StringBuilder();
+		for (final byte bxte : byteArray) {
 			stringBuilder.append(String.format("%02X", bxte));
 		}
 		return stringBuilder.toString();
 	}
 
 	private byte[] hexStringToByteArray(String hexString) {
-		int hexStringLength = hexString.length();
+		final int hexStringLength = hexString.length();
 
-		byte[] byteArray = new byte[hexStringLength / 2];
+		final byte[] byteArray = new byte[hexStringLength / 2];
 		for (int i = 0; i < hexStringLength; i += 2) {
 			byteArray[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
 					+ Character.digit(hexString.charAt(i + 1), 16));

@@ -16,7 +16,6 @@ public class Playground extends Serializable {
 	protected Map<String, ?> context = new LinkedHashMap<>();
 
 	public Playground() {
-
 	}
 
 	@JsonCreator
@@ -64,7 +63,7 @@ public class Playground extends Serializable {
 
 	@Override
 	public void fromJSON(String json) {
-		Playground temp = (Playground) SerializationHelper.getInstance().toClass(json, Playground.class);
+		final Playground temp = (Playground) SerializationHelper.getInstance().toClass(json, Playground.class);
 		this.name = temp.getName();
 		this.description = temp.getDescription();
 		this.expression = temp.getExpression();

@@ -21,14 +21,14 @@ import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 
 public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 
-	private EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
-	private EntityManager em = entityManagerFactory.createEntityManager();
-	private EntityTransaction transaction = em.getTransaction();
+	private final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
+	private final EntityManager em = entityManagerFactory.createEntityManager();
+	private final EntityTransaction transaction = em.getTransaction();
 
 	@Override
 	public Workspace findByUuid(String uuid) {
 		transaction.begin();
-		Workspace Workspace = em.find(Workspace.class, uuid);
+		final Workspace Workspace = em.find(Workspace.class, uuid);
 		transaction.commit();
 		return Optional.ofNullable(Workspace).get();
 	}
@@ -43,7 +43,7 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 
 	@Override
 	public Workspace create(String name, String description, VisabilityType visability) {
-		Workspace workspace = new Workspace(name, description, visability);
+		final Workspace workspace = new Workspace(name, description, visability);
 		return put(workspace);
 	}
 
@@ -55,17 +55,17 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	public List<Workspace> findByFilter(WorkspaceFilter... filterArray) {
-		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
-		CriteriaQuery<Workspace> cquery = cbuilder.createQuery(Workspace.class);
-		Root<Workspace> WorkspaceRoot = cquery.from(Workspace.class);
+		final CriteriaBuilder cbuilder = em.getCriteriaBuilder();
+		final CriteriaQuery<Workspace> cquery = cbuilder.createQuery(Workspace.class);
+		final Root<Workspace> WorkspaceRoot = cquery.from(Workspace.class);
 		cquery.select(WorkspaceRoot);
-		List<Predicate> predicates = new ArrayList<>();
-		for (WorkspaceFilter filter : filterArray) {
+		final List<Predicate> predicates = new ArrayList<>();
+		for (final WorkspaceFilter filter : filterArray) {
 			predicates.add(filter.toPredicate(WorkspaceRoot, cquery, cbuilder));
 		}
 		cquery.where(predicates.toArray(new Predicate[predicates.size()]));
 
-		TypedQuery<Workspace> query = em.createQuery(cquery);
+		final TypedQuery<Workspace> query = em.createQuery(cquery);
 		return query.getResultList();
 	}
 }

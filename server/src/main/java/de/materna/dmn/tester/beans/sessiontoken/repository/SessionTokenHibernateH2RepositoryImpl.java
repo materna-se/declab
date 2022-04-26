@@ -27,30 +27,29 @@ import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
 
 public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenRepository {
 
-	private EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
-	private EntityManager em = entityManagerFactory.createEntityManager();
-	private EntityTransaction transaction = em.getTransaction();
+	private final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
+	private final EntityManager em = entityManagerFactory.createEntityManager();
+	private final EntityTransaction transaction = em.getTransaction();
 
 	@Override
 	public List<SessionToken> findAll() {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<SessionToken> cq = cb.createQuery(SessionToken.class);
-		Root<SessionToken> rootEntry = cq.from(SessionToken.class);
-		CriteriaQuery<SessionToken> all = cq.select(rootEntry);
-		TypedQuery<SessionToken> allQuery = em.createQuery(all);
+		final CriteriaBuilder cb = em.getCriteriaBuilder();
+		final CriteriaQuery<SessionToken> cq = cb.createQuery(SessionToken.class);
+		final Root<SessionToken> rootEntry = cq.from(SessionToken.class);
+		final CriteriaQuery<SessionToken> all = cq.select(rootEntry);
+		final TypedQuery<SessionToken> allQuery = em.createQuery(all);
 		return allQuery.getResultList();
 	}
 
 	@Override
 	public List<SessionToken> findAllByUserUuid(UUID userUuid) {
-		List<SessionToken> tokensFound = findByFilter(new UserUuidFilter(userUuid));
-		return tokensFound;
+		return findByFilter(new UserUuidFilter(userUuid));
 	}
 
 	@Override
 	public SessionToken findByUuid(UUID tokenUuid) {
 		transaction.begin();
-		SessionToken sessionToken = em.find(SessionToken.class, tokenUuid);
+		final SessionToken sessionToken = em.find(SessionToken.class, tokenUuid);
 		transaction.commit();
 		return Optional.ofNullable(sessionToken).get();
 	}
@@ -62,23 +61,23 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 
 	@Override
 	public SessionToken findCurrentByUserUuid(UUID userUuid) {
-		List<SessionToken> tokens = findAllByUserUuid(userUuid);
+		final List<SessionToken> tokens = findAllByUserUuid(userUuid);
 		Collections.sort(tokens, new SessionTokenComparator());
 		return tokens.get(0);
 	}
 
 	public List<SessionToken> findByFilter(SessionTokenFilter... filterArray) {
-		CriteriaBuilder cbuilder = em.getCriteriaBuilder();
-		CriteriaQuery<SessionToken> cquery = cbuilder.createQuery(SessionToken.class);
-		Root<SessionToken> tokenRoot = cquery.from(SessionToken.class);
+		final CriteriaBuilder cbuilder = em.getCriteriaBuilder();
+		final CriteriaQuery<SessionToken> cquery = cbuilder.createQuery(SessionToken.class);
+		final Root<SessionToken> tokenRoot = cquery.from(SessionToken.class);
 		cquery.select(tokenRoot);
-		List<Predicate> predicates = new ArrayList<>();
-		for (SessionTokenFilter filter : filterArray) {
+		final List<Predicate> predicates = new ArrayList<>();
+		for (final SessionTokenFilter filter : filterArray) {
 			predicates.add(filter.toPredicate(tokenRoot, cquery, cbuilder));
 		}
 		cquery.where(predicates.toArray(new Predicate[predicates.size()]));
 
-		TypedQuery<SessionToken> query = em.createQuery(cquery);
+		final TypedQuery<SessionToken> query = em.createQuery(cquery);
 		return query.getResultList();
 	}
 

@@ -49,12 +49,12 @@ public class ChallengeServlet {
 	@Produces("application/json")
 	public Response getChallenges(@PathParam("workspace") String workspaceUUID, @QueryParam("order") boolean order)
 			throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<Challenge> challengeManager = workspace.getChallengeManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<Challenge> challengeManager = workspace.getChallengeManager();
 
-		Map<String, Challenge> unsortedChallenges = challengeManager.getFiles();
+		final Map<String, Challenge> unsortedChallenges = challengeManager.getFiles();
 
-		Map<String, Challenge> sortedChallenges = new LinkedHashMap<>();
+		final Map<String, Challenge> sortedChallenges = new LinkedHashMap<>();
 		unsortedChallenges.entrySet().stream()
 				.sorted(Map.Entry.comparingByValue((o1, o2) -> (order ? -1 : 1) * o1.getName().compareTo(o2.getName())))
 				.forEach(entry -> sortedChallenges.put(entry.getKey(), entry.getValue()));
@@ -68,10 +68,10 @@ public class ChallengeServlet {
 	@Produces("application/json")
 	public Response getChallenge(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String challengeUUID,
 			@QueryParam("merge") boolean merge) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<Challenge> challengeManager = workspace.getChallengeManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<Challenge> challengeManager = workspace.getChallengeManager();
 
-		Challenge challenge = challengeManager.getFile(challengeUUID);
+		final Challenge challenge = challengeManager.getFile(challengeUUID);
 		if (challenge == null) {
 			throw new NotFoundException();
 		}
@@ -87,22 +87,22 @@ public class ChallengeServlet {
 		// inputs and its solution
 		ArrayList<Scenario> scenarios = (ArrayList<Scenario>) challenge.getScenarios();
 
-		ChallengeType challengeType = challenge.getType();
+		final ChallengeType challengeType = challenge.getType();
 
 		// Slightly different depending on challenge type
-		if (challengeType.equals(ChallengeType.FEEL)) {
-			String feelExpression = (String) challenge.getSolution();
+		if (ChallengeType.FEEL.equals(challengeType)) {
+			final String feelExpression = (String) challenge.getSolution();
 
 			scenarios = ChallengeExecutionHelper.calculateFEELExpression(feelExpression, scenarios);
 			challenge.setScenarios(scenarios);
-		} else if (challengeType.equals(ChallengeType.DMN_MODEL)) {
+		} else if (ChallengeType.DMN_MODEL.equals(challengeType)) {
 			// Need to re-parse to avoid ClassCastException
-			DMNSolution solution = (DMNSolution) SerializationHelper.getInstance()
+			final DMNSolution solution = (DMNSolution) SerializationHelper.getInstance()
 					.toClass(SerializationHelper.getInstance().toJSON(challenge.getSolution()), DMNSolution.class);
 
-			ArrayList<ModelMap> modelMaps = solution.getModels();
+			final ArrayList<ModelMap> modelMaps = solution.getModels();
 
-			DecisionService decisionService = solution.getDecisionService();
+			final DecisionService decisionService = solution.getDecisionService();
 
 			// Use decision service if available
 			if (decisionService != null) {
@@ -122,8 +122,8 @@ public class ChallengeServlet {
 	@Consumes("application/json")
 	public Response createChallenge(@PathParam("workspace") String workspaceUUID, String body)
 			throws IOException, RuntimeException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		String uuid = UUID.randomUUID().toString();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final String uuid = UUID.randomUUID().toString();
 
 		try {
 			Challenge challenge = (Challenge) SerializationHelper.getInstance().toClass(body, Challenge.class);
@@ -135,7 +135,7 @@ public class ChallengeServlet {
 			workspace.getAccessLog().writeMessage("Created challenge" + uuid, System.currentTimeMillis());
 
 			return Response.status(Response.Status.CREATED).entity(uuid).build();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
@@ -148,8 +148,8 @@ public class ChallengeServlet {
 	@Produces("application/json")
 	public Response editChallenge(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String challengeUUID,
 			String body) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<Challenge> challengeManager = workspace.getChallengeManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<Challenge> challengeManager = workspace.getChallengeManager();
 
 		if (!challengeManager.getFiles().containsKey(challengeUUID)) {
 			throw new NotFoundException();
@@ -171,10 +171,10 @@ public class ChallengeServlet {
 	@Path("/{uuid}")
 	public Response deleteChallenge(@PathParam("workspace") String workspaceUUID,
 			@PathParam("uuid") String challengeUUID) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<Challenge> challengeManager = workspace.getChallengeManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<Challenge> challengeManager = workspace.getChallengeManager();
 
-		Challenge challenge = challengeManager.getFile(challengeUUID);
+		final Challenge challenge = challengeManager.getFile(challengeUUID);
 		if (challenge == null) {
 			throw new NotFoundException(String.format("Can't find challenge with uuid %s.", challengeUUID));
 		}
@@ -200,7 +200,7 @@ public class ChallengeServlet {
 		// importing all models for each scenario is significant
 
 		try {
-			Map<String, Object> params = SerializationHelper.getInstance().toClass(body,
+			final Map<String, Object> params = SerializationHelper.getInstance().toClass(body,
 					new TypeReference<HashMap<String, Object>>() {
 					});
 
@@ -208,37 +208,37 @@ public class ChallengeServlet {
 				throw new IllegalArgumentException();
 			}
 
-			DMNDecisionSession dS = new DMNDecisionSession();
+			final DMNDecisionSession dS = new DMNDecisionSession();
 
-			LinkedList<ExecutionResult> results = new LinkedList<ExecutionResult>();
+			final LinkedList<ExecutionResult> results = new LinkedList<>();
 
 			// Import models (defined by name (unused), namespace and source XML)
-			ArrayList<Map<String, Object>> modelMaps = (ArrayList<Map<String, Object>>) params.get("models");
+			final ArrayList<Map<String, Object>> modelMaps = (ArrayList<Map<String, Object>>) params.get("models");
 
-			for (Map<String, Object> modelMap : modelMaps) {
-				String modelNamespace = (String) modelMap.get("namespace");
-				String modelSource = (String) modelMap.get("source");
+			for (final Map<String, Object> modelMap : modelMaps) {
+				final String modelNamespace = (String) modelMap.get("namespace");
+				final String modelSource = (String) modelMap.get("source");
 
 				dS.importModel(modelNamespace, modelSource);
 			}
 
 			// Get parsed models from decision session
-			List<Model> models = dS.getModels();
+			final List<Model> models = dS.getModels();
 
 			// Get scenario inputs sent by client
-			ArrayList<Map<String, Object>> inputs = (ArrayList<Map<String, Object>>) params.get("inputs");
+			final ArrayList<Map<String, Object>> inputs = (ArrayList<Map<String, Object>>) params.get("inputs");
 
 			// Execute each scenario and store its results
 
-			DecisionService decisionService = (DecisionService) SerializationHelper.getInstance().toClass(
+			final DecisionService decisionService = (DecisionService) SerializationHelper.getInstance().toClass(
 					SerializationHelper.getInstance().toJSON(params.get("decisionService")), DecisionService.class);
 
-			for (Map<String, Object> input : inputs) {
+			for (final Map<String, Object> input : inputs) {
 				ExecutionResult result;
 
 				if (decisionService == null || decisionService.getName() == null
-						|| decisionService.getName().equals("")) {
-					String ns = models.get(models.size() - 1).getNamespace();
+						|| "".equals(decisionService.getName())) {
+					final String ns = models.get(models.size() - 1).getNamespace();
 					result = dS.executeModel(ns, input);
 				} else {
 					result = dS.executeModel(decisionService.getNamespace(), decisionService.getName(), input);
@@ -249,7 +249,7 @@ public class ChallengeServlet {
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(results))
 					.build();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}

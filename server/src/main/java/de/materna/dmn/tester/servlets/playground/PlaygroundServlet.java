@@ -33,10 +33,10 @@ public class PlaygroundServlet {
 	@Produces("application/json")
 	public Response getPlaygrounds(@PathParam("workspace") String workspaceUUID, @QueryParam("order") boolean order)
 			throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		Map<String, Playground> unsortedPlaygrounds = workspace.getPlaygroundManager().getFiles();
-		Map<String, Playground> sortedPlaygrounds = new LinkedHashMap<>();
+		final Map<String, Playground> unsortedPlaygrounds = workspace.getPlaygroundManager().getFiles();
+		final Map<String, Playground> sortedPlaygrounds = new LinkedHashMap<>();
 		unsortedPlaygrounds.entrySet().stream()
 				.sorted(Map.Entry.comparingByValue((o1, o2) -> (order ? -1 : 1) * o1.getName().compareTo(o2.getName())))
 				.forEach(entry -> sortedPlaygrounds.put(entry.getKey(), entry.getValue()));
@@ -51,13 +51,13 @@ public class PlaygroundServlet {
 	@Produces("application/json")
 	public Response getPlayground(@PathParam("workspace") String workspaceUUID,
 			@PathParam("uuid") String playgroundUUID) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 		if (!workspace.getPlaygroundManager().fileExists(playgroundUUID)) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
-		Playground playground = workspace.getPlaygroundManager().getFile(playgroundUUID);
+		final Playground playground = workspace.getPlaygroundManager().getFile(playgroundUUID);
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(playground)).build();
 	}
 
@@ -65,11 +65,11 @@ public class PlaygroundServlet {
 	@WriteAccess
 	@Consumes("application/json")
 	public Response createPlayground(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		String playgroundUUID = UUID.randomUUID().toString();
+		final String playgroundUUID = UUID.randomUUID().toString();
 
-		Playground playground = (Playground) SerializationHelper.getInstance().toClass(body, Playground.class);
+		final Playground playground = (Playground) SerializationHelper.getInstance().toClass(body, Playground.class);
 		if (playground.getName() == null) {
 			throw new BadRequestException("Playground name can't be null.");
 		}
@@ -87,12 +87,12 @@ public class PlaygroundServlet {
 	@Consumes("application/json")
 	public Response editPlayground(@PathParam("workspace") String workspaceUUID,
 			@PathParam("uuid") String playgroundUUID, String body) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 		if (!workspace.getPlaygroundManager().fileExists(playgroundUUID)) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
-		Playground playground = (Playground) SerializationHelper.getInstance().toClass(body, Playground.class);
+		final Playground playground = (Playground) SerializationHelper.getInstance().toClass(body, Playground.class);
 		if (playground.getName() == null) {
 			throw new BadRequestException("Playground name can't be null.");
 		}
@@ -108,8 +108,8 @@ public class PlaygroundServlet {
 	@Path("/{uuid}")
 	public Response deletePlayground(@PathParam("workspace") String workspaceUUID,
 			@PathParam("uuid") String playgroundUUID) throws IOException {
-		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		PersistenceDirectoryManager<Playground> playgroundManager = workspace.getPlaygroundManager();
+		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		final PersistenceDirectoryManager<Playground> playgroundManager = workspace.getPlaygroundManager();
 		if (!playgroundManager.fileExists(playgroundUUID)) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}

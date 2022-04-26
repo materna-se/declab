@@ -10,11 +10,11 @@ public class MergingHelper {
 	@SuppressWarnings("unchecked")
 	public static Object merge(Object existing, Object update) {
 		if (existing instanceof Map && update instanceof Map) {
-			Map<String, Object> existingMap = (Map<String, Object>) existing;
-			Map<String, Object> updateMap = (Map<String, Object>) update;
+			final Map<String, Object> existingMap = (Map<String, Object>) existing;
+			final Map<String, Object> updateMap = (Map<String, Object>) update;
 
-			Map<String, Object> mergedMap = new LinkedHashMap<>(existingMap);
-			for (String key : updateMap.keySet()) {
+			final Map<String, Object> mergedMap = new LinkedHashMap<>(existingMap);
+			for (final String key : updateMap.keySet()) {
 				mergedMap.put(key, merge(mergedMap.get(key), updateMap.get(key)));
 			}
 
@@ -22,13 +22,13 @@ public class MergingHelper {
 		}
 
 		if (existing instanceof List && update instanceof List) {
-			List<Object> existingList = (List<Object>) existing;
-			List<Object> updateList = (List<Object>) update;
+			final List<Object> existingList = (List<Object>) existing;
+			final List<Object> updateList = (List<Object>) update;
 
-			Iterator<Object> existingIterator = existingList.iterator();
-			Iterator<Object> updateIterator = updateList.iterator();
+			final Iterator<Object> existingIterator = existingList.iterator();
+			final Iterator<Object> updateIterator = updateList.iterator();
 
-			List<Object> mergedList = new LinkedList<>();
+			final List<Object> mergedList = new LinkedList<>();
 
 			while (existingIterator.hasNext() || updateIterator.hasNext()) {
 				if (!existingIterator.hasNext()) {
@@ -39,13 +39,10 @@ public class MergingHelper {
 					mergedList.add(existingIterator.next());
 					continue;
 				}
-
 				mergedList.add(merge(existingIterator.next(), updateIterator.next()));
 			}
-
 			return mergedList;
 		}
-
 		return update;
 	}
 }

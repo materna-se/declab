@@ -39,7 +39,7 @@ public class AccessLog extends Serializable {
 	}
 
 	public void trim(ArrayList<AccessLogEntry> logTemp) {
-		int diff = logTemp.size() - logLength;
+		final int diff = logTemp.size() - logLength;
 		if (diff > 0) {
 			logTemp.subList(0, diff).clear();
 		}
@@ -49,7 +49,7 @@ public class AccessLog extends Serializable {
 		// Serializing the access log is not so important, we'll catch io exceptions.
 		try {
 			fileManager.persistFile(toJSON());
-		} catch (IOException exception) {
+		} catch (final IOException exception) {
 			System.err.println("Serialization failed: " + exception);
 		}
 	}

@@ -8,12 +8,12 @@ import de.materna.dmn.tester.enums.VisabilityType;
 @ApplicationScoped
 public interface WorkspaceRepository {
 
-	public Workspace findByUuid(String uuid);
+	Workspace findByUuid(String uuid);
 
-	public Workspace put(Workspace workspace);
+	Workspace put(Workspace workspace);
 
 	Workspace create(String name, String description, VisabilityType visability);
 
-	public void delete(Workspace workspace);
+	void delete(Workspace workspace);
 
 }

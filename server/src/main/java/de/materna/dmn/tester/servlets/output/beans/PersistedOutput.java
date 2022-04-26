@@ -11,7 +11,6 @@ public class PersistedOutput extends Output {
 	protected String decision;
 
 	public PersistedOutput() {
-		super();
 	}
 
 	@JsonCreator
@@ -42,7 +41,8 @@ public class PersistedOutput extends Output {
 
 	@Override
 	public void fromJSON(String json) {
-		PersistedOutput temp = (PersistedOutput) SerializationHelper.getInstance().toClass(json, PersistedOutput.class);
+		final PersistedOutput temp = (PersistedOutput) SerializationHelper.getInstance().toClass(json,
+				PersistedOutput.class);
 		this.value = temp.getValue();
 		this.name = temp.getName();
 		this.decision = temp.getDecision();

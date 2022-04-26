@@ -28,13 +28,14 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
-		String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+		final String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		if (!isTokenBasedAuthentication(authorizationHeader)) {
 			abortWithUnauthorized(requestContext);
 			return;
 		}
 		try {
-			UUID tokenUuid = UUID.fromString(authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim());
+			final UUID tokenUuid = UUID
+					.fromString(authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim());
 			validateToken(tokenUuid);
 		} catch (SessionTokenNotFoundException | SessionTokenExpiredException e) {
 			abortWithUnauthorized(requestContext);
@@ -52,9 +53,10 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 	}
 
 	private void validateToken(UUID tokenUuid) throws SessionTokenNotFoundException, SessionTokenExpiredException {
-		SessionToken token = new SessionTokenHibernateH2RepositoryImpl().findByUuid(tokenUuid);
-		if (token == null)
+		final SessionToken token = new SessionTokenHibernateH2RepositoryImpl().findByUuid(tokenUuid);
+		if (token == null) {
 			throw new SessionTokenNotFoundException("SessionToken not found : " + tokenUuid);
+		}
 		if (token.getExpiration().isBefore(LocalDate.now())) {
 			throw new SessionTokenExpiredException("SessionToken expired : " + tokenUuid);
 		}

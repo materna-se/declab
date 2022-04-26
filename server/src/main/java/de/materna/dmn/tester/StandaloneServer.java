@@ -20,33 +20,33 @@ import de.materna.dmn.tester.sockets.MainSocket;
 public class StandaloneServer {
 
 	public static void main(String[] args) throws Exception {
-		UserHibernateH2RepositoryImpl userRepository = new UserHibernateH2RepositoryImpl();
+		final UserHibernateH2RepositoryImpl userRepository = new UserHibernateH2RepositoryImpl();
 
-		User userGeorg = userRepository.register("georg.wolffgang@materna.de", "Shazzarr", "password", "Georg",
+		final User userGeorg = userRepository.register("georg.wolffgang@materna.de", "Shazzarr", "password", "Georg",
 				"Wolffgang");
 		System.out.println("Saved new user Georg: " + userGeorg);
-		User userMike = userRepository.register("mike.myers@materna.de", "Mikey", "päswoad", "Mike", "Myers");
+		final User userMike = userRepository.register("mike.myers@materna.de", "Mikey", "päswoad", "Mike", "Myers");
 		System.out.println("Saved new user Mike: " + userMike);
 
 		System.setProperty("jboss.server.data.dir", "c:\\Users\\gwolffga\\declab");
 		System.setProperty("jboss.server.webapp.dir", "c:\\Users\\gwolffga\\declab\\server\\src\\main\\webapp");
 
-		Server server = new Server();
-		ServerConnector connector = new ServerConnector(server);
+		final Server server = new Server();
+		final ServerConnector connector = new ServerConnector(server);
 		connector.setPort(8080);
 		server.addConnector(connector);
 
-		ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+		final ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		contextHandler.setContextPath("/");
 		contextHandler.setBaseResource(new PathResource(Paths.get(System.getProperty("jboss.server.webapp.dir"))));
 		contextHandler.setWelcomeFiles(new String[] { "index.html" });
 
 		{
-			ServletHolder resourceHolder = new ServletHolder(new DefaultServlet());
+			final ServletHolder resourceHolder = new ServletHolder(new DefaultServlet());
 			contextHandler.addServlet(resourceHolder, "/*");
 		}
 		{
-			ServletHolder servletHolder = new ServletHolder(new ServletContainer(new MainApplication()));
+			final ServletHolder servletHolder = new ServletHolder(new ServletContainer(new MainApplication()));
 			contextHandler.addServlet(servletHolder, "/api/*");
 		}
 		{

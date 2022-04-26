@@ -25,25 +25,25 @@ public class ChallengeExecutionHelper {
 		// Calculate a list of scenario outputs using a FEEL expression
 
 		try {
-			Decision decision = new Decision();
+			final Decision decision = new Decision();
 			decision.setExpression(feelString);
 
 			// Why does this throw a generic Exception?
-			HybridDecisionSession decisionSession = new HybridDecisionSession();
+			final HybridDecisionSession decisionSession = new HybridDecisionSession();
 
-			ObjectMapper mapper = new ObjectMapper();
+			final ObjectMapper mapper = new ObjectMapper();
 
-			for (Scenario scenario : scenarios) {
-				ExecutionResult executionResult = decisionSession.getDMNDecisionSession()
+			for (final Scenario scenario : scenarios) {
+				final ExecutionResult executionResult = decisionSession.getDMNDecisionSession()
 						.executeExpression(decision.getExpression(), scenario.getInput().getValue());
 
-				JsonNode x = mapper.valueToTree(executionResult.getOutputs().get("main"));
+				final JsonNode x = mapper.valueToTree(executionResult.getOutputs().get("main"));
 
 				scenario.setOutput(new Output(x));
 			}
 
 			return scenarios;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeException();
 		}
 	}
@@ -59,26 +59,26 @@ public class ChallengeExecutionHelper {
 
 		// Import
 
-		DMNDecisionSession dS = new DMNDecisionSession();
+		final DMNDecisionSession dS = new DMNDecisionSession();
 
-		for (ModelMap modelMap : modelMaps) {
-			String modelNamespace = modelMap.getNamespace();
-			String modelSource = modelMap.getSource();
+		for (final ModelMap modelMap : modelMaps) {
+			final String modelNamespace = modelMap.getNamespace();
+			final String modelSource = modelMap.getSource();
 
 			dS.importModel(modelNamespace, modelSource);
 		}
 
-		List<Model> models = dS.getModels();
+		final List<Model> models = dS.getModels();
 
 		// Execute
 
-		ObjectMapper mapper = new ObjectMapper();
+		final ObjectMapper mapper = new ObjectMapper();
 
-		for (Scenario scenario : scenarios) {
+		for (final Scenario scenario : scenarios) {
 			// Inputs get modified by dS.executeModel().
 			// We need to preserve the original, so we make a copy.
-			Input input = scenario.getInput();
-			Input inputCopy = (Input) SerializationHelper.getInstance()
+			final Input input = scenario.getInput();
+			final Input inputCopy = (Input) SerializationHelper.getInstance()
 					.toClass(SerializationHelper.getInstance().toJSON(input), Input.class);
 
 			ExecutionResult executionResult;
@@ -87,11 +87,11 @@ public class ChallengeExecutionHelper {
 				executionResult = dS.executeModel(decisionService.getNamespace(), decisionService.getName(),
 						scenario.getInput().getValue());
 			} else {
-				String ns = models.get(models.size() - 1).getNamespace();
+				final String ns = models.get(models.size() - 1).getNamespace();
 				executionResult = dS.executeModel(ns, scenario.getInput().getValue());
 			}
 
-			JsonNode x = mapper.valueToTree(executionResult.getOutputs());
+			final JsonNode x = mapper.valueToTree(executionResult.getOutputs());
 
 			scenario.setOutput(new Output(x));
 			scenario.setInput(inputCopy);

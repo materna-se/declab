@@ -14,19 +14,19 @@ import de.materna.jdec.HybridDecisionSession;
 
 public class Workspace {
 
-	private PersistenceDirectoryManager<Challenge> challengeManager;
+	private final PersistenceDirectoryManager<Challenge> challengeManager;
 
-	private PersistenceDirectoryManager<String> modelManager;
-	private PersistenceDirectoryManager<Playground> playgroundManager;
+	private final PersistenceDirectoryManager<String> modelManager;
+	private final PersistenceDirectoryManager<Playground> playgroundManager;
 
-	private PersistenceDirectoryManager<PersistedInput> inputManager;
-	private PersistenceDirectoryManager<PersistedOutput> outputManager;
-	private PersistenceDirectoryManager<PersistedTest> testManager;
+	private final PersistenceDirectoryManager<PersistedInput> inputManager;
+	private final PersistenceDirectoryManager<PersistedOutput> outputManager;
+	private final PersistenceDirectoryManager<PersistedTest> testManager;
 
-	private PersistenceFileManager configurationManager;
-	private Configuration configuration;
-	private PersistenceFileManager accessLogManager;
-	private AccessLog accessLog;
+	private final PersistenceFileManager configurationManager;
+	private final Configuration configuration;
+	private final PersistenceFileManager accessLogManager;
+	private final AccessLog accessLog;
 
 	private HybridDecisionSession decisionSession;
 

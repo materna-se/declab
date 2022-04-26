@@ -42,7 +42,8 @@ public class PersistedInput extends Input {
 
 	@Override
 	public void fromJSON(String json) {
-		PersistedInput temp = (PersistedInput) SerializationHelper.getInstance().toClass(json, PersistedInput.class);
+		final PersistedInput temp = (PersistedInput) SerializationHelper.getInstance().toClass(json,
+				PersistedInput.class);
 		this.value = temp.getValue();
 		this.name = temp.getName();
 		this.parent = temp.getParent();

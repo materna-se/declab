@@ -71,7 +71,7 @@ public class TestResultOutput extends Serializable {
 
 	@Override
 	public void fromJSON(String json) {
-		TestResultOutput temp = (TestResultOutput) SerializationHelper.getInstance().toClass(json,
+		final TestResultOutput temp = (TestResultOutput) SerializationHelper.getInstance().toClass(json,
 				TestResultOutput.class);
 		this.expected = temp.getExpected();
 		this.calculated = temp.getCalculated();

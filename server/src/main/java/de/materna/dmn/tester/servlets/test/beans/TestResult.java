@@ -25,7 +25,7 @@ public class TestResult extends Serializable {
 	}
 
 	public boolean isEqual() {
-		for (TestResultOutput output : outputs.values()) {
+		for (final TestResultOutput output : outputs.values()) {
 			if (!output.isEqual()) {
 				return false;
 			}
@@ -36,7 +36,7 @@ public class TestResult extends Serializable {
 
 	@Override
 	public void fromJSON(String json) {
-		TestResult temp = (TestResult) SerializationHelper.getInstance().toClass(json, TestResult.class);
+		final TestResult temp = (TestResult) SerializationHelper.getInstance().toClass(json, TestResult.class);
 		this.outputs = temp.getOutputs();
 	}
 }

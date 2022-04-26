@@ -39,10 +39,10 @@ public class UserResourceRESTService {
 	@Path("/{filename}")
 	@Produces("image/jpg")
 	public Response showUserImageTag(@PathParam("filename") String filename) {
-		String filepath = PATH + filename;
+		final String filepath = PATH + filename;
 		try {
 			return Response.ok(Files.readAllBytes(Paths.get(filepath))).build();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			return Response.status(404).build();
 		}
 	}
