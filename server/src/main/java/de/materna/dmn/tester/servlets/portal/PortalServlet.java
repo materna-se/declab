@@ -45,10 +45,7 @@ public class PortalServlet {
 		final LoginRequest loginRequest = (LoginRequest) SerializationHelper.getInstance().toClass(body,
 				LoginRequest.class);
 		final User user = userRepository.findByUsername(loginRequest.getUsername());
-		// -> user.getSalt()
-		if (user != null && user.getPassword()
-				.equals(BCrypt.hashpw(loginRequest.getPassword(), "$2a$10$uFCpSmJSWBm00LNHVOZD/O"))) {
-
+		if ((user != null) && user.getPassword().equals(BCrypt.hashpw(loginRequest.getPassword(), user.getSalt()))) {
 			final SessionToken sessionToken = new SessionToken(user);
 			sessionTokenRepository.put(sessionToken);
 			return Response.status(Response.Status.OK)

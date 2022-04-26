@@ -45,9 +45,10 @@ public class User {
 	public User(String email, String userName, String password, String firstname, String lastname) {
 		this.uuid = UUID.randomUUID();
 		this.registrationDateTime = LocalDateTime.now();
+		this.salt = BCrypt.gensalt();
 		setEmail(email);
 		setUsername(userName);
-		setPassword(password);
+		setPassword(BCrypt.hashpw(password, this.salt));
 		setFirstname(firstname);
 		setLastname(lastname);
 	}
@@ -97,8 +98,7 @@ public class User {
 	}
 
 	public void setPassword(String password) {
-		// -> setSalt()
-		this.password = BCrypt.hashpw(password, "$2a$10$uFCpSmJSWBm00LNHVOZD/O");
+		this.password = password;
 	}
 
 	public String getSalt() {
@@ -112,5 +112,4 @@ public class User {
 	public void setRegistrationDateTime(LocalDateTime registrationDateTime) {
 		this.registrationDateTime = registrationDateTime;
 	}
-
 }
