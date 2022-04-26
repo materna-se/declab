@@ -18,6 +18,7 @@ import de.materna.dmn.tester.servlets.input.InputServlet;
 import de.materna.dmn.tester.servlets.model.ModelServlet;
 import de.materna.dmn.tester.servlets.output.OutputServlet;
 import de.materna.dmn.tester.servlets.playground.PlaygroundServlet;
+import de.materna.dmn.tester.servlets.portal.PortalServlet;
 import de.materna.dmn.tester.servlets.test.TestServlet;
 import de.materna.dmn.tester.servlets.workspace.MetaWorkspaceServlet;
 import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
@@ -39,6 +40,7 @@ public class MainApplication extends Application {
 		singletons.add(new TestServlet());
 		singletons.add(new MetaWorkspaceServlet());
 		singletons.add(new WorkspaceServlet());
+		singletons.add(new PortalServlet());
 
 		classes.add(CSRFFilter.class);
 		classes.add(ReadAccessFilter.class);

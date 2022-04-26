@@ -103,9 +103,9 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public User register(String email, String username, String password, String lastname, String firstname) {
+	public User register(String email, String username, String password, String firstname, String lastname) {
 		if (findByEmail(email) == null) {
-			User user = new User(email, username, password, lastname, firstname);
+			User user = new User(email, username, password, firstname, lastname);
 			return put(user);
 		}
 		return null;

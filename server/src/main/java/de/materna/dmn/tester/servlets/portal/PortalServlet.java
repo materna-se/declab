@@ -29,6 +29,7 @@ import de.materna.dmn.tester.servlets.portal.dto.CreateWorkspaceRequest;
 import de.materna.dmn.tester.servlets.portal.dto.LoginRequest;
 import de.materna.dmn.tester.servlets.portal.dto.RegisterRequest;
 import de.materna.jdec.serialization.SerializationHelper;
+import org.mindrot.jbcrypt.BCrypt;
 
 @Path("/portal")
 public class PortalServlet {
@@ -36,19 +37,25 @@ public class PortalServlet {
 	SessionTokenRepository sessionTokenRepository = new SessionTokenHibernateH2RepositoryImpl();
 
 	@POST
+	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response login(String body) {
 		LoginRequest loginRequest = (LoginRequest) SerializationHelper.getInstance().toClass(body, LoginRequest.class);
 		User user = userRepository.findByUsername(loginRequest.getUsername());
-		if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
+		// -> user.getSalt()
+		if (user != null && user.getPassword().equals(BCrypt.hashpw(loginRequest.getPassword(), "$2a$10$uFCpSmJSWBm00LNHVOZD/O"))) {
 			String uuid = UUID.randomUUID().toString();
+
+			// Save session token
+
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(uuid)).build();
 		}
 		return Response.status(Response.Status.UNAUTHORIZED).build();
 	}
 
 	@POST
+	@Path("/register")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response register(String body) throws UsernameInUseException, EmailInUseException {

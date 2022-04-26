@@ -34,20 +34,22 @@ public class User {
 	@Column(name = "password", nullable = false)
 	@NotEmpty(message = "Password cannot be empty")
 	private String password;
+	@Column(name = "salt", nullable = false)
+	private String salt;
 	@Column(name = "registration")
 	private LocalDateTime registrationDateTime;
 
 	public User() {
 	}
 
-	public User(String email, String userName, String firstname, String lastname, String password) {
+	public User(String email, String userName, String password, String firstname, String lastname) {
 		this.uuid = UUID.randomUUID();
 		this.registrationDateTime = LocalDateTime.now();
 		setEmail(email);
 		setUsername(userName);
+		setPassword(password);
 		setFirstname(firstname);
 		setLastname(lastname);
-		setPassword(password);
 	}
 
 	public UUID getUuid() {
@@ -95,7 +97,12 @@ public class User {
 	}
 
 	public void setPassword(String password) {
-		this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+		// -> setSalt()
+		this.password = BCrypt.hashpw(password, "$2a$10$uFCpSmJSWBm00LNHVOZD/O");
+	}
+
+	public String getSalt() {
+		return salt;
 	}
 
 	public LocalDateTime getRegistrationDateTime() {
