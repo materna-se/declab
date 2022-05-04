@@ -9,9 +9,9 @@ public class RegisterRequest {
 	}
 
 	public RegisterRequest(String email, String username, String password) {
-		this.email = email;
-		this.username = username;
-		this.password = password;
+		setEmail(email);
+		setUsername(username);
+		setPassword(password);
 	}
 
 	public String getEmail() {
