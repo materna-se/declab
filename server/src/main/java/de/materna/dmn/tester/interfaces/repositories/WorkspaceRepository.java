@@ -1,6 +1,10 @@
 package de.materna.dmn.tester.interfaces.repositories;
 
+import java.util.List;
+import java.util.UUID;
+
 import javax.enterprise.context.ApplicationScoped;
+import javax.xml.registry.JAXRException;
 
 import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.enums.VisabilityType;
@@ -8,12 +12,24 @@ import de.materna.dmn.tester.enums.VisabilityType;
 @ApplicationScoped
 public interface WorkspaceRepository {
 
-	Workspace findByUuid(String uuid);
+	List<Workspace> findAll();
+
+	Workspace findByUuid(UUID workspaceUuid);
+
+	List<Workspace> findByName(String name);
+
+	List<Workspace> findByVisability(VisabilityType visability);
+
+	List<Workspace> findByUser(UUID ownerUuid);
+
+	List<Workspace> findByLaboratory(UUID laboratoryUuid);
 
 	Workspace put(Workspace workspace);
 
 	Workspace create(String name, String description, VisabilityType visability);
 
-	void delete(Workspace workspace);
+	Workspace update(UUID workspaceUuid, String name, String description, VisabilityType visability)
+			throws JAXRException;
 
+	void delete(Workspace workspace);
 }

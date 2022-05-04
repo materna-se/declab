@@ -3,6 +3,8 @@ package de.materna.dmn.tester.beans.workspace.repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -13,24 +15,64 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.xml.registry.JAXRException;
 
+import de.materna.dmn.tester.beans.relationship.repository.RelationshipHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.Workspace;
+import de.materna.dmn.tester.beans.workspace.filter.NameFilter;
+import de.materna.dmn.tester.beans.workspace.filter.VisabilityFilter;
 import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.filters.WorkspaceFilter;
+import de.materna.dmn.tester.interfaces.repositories.RelationshipRepository;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 
 public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
+	private final RelationshipRepository relationshipRepository = new RelationshipHibernateH2RepositoryImpl();
 
 	private final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
 	private final EntityManager em = entityManagerFactory.createEntityManager();
 	private final EntityTransaction transaction = em.getTransaction();
 
 	@Override
-	public Workspace findByUuid(String uuid) {
+	public List<Workspace> findAll() {
+		final CriteriaBuilder cb = em.getCriteriaBuilder();
+		final CriteriaQuery<Workspace> cq = cb.createQuery(Workspace.class);
+		final Root<Workspace> rootEntry = cq.from(Workspace.class);
+		final CriteriaQuery<Workspace> all = cq.select(rootEntry);
+		final TypedQuery<Workspace> allQuery = em.createQuery(all);
+		return allQuery.getResultList();
+	}
+
+	@Override
+	public Workspace findByUuid(UUID workspaceUuid) {
 		transaction.begin();
-		final Workspace Workspace = em.find(Workspace.class, uuid);
+		final Workspace Workspace = em.find(Workspace.class, workspaceUuid);
 		transaction.commit();
 		return Optional.ofNullable(Workspace).get();
+	}
+
+	@Override
+	public List<Workspace> findByName(String name) {
+		return findByFilter(new NameFilter(name));
+	}
+
+	@Override
+	public List<Workspace> findByVisability(VisabilityType visability) {
+		return findByFilter(new VisabilityFilter(visability));
+	}
+
+	@Override
+	public List<Workspace> findByUser(UUID ownerUuid) {
+		return relationshipRepository.findByUser(ownerUuid).stream()
+				.filter(relationship -> relationship.getWorkplace() != null)
+				.map(relationship -> findByUuid(relationship.getWorkplace())).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<Workspace> findByLaboratory(UUID laboratoryUuid) {
+		return relationshipRepository.findByLaboratory(laboratoryUuid).stream()
+				.filter(relationship -> relationship.getWorkplace() != null)
+				.map(relationship -> findByUuid(relationship.getWorkplace())).collect(Collectors.toList());
 	}
 
 	@Override
@@ -45,6 +87,19 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	public Workspace create(String name, String description, VisabilityType visability) {
 		final Workspace workspace = new Workspace(name, description, visability);
 		return put(workspace);
+	}
+
+	@Override
+	public Workspace update(UUID workspaceUuid, String name, String description, VisabilityType visability)
+			throws JAXRException {
+		final Workspace workspace = findByUuid(workspaceUuid);
+		if (workspace != null) {
+			workspace.setName(name);
+			workspace.setDescription(description);
+			workspace.setVisability(visability);
+			return put(workspace);
+		}
+		return null;
 	}
 
 	@Override
