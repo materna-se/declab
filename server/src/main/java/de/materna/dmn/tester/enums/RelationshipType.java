@@ -1,5 +1,5 @@
 package de.materna.dmn.tester.enums;
 
 public enum RelationshipType {
-	OWNER, CONTRIBUTOR, GUEST
+	OWNER, ADMINISTRATOR, CONTRIBUTOR, GUEST
 }
