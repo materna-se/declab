@@ -83,6 +83,10 @@ public class PortalServlet {
 				: Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
+	@POST
+	@Path("/laboratory/create")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response createLaboratory(String body) throws UserNotFoundException, SessionTokenNotFoundException {
 		final CreateLaboratoryRequest createLaboratoryRequest = (CreateLaboratoryRequest) SerializationHelper
 				.getInstance().toClass(body, CreateLaboratoryRequest.class);
@@ -111,6 +115,10 @@ public class PortalServlet {
 				: Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
+	@POST
+	@Path("/workspace/create")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response createWorkspace(String body) throws UserNotFoundException, SessionTokenNotFoundException {
 		final CreateWorkspaceRequest createWorkspaceRequest = (CreateWorkspaceRequest) SerializationHelper.getInstance()
 				.toClass(body, CreateWorkspaceRequest.class);
