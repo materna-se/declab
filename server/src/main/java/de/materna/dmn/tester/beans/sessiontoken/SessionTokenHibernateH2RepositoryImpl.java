@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans.sessiontoken.repository;
+package de.materna.dmn.tester.beans.sessiontoken;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,8 +18,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.xml.registry.JAXRException;
 
-import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
-import de.materna.dmn.tester.beans.sessiontoken.SessionTokenComparator;
 import de.materna.dmn.tester.beans.sessiontoken.filter.UserUuidFilter;
 import de.materna.dmn.tester.beans.user.User;
 import de.materna.dmn.tester.interfaces.filters.SessionTokenFilter;

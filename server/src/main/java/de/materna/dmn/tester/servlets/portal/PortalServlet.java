@@ -12,13 +12,13 @@ import javax.ws.rs.core.Response;
 import org.mindrot.jbcrypt.BCrypt;
 
 import de.materna.dmn.tester.beans.laboratory.Laboratory;
-import de.materna.dmn.tester.beans.laboratory.repository.LaboratoryHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.laboratory.LaboratoryHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
-import de.materna.dmn.tester.beans.sessiontoken.repository.SessionTokenHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.sessiontoken.SessionTokenHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.user.User;
-import de.materna.dmn.tester.beans.user.repository.UserHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.user.UserHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.Workspace;
-import de.materna.dmn.tester.beans.workspace.repository.WorkspaceHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.workspace.WorkspaceHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;

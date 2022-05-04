@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans.user.repository;
+package de.materna.dmn.tester.beans.user;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +17,7 @@ import javax.persistence.criteria.Root;
 import javax.xml.registry.JAXRException;
 
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
-import de.materna.dmn.tester.beans.sessiontoken.repository.SessionTokenHibernateH2RepositoryImpl;
-import de.materna.dmn.tester.beans.user.User;
+import de.materna.dmn.tester.beans.sessiontoken.SessionTokenHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.user.filter.EmailFilter;
 import de.materna.dmn.tester.beans.user.filter.UsernameFilter;
 import de.materna.dmn.tester.interfaces.filters.UserFilter;

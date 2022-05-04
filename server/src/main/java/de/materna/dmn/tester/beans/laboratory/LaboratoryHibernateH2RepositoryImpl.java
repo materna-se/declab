@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans.laboratory.repository;
+package de.materna.dmn.tester.beans.laboratory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +16,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import de.materna.dmn.tester.beans.laboratory.Laboratory;
 import de.materna.dmn.tester.beans.laboratory.filter.NameFilter;
 import de.materna.dmn.tester.beans.laboratory.filter.VisabilityFilter;
-import de.materna.dmn.tester.beans.relationship.repository.RelationshipHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.relationship.RelationshipHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.filters.LaboratoryFilter;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;

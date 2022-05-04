@@ -13,7 +13,7 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import de.materna.dmn.tester.beans.user.User;
-import de.materna.dmn.tester.beans.user.repository.UserHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.user.UserHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.servlets.MainApplication;
 import de.materna.dmn.tester.sockets.MainSocket;
 

@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans.relationship.repository;
+package de.materna.dmn.tester.beans.relationship;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import de.materna.dmn.tester.beans.relationship.Relationship;
 import de.materna.dmn.tester.beans.relationship.filter.LaboratoryAndWorkspaceFilter;
 import de.materna.dmn.tester.beans.relationship.filter.LaboratoryFilter;
 import de.materna.dmn.tester.beans.relationship.filter.RelationshipTypeFilter;

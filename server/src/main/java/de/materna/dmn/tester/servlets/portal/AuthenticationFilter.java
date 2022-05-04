@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
-import de.materna.dmn.tester.beans.sessiontoken.repository.SessionTokenHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.sessiontoken.SessionTokenHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.interfaces.Secured;
 import de.materna.dmn.tester.servlets.exceptions.authorization.SessionTokenExpiredException;
 import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;

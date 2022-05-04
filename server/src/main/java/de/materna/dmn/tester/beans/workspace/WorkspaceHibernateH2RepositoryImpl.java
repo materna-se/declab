@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans.workspace.repository;
+package de.materna.dmn.tester.beans.workspace;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +17,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.xml.registry.JAXRException;
 
-import de.materna.dmn.tester.beans.relationship.repository.RelationshipHibernateH2RepositoryImpl;
-import de.materna.dmn.tester.beans.workspace.Workspace;
+import de.materna.dmn.tester.beans.relationship.RelationshipHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.filter.NameFilter;
 import de.materna.dmn.tester.beans.workspace.filter.VisabilityFilter;
 import de.materna.dmn.tester.enums.VisabilityType;
