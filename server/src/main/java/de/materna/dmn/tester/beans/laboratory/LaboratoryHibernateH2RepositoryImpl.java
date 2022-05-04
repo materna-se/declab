@@ -81,10 +81,11 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	}
 
 	@Override
-	public void delete(Laboratory laboratory) {
+	public boolean delete(Laboratory laboratory) {
 		transaction.begin();
 		em.remove(em.contains(laboratory) ? laboratory : em.merge(laboratory));
 		transaction.commit();
+		return findByUuid(laboratory.getUuid()) == null;
 	}
 
 	public List<Laboratory> findByFilter(LaboratoryFilter... filterArray) {

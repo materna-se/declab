@@ -102,10 +102,11 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	@Override
-	public void delete(Workspace workspace) {
+	public boolean delete(Workspace workspace) {
 		transaction.begin();
 		em.remove(em.contains(workspace) ? workspace : em.merge(workspace));
 		transaction.commit();
+		return findByUuid(workspace.getUuid()) == null;
 	}
 
 	public List<Workspace> findByFilter(WorkspaceFilter... filterArray) {
