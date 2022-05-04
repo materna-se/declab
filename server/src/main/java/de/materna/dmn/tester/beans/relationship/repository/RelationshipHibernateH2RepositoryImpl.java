@@ -16,8 +16,11 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.relationship.Relationship;
+import de.materna.dmn.tester.beans.relationship.filter.LaboratoryAndWorkspaceFilter;
 import de.materna.dmn.tester.beans.relationship.filter.LaboratoryFilter;
 import de.materna.dmn.tester.beans.relationship.filter.RelationshipTypeFilter;
+import de.materna.dmn.tester.beans.relationship.filter.UserAndLaboratoryFilter;
+import de.materna.dmn.tester.beans.relationship.filter.UserAndWorkspaceFilter;
 import de.materna.dmn.tester.beans.relationship.filter.UserFilter;
 import de.materna.dmn.tester.beans.relationship.filter.WorkspaceFilter;
 import de.materna.dmn.tester.enums.RelationshipType;
@@ -66,6 +69,26 @@ public class RelationshipHibernateH2RepositoryImpl implements RelationshipReposi
 	@Override
 	public List<Relationship> findByType(RelationshipType type) {
 		return findByFilter(new RelationshipTypeFilter(type));
+	}
+
+	@Override
+	public Relationship findByUserAndLaboratory(UUID userUuid, UUID laboratoryUuid) {
+		final List<Relationship> relationshipsFound = findByFilter(
+				new UserAndLaboratoryFilter(userUuid, laboratoryUuid));
+		return relationshipsFound.size() == 1 ? relationshipsFound.get(0) : null;
+	}
+
+	@Override
+	public Relationship findByUserAndWorkspace(UUID userUuid, UUID workspaceUuid) {
+		final List<Relationship> relationshipsFound = findByFilter(new UserAndWorkspaceFilter(userUuid, workspaceUuid));
+		return relationshipsFound.size() == 1 ? relationshipsFound.get(0) : null;
+	}
+
+	@Override
+	public Relationship findByLaboratoryAndWorkspace(UUID laboratoryUuid, UUID workspaceUuid) {
+		final List<Relationship> relationshipsFound = findByFilter(
+				new LaboratoryAndWorkspaceFilter(laboratoryUuid, workspaceUuid));
+		return relationshipsFound.size() == 1 ? relationshipsFound.get(0) : null;
 	}
 
 	@Override

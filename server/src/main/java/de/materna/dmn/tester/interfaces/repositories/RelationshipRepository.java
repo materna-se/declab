@@ -20,6 +20,12 @@ public interface RelationshipRepository {
 
 	List<Relationship> findByType(RelationshipType type);
 
+	Relationship findByUserAndLaboratory(UUID userUuid, UUID laboratoryUuid);
+
+	Relationship findByUserAndWorkspace(UUID userUuid, UUID workspaceUuid);
+
+	Relationship findByLaboratoryAndWorkspace(UUID laboratoryUuid, UUID workspaceUuid);
+
 	void put(Relationship relationship);
 
 	void delete(Relationship relationship);
