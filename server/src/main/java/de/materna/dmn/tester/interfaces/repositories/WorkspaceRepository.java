@@ -31,5 +31,5 @@ public interface WorkspaceRepository {
 	Workspace update(UUID workspaceUuid, String name, String description, VisabilityType visability)
 			throws JAXRException;
 
-	void delete(Workspace workspace);
+	boolean delete(Workspace workspace);
 }

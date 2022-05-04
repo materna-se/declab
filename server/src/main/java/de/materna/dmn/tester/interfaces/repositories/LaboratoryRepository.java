@@ -22,5 +22,5 @@ public interface LaboratoryRepository {
 
 	Laboratory create(String name, String description, VisabilityType visability);
 
-	void delete(Laboratory laboratory);
+	boolean delete(Laboratory laboratory);
 }
