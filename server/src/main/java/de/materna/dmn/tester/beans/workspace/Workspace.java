@@ -16,7 +16,7 @@ import de.materna.dmn.tester.enums.VisabilityType;
 public class Workspace {
 	@Id
 	@Column(name = "uuid", unique = true, nullable = false)
-	private String uuid;
+	private UUID uuid;
 	@Column(name = "name")
 	@NotEmpty(message = "The name of the Workspace cannot be empty.")
 	private String name;
@@ -29,13 +29,13 @@ public class Workspace {
 	}
 
 	public Workspace(String name, String description, VisabilityType visability) {
-		this.uuid = UUID.randomUUID().toString();
-		this.name = name;
-		this.description = description;
-		this.visability = visability;
+		this.uuid = UUID.randomUUID();
+		setName(name);
+		setDescription(description);
+		setVisability(visability);
 	}
 
-	public String getUuid() {
+	public UUID getUuid() {
 		return uuid;
 	}
 
