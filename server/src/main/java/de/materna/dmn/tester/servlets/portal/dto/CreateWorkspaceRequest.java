@@ -14,10 +14,10 @@ public class CreateWorkspaceRequest {
 	}
 
 	public CreateWorkspaceRequest(String name, String description, UUID sessionTokenUuid, VisabilityType visability) {
-		this.name = name;
-		this.description = description;
-		this.sessionTokenUuid = sessionTokenUuid;
-		this.visability = visability;
+		setName(name);
+		setDescription(description);
+		setSessionTokenUuid(sessionTokenUuid);
+		setVisability(visability);
 	}
 
 	public UUID getSessionTokenUuid() {
