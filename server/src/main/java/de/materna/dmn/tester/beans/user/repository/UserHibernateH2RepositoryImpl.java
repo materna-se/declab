@@ -22,9 +22,11 @@ import de.materna.dmn.tester.beans.user.User;
 import de.materna.dmn.tester.beans.user.filter.EmailFilter;
 import de.materna.dmn.tester.beans.user.filter.UsernameFilter;
 import de.materna.dmn.tester.interfaces.filters.UserFilter;
+import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
 import de.materna.dmn.tester.interfaces.repositories.UserRepository;
 
 public class UserHibernateH2RepositoryImpl implements UserRepository {
+	private final SessionTokenRepository sessionTokenRepository = new SessionTokenHibernateH2RepositoryImpl();
 
 	private final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
 	private final EntityManager em = entityManagerFactory.createEntityManager();
@@ -62,7 +64,7 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 
 	@Override
 	public User findBySessionToken(UUID tokenUuid) {
-		final SessionToken token = new SessionTokenHibernateH2RepositoryImpl().findByUuid(tokenUuid);
+		final SessionToken token = sessionTokenRepository.findByUuid(tokenUuid);
 		return findByUuid(token.getUserUuid());
 	}
 
