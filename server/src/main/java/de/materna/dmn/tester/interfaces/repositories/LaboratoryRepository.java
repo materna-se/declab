@@ -12,6 +12,12 @@ public interface LaboratoryRepository {
 
 	Laboratory findByUuid(UUID laboratoryUuid);
 
+	List<Laboratory> findByName(String name);
+
+	List<Laboratory> findByVisability(VisabilityType visability);
+
+	List<Laboratory> findByUser(UUID ownerUuid);
+
 	Laboratory put(Laboratory laboratory);
 
 	Laboratory create(String name, String description, VisabilityType visability);

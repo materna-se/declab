@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -16,11 +17,16 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.laboratory.Laboratory;
+import de.materna.dmn.tester.beans.laboratory.filter.NameFilter;
+import de.materna.dmn.tester.beans.laboratory.filter.VisabilityFilter;
+import de.materna.dmn.tester.beans.relationship.repository.RelationshipHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.filters.LaboratoryFilter;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
+import de.materna.dmn.tester.interfaces.repositories.RelationshipRepository;
 
 public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository {
+	private final RelationshipRepository relationshipRepository = new RelationshipHibernateH2RepositoryImpl();
 
 	private final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
 	private final EntityManager em = entityManagerFactory.createEntityManager();
@@ -42,6 +48,23 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 		final Laboratory Laboratory = em.find(Laboratory.class, laboratoryUuid);
 		transaction.commit();
 		return Optional.ofNullable(Laboratory).get();
+	}
+
+	@Override
+	public List<Laboratory> findByName(String name) {
+		return findByFilter(new NameFilter(name));
+	}
+
+	@Override
+	public List<Laboratory> findByVisability(VisabilityType visability) {
+		return findByFilter(new VisabilityFilter(visability));
+	}
+
+	@Override
+	public List<Laboratory> findByUser(UUID ownerUuid) {
+		return relationshipRepository.findByUser(ownerUuid).stream()
+				.filter(relationship -> relationship.getLaboratory() != null)
+				.map(relationship -> findByUuid(relationship.getLaboratory())).collect(Collectors.toList());
 	}
 
 	@Override
