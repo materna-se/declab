@@ -63,15 +63,15 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	@Override
 	public List<Workspace> findByUser(UUID ownerUuid) {
 		return relationshipRepository.findByUser(ownerUuid).stream()
-				.filter(relationship -> relationship.getWorkplace() != null)
-				.map(relationship -> findByUuid(relationship.getWorkplace())).collect(Collectors.toList());
+				.filter(relationship -> relationship.getWorkspace() != null)
+				.map(relationship -> findByUuid(relationship.getWorkspace())).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<Workspace> findByLaboratory(UUID laboratoryUuid) {
 		return relationshipRepository.findByLaboratory(laboratoryUuid).stream()
-				.filter(relationship -> relationship.getWorkplace() != null)
-				.map(relationship -> findByUuid(relationship.getWorkplace())).collect(Collectors.toList());
+				.filter(relationship -> relationship.getWorkspace() != null)
+				.map(relationship -> findByUuid(relationship.getWorkspace())).collect(Collectors.toList());
 	}
 
 	@Override
