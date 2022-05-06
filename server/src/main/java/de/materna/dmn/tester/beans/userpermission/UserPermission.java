@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.beans.relationship;
+package de.materna.dmn.tester.beans.userpermission;
 
 import java.util.UUID;
 
@@ -10,11 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import de.materna.dmn.tester.enums.RelationshipType;
+import de.materna.dmn.tester.enums.UserPermissionType;
 
 @Entity
 @Table(name = "relationship")
-public class Relationship {
+public class UserPermission {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -26,9 +26,9 @@ public class Relationship {
 	@Column(name = "workspace")
 	private UUID workspace;
 	@Column(name = "type")
-	private RelationshipType type;
+	private UserPermissionType type;
 
-	public Relationship() {
+	public UserPermission() {
 	}
 
 	public UUID getUser() {
@@ -55,11 +55,11 @@ public class Relationship {
 		this.workspace = workspace;
 	}
 
-	public RelationshipType getType() {
+	public UserPermissionType getType() {
 		return type;
 	}
 
-	public void setType(RelationshipType type) {
+	public void setType(UserPermissionType type) {
 		this.type = type;
 	}
 

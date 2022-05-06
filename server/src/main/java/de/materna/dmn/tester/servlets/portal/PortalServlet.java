@@ -16,25 +16,25 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import de.materna.dmn.tester.beans.laboratory.Laboratory;
 import de.materna.dmn.tester.beans.laboratory.LaboratoryHibernateH2RepositoryImpl;
-import de.materna.dmn.tester.beans.relationship.Relationship;
-import de.materna.dmn.tester.beans.relationship.RelationshipHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
 import de.materna.dmn.tester.beans.sessiontoken.SessionTokenHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.user.User;
 import de.materna.dmn.tester.beans.user.UserHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.userpermission.UserPermission;
+import de.materna.dmn.tester.beans.userpermission.UserPermissionHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.beans.workspace.WorkspaceHibernateH2RepositoryImpl;
-import de.materna.dmn.tester.enums.RelationshipType;
+import de.materna.dmn.tester.enums.UserPermissionType;
 import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
-import de.materna.dmn.tester.interfaces.repositories.RelationshipRepository;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
+import de.materna.dmn.tester.interfaces.repositories.UserPermissionRepository;
 import de.materna.dmn.tester.interfaces.repositories.UserRepository;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 import de.materna.dmn.tester.servlets.exceptions.authorization.MissingRightsException;
-import de.materna.dmn.tester.servlets.exceptions.database.RelationshipNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.UserNotFoundException;
+import de.materna.dmn.tester.servlets.exceptions.database.UserPermissionNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.registration.EmailInUseException;
 import de.materna.dmn.tester.servlets.exceptions.registration.UsernameInUseException;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.CreateLaboratoryRequest;
@@ -55,7 +55,7 @@ public class PortalServlet {
 	private final SessionTokenRepository sessionTokenRepository = new SessionTokenHibernateH2RepositoryImpl();
 	private final LaboratoryRepository laboratoryRepository = new LaboratoryHibernateH2RepositoryImpl();
 	private final WorkspaceRepository workspaceRepository = new WorkspaceHibernateH2RepositoryImpl();
-	private final RelationshipRepository relationshipRepository = new RelationshipHibernateH2RepositoryImpl();
+	private final UserPermissionRepository userPermissionRepository = new UserPermissionHibernateH2RepositoryImpl();
 
 	@POST
 	@Path("/user/login")
@@ -136,7 +136,7 @@ public class PortalServlet {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteLaboratory(String body)
-			throws SessionTokenNotFoundException, RelationshipNotFoundException, MissingRightsException {
+			throws SessionTokenNotFoundException, UserPermissionNotFoundException, MissingRightsException {
 		final DeleteLaboratoryRequest deleteLaboratoryRequest = (DeleteLaboratoryRequest) SerializationHelper
 				.getInstance().toClass(body, DeleteLaboratoryRequest.class);
 
@@ -149,20 +149,20 @@ public class PortalServlet {
 		}
 
 		final UUID userUuid = sessionToken.getUserUuid();
-		final List<Relationship> relationships = relationshipRepository.findByLaboratory(laboratoryUuid).stream()
-				.filter(relationship -> relationship.getType() == RelationshipType.OWNER
-						|| relationship.getType() == RelationshipType.ADMINISTRATOR)
+		final List<UserPermission> userPermissions = userPermissionRepository.findByLaboratory(laboratoryUuid).stream()
+				.filter(userPermission -> userPermission.getType() == UserPermissionType.OWNER
+						|| userPermission.getType() == UserPermissionType.ADMINISTRATOR)
 				.collect(Collectors.toList());
 
-		if (relationships.size() == 0) {
-			throw new RelationshipNotFoundException("No user is owner or administrator : " + laboratoryUuid);
+		if (userPermissions.size() == 0) {
+			throw new UserPermissionNotFoundException("No user is owner or administrator : " + laboratoryUuid);
 		}
 
-		final Relationship userRelationship = relationships.stream()
-				.filter(relationship -> relationship.getUser() == userUuid).findAny().orElse(null);
+		final UserPermission userUserPermission = userPermissions.stream()
+				.filter(userPermission -> userPermission.getUser() == userUuid).findAny().orElse(null);
 
-		if (userRelationship != null && userRelationship.getType() != RelationshipType.OWNER
-				&& userRelationship.getType() != RelationshipType.ADMINISTRATOR) {
+		if (userUserPermission != null && userUserPermission.getType() != UserPermissionType.OWNER
+				&& userUserPermission.getType() != UserPermissionType.ADMINISTRATOR) {
 			throw new MissingRightsException(
 					"Missing rights (owner or administrator status needed) : " + laboratoryUuid);
 		}
@@ -170,9 +170,9 @@ public class PortalServlet {
 		final Laboratory laboratory = laboratoryRepository.findByUuid(laboratoryUuid);
 
 		if (laboratoryRepository.delete(laboratory)) {
-			final List<Relationship> allRelationships = relationshipRepository.findByWorkspace(laboratoryUuid);
-			for (final Relationship rs : allRelationships) {
-				relationshipRepository.delete(rs);
+			final List<UserPermission> allUserPermissions = userPermissionRepository.findByWorkspace(laboratoryUuid);
+			for (final UserPermission rs : allUserPermissions) {
+				userPermissionRepository.delete(rs);
 			}
 			return Response.status(Response.Status.OK).build();
 		}
@@ -184,7 +184,7 @@ public class PortalServlet {
 	@Path("/laboratory/read")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response readLaboratory(String body) throws SessionTokenNotFoundException, RelationshipNotFoundException {
+	public Response readLaboratory(String body) throws SessionTokenNotFoundException, UserPermissionNotFoundException {
 		final ReadLaboratoryRequest readLaboratoryRequest = (ReadLaboratoryRequest) SerializationHelper.getInstance()
 				.toClass(body, ReadLaboratoryRequest.class);
 
@@ -197,10 +197,12 @@ public class PortalServlet {
 
 		final UUID userUuid = sessionToken.getUserUuid();
 		final UUID laboratoryUuid = readLaboratoryRequest.getLaboratoryUuid();
-		final Relationship relationship = relationshipRepository.findByUserAndLaboratory(userUuid, laboratoryUuid);
+		final UserPermission userPermission = userPermissionRepository.findByUserAndLaboratory(userUuid,
+				laboratoryUuid);
 
-		if (relationship == null) {
-			throw new RelationshipNotFoundException("User is not in any relation with laboratory : " + laboratoryUuid);
+		if (userPermission == null) {
+			throw new UserPermissionNotFoundException(
+					"User is not in any relation with laboratory : " + laboratoryUuid);
 		}
 
 		final Laboratory laboratory = laboratoryRepository.findByUuid(laboratoryUuid);
@@ -214,8 +216,8 @@ public class PortalServlet {
 	@Path("/laboratory/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateLaboratory(String body)
-			throws SessionTokenNotFoundException, RelationshipNotFoundException, MissingRightsException, JAXRException {
+	public Response updateLaboratory(String body) throws SessionTokenNotFoundException, UserPermissionNotFoundException,
+			MissingRightsException, JAXRException {
 		final UpdateLaboratoryRequest updateLaboratoryRequest = (UpdateLaboratoryRequest) SerializationHelper
 				.getInstance().toClass(body, UpdateLaboratoryRequest.class);
 
@@ -228,13 +230,15 @@ public class PortalServlet {
 
 		final UUID userUuid = sessionToken.getUserUuid();
 		final UUID laboratoryUuid = updateLaboratoryRequest.getLaboratoryUuid();
-		final Relationship relationship = relationshipRepository.findByUserAndLaboratory(userUuid, laboratoryUuid);
+		final UserPermission userPermission = userPermissionRepository.findByUserAndLaboratory(userUuid,
+				laboratoryUuid);
 
-		if (relationship == null) {
-			throw new RelationshipNotFoundException("User is not in any relation with laboratory : " + laboratoryUuid);
+		if (userPermission == null) {
+			throw new UserPermissionNotFoundException(
+					"User is not in any relation with laboratory : " + laboratoryUuid);
 		}
 
-		if (relationship.getType() == RelationshipType.GUEST) {
+		if (userPermission.getType() == UserPermissionType.GUEST) {
 			throw new MissingRightsException("Missing rights (user is only guest) : " + laboratoryUuid);
 		}
 
@@ -286,7 +290,7 @@ public class PortalServlet {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteWorkspace(String body)
-			throws SessionTokenNotFoundException, RelationshipNotFoundException, MissingRightsException {
+			throws SessionTokenNotFoundException, UserPermissionNotFoundException, MissingRightsException {
 		final DeleteWorkspaceRequest deleteWorkspaceRequest = (DeleteWorkspaceRequest) SerializationHelper.getInstance()
 				.toClass(body, DeleteWorkspaceRequest.class);
 
@@ -299,35 +303,35 @@ public class PortalServlet {
 		}
 
 		final UUID userUuid = sessionToken.getUserUuid();
-		final List<Relationship> workspaceRelationships = relationshipRepository.findByWorkspace(workspaceUuid).stream()
-				.filter(relationship -> relationship.getType() == RelationshipType.OWNER
-						|| relationship.getType() == RelationshipType.ADMINISTRATOR)
+		final List<UserPermission> workspaceUserPermissions = userPermissionRepository.findByWorkspace(workspaceUuid)
+				.stream().filter(userPermission -> userPermission.getType() == UserPermissionType.OWNER
+						|| userPermission.getType() == UserPermissionType.ADMINISTRATOR)
 				.collect(Collectors.toList());
 
-		if (workspaceRelationships.size() == 0) {
-			throw new RelationshipNotFoundException(
+		if (workspaceUserPermissions.size() == 0) {
+			throw new UserPermissionNotFoundException(
 					"No user or laboratory is owner or administrator : " + workspaceUuid);
 		}
 
-		final Relationship userRelationship = workspaceRelationships.stream()
-				.filter(relationship -> relationship.getUser() == userUuid).findAny().orElse(null);
+		final UserPermission userUserPermission = workspaceUserPermissions.stream()
+				.filter(userPermission -> userPermission.getUser() == userUuid).findAny().orElse(null);
 
-		if (userRelationship != null) {
-			if (userRelationship.getType() != RelationshipType.OWNER
-					&& userRelationship.getType() != RelationshipType.ADMINISTRATOR) {
+		if (userUserPermission != null) {
+			if (userUserPermission.getType() != UserPermissionType.OWNER
+					&& userUserPermission.getType() != UserPermissionType.ADMINISTRATOR) {
 				throw new MissingRightsException(
 						"Missing rights (owner or administrator status needed) : " + workspaceUuid);
 			}
 		} else {
-			final List<Laboratory> laboratories = workspaceRelationships.stream()
-					.filter(relationship -> relationship.getLaboratory() != null)
-					.map(relationship -> laboratoryRepository.findByUuid(relationship.getLaboratory()))
+			final List<Laboratory> laboratories = workspaceUserPermissions.stream()
+					.filter(userPermission -> userPermission.getLaboratory() != null)
+					.map(userPermission -> laboratoryRepository.findByUuid(userPermission.getLaboratory()))
 					.collect(Collectors.toList());
 			final Laboratory laboratory = laboratories.stream()
-					.filter(lab -> relationshipRepository.findByUserAndLaboratory(userUuid, lab.getUuid())
-							.getType() == RelationshipType.OWNER
-							|| relationshipRepository.findByUserAndLaboratory(userUuid, lab.getUuid())
-									.getType() == RelationshipType.ADMINISTRATOR)
+					.filter(lab -> userPermissionRepository.findByUserAndLaboratory(userUuid, lab.getUuid())
+							.getType() == UserPermissionType.OWNER
+							|| userPermissionRepository.findByUserAndLaboratory(userUuid, lab.getUuid())
+									.getType() == UserPermissionType.ADMINISTRATOR)
 					.findAny().orElse(null);
 			if (laboratory == null) {
 				throw new MissingRightsException(
@@ -337,9 +341,9 @@ public class PortalServlet {
 
 		final Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
 		if (workspaceRepository.delete(workspace)) {
-			final List<Relationship> allRelationships = relationshipRepository.findByWorkspace(workspaceUuid);
-			for (final Relationship rs : allRelationships) {
-				relationshipRepository.delete(rs);
+			final List<UserPermission> allUserPermissions = userPermissionRepository.findByWorkspace(workspaceUuid);
+			for (final UserPermission userPermission : allUserPermissions) {
+				userPermissionRepository.delete(userPermission);
 			}
 			return Response.status(Response.Status.OK).build();
 		}
@@ -351,7 +355,7 @@ public class PortalServlet {
 	@Path("/laboratory/read")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response readWorkspace(String body) throws SessionTokenNotFoundException, RelationshipNotFoundException {
+	public Response readWorkspace(String body) throws SessionTokenNotFoundException, UserPermissionNotFoundException {
 		final ReadWorkspaceRequest readWorkspaceRequest = (ReadWorkspaceRequest) SerializationHelper.getInstance()
 				.toClass(body, ReadWorkspaceRequest.class);
 
@@ -364,10 +368,10 @@ public class PortalServlet {
 
 		final UUID userUuid = sessionToken.getUserUuid();
 		final UUID workspaceUuid = readWorkspaceRequest.getWorkspaceUuid();
-		final Relationship relationship = relationshipRepository.findByUserAndWorkspace(userUuid, workspaceUuid);
+		final UserPermission userPermission = userPermissionRepository.findByUserAndWorkspace(userUuid, workspaceUuid);
 
-		if (relationship == null) {
-			throw new RelationshipNotFoundException("User is not in any relation with workspace : " + workspaceUuid);
+		if (userPermission == null) {
+			throw new UserPermissionNotFoundException("User is not in any relation with workspace : " + workspaceUuid);
 		}
 
 		final Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
@@ -381,8 +385,8 @@ public class PortalServlet {
 	@Path("/workspace/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateWorkspace(String body)
-			throws SessionTokenNotFoundException, RelationshipNotFoundException, MissingRightsException, JAXRException {
+	public Response updateWorkspace(String body) throws SessionTokenNotFoundException, UserPermissionNotFoundException,
+			MissingRightsException, JAXRException {
 		final UpdateWorkspaceRequest updateWorkspaceRequest = (UpdateWorkspaceRequest) SerializationHelper.getInstance()
 				.toClass(body, UpdateWorkspaceRequest.class);
 
@@ -395,13 +399,13 @@ public class PortalServlet {
 
 		final UUID userUuid = sessionToken.getUserUuid();
 		final UUID workspaceUuid = updateWorkspaceRequest.getWorkspaceUuid();
-		final Relationship relationship = relationshipRepository.findByUserAndWorkspace(userUuid, workspaceUuid);
+		final UserPermission userPermission = userPermissionRepository.findByUserAndWorkspace(userUuid, workspaceUuid);
 
-		if (relationship == null) {
-			throw new RelationshipNotFoundException("User is not in any relation with workspace : " + workspaceUuid);
+		if (userPermission == null) {
+			throw new UserPermissionNotFoundException("User is not in any relation with workspace : " + workspaceUuid);
 		}
 
-		if (relationship.getType() == RelationshipType.GUEST) {
+		if (userPermission.getType() == UserPermissionType.GUEST) {
 			throw new MissingRightsException("Missing rights (user is only guest) : " + workspaceUuid);
 		}
 

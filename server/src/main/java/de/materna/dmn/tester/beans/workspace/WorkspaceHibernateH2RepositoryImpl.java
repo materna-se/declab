@@ -17,16 +17,16 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.xml.registry.JAXRException;
 
-import de.materna.dmn.tester.beans.relationship.RelationshipHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.userpermission.UserPermissionHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.filter.NameFilter;
 import de.materna.dmn.tester.beans.workspace.filter.VisabilityFilter;
 import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.filters.WorkspaceFilter;
-import de.materna.dmn.tester.interfaces.repositories.RelationshipRepository;
+import de.materna.dmn.tester.interfaces.repositories.UserPermissionRepository;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 
 public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
-	private final RelationshipRepository relationshipRepository = new RelationshipHibernateH2RepositoryImpl();
+	private final UserPermissionRepository userPermissionRepository = new UserPermissionHibernateH2RepositoryImpl();
 
 	private final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
 	private final EntityManager em = entityManagerFactory.createEntityManager();
@@ -62,16 +62,16 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 
 	@Override
 	public List<Workspace> findByUser(UUID ownerUuid) {
-		return relationshipRepository.findByUser(ownerUuid).stream()
-				.filter(relationship -> relationship.getWorkspace() != null)
-				.map(relationship -> findByUuid(relationship.getWorkspace())).collect(Collectors.toList());
+		return userPermissionRepository.findByUser(ownerUuid).stream()
+				.filter(userPermission -> userPermission.getWorkspace() != null)
+				.map(userPermission -> findByUuid(userPermission.getWorkspace())).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<Workspace> findByLaboratory(UUID laboratoryUuid) {
-		return relationshipRepository.findByLaboratory(laboratoryUuid).stream()
-				.filter(relationship -> relationship.getWorkspace() != null)
-				.map(relationship -> findByUuid(relationship.getWorkspace())).collect(Collectors.toList());
+		return userPermissionRepository.findByLaboratory(laboratoryUuid).stream()
+				.filter(userPermission -> userPermission.getWorkspace() != null)
+				.map(userPermission -> findByUuid(userPermission.getWorkspace())).collect(Collectors.toList());
 	}
 
 	@Override
