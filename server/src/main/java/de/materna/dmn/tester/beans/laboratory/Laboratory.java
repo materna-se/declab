@@ -1,5 +1,7 @@
 package de.materna.dmn.tester.beans.laboratory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -9,6 +11,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotEmpty;
 
+import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.enums.VisabilityType;
 
 @Entity
@@ -24,6 +27,8 @@ public class Laboratory {
 	private String description;
 	@Column(name = "visability")
 	private VisabilityType visability;
+	@Column(name = "workspaces")
+	private List<Workspace> workspaces;
 
 	public Laboratory() {
 	}
@@ -33,6 +38,7 @@ public class Laboratory {
 		this.name = name;
 		this.description = description;
 		this.visability = visability;
+		this.workspaces = new ArrayList<>();
 	}
 
 	public UUID getUuid() {
@@ -63,4 +69,11 @@ public class Laboratory {
 		this.visability = visability;
 	}
 
+	public List<Workspace> getWorkspaces() {
+		return workspaces;
+	}
+
+	public void setWorkspaces(List<Workspace> workspaces) {
+		this.workspaces = workspaces;
+	}
 }
