@@ -156,15 +156,23 @@ public class PortalServlet {
 		final Relationship userRelationship = relationships.stream()
 				.filter(relationship -> relationship.getUser() == userUuid).findAny().orElse(null);
 
-		if ((userRelationship != null) && (userRelationship.getType() != RelationshipType.OWNER
-				&& userRelationship.getType() != RelationshipType.ADMINISTRATOR)) {
+		if (userRelationship != null && userRelationship.getType() != RelationshipType.OWNER
+				&& userRelationship.getType() != RelationshipType.ADMINISTRATOR) {
 			throw new MissingRightsException(
 					"Missing rights (owner or administrator status needed) : " + laboratoryUuid);
 		}
 
 		final Laboratory laboratory = laboratoryRepository.findByUuid(laboratoryUuid);
-		return laboratoryRepository.delete(laboratory) ? Response.status(Response.Status.OK).build()
-				: Response.status(Response.Status.NOT_MODIFIED).build();
+
+		if (laboratoryRepository.delete(laboratory)) {
+			final List<Relationship> allRelationships = relationshipRepository.findByWorkspace(laboratoryUuid);
+			for (final Relationship rs : allRelationships) {
+				relationshipRepository.delete(rs);
+			}
+			return Response.status(Response.Status.OK).build();
+		}
+
+		return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
 	@POST
@@ -217,17 +225,17 @@ public class PortalServlet {
 		}
 
 		final UUID userUuid = sessionToken.getUserUuid();
-		final List<Relationship> relationships = relationshipRepository.findByWorkspace(workspaceUuid).stream()
+		final List<Relationship> workspaceRelationships = relationshipRepository.findByWorkspace(workspaceUuid).stream()
 				.filter(relationship -> relationship.getType() == RelationshipType.OWNER
 						|| relationship.getType() == RelationshipType.ADMINISTRATOR)
 				.collect(Collectors.toList());
 
-		if (relationships.size() == 0) {
+		if (workspaceRelationships.size() == 0) {
 			throw new RelationshipNotFoundException(
 					"No user or laboratory is owner or administrator : " + workspaceUuid);
 		}
 
-		final Relationship userRelationship = relationships.stream()
+		final Relationship userRelationship = workspaceRelationships.stream()
 				.filter(relationship -> relationship.getUser() == userUuid).findAny().orElse(null);
 
 		if (userRelationship != null) {
@@ -237,7 +245,7 @@ public class PortalServlet {
 						"Missing rights (owner or administrator status needed) : " + workspaceUuid);
 			}
 		} else {
-			final List<Laboratory> laboratories = relationships.stream()
+			final List<Laboratory> laboratories = workspaceRelationships.stream()
 					.filter(relationship -> relationship.getLaboratory() != null)
 					.map(relationship -> laboratoryRepository.findByUuid(relationship.getLaboratory()))
 					.collect(Collectors.toList());
@@ -254,7 +262,14 @@ public class PortalServlet {
 		}
 
 		final Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
-		return workspaceRepository.delete(workspace) ? Response.status(Response.Status.OK).build()
-				: Response.status(Response.Status.NOT_MODIFIED).build();
+		if (workspaceRepository.delete(workspace)) {
+			final List<Relationship> allRelationships = relationshipRepository.findByWorkspace(workspaceUuid);
+			for (final Relationship rs : allRelationships) {
+				relationshipRepository.delete(rs);
+			}
+			return Response.status(Response.Status.OK).build();
+		}
+
+		return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 }
