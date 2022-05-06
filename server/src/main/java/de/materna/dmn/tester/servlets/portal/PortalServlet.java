@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.registry.JAXRException;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -42,6 +43,8 @@ import de.materna.dmn.tester.servlets.portal.dto.DeleteLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.DeleteWorkspaceRequest;
 import de.materna.dmn.tester.servlets.portal.dto.LoginRequest;
 import de.materna.dmn.tester.servlets.portal.dto.RegisterRequest;
+import de.materna.dmn.tester.servlets.portal.dto.UpdateLaboratoryRequest;
+import de.materna.dmn.tester.servlets.portal.dto.UpdateWorkspaceRequest;
 import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/portal")
@@ -176,6 +179,45 @@ public class PortalServlet {
 	}
 
 	@POST
+	@Path("/laboratory/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateLaboratory(String body)
+			throws SessionTokenNotFoundException, RelationshipNotFoundException, MissingRightsException, JAXRException {
+		final UpdateLaboratoryRequest updateLaboratoryRequest = (UpdateLaboratoryRequest) SerializationHelper
+				.getInstance().toClass(body, UpdateLaboratoryRequest.class);
+
+		final UUID sessionTokenUuid = updateLaboratoryRequest.getSessionTokenUuid();
+		final SessionToken sessionToken = sessionTokenRepository.findByUuid(sessionTokenUuid);
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException("SessionToken not found by UUID : " + sessionTokenUuid);
+		}
+
+		final UUID userUuid = sessionToken.getUserUuid();
+		final UUID laboratoryUuid = updateLaboratoryRequest.getLaboratoryUuid();
+		final Relationship relationship = relationshipRepository.findByUserAndLaboratory(userUuid, laboratoryUuid);
+
+		if (relationship == null) {
+			throw new RelationshipNotFoundException("User is not in any relation with laboratory : " + laboratoryUuid);
+		}
+
+		if (relationship.getType() == RelationshipType.GUEST) {
+			throw new MissingRightsException("Missing rights (user is only guest) : " + laboratoryUuid);
+		}
+
+		final String name = updateLaboratoryRequest.getName();
+		final String description = updateLaboratoryRequest.getDescription();
+		final VisabilityType visability = updateLaboratoryRequest.getVisability();
+
+		final Laboratory updatedLaboratory = laboratoryRepository.update(laboratoryUuid, name, description, visability);
+		return updatedLaboratory != null
+				? Response.status(Response.Status.OK)
+						.entity(SerializationHelper.getInstance().toJSON(updatedLaboratory)).build()
+				: Response.status(Response.Status.NOT_MODIFIED).build();
+	}
+
+	@POST
 	@Path("/workspace/create")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -271,5 +313,44 @@ public class PortalServlet {
 		}
 
 		return Response.status(Response.Status.NOT_MODIFIED).build();
+	}
+
+	@POST
+	@Path("/workspace/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateWorkspace(String body)
+			throws SessionTokenNotFoundException, RelationshipNotFoundException, MissingRightsException, JAXRException {
+		final UpdateWorkspaceRequest updateWorkspaceRequest = (UpdateWorkspaceRequest) SerializationHelper.getInstance()
+				.toClass(body, UpdateWorkspaceRequest.class);
+
+		final UUID sessionTokenUuid = updateWorkspaceRequest.getSessionTokenUuid();
+		final SessionToken sessionToken = sessionTokenRepository.findByUuid(sessionTokenUuid);
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException("SessionToken not found by UUID : " + sessionTokenUuid);
+		}
+
+		final UUID userUuid = sessionToken.getUserUuid();
+		final UUID workspaceUuid = updateWorkspaceRequest.getWorkspaceUuid();
+		final Relationship relationship = relationshipRepository.findByUserAndWorkspace(userUuid, workspaceUuid);
+
+		if (relationship == null) {
+			throw new RelationshipNotFoundException("User is not in any relation with workspace : " + workspaceUuid);
+		}
+
+		if (relationship.getType() == RelationshipType.GUEST) {
+			throw new MissingRightsException("Missing rights (user is only guest) : " + workspaceUuid);
+		}
+
+		final String name = updateWorkspaceRequest.getName();
+		final String description = updateWorkspaceRequest.getDescription();
+		final VisabilityType visability = updateWorkspaceRequest.getVisability();
+
+		final Workspace updatedWorkspace = workspaceRepository.update(workspaceUuid, name, description, visability);
+		return updatedWorkspace != null
+				? Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(updatedWorkspace))
+						.build()
+				: Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 }
