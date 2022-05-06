@@ -1,4 +1,4 @@
-package de.materna.dmn.tester.servlets.portal.dto;
+package de.materna.dmn.tester.servlets.portal.dto.laboratory;
 
 import java.util.UUID;
 

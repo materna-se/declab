@@ -1,35 +1,24 @@
-package de.materna.dmn.tester.servlets.portal.dto;
+package de.materna.dmn.tester.servlets.portal.dto.laboratory;
 
 import java.util.UUID;
 
 import de.materna.dmn.tester.enums.VisabilityType;
 
-public class UpdateWorkspaceRequest {
-	private UUID workspaceUuid;
+public class CreateLaboratoryRequest {
 	private String name;
 	private String description;
 	private VisabilityType visability;
 
 	private UUID sessionTokenUuid;
 
-	public UpdateWorkspaceRequest() {
+	public CreateLaboratoryRequest() {
 	}
 
-	public UpdateWorkspaceRequest(UUID workspaceUuid, String name, String description, VisabilityType visability,
-			UUID sessionTokenUuid) {
-		setWorkspaceUuid(workspaceUuid);
+	public CreateLaboratoryRequest(String name, String description, VisabilityType visability, UUID sessionTokenUuid) {
 		setName(name);
 		setDescription(description);
 		setVisability(visability);
 		setSessionTokenUuid(sessionTokenUuid);
-	}
-
-	public UUID getWorkspaceUuid() {
-		return workspaceUuid;
-	}
-
-	public void setWorkspaceUuid(UUID workspaceUuid) {
-		this.workspaceUuid = workspaceUuid;
 	}
 
 	public String getName() {

@@ -1,15 +1,25 @@
-package de.materna.dmn.tester.servlets.portal.dto;
+package de.materna.dmn.tester.servlets.portal.dto.user;
 
-public class LoginRequest {
+public class RegisterRequest {
+	private String email;
 	private String username;
 	private String password;
 
-	public LoginRequest() {
+	public RegisterRequest() {
 	}
 
-	public LoginRequest(String username, String password) {
+	public RegisterRequest(String email, String username, String password) {
+		setEmail(email);
 		setUsername(username);
 		setPassword(password);
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getUsername() {

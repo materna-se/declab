@@ -37,14 +37,14 @@ import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundEx
 import de.materna.dmn.tester.servlets.exceptions.database.UserNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.registration.EmailInUseException;
 import de.materna.dmn.tester.servlets.exceptions.registration.UsernameInUseException;
-import de.materna.dmn.tester.servlets.portal.dto.CreateLaboratoryRequest;
-import de.materna.dmn.tester.servlets.portal.dto.CreateWorkspaceRequest;
-import de.materna.dmn.tester.servlets.portal.dto.DeleteLaboratoryRequest;
-import de.materna.dmn.tester.servlets.portal.dto.DeleteWorkspaceRequest;
-import de.materna.dmn.tester.servlets.portal.dto.LoginRequest;
-import de.materna.dmn.tester.servlets.portal.dto.RegisterRequest;
-import de.materna.dmn.tester.servlets.portal.dto.UpdateLaboratoryRequest;
-import de.materna.dmn.tester.servlets.portal.dto.UpdateWorkspaceRequest;
+import de.materna.dmn.tester.servlets.portal.dto.laboratory.CreateLaboratoryRequest;
+import de.materna.dmn.tester.servlets.portal.dto.laboratory.DeleteLaboratoryRequest;
+import de.materna.dmn.tester.servlets.portal.dto.laboratory.UpdateLaboratoryRequest;
+import de.materna.dmn.tester.servlets.portal.dto.user.LoginRequest;
+import de.materna.dmn.tester.servlets.portal.dto.user.RegisterRequest;
+import de.materna.dmn.tester.servlets.portal.dto.workspace.CreateWorkspaceRequest;
+import de.materna.dmn.tester.servlets.portal.dto.workspace.DeleteWorkspaceRequest;
+import de.materna.dmn.tester.servlets.portal.dto.workspace.UpdateWorkspaceRequest;
 import de.materna.jdec.serialization.SerializationHelper;
 
 @Path("/portal")
