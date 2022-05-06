@@ -38,6 +38,7 @@ import de.materna.dmn.tester.servlets.exceptions.registration.EmailInUseExceptio
 import de.materna.dmn.tester.servlets.exceptions.registration.UsernameInUseException;
 import de.materna.dmn.tester.servlets.portal.dto.CreateLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.CreateWorkspaceRequest;
+import de.materna.dmn.tester.servlets.portal.dto.DeleteLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.DeleteWorkspaceRequest;
 import de.materna.dmn.tester.servlets.portal.dto.LoginRequest;
 import de.materna.dmn.tester.servlets.portal.dto.RegisterRequest;
@@ -122,6 +123,47 @@ public class PortalServlet {
 		return newLaboratory != null
 				? Response.status(Response.Status.CREATED)
 						.entity(SerializationHelper.getInstance().toJSON(newLaboratory.getUuid())).build()
+				: Response.status(Response.Status.NOT_MODIFIED).build();
+	}
+
+	@POST
+	@Path("/laboratory/delete")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteLaboratory(String body)
+			throws SessionTokenNotFoundException, RelationshipNotFoundException, MissingRightsException {
+		final DeleteLaboratoryRequest deleteLaboratoryRequest = (DeleteLaboratoryRequest) SerializationHelper
+				.getInstance().toClass(body, DeleteLaboratoryRequest.class);
+
+		final UUID sessionTokenUuid = deleteLaboratoryRequest.getSessionTokenUuid();
+		final UUID laboratoryUuid = deleteLaboratoryRequest.getLaboratoryUuid();
+		final SessionToken sessionToken = sessionTokenRepository.findByUuid(sessionTokenUuid);
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException("SessionToken not found by UUID : " + sessionTokenUuid);
+		}
+
+		final UUID userUuid = sessionToken.getUserUuid();
+		final List<Relationship> relationships = relationshipRepository.findByLaboratory(laboratoryUuid).stream()
+				.filter(relationship -> relationship.getType() == RelationshipType.OWNER
+						|| relationship.getType() == RelationshipType.ADMINISTRATOR)
+				.collect(Collectors.toList());
+
+		if (relationships.size() == 0) {
+			throw new RelationshipNotFoundException("No user is owner or administrator : " + laboratoryUuid);
+		}
+
+		final Relationship userRelationship = relationships.stream()
+				.filter(relationship -> relationship.getUser() == userUuid).findAny().orElse(null);
+
+		if ((userRelationship != null) && (userRelationship.getType() != RelationshipType.OWNER
+				&& userRelationship.getType() != RelationshipType.ADMINISTRATOR)) {
+			throw new MissingRightsException(
+					"Missing rights (owner or administrator status needed) : " + laboratoryUuid);
+		}
+
+		final Laboratory laboratory = laboratoryRepository.findByUuid(laboratoryUuid);
+		return laboratoryRepository.delete(laboratory) ? Response.status(Response.Status.OK).build()
 				: Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
