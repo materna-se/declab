@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import de.materna.dmn.tester.enums.RelationshipType;
 
@@ -18,11 +19,12 @@ public class Relationship {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Column(name = "user")
+	@NotNull
 	private UUID user;
 	@Column(name = "laboratory")
 	private UUID laboratory;
 	@Column(name = "workspace")
-	private UUID workplace;
+	private UUID workspace;
 	@Column(name = "type")
 	private RelationshipType type;
 
@@ -45,12 +47,12 @@ public class Relationship {
 		this.laboratory = laboratory;
 	}
 
-	public UUID getWorkplace() {
-		return workplace;
+	public UUID getWorkspace() {
+		return workspace;
 	}
 
-	public void setWorkplace(UUID workplace) {
-		this.workplace = workplace;
+	public void setWorkspace(UUID workspace) {
+		this.workspace = workspace;
 	}
 
 	public RelationshipType getType() {
