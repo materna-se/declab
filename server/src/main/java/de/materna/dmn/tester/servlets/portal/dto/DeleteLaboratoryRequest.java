@@ -3,23 +3,16 @@ package de.materna.dmn.tester.servlets.portal.dto;
 import java.util.UUID;
 
 public class DeleteLaboratoryRequest {
-	private UUID sessionTokenUuid;
 	private UUID laboratoryUuid;
+
+	private UUID sessionTokenUuid;
 
 	public DeleteLaboratoryRequest() {
 	}
 
-	public DeleteLaboratoryRequest(UUID sessionTokenUuid, UUID laboratoryUuid) {
-		this.setSessionTokenUuid(sessionTokenUuid);
+	public DeleteLaboratoryRequest(UUID laboratoryUuid, UUID sessionTokenUuid) {
 		this.setLaboratoryUuid(laboratoryUuid);
-	}
-
-	public UUID getSessionTokenUuid() {
-		return sessionTokenUuid;
-	}
-
-	public void setSessionTokenUuid(UUID sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+		this.setSessionTokenUuid(sessionTokenUuid);
 	}
 
 	public UUID getLaboratoryUuid() {
@@ -28,5 +21,13 @@ public class DeleteLaboratoryRequest {
 
 	public void setLaboratoryUuid(UUID laboratoryUuid) {
 		this.laboratoryUuid = laboratoryUuid;
+	}
+
+	public UUID getSessionTokenUuid() {
+		return sessionTokenUuid;
+	}
+
+	public void setSessionTokenUuid(UUID sessionTokenUuid) {
+		this.sessionTokenUuid = sessionTokenUuid;
 	}
 }

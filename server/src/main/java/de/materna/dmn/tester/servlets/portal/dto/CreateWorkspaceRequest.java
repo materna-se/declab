@@ -5,27 +5,20 @@ import java.util.UUID;
 import de.materna.dmn.tester.enums.VisabilityType;
 
 public class CreateWorkspaceRequest {
-	private UUID sessionTokenUuid;
 	private String name;
 	private String description;
 	private VisabilityType visability;
 
+	private UUID sessionTokenUuid;
+
 	public CreateWorkspaceRequest() {
 	}
 
-	public CreateWorkspaceRequest(String name, String description, UUID sessionTokenUuid, VisabilityType visability) {
+	public CreateWorkspaceRequest(String name, String description, VisabilityType visability, UUID sessionTokenUuid) {
 		setName(name);
 		setDescription(description);
-		setSessionTokenUuid(sessionTokenUuid);
 		setVisability(visability);
-	}
-
-	public UUID getSessionTokenUuid() {
-		return sessionTokenUuid;
-	}
-
-	public void setSessionTokenUuid(UUID sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+		setSessionTokenUuid(sessionTokenUuid);
 	}
 
 	public String getName() {
@@ -50,5 +43,13 @@ public class CreateWorkspaceRequest {
 
 	public void setVisability(VisabilityType visability) {
 		this.visability = visability;
+	}
+
+	public UUID getSessionTokenUuid() {
+		return sessionTokenUuid;
+	}
+
+	public void setSessionTokenUuid(UUID sessionTokenUuid) {
+		this.sessionTokenUuid = sessionTokenUuid;
 	}
 }
