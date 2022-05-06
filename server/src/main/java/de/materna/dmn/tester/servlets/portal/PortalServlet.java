@@ -39,11 +39,13 @@ import de.materna.dmn.tester.servlets.exceptions.registration.EmailInUseExceptio
 import de.materna.dmn.tester.servlets.exceptions.registration.UsernameInUseException;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.CreateLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.DeleteLaboratoryRequest;
+import de.materna.dmn.tester.servlets.portal.dto.laboratory.ReadLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.UpdateLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.LoginRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.RegisterRequest;
 import de.materna.dmn.tester.servlets.portal.dto.workspace.CreateWorkspaceRequest;
 import de.materna.dmn.tester.servlets.portal.dto.workspace.DeleteWorkspaceRequest;
+import de.materna.dmn.tester.servlets.portal.dto.workspace.ReadWorkspaceRequest;
 import de.materna.dmn.tester.servlets.portal.dto.workspace.UpdateWorkspaceRequest;
 import de.materna.jdec.serialization.SerializationHelper;
 
@@ -56,7 +58,7 @@ public class PortalServlet {
 	private final RelationshipRepository relationshipRepository = new RelationshipHibernateH2RepositoryImpl();
 
 	@POST
-	@Path("/login")
+	@Path("/user/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response login(String body) {
@@ -73,7 +75,7 @@ public class PortalServlet {
 	}
 
 	@POST
-	@Path("/register")
+	@Path("/user/register")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response register(String body) throws UsernameInUseException, EmailInUseException {
@@ -176,6 +178,36 @@ public class PortalServlet {
 		}
 
 		return Response.status(Response.Status.NOT_MODIFIED).build();
+	}
+
+	@POST
+	@Path("/laboratory/read")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response readLaboratory(String body) throws SessionTokenNotFoundException, RelationshipNotFoundException {
+		final ReadLaboratoryRequest readLaboratoryRequest = (ReadLaboratoryRequest) SerializationHelper.getInstance()
+				.toClass(body, ReadLaboratoryRequest.class);
+
+		final UUID sessionTokenUuid = readLaboratoryRequest.getSessionTokenUuid();
+		final SessionToken sessionToken = sessionTokenRepository.findByUuid(sessionTokenUuid);
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException("SessionToken not found by UUID : " + sessionTokenUuid);
+		}
+
+		final UUID userUuid = sessionToken.getUserUuid();
+		final UUID laboratoryUuid = readLaboratoryRequest.getLaboratoryUuid();
+		final Relationship relationship = relationshipRepository.findByUserAndLaboratory(userUuid, laboratoryUuid);
+
+		if (relationship == null) {
+			throw new RelationshipNotFoundException("User is not in any relation with laboratory : " + laboratoryUuid);
+		}
+
+		final Laboratory laboratory = laboratoryRepository.findByUuid(laboratoryUuid);
+		return laboratory != null
+				? Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(laboratory))
+						.build()
+				: Response.status(Response.Status.NOT_FOUND).build();
 	}
 
 	@POST
@@ -313,6 +345,36 @@ public class PortalServlet {
 		}
 
 		return Response.status(Response.Status.NOT_MODIFIED).build();
+	}
+
+	@POST
+	@Path("/laboratory/read")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response readWorkspace(String body) throws SessionTokenNotFoundException, RelationshipNotFoundException {
+		final ReadWorkspaceRequest readWorkspaceRequest = (ReadWorkspaceRequest) SerializationHelper.getInstance()
+				.toClass(body, ReadWorkspaceRequest.class);
+
+		final UUID sessionTokenUuid = readWorkspaceRequest.getSessionTokenUuid();
+		final SessionToken sessionToken = sessionTokenRepository.findByUuid(sessionTokenUuid);
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException("SessionToken not found by UUID : " + sessionTokenUuid);
+		}
+
+		final UUID userUuid = sessionToken.getUserUuid();
+		final UUID workspaceUuid = readWorkspaceRequest.getWorkspaceUuid();
+		final Relationship relationship = relationshipRepository.findByUserAndWorkspace(userUuid, workspaceUuid);
+
+		if (relationship == null) {
+			throw new RelationshipNotFoundException("User is not in any relation with workspace : " + workspaceUuid);
+		}
+
+		final Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
+		return workspace != null
+				? Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(workspace))
+						.build()
+				: Response.status(Response.Status.NOT_FOUND).build();
 	}
 
 	@POST
