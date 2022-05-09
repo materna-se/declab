@@ -32,6 +32,7 @@ import de.materna.dmn.tester.interfaces.repositories.UserPermissionRepository;
 import de.materna.dmn.tester.interfaces.repositories.UserRepository;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 import de.materna.dmn.tester.servlets.exceptions.authorization.MissingRightsException;
+import de.materna.dmn.tester.servlets.exceptions.database.LaboratoryNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.UserNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.UserPermissionNotFoundException;
@@ -216,8 +217,8 @@ public class PortalServlet {
 	@Path("/laboratory/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateLaboratory(String body) throws SessionTokenNotFoundException, UserPermissionNotFoundException,
-			MissingRightsException, JAXRException {
+	public Response updateLaboratoryDescription(String body) throws SessionTokenNotFoundException,
+			UserPermissionNotFoundException, MissingRightsException, JAXRException {
 		final UpdateLaboratoryRequest updateLaboratoryRequest = (UpdateLaboratoryRequest) SerializationHelper
 				.getInstance().toClass(body, UpdateLaboratoryRequest.class);
 
@@ -242,22 +243,26 @@ public class PortalServlet {
 			throw new MissingRightsException("Missing rights (user is only guest) : " + laboratoryUuid);
 		}
 
-		final String name = updateLaboratoryRequest.getName();
-		final String description = updateLaboratoryRequest.getDescription();
-		final VisabilityType visability = updateLaboratoryRequest.getVisability();
-
-		final Laboratory updatedLaboratory = laboratoryRepository.update(laboratoryUuid, name, description, visability);
-		return updatedLaboratory != null
-				? Response.status(Response.Status.OK)
-						.entity(SerializationHelper.getInstance().toJSON(updatedLaboratory)).build()
-				: Response.status(Response.Status.NOT_MODIFIED).build();
+		final Laboratory laboratory = laboratoryRepository.findByUuid(laboratoryUuid);
+		if (laboratory != null) {
+			laboratory.setName(updateLaboratoryRequest.getName());
+			laboratory.setDescription(updateLaboratoryRequest.getDescription());
+			laboratory.setVisability(updateLaboratoryRequest.getVisability());
+			final Laboratory updatedLaboratory = laboratoryRepository.put(laboratory);
+			if (updatedLaboratory != null) {
+				return Response.status(Response.Status.OK)
+						.entity(SerializationHelper.getInstance().toJSON(updatedLaboratory)).build();
+			}
+		}
+		return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
 	@POST
 	@Path("/workspace/create")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createWorkspace(String body) throws UserNotFoundException, SessionTokenNotFoundException {
+	public Response createWorkspace(String body)
+			throws UserNotFoundException, SessionTokenNotFoundException, LaboratoryNotFoundException {
 		final CreateWorkspaceRequest createWorkspaceRequest = (CreateWorkspaceRequest) SerializationHelper.getInstance()
 				.toClass(body, CreateWorkspaceRequest.class);
 
@@ -274,15 +279,26 @@ public class PortalServlet {
 			throw new UserNotFoundException("User not found by session token : " + sessionToken.getUserUuid());
 		}
 
+		final UUID laboratoryUuid = createWorkspaceRequest.getLaboratoryUuid();
+		final Laboratory laboratory = laboratoryRepository.findByUuid(laboratoryUuid);
+
+		if (laboratory == null) {
+			throw new LaboratoryNotFoundException("Laboratory not found by UUID : " + laboratoryUuid);
+		}
+
 		final String name = createWorkspaceRequest.getName();
 		final String description = createWorkspaceRequest.getDescription();
 		final VisabilityType visability = createWorkspaceRequest.getVisability();
 
 		final Workspace newWorkspace = workspaceRepository.create(name, description, visability);
-		return newWorkspace != null
-				? Response.status(Response.Status.CREATED)
-						.entity(SerializationHelper.getInstance().toJSON(newWorkspace.getUuid())).build()
-				: Response.status(Response.Status.NOT_MODIFIED).build();
+
+		if (newWorkspace != null) {
+			laboratory.getWorkspaces().add(newWorkspace);
+			laboratoryRepository.put(laboratory);
+			return Response.status(Response.Status.CREATED)
+					.entity(SerializationHelper.getInstance().toJSON(newWorkspace.getUuid())).build();
+		}
+		return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
 	@POST
@@ -409,14 +425,17 @@ public class PortalServlet {
 			throw new MissingRightsException("Missing rights (user is only guest) : " + workspaceUuid);
 		}
 
-		final String name = updateWorkspaceRequest.getName();
-		final String description = updateWorkspaceRequest.getDescription();
-		final VisabilityType visability = updateWorkspaceRequest.getVisability();
-
-		final Workspace updatedWorkspace = workspaceRepository.update(workspaceUuid, name, description, visability);
-		return updatedWorkspace != null
-				? Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(updatedWorkspace))
-						.build()
-				: Response.status(Response.Status.NOT_MODIFIED).build();
+		final Workspace workspace = workspaceRepository.findByUuid(workspaceUuid);
+		if (workspace != null) {
+			workspace.setName(updateWorkspaceRequest.getName());
+			workspace.setDescription(updateWorkspaceRequest.getDescription());
+			workspace.setVisability(updateWorkspaceRequest.getVisability());
+			final Workspace updatedworkspace = workspaceRepository.put(workspace);
+			if (updatedworkspace != null) {
+				return Response.status(Response.Status.OK)
+						.entity(SerializationHelper.getInstance().toJSON(updatedworkspace)).build();
+			}
+		}
+		return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 }
