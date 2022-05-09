@@ -3,8 +3,6 @@ package de.materna.dmn.tester.interfaces.repositories;
 import java.util.List;
 import java.util.UUID;
 
-import javax.xml.registry.JAXRException;
-
 import de.materna.dmn.tester.beans.user.User;
 
 public interface UserRepository {
@@ -20,8 +18,6 @@ public interface UserRepository {
 	User findBySessionToken(UUID tokenUuid);
 
 	User put(User user);
-
-	User update(String email, String username, String firstname, String lastname, String password) throws JAXRException;
 
 	boolean delete(User user);
 

@@ -14,7 +14,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.xml.registry.JAXRException;
 
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
 import de.materna.dmn.tester.beans.sessiontoken.SessionTokenHibernateH2RepositoryImpl;
@@ -65,21 +64,6 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 	public User findBySessionToken(UUID tokenUuid) {
 		final SessionToken token = sessionTokenRepository.findByUuid(tokenUuid);
 		return findByUuid(token.getUserUuid());
-	}
-
-	@Override
-	public User update(String email, String username, String firstname, String lastname, String password)
-			throws JAXRException {
-		final User user = findByEmail(email);
-		if (user != null) {
-			user.setEmail(email);
-			user.setUsername(username);
-			user.setFirstname(firstname);
-			user.setLastname(lastname);
-			user.setPassword(password);
-			return put(user);
-		}
-		return null;
 	}
 
 	@Override
