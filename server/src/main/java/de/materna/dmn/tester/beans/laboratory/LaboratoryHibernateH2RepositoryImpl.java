@@ -15,7 +15,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.xml.registry.JAXRException;
 
 import de.materna.dmn.tester.beans.laboratory.filter.NameFilter;
 import de.materna.dmn.tester.beans.laboratory.filter.VisabilityFilter;
@@ -79,19 +78,6 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	public Laboratory create(String name, String description, VisabilityType visability) {
 		final Laboratory laboratory = new Laboratory(name, description, visability);
 		return put(laboratory);
-	}
-
-	@Override
-	public Laboratory update(UUID laboratoryUuid, String name, String description, VisabilityType visability)
-			throws JAXRException {
-		final Laboratory laboratory = findByUuid(laboratoryUuid);
-		if (laboratory != null) {
-			laboratory.setName(name);
-			laboratory.setDescription(description);
-			laboratory.setVisability(visability);
-			return put(laboratory);
-		}
-		return null;
 	}
 
 	@Override
