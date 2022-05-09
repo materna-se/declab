@@ -5,6 +5,7 @@ import java.util.UUID;
 import de.materna.dmn.tester.enums.VisabilityType;
 
 public class CreateWorkspaceRequest {
+	private UUID laboratoryUuid;
 	private String name;
 	private String description;
 	private VisabilityType visability;
@@ -14,11 +15,21 @@ public class CreateWorkspaceRequest {
 	public CreateWorkspaceRequest() {
 	}
 
-	public CreateWorkspaceRequest(String name, String description, VisabilityType visability, UUID sessionTokenUuid) {
+	public CreateWorkspaceRequest(UUID laboratoryUuid, String name, String description, VisabilityType visability,
+			UUID sessionTokenUuid) {
+		setLaboratoryUuid(laboratoryUuid);
 		setName(name);
 		setDescription(description);
 		setVisability(visability);
 		setSessionTokenUuid(sessionTokenUuid);
+	}
+
+	public UUID getLaboratoryUuid() {
+		return laboratoryUuid;
+	}
+
+	public void setLaboratoryUuid(UUID laboratoryUuid) {
+		this.laboratoryUuid = laboratoryUuid;
 	}
 
 	public String getName() {
