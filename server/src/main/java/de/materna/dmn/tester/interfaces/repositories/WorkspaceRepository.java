@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.xml.registry.JAXRException;
 
 import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.enums.VisabilityType;
@@ -27,9 +26,6 @@ public interface WorkspaceRepository {
 	Workspace put(Workspace workspace);
 
 	Workspace create(String name, String description, VisabilityType visability);
-
-	Workspace update(UUID workspaceUuid, String name, String description, VisabilityType visability)
-			throws JAXRException;
 
 	boolean delete(Workspace workspace);
 }

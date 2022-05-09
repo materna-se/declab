@@ -15,7 +15,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.xml.registry.JAXRException;
 
 import de.materna.dmn.tester.beans.userpermission.UserPermissionHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.filter.NameFilter;
@@ -86,19 +85,6 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	public Workspace create(String name, String description, VisabilityType visability) {
 		final Workspace workspace = new Workspace(name, description, visability);
 		return put(workspace);
-	}
-
-	@Override
-	public Workspace update(UUID workspaceUuid, String name, String description, VisabilityType visability)
-			throws JAXRException {
-		final Workspace workspace = findByUuid(workspaceUuid);
-		if (workspace != null) {
-			workspace.setName(name);
-			workspace.setDescription(description);
-			workspace.setVisability(visability);
-			return put(workspace);
-		}
-		return null;
 	}
 
 	@Override
