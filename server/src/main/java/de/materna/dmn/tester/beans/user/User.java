@@ -38,6 +38,8 @@ public class User {
 	private String salt;
 	@Column(name = "registration")
 	private LocalDateTime registrationDateTime;
+	@Column(name = "systemadmin", columnDefinition = "boolean default false")
+	private boolean systemAdmin;
 
 	public User() {
 	}
@@ -51,6 +53,7 @@ public class User {
 		setPassword(BCrypt.hashpw(password, this.salt));
 		setFirstname(firstname);
 		setLastname(lastname);
+		setSystemAdmin(false);
 	}
 
 	public UUID getUuid() {
@@ -111,5 +114,13 @@ public class User {
 
 	public void setRegistrationDateTime(LocalDateTime registrationDateTime) {
 		this.registrationDateTime = registrationDateTime;
+	}
+
+	public boolean isSystemAdmin() {
+		return systemAdmin;
+	}
+
+	public void setSystemAdmin(boolean systemAdmin) {
+		this.systemAdmin = systemAdmin;
 	}
 }
