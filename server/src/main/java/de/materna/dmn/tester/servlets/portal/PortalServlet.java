@@ -1,5 +1,6 @@
 package de.materna.dmn.tester.servlets.portal;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +24,7 @@ import de.materna.dmn.tester.beans.userpermission.UserPermission;
 import de.materna.dmn.tester.beans.userpermission.UserPermissionHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.beans.workspace.WorkspaceHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.enums.UserPermissionGroup;
 import de.materna.dmn.tester.enums.UserPermissionType;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
@@ -136,7 +138,8 @@ public class PortalServlet {
 
 		final Laboratory laboratory = laboratoryRepository.findByUuid(deleteLaboratoryRequest.getLaboratoryUuid());
 		if (laboratory != null) {
-			checkUserPermission(laboratory.getUuid(), deleteLaboratoryRequest.getSessionTokenUuid());
+			checkUserPermission(laboratory.getUuid(), deleteLaboratoryRequest.getSessionTokenUuid(),
+					UserPermissionGroup.ADMINISTRATOR);
 
 			if (laboratoryRepository.delete(laboratory)) {
 				final List<UserPermission> allUserPermissions = userPermissionRepository
@@ -160,7 +163,8 @@ public class PortalServlet {
 
 		final Laboratory laboratory = laboratoryRepository.findByUuid(readLaboratoryRequest.getLaboratoryUuid());
 		if (laboratory != null) {
-			checkUserPermission(laboratory.getUuid(), readLaboratoryRequest.getSessionTokenUuid());
+			checkUserPermission(laboratory.getUuid(), readLaboratoryRequest.getSessionTokenUuid(),
+					UserPermissionGroup.GUEST);
 
 			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(laboratory))
 					.build();
@@ -179,7 +183,8 @@ public class PortalServlet {
 
 		final Laboratory laboratory = laboratoryRepository.findByUuid(updateLaboratoryRequest.getLaboratoryUuid());
 		if (laboratory != null) {
-			checkUserPermission(laboratory.getUuid(), updateLaboratoryRequest.getSessionTokenUuid());
+			checkUserPermission(laboratory.getUuid(), updateLaboratoryRequest.getSessionTokenUuid(),
+					UserPermissionGroup.CONTRIBUTOR);
 
 			laboratory.setName(updateLaboratoryRequest.getName());
 			laboratory.setDescription(updateLaboratoryRequest.getDescription());
@@ -242,9 +247,11 @@ public class PortalServlet {
 		final Workspace workspace = workspaceRepository.findByUuid(deleteWorkspaceRequest.getWorkspaceUuid());
 		if (workspace != null) {
 			try {
-				checkUserPermission(workspace.getUuid(), deleteWorkspaceRequest.getSessionTokenUuid());
+				checkUserPermission(workspace.getUuid(), deleteWorkspaceRequest.getSessionTokenUuid(),
+						UserPermissionGroup.ADMINISTRATOR);
 			} catch (SessionTokenNotFoundException | MissingRightsException e) {
-				checkUserPermission(workspace.getLaboratoryUuid(), deleteWorkspaceRequest.getSessionTokenUuid());
+				checkUserPermission(workspace.getLaboratoryUuid(), deleteWorkspaceRequest.getSessionTokenUuid(),
+						UserPermissionGroup.ADMINISTRATOR);
 			}
 
 			if (workspaceRepository.delete(workspace)) {
@@ -269,7 +276,8 @@ public class PortalServlet {
 
 		final Workspace workspace = workspaceRepository.findByUuid(readWorkspaceRequest.getWorkspaceUuid());
 		if (workspace != null) {
-			checkUserPermission(workspace.getUuid(), readWorkspaceRequest.getSessionTokenUuid());
+			checkUserPermission(workspace.getUuid(), readWorkspaceRequest.getSessionTokenUuid(),
+					UserPermissionGroup.GUEST);
 
 			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(workspace))
 					.build();
@@ -288,7 +296,8 @@ public class PortalServlet {
 
 		final Workspace workspace = workspaceRepository.findByUuid(updateWorkspaceRequest.getWorkspaceUuid());
 		if (workspace != null) {
-			checkUserPermission(workspace.getUuid(), updateWorkspaceRequest.getSessionTokenUuid());
+			checkUserPermission(workspace.getUuid(), updateWorkspaceRequest.getSessionTokenUuid(),
+					UserPermissionGroup.CONTRIBUTOR);
 
 			workspace.setName(updateWorkspaceRequest.getName());
 			workspace.setDescription(updateWorkspaceRequest.getDescription());
@@ -302,8 +311,8 @@ public class PortalServlet {
 		return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
-	private UserPermission checkUserPermission(UUID targetUuid, UUID sessionTokenUuid)
-			throws SessionTokenNotFoundException, MissingRightsException {
+	private UserPermission checkUserPermission(UUID targetUuid, UUID sessionTokenUuid,
+			UserPermissionType[] userPermissionGroup) throws SessionTokenNotFoundException, MissingRightsException {
 		final SessionToken sessionToken = sessionTokenRepository.findByUuid(sessionTokenUuid);
 
 		if (sessionToken == null) {
@@ -313,12 +322,12 @@ public class PortalServlet {
 		final UUID userUuid = sessionToken.getUserUuid();
 		final UserPermission userPermissionLaboratory = userPermissionRepository.findByUserAndLaboratory(userUuid,
 				targetUuid);
-		if (userPermissionLaboratory == null || userPermissionLaboratory.getType() != UserPermissionType.OWNER
-				&& userPermissionLaboratory.getType() != UserPermissionType.ADMINISTRATOR) {
+		if (userPermissionLaboratory == null
+				|| Arrays.asList(userPermissionGroup).contains(userPermissionLaboratory.getType())) {
 			final UserPermission userPermissionWorkspace = userPermissionRepository.findByUserAndWorkspace(userUuid,
 					targetUuid);
-			if (userPermissionWorkspace == null || userPermissionWorkspace.getType() != UserPermissionType.OWNER
-					&& userPermissionWorkspace.getType() != UserPermissionType.ADMINISTRATOR) {
+			if (userPermissionWorkspace == null
+					|| Arrays.asList(userPermissionGroup).contains(userPermissionWorkspace.getType())) {
 				throw new MissingRightsException("User is not owner or administrator : " + targetUuid);
 			}
 			return userPermissionWorkspace;
