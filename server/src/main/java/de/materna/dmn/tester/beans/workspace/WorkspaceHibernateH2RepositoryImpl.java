@@ -16,18 +16,15 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import de.materna.dmn.tester.beans.laboratory.LaboratoryHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.userpermission.UserPermissionHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.filter.NameFilter;
 import de.materna.dmn.tester.beans.workspace.filter.VisabilityFilter;
 import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.filters.WorkspaceFilter;
-import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
 import de.materna.dmn.tester.interfaces.repositories.UserPermissionRepository;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 
 public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
-	private final LaboratoryRepository laboratoryRepository = new LaboratoryHibernateH2RepositoryImpl();
 	private final UserPermissionRepository userPermissionRepository = new UserPermissionHibernateH2RepositoryImpl();
 
 	private final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
