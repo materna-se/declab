@@ -24,6 +24,7 @@ public class StandaloneServer {
 
 		final User userGeorg = userRepository.register("georg.wolffgang@materna.de", "Shazzarr", "password", "Georg",
 				"Wolffgang");
+		userGeorg.setSystemAdmin(true);
 		System.out.println("Saved new user Georg: " + userGeorg);
 		final User userMike = userRepository.register("mike.myers@materna.de", "Mikey", "päswoad", "Mike", "Myers");
 		System.out.println("Saved new user Mike: " + userMike);
