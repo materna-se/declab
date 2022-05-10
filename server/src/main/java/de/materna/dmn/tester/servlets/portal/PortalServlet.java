@@ -341,8 +341,8 @@ public class PortalServlet {
 		return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
-	private UserPermission checkUserPermission(UUID targetUuid, UUID sessionTokenUuid,
-			UserPermissionType[] userPermissionGroup) throws SessionTokenNotFoundException, MissingRightsException {
+	private void checkUserPermission(UUID targetUuid, UUID sessionTokenUuid, UserPermissionType[] userPermissionGroup)
+			throws SessionTokenNotFoundException, MissingRightsException {
 		final SessionToken sessionToken = sessionTokenRepository.findByUuid(sessionTokenUuid);
 
 		if (sessionToken == null) {
@@ -350,18 +350,18 @@ public class PortalServlet {
 		}
 
 		final UUID userUuid = sessionToken.getUserUuid();
-		final UserPermission userPermissionLaboratory = userPermissionRepository.findByUserAndLaboratory(userUuid,
-				targetUuid);
-		if (userPermissionLaboratory == null
-				|| Arrays.asList(userPermissionGroup).contains(userPermissionLaboratory.getType())) {
-			final UserPermission userPermissionWorkspace = userPermissionRepository.findByUserAndWorkspace(userUuid,
+		if (!userRepository.findByUuid(userUuid).isSystemAdmin()) {
+			final UserPermission userPermissionLaboratory = userPermissionRepository.findByUserAndLaboratory(userUuid,
 					targetUuid);
-			if (userPermissionWorkspace == null
-					|| Arrays.asList(userPermissionGroup).contains(userPermissionWorkspace.getType())) {
-				throw new MissingRightsException("User is not owner or administrator : " + targetUuid);
+			if (userPermissionLaboratory == null
+					|| !Arrays.asList(userPermissionGroup).contains(userPermissionLaboratory.getType())) {
+				final UserPermission userPermissionWorkspace = userPermissionRepository.findByUserAndWorkspace(userUuid,
+						targetUuid);
+				if (userPermissionWorkspace == null
+						|| !Arrays.asList(userPermissionGroup).contains(userPermissionWorkspace.getType())) {
+					throw new MissingRightsException("User is missing rights : " + targetUuid);
+				}
 			}
-			return userPermissionWorkspace;
 		}
-		return userPermissionLaboratory;
 	}
 }
