@@ -45,6 +45,7 @@ import de.materna.dmn.tester.servlets.portal.dto.laboratory.UpdateLaboratoryRequ
 import de.materna.dmn.tester.servlets.portal.dto.user.LoginRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ReadUserRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.RegisterRequest;
+import de.materna.dmn.tester.servlets.portal.dto.user.UpdateUserRequest;
 import de.materna.dmn.tester.servlets.portal.dto.workspace.CreateWorkspaceRequest;
 import de.materna.dmn.tester.servlets.portal.dto.workspace.DeleteWorkspaceRequest;
 import de.materna.dmn.tester.servlets.portal.dto.workspace.ReadWorkspaceRequest;
@@ -110,6 +111,11 @@ public class PortalServlet {
 				ReadUserRequest.class);
 
 		final User userFound = userRepository.findByUuid(readUserRequest.getUserUuid());
+
+		if (userFound == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
 		final SessionToken sessionToken = sessionTokenRepository.findByUuid(readUserRequest.getSessionTokenUuid());
 
 		if (sessionToken == null) {
@@ -118,12 +124,44 @@ public class PortalServlet {
 		}
 
 		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
+
+		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
+			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(userFound))
+					.build();
+		}
+
+		return Response.status(Response.Status.FORBIDDEN).build();
+	}
+
+	@POST
+	@Path("/user/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateUser(String body) throws SessionTokenNotFoundException {
+		final UpdateUserRequest updateUserRequest = (UpdateUserRequest) SerializationHelper.getInstance().toClass(body,
+				UpdateUserRequest.class);
+
+		final User userFound = userRepository.findByUuid(updateUserRequest.getUserUuid());
+
 		if (userFound == null) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
+		final SessionToken sessionToken = sessionTokenRepository.findByUuid(updateUserRequest.getSessionTokenUuid());
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException(
+					"SessionToken not found by UUID : " + updateUserRequest.getSessionTokenUuid());
+		}
+
+		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
+
 		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
-			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(userFound))
+			userFound.setUsername(updateUserRequest.getUsername());
+			userFound.setLastname(updateUserRequest.getLastname());
+			userFound.setFirstname(updateUserRequest.getFirstname());
+			final User userUpdated = userRepository.put(userFound);
+			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(userUpdated))
 					.build();
 		}
 
