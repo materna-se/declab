@@ -1,4 +1,6 @@
-package de.materna.dmn.tester.enums;
+package de.materna.dmn.tester.beans.userpermission;
+
+import de.materna.dmn.tester.enums.UserPermissionType;
 
 public class UserPermissionGroup {
 	public UserPermissionGroup() {

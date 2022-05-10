@@ -21,10 +21,10 @@ import de.materna.dmn.tester.beans.sessiontoken.SessionTokenHibernateH2Repositor
 import de.materna.dmn.tester.beans.user.User;
 import de.materna.dmn.tester.beans.user.UserHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.userpermission.UserPermission;
+import de.materna.dmn.tester.beans.userpermission.UserPermissionGroup;
 import de.materna.dmn.tester.beans.userpermission.UserPermissionHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.beans.workspace.WorkspaceHibernateH2RepositoryImpl;
-import de.materna.dmn.tester.enums.UserPermissionGroup;
 import de.materna.dmn.tester.enums.UserPermissionType;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
