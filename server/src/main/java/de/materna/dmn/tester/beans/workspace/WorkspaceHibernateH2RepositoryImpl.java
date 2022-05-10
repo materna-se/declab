@@ -82,8 +82,8 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	@Override
-	public Workspace create(String name, String description, VisabilityType visability) {
-		final Workspace workspace = new Workspace(name, description, visability);
+	public Workspace create(String name, String description, VisabilityType visability, UUID laboratoryUuid) {
+		final Workspace workspace = new Workspace(name, description, visability, laboratoryUuid);
 		return put(workspace);
 	}
 
