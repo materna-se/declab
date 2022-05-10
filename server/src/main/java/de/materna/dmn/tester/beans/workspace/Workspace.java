@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import de.materna.dmn.tester.enums.VisabilityType;
 
@@ -24,15 +25,19 @@ public class Workspace {
 	private String description;
 	@Column(name = "visability")
 	private VisabilityType visability;
+	@Column(name = "laboratory")
+	@NotNull
+	private UUID laboratoryUuid;
 
 	public Workspace() {
 	}
 
-	public Workspace(String name, String description, VisabilityType visability) {
+	public Workspace(String name, String description, VisabilityType visability, UUID laboratoryUuid) {
 		this.uuid = UUID.randomUUID();
 		setName(name);
 		setDescription(description);
 		setVisability(visability);
+		setLaboratoryUuid(laboratoryUuid);
 	}
 
 	public UUID getUuid() {
@@ -63,4 +68,11 @@ public class Workspace {
 		this.visability = visability;
 	}
 
+	public UUID getLaboratoryUuid() {
+		return laboratoryUuid;
+	}
+
+	public void setLaboratoryUuid(UUID laboratoryUuid) {
+		this.laboratoryUuid = laboratoryUuid;
+	}
 }
