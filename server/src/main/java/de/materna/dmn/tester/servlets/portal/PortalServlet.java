@@ -42,6 +42,7 @@ import de.materna.dmn.tester.servlets.portal.dto.laboratory.CreateLaboratoryRequ
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.DeleteLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.ReadLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.UpdateLaboratoryRequest;
+import de.materna.dmn.tester.servlets.portal.dto.user.DeleteUserRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.LoginRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ReadUserRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.RegisterRequest;
@@ -100,6 +101,53 @@ public class PortalServlet {
 				? Response.status(Response.Status.CREATED).entity(SerializationHelper.getInstance().toJSON(newUser))
 						.build()
 				: Response.status(Response.Status.NOT_MODIFIED).build();
+	}
+
+	@POST
+	@Path("/user/delete")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteUser(String body) throws SessionTokenNotFoundException {
+		final DeleteUserRequest deleteUserRequest = (DeleteUserRequest) SerializationHelper.getInstance().toClass(body,
+				DeleteUserRequest.class);
+
+		final User userFound = userRepository.findByUuid(deleteUserRequest.getUserUuid());
+
+		if (userFound == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		final SessionToken sessionToken = sessionTokenRepository.findByUuid(deleteUserRequest.getSessionTokenUuid());
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException(
+					"SessionToken not found by UUID : " + deleteUserRequest.getSessionTokenUuid());
+		}
+
+		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
+
+		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
+			if (userRepository.delete(userFound)) {
+				final UUID userUuid = deleteUserRequest.getUserUuid();
+
+				final List<UserPermission> allUserPermissions = userPermissionRepository.findByUser(userUuid);
+				for (final UserPermission userPermission : allUserPermissions) {
+					userPermissionRepository.delete(userPermission);
+				}
+
+				final List<Workspace> allWorkspaces = workspaceRepository.findByUser(userUuid);
+				for (final Workspace workspace : allWorkspaces) {
+					workspaceRepository.delete(workspace);
+				}
+
+				final List<Laboratory> allLaboratories = laboratoryRepository.findByUser(userUuid);
+				for (final Laboratory laboratory : allLaboratories) {
+					laboratoryRepository.delete(laboratory);
+				}
+			}
+			return Response.status(Response.Status.OK).build();
+		}
+		return Response.status(Response.Status.FORBIDDEN).build();
 	}
 
 	@POST
@@ -212,8 +260,8 @@ public class PortalServlet {
 			if (laboratoryRepository.delete(laboratory)) {
 				final List<UserPermission> allUserPermissions = userPermissionRepository
 						.findByLaboratory(deleteLaboratoryRequest.getLaboratoryUuid());
-				for (final UserPermission rs : allUserPermissions) {
-					userPermissionRepository.delete(rs);
+				for (final UserPermission userPermission : allUserPermissions) {
+					userPermissionRepository.delete(userPermission);
 				}
 				return Response.status(Response.Status.OK).build();
 			}
