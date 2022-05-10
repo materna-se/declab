@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 import de.materna.dmn.tester.enums.UserPermissionType;
 
 @Entity
-@Table(name = "relationship")
+@Table(name = "userpermission")
 public class UserPermission {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,5 +66,4 @@ public class UserPermission {
 	public Long getId() {
 		return id;
 	}
-
 }
