@@ -25,7 +25,8 @@ public interface WorkspaceRepository {
 
 	Workspace put(Workspace workspace);
 
-	Workspace create(String name, String description, VisabilityType visability);
+	Workspace create(String name, String description, VisabilityType visability, UUID laboratoryUuid);
 
 	boolean delete(Workspace workspace);
+
 }
