@@ -24,6 +24,8 @@ public class User {
 	@Email(message = "Email address must be valid")
 	@NotEmpty(message = "E-Mail cannot be empty")
 	private String email;
+	@Column(name = "confirmed", columnDefinition = "boolean default false")
+	private boolean confirmed;
 	@Column(name = "username", nullable = false)
 	@NotEmpty(message = "Username cannot be empty")
 	private String username;
@@ -48,12 +50,13 @@ public class User {
 		this.uuid = UUID.randomUUID();
 		this.registrationDateTime = LocalDateTime.now();
 		this.salt = BCrypt.gensalt();
+		this.confirmed = false;
+		this.systemAdmin = false;
 		setEmail(email);
 		setUsername(userName);
 		setPassword(BCrypt.hashpw(password, this.salt));
 		setFirstname(firstname);
 		setLastname(lastname);
-		setSystemAdmin(false);
 	}
 
 	public UUID getUuid() {
@@ -70,6 +73,14 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public boolean isConfirmed() {
+		return confirmed;
+	}
+
+	public void setConfirmed(boolean confirmed) {
+		this.confirmed = confirmed;
 	}
 
 	public String getUsername() {
