@@ -43,6 +43,7 @@ import de.materna.dmn.tester.servlets.portal.dto.laboratory.DeleteLaboratoryRequ
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.ReadLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.UpdateLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.LoginRequest;
+import de.materna.dmn.tester.servlets.portal.dto.user.ReadUserRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.RegisterRequest;
 import de.materna.dmn.tester.servlets.portal.dto.workspace.CreateWorkspaceRequest;
 import de.materna.dmn.tester.servlets.portal.dto.workspace.DeleteWorkspaceRequest;
@@ -98,6 +99,35 @@ public class PortalServlet {
 				? Response.status(Response.Status.CREATED).entity(SerializationHelper.getInstance().toJSON(newUser))
 						.build()
 				: Response.status(Response.Status.NOT_MODIFIED).build();
+	}
+
+	@POST
+	@Path("/user/read")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response readUser(String body) throws SessionTokenNotFoundException {
+		final ReadUserRequest readUserRequest = (ReadUserRequest) SerializationHelper.getInstance().toClass(body,
+				ReadUserRequest.class);
+
+		final User userFound = userRepository.findByUuid(readUserRequest.getUserUuid());
+		final SessionToken sessionToken = sessionTokenRepository.findByUuid(readUserRequest.getSessionTokenUuid());
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException(
+					"SessionToken not found by UUID : " + readUserRequest.getSessionTokenUuid());
+		}
+
+		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
+		if (userFound == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
+			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(userFound))
+					.build();
+		}
+
+		return Response.status(Response.Status.FORBIDDEN).build();
 	}
 
 	@POST
