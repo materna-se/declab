@@ -62,48 +62,6 @@ public class PortalServlet {
 	private final UserPermissionRepository userPermissionRepository = new UserPermissionHibernateH2RepositoryImpl();
 
 	@POST
-	@Path("/user/login")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response login(String body) {
-		final LoginRequest loginRequest = (LoginRequest) SerializationHelper.getInstance().toClass(body,
-				LoginRequest.class);
-		final User user = userRepository.findByUsername(loginRequest.getUsername());
-		if (user != null && user.getPassword().equals(BCrypt.hashpw(loginRequest.getPassword(), user.getSalt()))) {
-			final SessionToken sessionToken = new SessionToken(user);
-			sessionTokenRepository.put(sessionToken);
-			return Response.status(Response.Status.OK)
-					.entity(SerializationHelper.getInstance().toJSON(sessionToken.getUuid())).build();
-		}
-		return Response.status(Response.Status.UNAUTHORIZED).build();
-	}
-
-	@POST
-	@Path("/user/register")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response register(String body) throws UsernameInUseException, EmailInUseException {
-		final RegisterRequest registerRequest = (RegisterRequest) SerializationHelper.getInstance().toClass(body,
-				RegisterRequest.class);
-		final String username = registerRequest.getUsername();
-		final String email = registerRequest.getEmail();
-		final String password = registerRequest.getPassword();
-
-		if (userRepository.findByUsername(username) != null) {
-			throw new UsernameInUseException("The username is already in use : " + username);
-		}
-		if (userRepository.findByEmail(registerRequest.getEmail()) != null) {
-			throw new EmailInUseException("The email is already in use : " + email);
-		}
-
-		final User newUser = userRepository.register(email, username, password);
-		return newUser != null
-				? Response.status(Response.Status.CREATED).entity(SerializationHelper.getInstance().toJSON(newUser))
-						.build()
-				: Response.status(Response.Status.NOT_MODIFIED).build();
-	}
-
-	@POST
 	@Path("/user/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -151,6 +109,23 @@ public class PortalServlet {
 	}
 
 	@POST
+	@Path("/user/login")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response login(String body) {
+		final LoginRequest loginRequest = (LoginRequest) SerializationHelper.getInstance().toClass(body,
+				LoginRequest.class);
+		final User user = userRepository.findByUsername(loginRequest.getUsername());
+		if (user != null && user.getPassword().equals(BCrypt.hashpw(loginRequest.getPassword(), user.getSalt()))) {
+			final SessionToken sessionToken = new SessionToken(user);
+			sessionTokenRepository.put(sessionToken);
+			return Response.status(Response.Status.OK)
+					.entity(SerializationHelper.getInstance().toJSON(sessionToken.getUuid())).build();
+		}
+		return Response.status(Response.Status.UNAUTHORIZED).build();
+	}
+
+	@POST
 	@Path("/user/read")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -179,6 +154,31 @@ public class PortalServlet {
 		}
 
 		return Response.status(Response.Status.FORBIDDEN).build();
+	}
+
+	@POST
+	@Path("/user/register")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response register(String body) throws UsernameInUseException, EmailInUseException {
+		final RegisterRequest registerRequest = (RegisterRequest) SerializationHelper.getInstance().toClass(body,
+				RegisterRequest.class);
+		final String username = registerRequest.getUsername();
+		final String email = registerRequest.getEmail();
+		final String password = registerRequest.getPassword();
+
+		if (userRepository.findByUsername(username) != null) {
+			throw new UsernameInUseException("The username is already in use : " + username);
+		}
+		if (userRepository.findByEmail(registerRequest.getEmail()) != null) {
+			throw new EmailInUseException("The email is already in use : " + email);
+		}
+
+		final User newUser = userRepository.register(email, username, password);
+		return newUser != null
+				? Response.status(Response.Status.CREATED).entity(SerializationHelper.getInstance().toJSON(newUser))
+						.build()
+				: Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
 	@POST
