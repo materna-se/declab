@@ -5,16 +5,18 @@ import java.util.UUID;
 public class ChangePasswordRequest {
 
 	private UUID userUuid;
-	private String password;
+	private String passwordNew;
+	private String passwordOld;
 
 	private UUID sessionTokenUuid;
 
 	public ChangePasswordRequest() {
 	}
 
-	public ChangePasswordRequest(UUID userUuid, String password, UUID sessionTokenUuid) {
+	public ChangePasswordRequest(UUID userUuid, String passwordNew, String passwordOld, UUID sessionTokenUuid) {
 		setUserUuid(userUuid);
-		setPassword(password);
+		setPasswordNew(passwordNew);
+		setPasswordOld(passwordOld);
 		setSessionTokenUuid(sessionTokenUuid);
 	}
 
@@ -26,12 +28,20 @@ public class ChangePasswordRequest {
 		this.userUuid = userUuid;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getPasswordNew() {
+		return passwordNew;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPasswordNew(String passwordNew) {
+		this.passwordNew = passwordNew;
+	}
+
+	public String getPasswordOld() {
+		return passwordOld;
+	}
+
+	public void setPasswordOld(String passwordOld) {
+		this.passwordOld = passwordOld;
 	}
 
 	public UUID getSessionTokenUuid() {
