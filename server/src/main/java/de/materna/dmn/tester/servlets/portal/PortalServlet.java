@@ -66,43 +66,6 @@ public class PortalServlet {
 	private final UserPermissionRepository userPermissionRepository = new UserPermissionHibernateH2RepositoryImpl();
 
 	@POST
-	@Path("/user/changeSystemAdminState")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response changeSystemAdminState(String body) throws SessionTokenNotFoundException {
-		final ChangeSystemAdminStateRequest changeSystemAdminStateRequest = (ChangeSystemAdminStateRequest) SerializationHelper
-				.getInstance().toClass(body, ChangeSystemAdminStateRequest.class);
-
-		final User userFound = userRepository.findByUuid(changeSystemAdminStateRequest.getUserUuid());
-
-		if (userFound == null) {
-			return Response.status(Response.Status.NOT_FOUND).build();
-		}
-
-		final SessionToken sessionToken = sessionTokenRepository
-				.findByUuid(changeSystemAdminStateRequest.getSessionTokenUuid());
-
-		if (sessionToken == null) {
-			throw new SessionTokenNotFoundException(
-					"SessionToken not found by UUID : " + changeSystemAdminStateRequest.getSessionTokenUuid());
-		}
-
-		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
-
-		if (userCurrent == null) {
-			return Response.status(Response.Status.NOT_FOUND).build();
-		}
-
-		if (userCurrent.isSystemAdmin()) {
-			userFound.setSystemAdmin(changeSystemAdminStateRequest.isSystemAdmin());
-			final User userUpdated = userRepository.put(userFound);
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
-					.build();
-		}
-		return Response.status(Response.Status.FORBIDDEN).build();
-	}
-
-	@POST
 	@Path("/user/changeEmail")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -172,6 +135,43 @@ public class PortalServlet {
 			userFound.setSalt(BCrypt.gensalt());
 			userFound.setPassword(BCrypt.hashpw(changeEmailRequest.getPasswordNew(), userFound.getSalt()));
 			userFound.setConfirmed(false);
+			final User userUpdated = userRepository.put(userFound);
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
+					.build();
+		}
+		return Response.status(Response.Status.FORBIDDEN).build();
+	}
+
+	@POST
+	@Path("/user/changeSystemAdminState")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response changeSystemAdminState(String body) throws SessionTokenNotFoundException {
+		final ChangeSystemAdminStateRequest changeSystemAdminStateRequest = (ChangeSystemAdminStateRequest) SerializationHelper
+				.getInstance().toClass(body, ChangeSystemAdminStateRequest.class);
+
+		final User userFound = userRepository.findByUuid(changeSystemAdminStateRequest.getUserUuid());
+
+		if (userFound == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		final SessionToken sessionToken = sessionTokenRepository
+				.findByUuid(changeSystemAdminStateRequest.getSessionTokenUuid());
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException(
+					"SessionToken not found by UUID : " + changeSystemAdminStateRequest.getSessionTokenUuid());
+		}
+
+		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
+
+		if (userCurrent == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		if (userCurrent.isSystemAdmin()) {
+			userFound.setSystemAdmin(changeSystemAdminStateRequest.isSystemAdmin());
 			final User userUpdated = userRepository.put(userFound);
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
 					.build();
