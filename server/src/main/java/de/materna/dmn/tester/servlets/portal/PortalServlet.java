@@ -31,6 +31,7 @@ import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
 import de.materna.dmn.tester.interfaces.repositories.UserPermissionRepository;
 import de.materna.dmn.tester.interfaces.repositories.UserRepository;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
+import de.materna.dmn.tester.servlets.exceptions.authorization.EmailNotConfirmedException;
 import de.materna.dmn.tester.servlets.exceptions.authorization.MissingRightsException;
 import de.materna.dmn.tester.servlets.exceptions.database.LaboratoryNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
@@ -42,6 +43,8 @@ import de.materna.dmn.tester.servlets.portal.dto.laboratory.CreateLaboratoryRequ
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.DeleteLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.ReadLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.UpdateLaboratoryRequest;
+import de.materna.dmn.tester.servlets.portal.dto.user.ChangeEmailRequest;
+import de.materna.dmn.tester.servlets.portal.dto.user.ChangePasswordRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.DeleteUserRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.LoginRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ReadUserRequest;
@@ -60,6 +63,75 @@ public class PortalServlet {
 	private final LaboratoryRepository laboratoryRepository = new LaboratoryHibernateH2RepositoryImpl();
 	private final WorkspaceRepository workspaceRepository = new WorkspaceHibernateH2RepositoryImpl();
 	private final UserPermissionRepository userPermissionRepository = new UserPermissionHibernateH2RepositoryImpl();
+
+	@POST
+	@Path("/user/changeEmail")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response changeEmail(String body) throws SessionTokenNotFoundException {
+		final ChangeEmailRequest changeEmailRequest = (ChangeEmailRequest) SerializationHelper.getInstance()
+				.toClass(body, ChangeEmailRequest.class);
+
+		final User userFound = userRepository.findByUuid(changeEmailRequest.getUserUuid());
+
+		if (userFound == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		final SessionToken sessionToken = sessionTokenRepository.findByUuid(changeEmailRequest.getSessionTokenUuid());
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException(
+					"SessionToken not found by UUID : " + changeEmailRequest.getSessionTokenUuid());
+		}
+
+		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
+
+		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
+			userFound.setEmail(changeEmailRequest.getEmail());
+			userFound.setConfirmed(false);
+			final User userUpdated = userRepository.put(userFound);
+			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(userUpdated))
+					.build();
+		}
+
+		return Response.status(Response.Status.FORBIDDEN).build();
+	}
+
+	@POST
+	@Path("/user/changePassword")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response changePassword(String body) throws SessionTokenNotFoundException {
+		final ChangePasswordRequest changeEmailRequest = (ChangePasswordRequest) SerializationHelper.getInstance()
+				.toClass(body, ChangePasswordRequest.class);
+
+		final User userFound = userRepository.findByUuid(changeEmailRequest.getUserUuid());
+
+		if (userFound == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		final SessionToken sessionToken = sessionTokenRepository.findByUuid(changeEmailRequest.getSessionTokenUuid());
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException(
+					"SessionToken not found by UUID : " + changeEmailRequest.getSessionTokenUuid());
+		}
+
+		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
+
+		if ((userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin())
+				&& BCrypt.checkpw(changeEmailRequest.getPasswordOld(), userFound.getPassword())) {
+			userFound.setSalt(BCrypt.gensalt());
+			userFound.setPassword(BCrypt.hashpw(changeEmailRequest.getPasswordNew(), userFound.getSalt()));
+			userFound.setConfirmed(false);
+			final User userUpdated = userRepository.put(userFound);
+			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(userUpdated))
+					.build();
+		}
+		return Response.status(Response.Status.FORBIDDEN).build();
+	}
 
 	@POST
 	@Path("/user/delete")
@@ -112,16 +184,26 @@ public class PortalServlet {
 	@Path("/user/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response login(String body) {
+	public Response login(String body) throws UserNotFoundException, EmailNotConfirmedException {
 		final LoginRequest loginRequest = (LoginRequest) SerializationHelper.getInstance().toClass(body,
 				LoginRequest.class);
 		final User user = userRepository.findByUsername(loginRequest.getUsername());
-		if (user != null && user.getPassword().equals(BCrypt.hashpw(loginRequest.getPassword(), user.getSalt()))) {
+
+		if (user == null) {
+			throw new UserNotFoundException("User not found in database : " + loginRequest.getUsername());
+		}
+
+		if (!user.isConfirmed()) {
+			throw new EmailNotConfirmedException("Email address not confirmed yet : " + user.getEmail());
+		}
+
+		if (BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
 			final SessionToken sessionToken = new SessionToken(user);
 			sessionTokenRepository.put(sessionToken);
 			return Response.status(Response.Status.OK)
 					.entity(SerializationHelper.getInstance().toJSON(sessionToken.getUuid())).build();
 		}
+
 		return Response.status(Response.Status.UNAUTHORIZED).build();
 	}
 
