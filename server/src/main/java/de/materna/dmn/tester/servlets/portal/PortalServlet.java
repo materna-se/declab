@@ -45,6 +45,7 @@ import de.materna.dmn.tester.servlets.portal.dto.laboratory.ReadLaboratoryReques
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.UpdateLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ChangeEmailRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ChangePasswordRequest;
+import de.materna.dmn.tester.servlets.portal.dto.user.ChangeSystemAdminStateRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.DeleteUserRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.LoginRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ReadUserRequest;
@@ -63,6 +64,43 @@ public class PortalServlet {
 	private final LaboratoryRepository laboratoryRepository = new LaboratoryHibernateH2RepositoryImpl();
 	private final WorkspaceRepository workspaceRepository = new WorkspaceHibernateH2RepositoryImpl();
 	private final UserPermissionRepository userPermissionRepository = new UserPermissionHibernateH2RepositoryImpl();
+
+	@POST
+	@Path("/user/changeSystemAdminState")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response changeSystemAdminState(String body) throws SessionTokenNotFoundException {
+		final ChangeSystemAdminStateRequest changeSystemAdminStateRequest = (ChangeSystemAdminStateRequest) SerializationHelper
+				.getInstance().toClass(body, ChangeSystemAdminStateRequest.class);
+
+		final User userFound = userRepository.findByUuid(changeSystemAdminStateRequest.getUserUuid());
+
+		if (userFound == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		final SessionToken sessionToken = sessionTokenRepository
+				.findByUuid(changeSystemAdminStateRequest.getSessionTokenUuid());
+
+		if (sessionToken == null) {
+			throw new SessionTokenNotFoundException(
+					"SessionToken not found by UUID : " + changeSystemAdminStateRequest.getSessionTokenUuid());
+		}
+
+		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
+
+		if (userCurrent == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		if (userCurrent.isSystemAdmin()) {
+			userFound.setSystemAdmin(changeSystemAdminStateRequest.isSystemAdmin());
+			final User userUpdated = userRepository.put(userFound);
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
+					.build();
+		}
+		return Response.status(Response.Status.FORBIDDEN).build();
+	}
 
 	@POST
 	@Path("/user/changeEmail")
@@ -87,11 +125,15 @@ public class PortalServlet {
 
 		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
 
+		if (userCurrent == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
 		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
 			userFound.setEmail(changeEmailRequest.getEmail());
 			userFound.setConfirmed(false);
 			final User userUpdated = userRepository.put(userFound);
-			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(userUpdated))
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
 					.build();
 		}
 
@@ -121,13 +163,17 @@ public class PortalServlet {
 
 		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
 
+		if (userCurrent == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
 		if ((userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin())
 				&& BCrypt.checkpw(changeEmailRequest.getPasswordOld(), userFound.getPassword())) {
 			userFound.setSalt(BCrypt.gensalt());
 			userFound.setPassword(BCrypt.hashpw(changeEmailRequest.getPasswordNew(), userFound.getSalt()));
 			userFound.setConfirmed(false);
 			final User userUpdated = userRepository.put(userFound);
-			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(userUpdated))
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
 					.build();
 		}
 		return Response.status(Response.Status.FORBIDDEN).build();
@@ -155,6 +201,10 @@ public class PortalServlet {
 		}
 
 		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
+
+		if (userCurrent == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
 
 		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
 			if (userRepository.delete(userFound)) {
