@@ -44,9 +44,8 @@ public class SendEmail {
 				return new PasswordAuthentication(Constants.EMAIL.SENDER.VALUE, Constants.EMAIL.PASSWORD.VALUE);
 			}
 		});
-
-		try {
-			if (!Constants.EMAIL.CONFIRMED.VALUE.equals(getRecipient().getConfirmation())) {
+		if (!Constants.EMAIL.CONFIRMED.VALUE.equals(getRecipient().getConfirmation())) {
+			try {
 				final MimeMessage message = new MimeMessage(session);
 				message.setFrom(new InternetAddress(Constants.EMAIL.SENDER.VALUE));
 				message.addRecipient(Message.RecipientType.TO, new InternetAddress(getRecipient().getEmail()));
@@ -55,9 +54,9 @@ public class SendEmail {
 						+ "http://localhost:8080/declab/portal/user/confirmEmail?email=" + getRecipient().getEmail()
 						+ "&hash=" + getRecipient().getConfirmation());
 				Transport.send(message);
+			} catch (final MessagingException e) {
+				e.printStackTrace();
 			}
-		} catch (final MessagingException e) {
-			e.printStackTrace();
 		}
 	}
 }
