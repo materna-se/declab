@@ -31,20 +31,21 @@ public class SendEmail {
 	}
 
 	public void sendConfirmationMail() {
-
-		final Properties properties = System.getProperties();
-		properties.setProperty("mail.smtp.auth", Constants.EMAIL.AUTH.VALUE);
-		properties.setProperty("mail.smtp.starttls.enabled", Constants.EMAIL.STARTTLS.VALUE);
-		properties.setProperty("mail.smtp.host", Constants.EMAIL.HOST.VALUE);
-		properties.setProperty("mail.smtp.port", Constants.EMAIL.PORT.VALUE);
-
-		final Session session = Session.getDefaultInstance(properties, new Authenticator() {
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(Constants.EMAIL.SENDER.VALUE, Constants.EMAIL.PASSWORD.VALUE);
-			}
-		});
 		if (!Constants.EMAIL.CONFIRMED.VALUE.equals(getRecipient().getConfirmation())) {
+
+			final Properties properties = System.getProperties();
+			properties.setProperty("mail.smtp.auth", Constants.EMAIL.AUTH.VALUE);
+			properties.setProperty("mail.smtp.starttls.enabled", Constants.EMAIL.STARTTLS.VALUE);
+			properties.setProperty("mail.smtp.host", Constants.EMAIL.HOST.VALUE);
+			properties.setProperty("mail.smtp.port", Constants.EMAIL.PORT.VALUE);
+
+			final Session session = Session.getDefaultInstance(properties, new Authenticator() {
+				@Override
+				protected PasswordAuthentication getPasswordAuthentication() {
+					return new PasswordAuthentication(Constants.EMAIL.SENDER.VALUE, Constants.EMAIL.PASSWORD.VALUE);
+				}
+			});
+
 			try {
 				final MimeMessage message = new MimeMessage(session);
 				message.setFrom(new InternetAddress(Constants.EMAIL.SENDER.VALUE));
