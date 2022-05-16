@@ -25,6 +25,7 @@ import de.materna.dmn.tester.beans.user.UserHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.userpermission.UserPermission;
 import de.materna.dmn.tester.beans.userpermission.UserPermissionGroup;
 import de.materna.dmn.tester.beans.userpermission.UserPermissionHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.util.SendEmail;
 import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.beans.workspace.WorkspaceHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.enums.Constants;
@@ -98,6 +99,7 @@ public class PortalServlet {
 		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
 			userFound.setEmail(changeEmailRequest.getEmail());
 			userFound.setConfirmation(UUID.randomUUID().toString());
+			new SendEmail(userFound).sendConfirmationMail();
 			final User userUpdated = userRepository.put(userFound);
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
 					.build();
@@ -198,7 +200,7 @@ public class PortalServlet {
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
 					.build();
 		}
-		return Response.status(Response.Status.OK).build();
+		return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
 	@POST
@@ -329,6 +331,7 @@ public class PortalServlet {
 		}
 
 		final User newUser = userRepository.register(email, username, password);
+		new SendEmail(newUser).sendConfirmationMail();
 		return newUser != null
 				? Response.status(Response.Status.CREATED).entity(SerializationHelper.getInstance().toJSON(newUser))
 						.build()
