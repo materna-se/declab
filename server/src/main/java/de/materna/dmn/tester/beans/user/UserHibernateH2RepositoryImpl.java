@@ -3,7 +3,6 @@ package de.materna.dmn.tester.beans.user;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -41,7 +40,7 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public User findByUuid(UUID uuid) {
+	public User findByUuid(String uuid) {
 		transaction.begin();
 		final User user = em.find(User.class, uuid);
 		transaction.commit();
@@ -61,7 +60,7 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public User findBySessionToken(UUID tokenUuid) {
+	public User findBySessionToken(String tokenUuid) {
 		final SessionToken token = sessionTokenRepository.findByUuid(tokenUuid);
 		return findByUuid(token.getUserUuid());
 	}

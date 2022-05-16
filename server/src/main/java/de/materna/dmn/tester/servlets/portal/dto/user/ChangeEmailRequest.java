@@ -1,28 +1,26 @@
 package de.materna.dmn.tester.servlets.portal.dto.user;
 
-import java.util.UUID;
-
 public class ChangeEmailRequest {
 
-	private UUID userUuid;
+	private String userUuid;
 	private String email;
 
-	private UUID sessionTokenUuid;
+	private String sessionTokenUuid;
 
 	public ChangeEmailRequest() {
 	}
 
-	public ChangeEmailRequest(UUID userUuid, String email, UUID sessionTokenUuid) {
+	public ChangeEmailRequest(String userUuid, String email, String sessionTokenUuid) {
 		setUserUuid(userUuid);
 		setEmail(email);
 		setSessionTokenUuid(sessionTokenUuid);
 	}
 
-	public UUID getUserUuid() {
+	public String getUserUuid() {
 		return userUuid;
 	}
 
-	public void setUserUuid(UUID userUuid) {
+	public void setUserUuid(String userUuid) {
 		this.userUuid = userUuid;
 	}
 
@@ -34,11 +32,11 @@ public class ChangeEmailRequest {
 		this.email = email;
 	}
 
-	public UUID getSessionTokenUuid() {
+	public String getSessionTokenUuid() {
 		return sessionTokenUuid;
 	}
 
-	public void setSessionTokenUuid(UUID sessionTokenUuid) {
+	public void setSessionTokenUuid(String sessionTokenUuid) {
 		this.sessionTokenUuid = sessionTokenUuid;
 	}
 }

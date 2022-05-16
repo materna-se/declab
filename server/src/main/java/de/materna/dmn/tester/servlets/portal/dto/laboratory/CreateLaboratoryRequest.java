@@ -1,7 +1,5 @@
 package de.materna.dmn.tester.servlets.portal.dto.laboratory;
 
-import java.util.UUID;
-
 import de.materna.dmn.tester.enums.VisabilityType;
 
 public class CreateLaboratoryRequest {
@@ -9,12 +7,13 @@ public class CreateLaboratoryRequest {
 	private String description;
 	private VisabilityType visability;
 
-	private UUID sessionTokenUuid;
+	private String sessionTokenUuid;
 
 	public CreateLaboratoryRequest() {
 	}
 
-	public CreateLaboratoryRequest(String name, String description, VisabilityType visability, UUID sessionTokenUuid) {
+	public CreateLaboratoryRequest(String name, String description, VisabilityType visability,
+			String sessionTokenUuid) {
 		setName(name);
 		setDescription(description);
 		setVisability(visability);
@@ -45,11 +44,11 @@ public class CreateLaboratoryRequest {
 		this.visability = visability;
 	}
 
-	public UUID getSessionTokenUuid() {
+	public String getSessionTokenUuid() {
 		return sessionTokenUuid;
 	}
 
-	public void setSessionTokenUuid(UUID sessionTokenUuid) {
+	public void setSessionTokenUuid(String sessionTokenUuid) {
 		this.sessionTokenUuid = sessionTokenUuid;
 	}
 }

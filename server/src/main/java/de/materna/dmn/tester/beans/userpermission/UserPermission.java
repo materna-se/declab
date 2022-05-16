@@ -1,7 +1,5 @@
 package de.materna.dmn.tester.beans.userpermission;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,38 +18,38 @@ public class UserPermission {
 	private Long id;
 	@Column(name = "user")
 	@NotNull
-	private UUID user;
+	private String user;
 	@Column(name = "laboratory")
-	private UUID laboratory;
+	private String laboratory;
 	@Column(name = "workspace")
-	private UUID workspace;
+	private String workspace;
 	@Column(name = "type")
 	private UserPermissionType type;
 
 	public UserPermission() {
 	}
 
-	public UUID getUser() {
+	public String getUser() {
 		return user;
 	}
 
-	public void setUser(UUID user) {
+	public void setUser(String user) {
 		this.user = user;
 	}
 
-	public UUID getLaboratory() {
+	public String getLaboratory() {
 		return laboratory;
 	}
 
-	public void setLaboratory(UUID laboratory) {
+	public void setLaboratory(String laboratory) {
 		this.laboratory = laboratory;
 	}
 
-	public UUID getWorkspace() {
+	public String getWorkspace() {
 		return workspace;
 	}
 
-	public void setWorkspace(UUID workspace) {
+	public void setWorkspace(String workspace) {
 		this.workspace = workspace;
 	}
 

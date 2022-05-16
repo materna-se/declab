@@ -2,7 +2,6 @@ package de.materna.dmn.tester.servlets.portal;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.UUID;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -34,8 +33,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 			return;
 		}
 		try {
-			final UUID tokenUuid = UUID
-					.fromString(authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim());
+			final String tokenUuid = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
 			validateToken(tokenUuid);
 		} catch (SessionTokenNotFoundException | SessionTokenExpiredException e) {
 			abortWithUnauthorized(requestContext);
@@ -52,7 +50,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 				.header(HttpHeaders.WWW_AUTHENTICATE, AUTHENTICATION_SCHEME + " realm=\"" + REALM + "\"").build());
 	}
 
-	private void validateToken(UUID tokenUuid) throws SessionTokenNotFoundException, SessionTokenExpiredException {
+	private void validateToken(String tokenUuid) throws SessionTokenNotFoundException, SessionTokenExpiredException {
 		final SessionToken token = new SessionTokenHibernateH2RepositoryImpl().findByUuid(tokenUuid);
 		if (token == null) {
 			throw new SessionTokenNotFoundException("SessionToken not found : " + tokenUuid);

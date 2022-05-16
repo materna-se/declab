@@ -1,34 +1,31 @@
 package de.materna.dmn.tester.servlets.portal.dto.workspace;
 
-import java.util.UUID;
-
 public class DeleteWorkspaceRequest {
-	private UUID workspaceUuid;
+	private String workspaceUuid;
 
-	private UUID sessionTokenUuid;
+	private String sessionTokenUuid;
 
 	public DeleteWorkspaceRequest() {
 	}
 
-	public DeleteWorkspaceRequest(UUID workplaceUuid, UUID sessionTokenUuid) {
+	public DeleteWorkspaceRequest(String workplaceUuid, String sessionTokenUuid) {
 		this.setWorkspaceUuid(workplaceUuid);
 		this.setSessionTokenUuid(sessionTokenUuid);
 	}
 
-	public UUID getWorkspaceUuid() {
+	public String getWorkspaceUuid() {
 		return workspaceUuid;
 	}
 
-	public void setWorkspaceUuid(UUID workplaceUuid) {
+	public void setWorkspaceUuid(String workplaceUuid) {
 		this.workspaceUuid = workplaceUuid;
 	}
 
-	public UUID getSessionTokenUuid() {
+	public String getSessionTokenUuid() {
 		return sessionTokenUuid;
 	}
 
-	public void setSessionTokenUuid(UUID sessionTokenUuid) {
+	public void setSessionTokenUuid(String sessionTokenUuid) {
 		this.sessionTokenUuid = sessionTokenUuid;
 	}
-
 }

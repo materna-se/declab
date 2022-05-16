@@ -3,7 +3,6 @@ package de.materna.dmn.tester.beans.laboratory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -42,7 +41,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	}
 
 	@Override
-	public Laboratory findByUuid(UUID laboratoryUuid) {
+	public Laboratory findByUuid(String laboratoryUuid) {
 		transaction.begin();
 		final Laboratory Laboratory = em.find(Laboratory.class, laboratoryUuid);
 		transaction.commit();
@@ -60,7 +59,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	}
 
 	@Override
-	public List<Laboratory> findByUser(UUID ownerUuid) {
+	public List<Laboratory> findByUser(String ownerUuid) {
 		return userPermissionRepository.findByUser(ownerUuid).stream()
 				.filter(userPermission -> userPermission.getLaboratory() != null)
 				.map(userPermission -> findByUuid(userPermission.getLaboratory())).collect(Collectors.toList());

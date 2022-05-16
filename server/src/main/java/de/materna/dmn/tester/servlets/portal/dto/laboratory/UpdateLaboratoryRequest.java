@@ -1,22 +1,20 @@
 package de.materna.dmn.tester.servlets.portal.dto.laboratory;
 
-import java.util.UUID;
-
 import de.materna.dmn.tester.enums.VisabilityType;
 
 public class UpdateLaboratoryRequest {
-	private UUID laboratoryUuid;
+	private String laboratoryUuid;
 	private String name;
 	private String description;
 	private VisabilityType visability;
 
-	private UUID sessionTokenUuid;
+	private String sessionTokenUuid;
 
 	public UpdateLaboratoryRequest() {
 	}
 
-	public UpdateLaboratoryRequest(UUID laboratoryUuid, String name, String description, VisabilityType visability,
-			UUID sessionTokenUuid) {
+	public UpdateLaboratoryRequest(String laboratoryUuid, String name, String description, VisabilityType visability,
+			String sessionTokenUuid) {
 		setLaboratoryUuid(laboratoryUuid);
 		setName(name);
 		setDescription(description);
@@ -24,11 +22,11 @@ public class UpdateLaboratoryRequest {
 		setSessionTokenUuid(sessionTokenUuid);
 	}
 
-	public UUID getLaboratoryUuid() {
+	public String getLaboratoryUuid() {
 		return laboratoryUuid;
 	}
 
-	public void setLaboratoryUuid(UUID laboratoryUuid) {
+	public void setLaboratoryUuid(String laboratoryUuid) {
 		this.laboratoryUuid = laboratoryUuid;
 	}
 
@@ -56,11 +54,11 @@ public class UpdateLaboratoryRequest {
 		this.visability = visability;
 	}
 
-	public UUID getSessionTokenUuid() {
+	public String getSessionTokenUuid() {
 		return sessionTokenUuid;
 	}
 
-	public void setSessionTokenUuid(UUID sessionTokenUuid) {
+	public void setSessionTokenUuid(String sessionTokenUuid) {
 		this.sessionTokenUuid = sessionTokenUuid;
 	}
 }

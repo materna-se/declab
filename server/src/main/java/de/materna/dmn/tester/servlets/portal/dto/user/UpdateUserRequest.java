@@ -1,22 +1,20 @@
 package de.materna.dmn.tester.servlets.portal.dto.user;
 
-import java.util.UUID;
-
 public class UpdateUserRequest {
 
-	private UUID userUuid;
+	private String userUuid;
 	private String email;
 	private String username;
 	private String firstname;
 	private String lastname;
 
-	private UUID sessionTokenUuid;
+	private String sessionTokenUuid;
 
 	public UpdateUserRequest() {
 	}
 
-	public UpdateUserRequest(UUID userUuid, String email, String username, String firstname, String lastname,
-			UUID sessionTokenUuid) {
+	public UpdateUserRequest(String userUuid, String email, String username, String firstname, String lastname,
+			String sessionTokenUuid) {
 		setUserUuid(userUuid);
 		setEmail(email);
 		setUsername(username);
@@ -25,11 +23,11 @@ public class UpdateUserRequest {
 		setSessionTokenUuid(sessionTokenUuid);
 	}
 
-	public UUID getUserUuid() {
+	public String getUserUuid() {
 		return userUuid;
 	}
 
-	public void setUserUuid(UUID userUuid) {
+	public void setUserUuid(String userUuid) {
 		this.userUuid = userUuid;
 	}
 
@@ -65,11 +63,11 @@ public class UpdateUserRequest {
 		this.lastname = lastname;
 	}
 
-	public UUID getSessionTokenUuid() {
+	public String getSessionTokenUuid() {
 		return sessionTokenUuid;
 	}
 
-	public void setSessionTokenUuid(UUID sessionTokenUuid) {
+	public void setSessionTokenUuid(String sessionTokenUuid) {
 		this.sessionTokenUuid = sessionTokenUuid;
 	}
 }

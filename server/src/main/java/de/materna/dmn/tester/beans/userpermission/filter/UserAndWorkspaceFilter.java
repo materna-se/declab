@@ -1,7 +1,5 @@
 package de.materna.dmn.tester.beans.userpermission.filter;
 
-import java.util.UUID;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -12,9 +10,9 @@ import de.materna.dmn.tester.interfaces.filters.UserPermissionFilter;
 
 public class UserAndWorkspaceFilter implements UserPermissionFilter {
 
-	UUID userUuid, workspaceUuid;
+	String userUuid, workspaceUuid;
 
-	public UserAndWorkspaceFilter(UUID userUuid, UUID workspaceUuid) {
+	public UserAndWorkspaceFilter(String userUuid, String workspaceUuid) {
 		this.userUuid = userUuid;
 		this.workspaceUuid = workspaceUuid;
 	}

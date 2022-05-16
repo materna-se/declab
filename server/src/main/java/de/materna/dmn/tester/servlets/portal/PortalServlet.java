@@ -186,7 +186,7 @@ public class PortalServlet {
 	@GET
 	@Path("/user/confirmEmail")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response confirmEmail(@QueryParam("email") String email, @QueryParam("hash") UUID hash) {
+	public Response confirmEmail(@QueryParam("email") String email, @QueryParam("hash") String hash) {
 
 		final User userFound = userRepository.findByEmail(email);
 
@@ -232,7 +232,7 @@ public class PortalServlet {
 
 		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
 			if (userRepository.delete(userFound)) {
-				final UUID userUuid = deleteUserRequest.getUserUuid();
+				final String userUuid = deleteUserRequest.getUserUuid();
 
 				final List<UserPermission> allUserPermissions = userPermissionRepository.findByUser(userUuid);
 				for (final UserPermission userPermission : allUserPermissions) {
@@ -492,7 +492,7 @@ public class PortalServlet {
 			throw new UserNotFoundException("User not found by session token : " + sessionToken.getUserUuid());
 		}
 
-		final UUID laboratoryUuid = createWorkspaceRequest.getLaboratoryUuid();
+		final String laboratoryUuid = createWorkspaceRequest.getLaboratoryUuid();
 		if (laboratoryUuid != null) {
 			if (laboratoryRepository.findByUuid(laboratoryUuid) == null) {
 				throw new LaboratoryNotFoundException("Laboratory not found by UUID : " + laboratoryUuid);
@@ -584,15 +584,15 @@ public class PortalServlet {
 		return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
-	private void checkUserPermission(UUID targetUuid, UUID sessionTokenUuid, UserPermissionType[] userPermissionGroup)
-			throws SessionTokenNotFoundException, MissingRightsException {
+	private void checkUserPermission(String targetUuid, String sessionTokenUuid,
+			UserPermissionType[] userPermissionGroup) throws SessionTokenNotFoundException, MissingRightsException {
 		final SessionToken sessionToken = sessionTokenRepository.findByUuid(sessionTokenUuid);
 
 		if (sessionToken == null) {
 			throw new SessionTokenNotFoundException("SessionToken not found by UUID : " + sessionTokenUuid);
 		}
 
-		final UUID userUuid = sessionToken.getUserUuid();
+		final String userUuid = sessionToken.getUserUuid();
 		if (!userRepository.findByUuid(userUuid).isSystemAdmin()) {
 			final UserPermission userPermissionLaboratory = userPermissionRepository.findByUserAndLaboratory(userUuid,
 					targetUuid);

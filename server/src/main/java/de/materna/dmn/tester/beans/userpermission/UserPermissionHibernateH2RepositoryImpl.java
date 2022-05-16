@@ -3,7 +3,6 @@ package de.materna.dmn.tester.beans.userpermission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -51,17 +50,17 @@ public class UserPermissionHibernateH2RepositoryImpl implements UserPermissionRe
 	}
 
 	@Override
-	public List<UserPermission> findByUser(UUID userUuid) {
+	public List<UserPermission> findByUser(String userUuid) {
 		return findByFilter(new UserFilter(userUuid));
 	}
 
 	@Override
-	public List<UserPermission> findByLaboratory(UUID laboratoryUuid) {
+	public List<UserPermission> findByLaboratory(String laboratoryUuid) {
 		return findByFilter(new LaboratoryFilter(laboratoryUuid));
 	}
 
 	@Override
-	public List<UserPermission> findByWorkspace(UUID workspaceUuid) {
+	public List<UserPermission> findByWorkspace(String workspaceUuid) {
 		return findByFilter(new WorkspaceFilter(workspaceUuid));
 	}
 
@@ -71,20 +70,21 @@ public class UserPermissionHibernateH2RepositoryImpl implements UserPermissionRe
 	}
 
 	@Override
-	public UserPermission findByUserAndLaboratory(UUID userUuid, UUID laboratoryUuid) {
+	public UserPermission findByUserAndLaboratory(String userUuid, String laboratoryUuid) {
 		final List<UserPermission> relationshipsFound = findByFilter(
 				new UserAndLaboratoryFilter(userUuid, laboratoryUuid));
 		return relationshipsFound.size() == 1 ? relationshipsFound.get(0) : null;
 	}
 
 	@Override
-	public UserPermission findByUserAndWorkspace(UUID userUuid, UUID workspaceUuid) {
-		final List<UserPermission> relationshipsFound = findByFilter(new UserAndWorkspaceFilter(userUuid, workspaceUuid));
+	public UserPermission findByUserAndWorkspace(String userUuid, String workspaceUuid) {
+		final List<UserPermission> relationshipsFound = findByFilter(
+				new UserAndWorkspaceFilter(userUuid, workspaceUuid));
 		return relationshipsFound.size() == 1 ? relationshipsFound.get(0) : null;
 	}
 
 	@Override
-	public UserPermission findByLaboratoryAndWorkspace(UUID laboratoryUuid, UUID workspaceUuid) {
+	public UserPermission findByLaboratoryAndWorkspace(String laboratoryUuid, String workspaceUuid) {
 		final List<UserPermission> relationshipsFound = findByFilter(
 				new LaboratoryAndWorkspaceFilter(laboratoryUuid, workspaceUuid));
 		return relationshipsFound.size() == 1 ? relationshipsFound.get(0) : null;

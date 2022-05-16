@@ -1,33 +1,31 @@
 package de.materna.dmn.tester.servlets.portal.dto.laboratory;
 
-import java.util.UUID;
-
 public class ReadLaboratoryRequest {
-	private UUID laboratoryUuid;
+	private String laboratoryUuid;
 
-	private UUID sessionTokenUuid;
+	private String sessionTokenUuid;
 
 	public ReadLaboratoryRequest() {
 	}
 
-	public ReadLaboratoryRequest(UUID laboratoryUuid, UUID sessionTokenUuid) {
+	public ReadLaboratoryRequest(String laboratoryUuid, String sessionTokenUuid) {
 		this.setLaboratoryUuid(laboratoryUuid);
 		this.setSessionTokenUuid(sessionTokenUuid);
 	}
 
-	public UUID getLaboratoryUuid() {
+	public String getLaboratoryUuid() {
 		return laboratoryUuid;
 	}
 
-	public void setLaboratoryUuid(UUID laboratoryUuid) {
+	public void setLaboratoryUuid(String laboratoryUuid) {
 		this.laboratoryUuid = laboratoryUuid;
 	}
 
-	public UUID getSessionTokenUuid() {
+	public String getSessionTokenUuid() {
 		return sessionTokenUuid;
 	}
 
-	public void setSessionTokenUuid(UUID sessionTokenUuid) {
+	public void setSessionTokenUuid(String sessionTokenUuid) {
 		this.sessionTokenUuid = sessionTokenUuid;
 	}
 }

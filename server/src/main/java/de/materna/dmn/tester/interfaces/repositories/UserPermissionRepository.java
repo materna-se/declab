@@ -1,7 +1,6 @@
 package de.materna.dmn.tester.interfaces.repositories;
 
 import java.util.List;
-import java.util.UUID;
 
 import de.materna.dmn.tester.beans.userpermission.UserPermission;
 import de.materna.dmn.tester.enums.UserPermissionType;
@@ -12,19 +11,19 @@ public interface UserPermissionRepository {
 
 	UserPermission findByUuid(Long id);
 
-	List<UserPermission> findByUser(UUID userUuid);
+	List<UserPermission> findByUser(String ownerUuid);
 
-	List<UserPermission> findByLaboratory(UUID laboratoryUuid);
+	List<UserPermission> findByLaboratory(String laboratoryUuid);
 
-	List<UserPermission> findByWorkspace(UUID workspaceUuid);
+	List<UserPermission> findByWorkspace(String workspaceUuid);
 
 	List<UserPermission> findByType(UserPermissionType type);
 
-	UserPermission findByUserAndLaboratory(UUID userUuid, UUID laboratoryUuid);
+	UserPermission findByUserAndLaboratory(String userUuid, String laboratoryUuid);
 
-	UserPermission findByUserAndWorkspace(UUID userUuid, UUID workspaceUuid);
+	UserPermission findByUserAndWorkspace(String userUuid, String workspaceUuid);
 
-	UserPermission findByLaboratoryAndWorkspace(UUID laboratoryUuid, UUID workspaceUuid);
+	UserPermission findByLaboratoryAndWorkspace(String laboratoryUuid, String workspaceUuid);
 
 	void put(UserPermission relationship);
 

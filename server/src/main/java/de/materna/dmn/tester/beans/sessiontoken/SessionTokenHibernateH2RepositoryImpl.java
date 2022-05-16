@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -40,12 +39,12 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	}
 
 	@Override
-	public List<SessionToken> findAllByUserUuid(UUID userUuid) {
+	public List<SessionToken> findAllByUserUuid(String userUuid) {
 		return findByFilter(new UserUuidFilter(userUuid));
 	}
 
 	@Override
-	public SessionToken findByUuid(UUID tokenUuid) {
+	public SessionToken findByUuid(String tokenUuid) {
 		transaction.begin();
 		final SessionToken sessionToken = em.find(SessionToken.class, tokenUuid);
 		transaction.commit();
@@ -58,7 +57,7 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	}
 
 	@Override
-	public SessionToken findCurrentByUserUuid(UUID userUuid) {
+	public SessionToken findCurrentByUserUuid(String userUuid) {
 		final List<SessionToken> tokens = findAllByUserUuid(userUuid);
 		Collections.sort(tokens, new SessionTokenComparator());
 		return tokens.get(0);

@@ -3,7 +3,6 @@ package de.materna.dmn.tester.beans.workspace;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -42,9 +41,9 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	@Override
-	public Workspace findByUuid(UUID workspaceUuid) {
+	public Workspace findByUuid(String uuid) {
 		transaction.begin();
-		final Workspace Workspace = em.find(Workspace.class, workspaceUuid);
+		final Workspace Workspace = em.find(Workspace.class, uuid);
 		transaction.commit();
 		return Optional.ofNullable(Workspace).get();
 	}
@@ -60,14 +59,14 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	@Override
-	public List<Workspace> findByUser(UUID ownerUuid) {
+	public List<Workspace> findByUser(String ownerUuid) {
 		return userPermissionRepository.findByUser(ownerUuid).stream()
 				.filter(userPermission -> userPermission.getWorkspace() != null)
 				.map(userPermission -> findByUuid(userPermission.getWorkspace())).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<Workspace> findByLaboratory(UUID laboratoryUuid) {
+	public List<Workspace> findByLaboratory(String laboratoryUuid) {
 		return findAll().stream().filter(workspace -> workspace.getLaboratoryUuid() == laboratoryUuid)
 				.collect(Collectors.toList());
 	}
@@ -81,7 +80,7 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	@Override
-	public Workspace create(String name, String description, VisabilityType visability, UUID laboratoryUuid) {
+	public Workspace create(String name, String description, VisabilityType visability, String laboratoryUuid) {
 		final Workspace workspace = new Workspace(name, description, visability, laboratoryUuid);
 		return put(workspace);
 	}

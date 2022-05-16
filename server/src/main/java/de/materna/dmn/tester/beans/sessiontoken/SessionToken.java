@@ -17,10 +17,10 @@ import de.materna.dmn.tester.beans.user.User;
 public class SessionToken {
 	@Id
 	@Column(name = "uuid", unique = true, nullable = false)
-	private UUID uuid;
+	private String uuid;
 	@Column(name = "user")
 	@NotNull
-	private UUID userUuid;
+	private String userUuid;
 	@Column(name = "initiation")
 	private LocalDate initiation;
 	@Column(name = "expiration")
@@ -35,20 +35,20 @@ public class SessionToken {
 		this(user.getUuid());
 	}
 
-	public SessionToken(UUID userUuid) {
-		this.uuid = UUID.randomUUID();
+	public SessionToken(String userUuid) {
+		this.uuid = UUID.randomUUID().toString();
 		setUserUuid(userUuid);
 	}
 
-	public UUID getUuid() {
+	public String getUuid() {
 		return uuid;
 	}
 
-	public UUID getUserUuid() {
+	public String getUserUuid() {
 		return userUuid;
 	}
 
-	public void setUserUuid(UUID userUuid) {
+	public void setUserUuid(String userUuid) {
 		this.userUuid = userUuid;
 	}
 

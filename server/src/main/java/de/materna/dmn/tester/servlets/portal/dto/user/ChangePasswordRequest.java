@@ -1,30 +1,28 @@
 package de.materna.dmn.tester.servlets.portal.dto.user;
 
-import java.util.UUID;
-
 public class ChangePasswordRequest {
 
-	private UUID userUuid;
+	private String userUuid;
 	private String passwordNew;
 	private String passwordOld;
 
-	private UUID sessionTokenUuid;
+	private String sessionTokenUuid;
 
 	public ChangePasswordRequest() {
 	}
 
-	public ChangePasswordRequest(UUID userUuid, String passwordNew, String passwordOld, UUID sessionTokenUuid) {
+	public ChangePasswordRequest(String userUuid, String passwordNew, String passwordOld, String sessionTokenUuid) {
 		setUserUuid(userUuid);
 		setPasswordNew(passwordNew);
 		setPasswordOld(passwordOld);
 		setSessionTokenUuid(sessionTokenUuid);
 	}
 
-	public UUID getUserUuid() {
+	public String getUserUuid() {
 		return userUuid;
 	}
 
-	public void setUserUuid(UUID userUuid) {
+	public void setUserUuid(String userUuid) {
 		this.userUuid = userUuid;
 	}
 
@@ -44,11 +42,11 @@ public class ChangePasswordRequest {
 		this.passwordOld = passwordOld;
 	}
 
-	public UUID getSessionTokenUuid() {
+	public String getSessionTokenUuid() {
 		return sessionTokenUuid;
 	}
 
-	public void setSessionTokenUuid(UUID sessionTokenUuid) {
+	public void setSessionTokenUuid(String sessionTokenUuid) {
 		this.sessionTokenUuid = sessionTokenUuid;
 	}
 }

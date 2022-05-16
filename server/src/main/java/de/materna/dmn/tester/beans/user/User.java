@@ -19,7 +19,7 @@ public class User {
 
 	@Id
 	@Column(name = "uuid", unique = true, nullable = false)
-	private UUID uuid;
+	private String uuid;
 	@Column(name = "email", unique = true, nullable = false)
 	@Email(message = "Email address must be valid")
 	@NotEmpty(message = "E-Mail cannot be empty")
@@ -47,7 +47,7 @@ public class User {
 	}
 
 	public User(String email, String userName, String password, String firstname, String lastname) {
-		this.uuid = UUID.randomUUID();
+		this.uuid = UUID.randomUUID().toString();
 		this.registrationDateTime = LocalDateTime.now();
 		this.systemAdmin = false;
 		setEmail(email);
@@ -59,11 +59,11 @@ public class User {
 		setLastname(lastname);
 	}
 
-	public UUID getUuid() {
+	public String getUuid() {
 		return uuid;
 	}
 
-	public void setUuid(UUID uuid) {
+	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
 

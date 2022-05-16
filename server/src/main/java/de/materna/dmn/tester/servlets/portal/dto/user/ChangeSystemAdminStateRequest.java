@@ -1,28 +1,26 @@
 package de.materna.dmn.tester.servlets.portal.dto.user;
 
-import java.util.UUID;
-
 public class ChangeSystemAdminStateRequest {
 
-	private UUID userUuid;
+	private String userUuid;
 	private boolean systemAdmin;
 
-	private UUID sessionTokenUuid;
+	private String sessionTokenUuid;
 
 	public ChangeSystemAdminStateRequest() {
 	}
 
-	public ChangeSystemAdminStateRequest(UUID userUuid, boolean systemAdmin, UUID sessionTokenUuid) {
+	public ChangeSystemAdminStateRequest(String userUuid, boolean systemAdmin, String sessionTokenUuid) {
 		setUserUuid(userUuid);
 		setSystemAdmin(systemAdmin);
 		setSessionTokenUuid(sessionTokenUuid);
 	}
 
-	public UUID getUserUuid() {
+	public String getUserUuid() {
 		return userUuid;
 	}
 
-	public void setUserUuid(UUID userUuid) {
+	public void setUserUuid(String userUuid) {
 		this.userUuid = userUuid;
 	}
 
@@ -34,11 +32,11 @@ public class ChangeSystemAdminStateRequest {
 		this.systemAdmin = systemAdmin;
 	}
 
-	public UUID getSessionTokenUuid() {
+	public String getSessionTokenUuid() {
 		return sessionTokenUuid;
 	}
 
-	public void setSessionTokenUuid(UUID sessionTokenUuid) {
+	public void setSessionTokenUuid(String sessionTokenUuid) {
 		this.sessionTokenUuid = sessionTokenUuid;
 	}
 }
