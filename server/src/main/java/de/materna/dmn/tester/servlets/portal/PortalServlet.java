@@ -2,14 +2,11 @@ package de.materna.dmn.tester.servlets.portal;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.registry.JAXRException;
@@ -25,17 +22,14 @@ import de.materna.dmn.tester.beans.user.UserHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.userpermission.UserPermission;
 import de.materna.dmn.tester.beans.userpermission.UserPermissionGroup;
 import de.materna.dmn.tester.beans.userpermission.UserPermissionHibernateH2RepositoryImpl;
-import de.materna.dmn.tester.beans.util.SendEmail;
 import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.beans.workspace.WorkspaceHibernateH2RepositoryImpl;
-import de.materna.dmn.tester.enums.Constants;
 import de.materna.dmn.tester.enums.UserPermissionType;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
 import de.materna.dmn.tester.interfaces.repositories.UserPermissionRepository;
 import de.materna.dmn.tester.interfaces.repositories.UserRepository;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
-import de.materna.dmn.tester.servlets.exceptions.authorization.EmailNotConfirmedException;
 import de.materna.dmn.tester.servlets.exceptions.authorization.MissingRightsException;
 import de.materna.dmn.tester.servlets.exceptions.database.LaboratoryNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
@@ -98,8 +92,6 @@ public class PortalServlet {
 
 		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
 			userFound.setEmail(changeEmailRequest.getEmail());
-			userFound.setConfirmation(UUID.randomUUID().toString());
-			new SendEmail(userFound).sendConfirmationMail();
 			final User userUpdated = userRepository.put(userFound);
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
 					.build();
@@ -183,26 +175,6 @@ public class PortalServlet {
 		return Response.status(Response.Status.FORBIDDEN).build();
 	}
 
-	@GET
-	@Path("/user/confirmEmail")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response confirmEmail(@QueryParam("email") String email, @QueryParam("hash") String hash) {
-
-		final User userFound = userRepository.findByEmail(email);
-
-		if (userFound == null) {
-			return Response.status(Response.Status.NOT_FOUND).build();
-		}
-
-		if (hash.equals(userFound.getConfirmation())) {
-			userFound.setConfirmation(Constants.EMAIL.CONFIRMED.VALUE);
-			final User userUpdated = userRepository.put(userFound);
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
-					.build();
-		}
-		return Response.status(Response.Status.NOT_MODIFIED).build();
-	}
-
 	@POST
 	@Path("/user/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -258,17 +230,13 @@ public class PortalServlet {
 	@Path("/user/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response login(String body) throws UserNotFoundException, EmailNotConfirmedException {
+	public Response login(String body) throws UserNotFoundException {
 		final LoginRequest loginRequest = (LoginRequest) SerializationHelper.getInstance().toClass(body,
 				LoginRequest.class);
 		final User user = userRepository.findByUsername(loginRequest.getUsername());
 
 		if (user == null) {
 			throw new UserNotFoundException("User not found in database : " + loginRequest.getUsername());
-		}
-
-		if (!Constants.EMAIL.CONFIRMED.VALUE.equals(user.getConfirmation())) {
-			throw new EmailNotConfirmedException("Email address not confirmed yet : " + user.getEmail());
 		}
 
 		if (BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
@@ -331,7 +299,6 @@ public class PortalServlet {
 		}
 
 		final User newUser = userRepository.register(email, username, password);
-		new SendEmail(newUser).sendConfirmationMail();
 		return newUser != null
 				? Response.status(Response.Status.CREATED).entity(SerializationHelper.getInstance().toJSON(newUser))
 						.build()
