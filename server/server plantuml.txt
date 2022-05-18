@@ -1,0 +1,293 @@
+@startuml
+class Laboratory {
+- String uuid
+- String name
+- String description
+- VisabilityType visability
+-- constructors --
++ Laboratory()
++ Laboratory(String name, String description, VisabilityType visability) 
+-- getter & setter --
++ String getUuid()
++ String getName()
++ void setName(String name)
++ String getDescription()
++ void setDescription(String description)
++ VisabilityType getVisability()
++ void setVisability(VisabilityType visability)
+}
+
+interface LaboratoryRepository {
+  List<Laboratory> findAll()
+  Laboratory findByUuid(String laboratoryUuid)
+  List<Laboratory> findByName(String name)
+  List<Laboratory> findByVisability(VisabilityType visability)
+  List<Laboratory> findByUser(String ownerUuid)
+  Laboratory put(Laboratory laboratory)
+  Laboratory create(String name, String description, VisabilityType visability)
+  boolean delete(Laboratory laboratory)
+}
+
+class LaboratoryHibernateH2RepositoryImpl {
+-- overriding --
++ List<Laboratory> findAll()
++ Laboratory findByUuid(String laboratoryUuid)
++ List<Laboratory> findByName(String name)
++ List<Laboratory> findByVisability(VisabilityType visability)
++ List<Laboratory> findByUser(String ownerUuid)
++ Laboratory put(Laboratory laboratory)
++ Laboratory create(String name, String description, VisabilityType visability)
++ boolean delete(Laboratory laboratory)
+-- additional --
++ List<Laboratory> findByFilter(LaboratoryFilter... filterArray)
+}
+
+class SessionToken {
+- String uuid;
+- String userUuid;
+- LocalDate initiation;
+- LocalDate expiration;
+- LocalDate lastUpdate;
+-- constructors --
++ SessionToken() {
++ SessionToken(User user) {
++ SessionToken(String userUuid) {
+-- getter & setter --
++ String getUuid() {
++ String getUserUuid() {
++ void setUserUuid(String userUuid) {
++ LocalDate getInitiation() {
++ void setInitiation(LocalDate initiation) {
++ LocalDate getExpiration() {
++ void setExpiration(LocalDate expiration) {
++ LocalDate getLastUpdate() {
++ void setLastUpdate(LocalDate lastUpdate)
+}
+
+interface SessionTokenRepository {
+  List<SessionToken> findAll()
+  List<SessionToken> findAllByUserUuid(String userUuid)
+  SessionToken findByUuid(String tokenUuid)
+  SessionToken findCurrentByUser(User user)
+  SessionToken findCurrentByUserUuid(String userUuid)
+  SessionToken put(SessionToken token)
+  SessionToken update(SessionToken token) throws JAXRException
+  boolean delete(SessionToken token)
+}
+
+class SessionTokenHibernateH2RepositoryImpl {
+-- overriding --
++ List<SessionToken> findAll()
++ List<SessionToken> findAllByUserUuid(String userUuid)
++ SessionToken findByUuid(String tokenUuid)
++ SessionToken findCurrentByUser(User user)
++ SessionToken findCurrentByUserUuid(String userUuid)
++ SessionToken put(SessionToken token)
++ SessionToken update(SessionToken token) throws JAXRException
++ boolean delete(SessionToken token)
+-- additional --
++ List<SessionToken> findByFilter(SessionTokenFilter... filterArray)
+}
+
+class User {
+- String uuid
+- String email;
+- String username;
+- String firstname;
+- String lastname;
+- String password;
+- String salt;
+- LocalDateTime registrationDateTime;
+- boolean systemAdmin;
+-- constructors --
++ User()
++ User(String email, String userName, String password, String firstname, String lastname)
+-- getter & setter --
++ String getUuid()
++ void setUuid(String uuid)
++ String getEmail()
++ void setEmail(String email)
++ String getUsername()
++ void setUsername(String username)
++ String getFirstname()
++ void setFirstname(String firstname)
++ String getLastname()
++ void setLastname(String lastname)
++ String getPassword()
++ void setPassword(String password)
++ String getSalt()
++ void setSalt(String salt)
++ LocalDateTime getRegistrationDateTime()
++ void setRegistrationDateTime(LocalDateTime registrationDateTime)
++ boolean isSystemAdmin()
++ void setSystemAdmin(boolean systemAdmin)
+}
+
+interface UserRepository {
+  List<User> findAll()
+  User findByUuid(String userUuid)
+  User findByEmail(String email)
+  User findByUsername(String username)
+  User findBySessionToken(String tokenUuid)
+  User put(User user)
+  boolean delete(User user)
+  User register(String email, String username, String password)
+  User register(String email, String username, String password, String lastname, String firstname)
+}
+
+class UserHibernateH2RepositoryImpl {
+-- overriding --
++ List<User> findAll()
++ User findByUuid(String userUuid)
++ User findByEmail(String email)
++ User findByUsername(String username)
++ User findBySessionToken(String tokenUuid)
++ User put(User user)
++ boolean delete(User user)
++ User register(String email, String username, String password)
++ User register(String email, String username, String password, String lastname, String firstname)
+-- additional --
++ List<User> findByFilter(UserFilter... filterArray)
+}
+
+class UserPermission {
+- Long id;
+- String user;
+- String laboratory;
+- String workspace;
+- UserPermissionType type;
+-- constructors --
++ UserPermission()
+-- getter & setter --
++ Long getId()
++ String getUser()
++ void setUser(String user)
++ String getLaboratory()
++ void setLaboratory(String laboratory)
++ String getWorkspace()
++ void setWorkspace(String workspace)
++ UserPermissionType getType()
++ void setType(UserPermissionType type)
+}
+
+interface UserPermissionRepository {
+  List<UserPermission> findAll()
+  UserPermission findByUuid(Long id)
+  List<UserPermission> findByUser(String ownerUuid)
+  List<UserPermission> findByLaboratory(String laboratoryUuid)
+  List<UserPermission> findByWorkspace(String workspaceUuid)
+  List<UserPermission> findByType(UserPermissionType type)
+  UserPermission findByUserAndLaboratory(String userUuid, String laboratoryUuid)
+  UserPermission findByUserAndWorkspace(String userUuid, String workspaceUuid)
+  UserPermission findByLaboratoryAndWorkspace(String laboratoryUuid, String workspaceUuid)
+  void put(UserPermission relationship)
+  void delete(UserPermission relationship)
+}
+
+class UserPermissionHibernateH2RepositoryImpl {
+-- overriding --
++ List<UserPermission> findAll()
++ UserPermission findByUuid(Long id)
++ List<UserPermission> findByUser(String ownerUuid)
++ List<UserPermission> findByLaboratory(String laboratoryUuid)
++ List<UserPermission> findByWorkspace(String workspaceUuid)
++ List<UserPermission> findByType(UserPermissionType type)
++ UserPermission findByUserAndLaboratory(String userUuid, String laboratoryUuid)
++ UserPermission findByUserAndWorkspace(String userUuid, String workspaceUuid)
++ UserPermission findByLaboratoryAndWorkspace(String laboratoryUuid, String workspaceUuid)
++ void put(UserPermission relationship)
++ void delete(UserPermission relationship)
+-- additional --
++ List<UserPermission> findByFilter(UserPermissionFilter... filterArray)
+}
+
+enum UserPermissionType {
+  OWNER
+  ADMINISTRATOR
+  CONTRIBUTOR
+  GUEST
+}
+
+class UserPermissionGroup {
++ {static} UserPermissionType[] OWNER
++ {static} UserPermissionType[] ADMINISTRATOR
++ {static} UserPermissionType[] CONTRIBUTOR
++ {static} UserPermissionType[] GUEST
+-- constructors --
++ UserPermissionGroup()
+}
+
+enum VisabilityType {
+  PUBLIC
+  PROTECTED
+  PRIVATE
+}
+
+class Workspace {
+- String uuid
+- String name
+- String description
+- VisabilityType visability
+- String laboratoryUuid
+-- constructors --
++ Workspace()
++ Workspace(String name, String description, VisabilityType visability, String laboratoryUuid) 
+-- getter & setter --
++ String getUuid()
++ String getName()
++ void setName(String name)
++ String getDescription()
++ void setDescription(String description)
++ VisabilityType getVisability()
++ void setVisability(VisabilityType visability)
++ String getLaboratoryUuid()
++ void setLaboratoryUuid(String laboratoryUuid)
+}
+
+interface WorkspaceRepository {
+  List<Workspace> findAll()
+  Workspace findByUuid(String workspaceUuid)
+  List<Workspace> findByName(String name)
+  List<Workspace> findByVisability(VisabilityType visability)
+  List<Workspace> findByUser(String ownerUuid)
+  List<Workspace> findByLaboratory(String laboratoryUuid)
+  Workspace put(Workspace workspace)
+  Workspace create(String name, String description, VisabilityType visability, String laboratoryUuid)
+  boolean delete(Workspace workspace)
+}
+
+class WorkspaceHibernateH2RepositoryImpl {
+-- overriding --
++ List<Workspace> findAll()
++ Workspace findByUuid(String workspaceUuid)
++ List<Workspace> findByName(String name)
++ List<Workspace> findByVisability(VisabilityType visability)
++ List<Workspace> findByUser(String ownerUuid)
++ List<Workspace> findByLaboratory(String laboratoryUuid)
++ Workspace put(Workspace workspace)
++ Workspace create(String name, String description, VisabilityType visability, String laboratoryUuid)
++ boolean delete(Workspace workspace)
+-- additional --
++ List<Workspace> findByFilter(WorkspaceFilter... filterArray)
+}
+
+LaboratoryRepository --> Laboratory : persists
+LaboratoryRepository <|.. LaboratoryHibernateH2RepositoryImpl : implements
+SessionTokenRepository --> SessionToken : persists
+SessionTokenRepository <|.. SessionTokenHibernateH2RepositoryImpl : implements
+UserRepository --> User : persists
+UserRepository <|.. UserHibernateH2RepositoryImpl : implements
+User --> UserPermission : has level
+User --> SessionToken : recieves
+UserPermission --> Laboratory : gives rights
+UserPermission --> Workspace : gives rights
+UserPermissionRepository --> UserPermission : persists
+UserPermissionRepository <|.. UserPermissionHibernateH2RepositoryImpl : implements
+UserPermissionType --> UserPermission : types
+UserPermissionGroup --> UserPermissionType : concentraits
+Workspace --> Laboratory : is part of
+WorkspaceRepository --> Workspace : persists
+WorkspaceRepository <|.. WorkspaceHibernateH2RepositoryImpl : implements
+VisabilityType --> Laboratory : influences visability
+VisabilityType --> Workspace : influences visability
+@enduml
