@@ -63,21 +63,6 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 		return tokens.get(0);
 	}
 
-	public List<SessionToken> findByFilter(SessionTokenFilter... filterArray) {
-		final CriteriaBuilder cbuilder = em.getCriteriaBuilder();
-		final CriteriaQuery<SessionToken> cquery = cbuilder.createQuery(SessionToken.class);
-		final Root<SessionToken> tokenRoot = cquery.from(SessionToken.class);
-		cquery.select(tokenRoot);
-		final List<Predicate> predicates = new ArrayList<>();
-		for (final SessionTokenFilter filter : filterArray) {
-			predicates.add(filter.toPredicate(tokenRoot, cquery, cbuilder));
-		}
-		cquery.where(predicates.toArray(new Predicate[predicates.size()]));
-
-		final TypedQuery<SessionToken> query = em.createQuery(cquery);
-		return query.getResultList();
-	}
-
 	@Override
 	public SessionToken put(SessionToken token) {
 		transaction.begin();
@@ -101,5 +86,20 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 		em.remove(em.contains(sessionToken) ? sessionToken : em.merge(sessionToken));
 		transaction.commit();
 		return findByUuid(sessionToken.getUuid()) == null;
+	}
+
+	public List<SessionToken> findByFilter(SessionTokenFilter... filterArray) {
+		final CriteriaBuilder cbuilder = em.getCriteriaBuilder();
+		final CriteriaQuery<SessionToken> cquery = cbuilder.createQuery(SessionToken.class);
+		final Root<SessionToken> tokenRoot = cquery.from(SessionToken.class);
+		cquery.select(tokenRoot);
+		final List<Predicate> predicates = new ArrayList<>();
+		for (final SessionTokenFilter filter : filterArray) {
+			predicates.add(filter.toPredicate(tokenRoot, cquery, cbuilder));
+		}
+		cquery.where(predicates.toArray(new Predicate[predicates.size()]));
+
+		final TypedQuery<SessionToken> query = em.createQuery(cquery);
+		return query.getResultList();
 	}
 }
