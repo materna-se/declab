@@ -33,16 +33,16 @@
 				</div>
 				<div class="card card-borderless mb-2">
 					<div class="card-body p-0" style="overflow-x: auto">
-						<json-builder :template="model.input.template" :fixed="true" :convert-after="false" @update:value="model.input.value = $event; executeModel();" class="input-builder"/>
+						<json-builder :template="model.input.template" :fixed="true" :convert-after="false" @update:value="model.input.value = $event; executeModelLoading = true; debouncedExecuteModel();" class="input-builder"/>
 					</div>
 				</div>
 				<div class="card card-borderless mb-2">
 					<div class="card-body p-0" style="overflow-x: auto">
-						<json-builder :template="model.decisions.template" :fixed="true" :convert-after="false" @update:value="model.decisions.value = $event; executeModel();" class="decision-builder"/>
+						<json-builder :template="model.decisions.template" :fixed="true" :convert-after="false" @update:value="model.decisions.value = $event; executeModelLoading = true; debouncedExecuteModel();" class="decision-builder"/>
 					</div>
 				</div>
 			</div>
-			<div class="mb-4" v-if="mode !== 1" style="flex: 1">
+			<div class="output-context mb-4" v-if="mode !== 1" style="flex: 1" v-bind:class="{'output-context-loading': executeModelLoading}">
 				<h4 class="mb-2">Output Context</h4>
 				<div class="row mb-2" v-if="alert.message !== null">
 					<div class="col-12">
@@ -118,6 +118,7 @@
 	import JSONBuilder from "../../components/json/json-builder.vue";
 	import AccessLogComponent from "../../components/dmn/access-log.vue";
 	import base64 from "base-64";
+	import {throttle} from "lodash";
 
 	export default {
 		head() {
@@ -173,11 +174,17 @@
 				// 1: Input
 				// 2: Output
 				mode: 0,
-				worker: null
+				worker: null,
+
+				debouncedExecuteModel: () => {
+				},
+				executeModelLoading: false,
 			}
 		},
 		async mounted() {
 			const vue = this;
+
+			this.debouncedExecuteModel = throttle(this.executeModel, 1000);
 
 			await this.getModelInputs();
 			await this.getInputs();
@@ -259,6 +266,9 @@
 				}
 				catch (e) {
 					this.displayAlert("The output could not be calculated.", "danger");
+				}
+				finally {
+					this.executeModelLoading = false;
 				}
 			},
 
@@ -388,5 +398,13 @@
 
 	.input-disabled {
 		opacity: 0.6;
+	}
+
+	.output-context {
+		transition: opacity .15s;
+	}
+
+	.output-context-loading {
+		opacity: 0.5;
 	}
 </style>
