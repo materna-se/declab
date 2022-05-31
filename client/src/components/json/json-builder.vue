@@ -11,16 +11,20 @@
 
 <style>
 	.input-builder table tr td:nth-child(1) span {
-		background: #c6ddfd;
+		background: #aaceff;
+		border-color: #95b7e9;
 	}
 	.input-builder table table tr td:nth-child(1) span {
-		background: #e7ebee;
+		background: #f3f3f3;
+		border-color: #dadfe5;
 	}
 	.decision-builder table tr td:nth-child(1) span {
-		background: #fcf0a5;
+		background: #fdee8e;
+		border-color: #ead38f;
 	}
 	.decision-builder table table tr td:nth-child(1) span {
-		background: #e7ebee;
+		background: #f3f3f3;
+		border-color: #dadfe5;
 	}
 
 	.json-builder tr td:nth-child(1) span {
