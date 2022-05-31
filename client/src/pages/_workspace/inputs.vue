@@ -13,73 +13,69 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-3 mb-4">
-				<div class="row mb-2">
-					<div class="col-12">
-						<button class="btn btn-block btn-outline-primary mb-2" @click="order = !order; getInputs()">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
-								<path d="M9.25 5l3.25-3.25L15.75 5h-6.5m-.36 9.3H6L5.28 17H2.91L6 7h3l3.13 10H9.67l-.78-2.7m-2.56-1.62h2.23l-.63-2.12-.26-.97-.25-.96h-.03l-.22.97-.24.98-.6 2.1M13.05 17v-1.26l4.75-6.77v-.06h-4.3V7h7.23v1.34L16.09 15v.08h4.71V17h-7.75z" fill="currentColor" v-if="order"/>
-								<path d="M15.75 19l-3.25 3.25L9.25 19h6.5m-6.86-4.7H6L5.28 17H2.91L6 7h3l3.13 10H9.67l-.78-2.7m-2.56-1.62h2.23l-.63-2.12-.26-.97-.25-.96h-.03l-.22.97-.24.98-.6 2.1M13.05 17v-1.26l4.75-6.77v-.06h-4.3V7h7.23v1.34L16.09 15v.08h4.71V17h-7.75z" fill="currentColor" v-else/>
-							</svg>
-						</button>
-					</div>
-				</div>
-				<div class="list-group">
-					<template v-if="Object.keys(inputs).length !== 0">
-						<div class="list-group-item list-group-item-action c-pointer" v-for="(input, uuid) in inputs" :key="uuid" @click.self="setViewMode(uuid)">
-							<span class="d-block float-start me-4" @click="setViewMode(uuid)">{{input.name}}</span>
-							<div class="float-end">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start me-2" @click="setEditMode(uuid)">
+			<div class="d-flex">
+				<div class="mb-4 me-4" style="width: 25%; min-width: 25%;">
+					<button class="btn btn-block btn-outline-primary mb-2" @click="order = !order; getInputs()">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
+							<path d="M9.25 5l3.25-3.25L15.75 5h-6.5m-.36 9.3H6L5.28 17H2.91L6 7h3l3.13 10H9.67l-.78-2.7m-2.56-1.62h2.23l-.63-2.12-.26-.97-.25-.96h-.03l-.22.97-.24.98-.6 2.1M13.05 17v-1.26l4.75-6.77v-.06h-4.3V7h7.23v1.34L16.09 15v.08h4.71V17h-7.75z" fill="currentColor" v-if="order"/>
+							<path d="M15.75 19l-3.25 3.25L9.25 19h6.5m-6.86-4.7H6L5.28 17H2.91L6 7h3l3.13 10H9.67l-.78-2.7m-2.56-1.62h2.23l-.63-2.12-.26-.97-.25-.96h-.03l-.22.97-.24.98-.6 2.1M13.05 17v-1.26l4.75-6.77v-.06h-4.3V7h7.23v1.34L16.09 15v.08h4.71V17h-7.75z" fill="currentColor" v-else/>
+						</svg>
+					</button>
+					<div class="list-group">
+						<template v-if="Object.keys(inputs).length !== 0">
+							<div class="list-group-item list-group-item-action c-pointer d-flex align-items-center" v-for="(input, uuid) in inputs" :key="uuid" @click.self="setViewMode(uuid)">
+								<span class="me-auto" @click="setViewMode(uuid)"><b>{{input.name}}</b></span>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="ms-4 me-2" @click="setEditMode(uuid)">
 									<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
 								</svg>
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start me-2" @click="setDuplicateMode(uuid)">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="me-2" @click="setDuplicateMode(uuid)">
 									<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"/>
 								</svg>
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start" @click="deleteInput(uuid)">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" @click="deleteInput(uuid)">
 									<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 								</svg>
 							</div>
+						</template>
+						<div class="list-group-item" v-else>
+							<empty-collection/>
 						</div>
-					</template>
-					<div class="list-group-item" v-else>
-						<empty-collection/>
 					</div>
 				</div>
-			</div>
-			<div class="col-9 mb-4">
-				<div class="card" v-if="mode === 'VIEW'">
-					<div class="card-header">
-						<h4 class="mb-0">{{input.name}}</h4>
+				<div class="flex-grow-1 mb-4">
+					<div class="card card-sticky" v-if="mode === 'VIEW'">
+						<div class="card-header">
+							<h4 class="mb-0">{{input.name}}</h4>
+						</div>
+						<div class="card-body">
+							<div v-if="input.parent !== null">
+								<h5 class="mb-2">Parent</h5>
+								<p class="mb-4">{{inputs[input.parent].name}}</p>
+							</div>
+
+							<h5 class="mb-2">Input</h5>
+							<json-builder v-if="input.parent === null" :template="input.value" :convert="true" :fixed="true" :fixed-values="true"/>
+							<json-builder v-else :template="input.enrichedValue" :convert="true" :fixed="true" :fixed-values="true"/>
+						</div>
 					</div>
-					<div class="card-body">
-						<div v-if="input.parent !== null">
+					<div class="card" v-if="mode === 'ADD' || mode === 'EDIT'">
+						<div class="card-body">
+							<h5 class="mb-2">Name</h5>
+							<input class="form-control mb-4" v-model="input.name">
+
 							<h5 class="mb-2">Parent</h5>
-							<p class="mb-4">{{inputs[input.parent].name}}</p>
+							<select class="form-control mb-4" :value="input.parent" @change="setParent($event.target.value)">
+								<option value="" selected/>
+								<option v-for="(input, uuid) in inputs" :key="uuid" :value="uuid">{{input.name}}</option>
+							</select>
+
+							<h5 class="mb-2">Input</h5>
+							<json-builder :template="input.template" :fixed-root="true" @update:value="input.value = $event"/>
+
+							<hr>
+
+							<button class="btn btn-block btn-outline-primary" v-if="mode === 'ADD'" @click="addInput">Save Input</button>
+							<button class="btn btn-block btn-outline-primary" v-if="mode === 'EDIT'" @click="editInput">Save Input</button>
 						</div>
-
-						<h5 class="mb-2">Input</h5>
-						<json-builder v-if="input.parent === null" :template="input.value" :convert="true" :fixed="true" :fixed-values="true"/>
-						<json-builder v-else :template="input.enrichedValue" :convert="true" :fixed="true" :fixed-values="true"/>
-					</div>
-				</div>
-				<div class="card" v-if="mode === 'ADD' || mode === 'EDIT'">
-					<div class="card-body">
-						<h5 class="mb-2">Name</h5>
-						<input class="form-control mb-4" v-model="input.name">
-
-						<h5 class="mb-2">Parent</h5>
-						<select class="form-control mb-4" :value="input.parent" @change="setParent($event.target.value)">
-							<option value="" selected/>
-							<option v-for="(input, uuid) in inputs" :key="uuid" :value="uuid">{{input.name}}</option>
-						</select>
-
-						<h5 class="mb-2">Input</h5>
-						<json-builder :template="input.template" :fixed-root="true" @update:value="input.value = $event"/>
-
-						<hr>
-
-						<button class="btn btn-block btn-outline-primary" v-if="mode === 'ADD'" @click="addInput">Save Input</button>
-						<button class="btn btn-block btn-outline-primary" v-if="mode === 'EDIT'" @click="editInput">Save Input</button>
 					</div>
 				</div>
 			</div>
@@ -231,7 +227,7 @@
 			// Helper
 			//
 			async setParent(parent) {
-				if(parent === "") {
+				if (parent === "") {
 					parent = null;
 				}
 
