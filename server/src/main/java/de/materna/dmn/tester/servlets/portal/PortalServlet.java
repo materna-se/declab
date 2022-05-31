@@ -507,7 +507,7 @@ public class PortalServlet {
 	}
 
 	@POST
-	@Path("/laboratory/read")
+	@Path("/workspace/read")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response readWorkspace(String body) throws SessionTokenNotFoundException, MissingRightsException {
