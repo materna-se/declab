@@ -26,7 +26,7 @@ export default async function () {
 			link: [
 				{
 					rel: 'stylesheet',
-					href: 'https://fonts.googleapis.com/css?family=PT+Sans:400,700|Source+Code+Pro:400'
+					href: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600|Source+Code+Pro:400'
 				},
 				{
 					rel: 'icon',
@@ -85,8 +85,14 @@ async function getDeveloperInformation() {
 	const droolsVersion = jDECPOM.dependencies.dependency.find((dependency) => {
 		return dependency.artifactId === "kie-dmn-core";
 	}).version;
+	const camundaVersion = jDECPOM.dependencies.dependency.find((dependency) => {
+		return dependency.artifactId === "dmn-engine";
+	}).version;
+	const jDMNVersion = jDECPOM.dependencies.dependency.find((dependency) => {
+		return dependency.artifactId === "jdmn-core";
+	}).version;
 
 	return "Build Time: " + new Date().toISOString().split("Z")[0].split("T").join(", ") + "<br>" +
 		"Build Environment: " + process.env.NODE_ENV + "<br>" +
-		"Dependencies: jDEC " + jDECVersion + ", Drools " + droolsVersion;
+		"Dependencies:<br>&nbsp;&nbsp;jDEC " + jDECVersion + ", Drools " + droolsVersion + ",<br>&nbsp;&nbsp;Camunda " + camundaVersion + ", jDMN " + jDMNVersion;
 }
