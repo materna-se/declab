@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [2.8.0](https://github.com/materna-se/declab/compare/2.7.0...2.8.0) - 2022
+## [2.8.0](https://github.com/materna-se/declab/compare/2.7.0...2.8.0) - 2022-03-04
 
 
 ### Added
