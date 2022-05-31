@@ -164,7 +164,7 @@ public class WorkspaceServlet {
 				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).forEach(path -> {
 					try {
 						String relativePath = getRelativePath(path, workspaceUUID);
-						if(relativePath == null) {
+						if (relativePath == null) {
 							return;
 						}
 
@@ -233,7 +233,7 @@ public class WorkspaceServlet {
 
 					// If the directory for the entity does not exist yet, it will be created.
 					java.nio.file.Path entityPath = rootPath.resolve(zipEntry.getName());
-					if(zipEntry.isDirectory()) {
+					if (zipEntry.isDirectory()) {
 						Files.createDirectories(entityPath);
 						continue;
 					}
@@ -277,10 +277,8 @@ public class WorkspaceServlet {
 			return null;
 		}
 
-		System.out.println("getRelativePath: pathName " + pathName);
 		String parentPathName = path.getParent().getFileName().toString();
-		System.out.println("getRelativePath: parentPathName " + parentPathName);
-		// We've reached the destination, we can return the path.
+		// We've reached the destination and can return the path.
 		if (parentPathName.equals(workspaceName)) {
 			return pathName;
 		}
