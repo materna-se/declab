@@ -24,8 +24,7 @@
 						</div>
 						<div class="card-body">
 							<div class="input-group">
-								<label class="custom-file-label" for="file">Select DMN backup...</label>
-								<input accept=".dtar" class="custom-file-input" id="file" name="file" type="file" @change="importWorkspace">
+								<input id="file" name="file" type="file" class="form-control" @change="importWorkspace">
 							</div>
 						</div>
 					</div>
