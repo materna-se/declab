@@ -7,7 +7,7 @@
 		<input placeholder="Enter description..." class="form-control mb-4" v-model="value.description">
 
 		<h5 class="mb-2">Protection</h5>
-		<div class="d-flex">
+		<div class="d-flex mb-4">
 			<div class="btn-group me-2" role="group" aria-label="Enter protection...">
 				<button type="button" class="btn" aria-label="Public: Anonymous users can create, read, update and delete entities inside this workspace." v-bind:class="[value.access === 'PUBLIC' ? 'btn-primary' : 'btn-outline-primary']" v-on:click="value.access = 'PUBLIC'" v-tooltip="{content: '<b>Public:</b> Anonymous users can create, read, update and delete entities inside this workspace.'}">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">

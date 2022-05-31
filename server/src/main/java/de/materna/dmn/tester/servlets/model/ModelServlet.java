@@ -51,6 +51,22 @@ public class ModelServlet {
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(models)).build();
 	}
 
+	@GET
+	@Path("/documentation")
+	@ReadAccess
+	@Produces("application/json")
+	public Response getModelDocumentation(@PathParam("workspace") String workspaceUUID) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+
+		List<de.materna.dmn.tester.servlets.model.entities.ModelDocumentation> documentations = new ArrayList<>();
+		for (DMNModel model : workspace.getDecisionSession().getDMNDecisionSession().getRuntime().getModels()) {
+			documentations.add(new de.materna.dmn.tester.servlets.model.entities.ModelDocumentation(model));
+		}
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(documentations)).build();
+	}
+
+
 	@PUT
 	@WriteAccess
 	@Consumes("application/json")
