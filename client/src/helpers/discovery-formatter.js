@@ -7,6 +7,20 @@ export default {
         this.rec(root, options, 0, this.table);
     },
 
+    /**
+     * This code will recursively extract a 1- or 2-dimensional slice (i.e. a table) 
+     * from the discovery tree. It will take into account which selectors have been
+     * pinned and navigate the tree such that the correctly-valued node for pinned
+     * selectors is always chosen.
+     * 
+     * It doesn't directly return the results, instead it populates the variables table,
+     * rowHeaders and columnHeaders.
+     * @param {*} root      The root of the (sub-)tree
+     * @param {*} options   Configured options from discoverer.vue, such as pinned selectors
+     * @param {*} depth     The depth that this recursive algorithm has reached
+     * @param {*} tableCell The cell of the table that this instance of the algorithm will 
+     *                      place its result in
+     */
     rec(root, options, depth, tableCell) {
         // Reset globals
         if (depth == 0) {
@@ -19,14 +33,7 @@ export default {
 
         // Have we reached a leaf?
         if (root.subtree === undefined) {
-            // Is this selector pinned?
-            const leaf_selector = options.inputs[depth-1].selector;
-
-            if (leaf_selector in options.pinnedSelectors && options.pinnedSelectors[leaf_selector] !== null) {
-                tableCell.push(root.output);
-            } else {
-                    tableCell.push(root.output);
-            }
+            tableCell.push(root.output);
             return;
         }
 
