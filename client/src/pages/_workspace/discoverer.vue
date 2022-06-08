@@ -71,7 +71,7 @@
 				</button>
 
 				<h5 class="mb-2">Discovery</h5>
-				<button class="btn btn-block btn-outline-secondary mb-4" :disabled="inputTemplateSelected === null" v-if="!running" v-on:click="startDiscovery()">
+				<button class="btn btn-block btn-outline-secondary mb-4" :disabled="inputTemplateSelected === null || options.inputs.length == 0" v-if="!running" v-on:click="startDiscovery()">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M8,5.14V19.14L19,12.14L8,5.14Z" fill="currentColor"/>
 					</svg>
@@ -421,17 +421,16 @@
 					}
 				}
 
+				// Abort if discovery state is invalid
+				if (!this.isDiscoveryInValidState()) {
+					return;
+				}
 
 				let table = document.getElementById("discovery-table");
 
 				// Remove old table contents
 				while (table.hasChildNodes()) {
 					table.removeChild(table.lastChild);
-				}
-
-				// Abort if discovery state is invalid
-				if (!this.isDiscoveryInValidState()) {
-					return;
 				}
 
 				// Create table headers
@@ -626,6 +625,10 @@
 
 			resetDiscoveryTable() {
 				let table = document.getElementById("discovery-table");
+
+				if (table === null || table === undefined) {
+					return;
+				}
 
 				// Remove old table contents
 				while (table.hasChildNodes()) {
