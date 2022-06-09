@@ -9,12 +9,12 @@
 				</select>
 
 				<h5 class="mb-2">Input Selectors</h5>
-				<div class="list-group mb-2">
+				<div class="list-group">
 					<template v-if="options.inputs.length !== 0">
 
-						<div class="list-group-item" v-for="(inputOption, index) in options.inputs">
+						<div class="list-group-item mb-2" v-for="(inputOption, index) in options.inputs">
 							<div class="row mx-0 mb-2 flex-row">
-								<button class="btn btn-outline-primary" v-on:click="toggleInputExpanded(index)">
+								<button class="btn btn-outline-primary" style="flex: 0" v-on:click="toggleInputExpanded(index)">
 									<svg v-if="!options.inputs[index]['expanded']" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start">
 										<path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" fill="currentColor"/>
 									</svg>
@@ -23,7 +23,7 @@
 									</svg>
 								</button>
 								<input class="form-control mb-0 me-2 ms-2" placeholder="Enter JSONPath..." style="flex: 1" v-model="options.inputs[index]['selector']">
-								<button class="btn btn-outline-primary" v-on:click="removeInput(index)">
+								<button class="btn btn-outline-primary" style="flex: 0" v-on:click="removeInput(index)">
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start">
 										<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 									</svg>
@@ -78,7 +78,7 @@
 				</button>
 				<button class="btn btn-block btn-outline-primary mb-4" :disabled="inputTemplateSelected === null" v-else v-on:click="stopDiscovery()">
 					<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-						<path fill="currentColor" d="M18,18H6V6H18V18Z" />
+						<path fill="currentColor" d="M18,18H6V6H18V18Z"/>
 					</svg>
 				</button>
 			</div>
@@ -119,24 +119,24 @@
 							{{alertMessage}}
 						</div>
 
-						<div class="row mx-0 mb-2 flex-row"  v-if="isDiscoveryInValidState()">
+						<div class="row mx-0 mb-2 flex-row" v-if="isDiscoveryInValidState()">
 							<button class="btn btn-block btn-outline-primary mr-4 mb-4" style="flex: 1" v-on:click="refreshDiscoveryTable()">
 								Refresh
 								<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-									<path fill="currentColor" d="M2 12C2 16.97 6.03 21 11 21C13.39 21 15.68 20.06 17.4 18.4L15.9 16.9C14.63 18.25 12.86 19 11 19C4.76 19 1.64 11.46 6.05 7.05C10.46 2.64 18 5.77 18 12H15L19 16H19.1L23 12H20C20 7.03 15.97 3 11 3C6.03 3 2 7.03 2 12Z" />
+									<path fill="currentColor" d="M2 12C2 16.97 6.03 21 11 21C13.39 21 15.68 20.06 17.4 18.4L15.9 16.9C14.63 18.25 12.86 19 11 19C4.76 19 1.64 11.46 6.05 7.05C10.46 2.64 18 5.77 18 12H15L19 16H19.1L23 12H20C20 7.03 15.97 3 11 3C6.03 3 2 7.03 2 12Z"/>
 								</svg>
 							</button>
 							<button class="btn btn-outline-primary ml-4 mb-4" v-on:click="toggleForceCleanTableCells(); refreshDiscoveryTable()" title="If table output cells contain a single key-value pair, this button toggles whether or not the output text is displayed in the cells.">
 								<div v-if="options.forceCleanTableCells">
 									Clean
 									<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-										<path fill="currentColor" d="M20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20M4,6V18H20V6H4Z" />
+										<path fill="currentColor" d="M20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20M4,6V18H20V6H4Z"/>
 									</svg>
 								</div>
 								<div v-else>
 									Verbose
 									<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-										<path fill="currentColor" d="M20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20M4,6V18H20V6H4M6,9H18V11H6V9M6,13H16V15H6V13Z" />
+										<path fill="currentColor" d="M20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20M4,6V18H20V6H4M6,9H18V11H6V9M6,13H16V15H6V13Z"/>
 									</svg>
 								</div>
 							</button>
@@ -165,14 +165,12 @@
 
 <script>
 	import Network from "../../helpers/network";
-	import AlertHelper from "../../components/alert/alert-helper";
 	import JSONPath from "jsonpath";
 	import LiteralExpression from "../../components/dmn/literal-expression.vue";
 	import JSONBuilder from "../../components/json/json-builder.vue";
 	import {Leaf, Node} from "../../helpers/discovery"
 	import EmptyCollectionComponent from "../../components/empty-collection.vue";
 	import Colors from "../../helpers/colors";
-	import isEqual from "lodash/isEqual"
 	import DiscoveryFormatter from "../../helpers/discovery-formatter.js"
 
 	import Vue from 'vue';
@@ -197,7 +195,7 @@
 				pinnedSelectors: {
 					deep: true,
 
-					handler(n,o) {
+					handler(n, o) {
 						this.refreshDiscoveryTable();
 					}
 				}
@@ -221,8 +219,7 @@
 
 				options: {
 					// Input selectors and expressions
-					inputs: [
-					],
+					inputs: [],
 
 					// Input selector cache
 					inputExpressions: {},
@@ -234,8 +231,7 @@
 					outputs: [],
 
 					// Input selector values for visualization
-					pinnedSelectors: {
-					},
+					pinnedSelectors: {},
 
 					discoveryTableAxes: {
 						"x": null,
@@ -287,7 +283,8 @@
 
 				if (this.cancelled) {
 					this.resetDiscovery();
-				} else {
+				}
+				else {
 					this.drawDiscovery();
 				}
 			},
@@ -403,7 +400,8 @@
 					}
 
 					rows.push(row);
-				} else {
+				}
+				else {
 					for (const i of tableData) {
 						let row = [];
 
@@ -493,7 +491,8 @@
 							headerText = document.createTextNode(rowHeader[0] + " - " + rowHeader[rowHeader.length - 1]);
 							headerCell.title = rowHeaderJson;
 						}
-					} else {
+					}
+					else {
 						headerText = document.createTextNode(rowHeader);
 					}
 
@@ -582,7 +581,8 @@
 				if (inputOption.pinned) {
 					this.options.pinnedSelectors[inputOption.selector] = inputOption.values[0];
 					Vue.set(this.options.pinnedSelectors, inputOption.selector, inputOption.values[0]);
-				} else {
+				}
+				else {
 					this.options.pinnedSelectors[inputOption.selector] = null;
 					Vue.set(this.options.pinnedSelectors, inputOption.selector, null);
 				}
@@ -593,7 +593,7 @@
 			getUnpinnedSelectors() {
 				var matches = [];
 
-				this.options.inputs.forEach(function(e) {
+				this.options.inputs.forEach(function (e) {
 					if (e["pinned"] !== true) {
 						matches.push(e);
 					}
@@ -665,6 +665,7 @@
 
 				// How many selectors are not pinned?
 				var unpinnedSelectors = this.getUnpinnedSelectors();
+				console.info(unpinnedSelectors);
 
 				if (unpinnedSelectors.length < 1 || unpinnedSelectors.length > 2) {
 					this.setAlertMessage("There must be either 1 or 2 unpinned selectors. There are currently " + unpinnedSelectors.length + ".")
