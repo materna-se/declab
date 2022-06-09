@@ -31,7 +31,8 @@
 		"vue-infinite-loading": "^2.4.5",
 		"vue-router": "^3.5.2",
 		"vuedraggable": "^2.24.3",
-		"xlsx": "^0.17.3"
+		"xlsx": "^0.17.3",
+		"xss": "^1.0.11"
 	},
 	"devDependencies": {
 		"node-fetch": "^2.6.7",
