@@ -17,7 +17,7 @@ export default (context) => {
 			}
 			else {
 				(async () => {
-					vue.store.commit("setName", (await Network.getWorkspace()).name);
+					vue.store.commit("setName", (await Network.getPublicWorkspace()).name);
 				})();
 			}
 

@@ -112,4 +112,8 @@
       font-weight: bold;
     }
   }
+
+  mark, .mark {
+    color: inherit;
+  }
 </style>

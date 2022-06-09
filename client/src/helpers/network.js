@@ -76,6 +76,11 @@ export default {
 		return await response.json();
 	},
 
+	async getPublicWorkspace() {
+		const response = await this._authorizedFetch(this._endpoint + "/public", {});
+		return await response.json();
+	},
+
 	async getWorkspace() {
 		const response = await this._authorizedFetch(this._endpoint + "/config", {});
 		return await response.json();
