@@ -231,17 +231,27 @@ public class WorkspaceServlet {
 						break;
 					}
 
+					String relativePath = zipEntry.getName();
+					// The .zip archive always contains separators of the operating system on which they were created.
+					// We need to normalize them.
+					if(File.separator.equals("/")) {
+						relativePath = relativePath.replace("\\", "/");
+					}
+					else {
+						relativePath = relativePath.replace("/", "\\");
+					}
+
 					// If the directory for the entity does not exist yet, it will be created.
-					java.nio.file.Path entityPath = rootPath.resolve(zipEntry.getName());
+					java.nio.file.Path absolutePath = rootPath.resolve(relativePath);
 					if (zipEntry.isDirectory()) {
-						Files.createDirectories(entityPath);
+						Files.createDirectories(absolutePath);
 						continue;
 					}
 
 					// Normally, the parent directory should already exist. We'll check it anyway.
-					Files.createDirectories(entityPath.getParent());
+					Files.createDirectories(absolutePath.getParent());
 
-					if (zipEntry.getName().endsWith("configuration.json")) {
+					if (relativePath.endsWith("configuration.json")) {
 						Configuration currentConfiguration = workspace.getConfig();
 						Configuration importConfiguration = (Configuration) SerializationHelper.getInstance().toClass(new String(IOUtils.toByteArray(zipInputStream), StandardCharsets.UTF_8), Configuration.class);
 						// Model import order needs to be merged with the current configuration.
@@ -253,7 +263,7 @@ public class WorkspaceServlet {
 						continue;
 					}
 
-					Files.write(entityPath, IOUtils.toByteArray(zipInputStream));
+					Files.write(absolutePath, IOUtils.toByteArray(zipInputStream));
 				}
 			}
 			catch (JsonMappingException e) {
