@@ -15,7 +15,7 @@
 			<div class="mb-2 draggable" @drop="onReplaceModelDrop($event, index)" @dragover="onModelDragOver" @dragenter="onModelDragOver" v-for="(importedModel, index) of importedModels" :key="importedModel.namespace">
 				<div class="card">
 					<div class="card-header d-flex align-items-center">
-						<h4 class="mb-0 me-auto">{{importedModel.name}}</h4>
+						<h4 class="mb-0 me-auto">{{importedModel.name}} ({{importedModel.namespace}})</h4>
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" @click="editModel(index)" class="c-pointer me-2">
 							<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
 						</svg>
@@ -57,7 +57,7 @@
 									<h5 class="mb-2">Decision Services</h5>
 									<template v-if="importedModel.decisionServices.length > 0">
 										<div class="dmn dmn-ds mb-2 me-2" v-for="decisionService in importedModel.decisionServices" :key="decisionService">
-											<span @click="toggleDecisionService(decisionService, importedModel.namespace)" :class="[isCurrentDecisionService(decisionService, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionService}}</span>
+											<span @click="toggleDecisionService(decisionService, importedModel.namespace)" :class="[isCurrentDecisionService(decisionService, importedModel.namespace) ? 'fw-bold' : null]">{{decisionService}}</span>
 										</div>
 									</template>
 								</div>
