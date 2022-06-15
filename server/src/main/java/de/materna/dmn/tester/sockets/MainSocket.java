@@ -12,14 +12,14 @@ import javax.websocket.server.ServerEndpoint;
 @ServerEndpoint("/sockets/{workspace}")
 public class MainSocket {
 	@OnOpen
-	public void onOpen(@PathParam("workspace") String workspace, Session session) {
+	public void onOpen(@PathParam("workspace") String workspace, Session session) throws InterruptedException {
 		SessionManager sessionManager = SessionManager.getInstance();
 		sessionManager.add(workspace, session);
 		sessionManager.notify(workspace, "{\"type\": \"listeners\", \"data\": " + sessionManager.listeners(workspace) + "}");
 	}
 
 	@OnClose
-	public void onClose(@PathParam("workspace") String workspace, Session session) {
+	public void onClose(@PathParam("workspace") String workspace, Session session) throws InterruptedException {
 		SessionManager sessionManager = SessionManager.getInstance();
 		sessionManager.remove(workspace, session);
 		sessionManager.notify(workspace, "{\"type\": \"listeners\", \"data\": " + sessionManager.listeners(workspace) + "}");

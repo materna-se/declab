@@ -1,14 +1,19 @@
 package de.materna.dmn.tester.sockets.managers;
 
 import de.materna.dmn.tester.helpers.SynchronizationHelper;
+import de.materna.dmn.tester.servlets.model.ModelServlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.websocket.Session;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class SessionManager {
+	private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
 	private static SessionManager instance;
 
 	private final Map<String, List<Session>> workspaceSessions = new HashMap<>();
@@ -16,8 +21,11 @@ public class SessionManager {
 	private SessionManager() {
 	}
 
-	public void add(String workspaceUUID, Session session) {
-		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().lock();
+	public void add(String workspaceUUID, Session session) throws InterruptedException {
+		boolean lockAcquired = SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().tryLock(30, TimeUnit.SECONDS);
+		if (!lockAcquired) {
+			throw new InterruptedException(String.format("Could not acquire lock for workspace %s!", workspaceUUID));
+		}
 
 		try {
 			List<Session> sessions = workspaceSessions.get(workspaceUUID);
@@ -34,8 +42,11 @@ public class SessionManager {
 		}
 	}
 
-	public void remove(String workspaceUUID, Session session) {
-		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().lock();
+	public void remove(String workspaceUUID, Session session) throws InterruptedException {
+		boolean lockAcquired = SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().tryLock(30, TimeUnit.SECONDS);
+		if (!lockAcquired) {
+			throw new InterruptedException(String.format("Could not acquire lock for workspace %s!", workspaceUUID));
+		}
 
 		try {
 			List<Session> sessions = workspaceSessions.get(workspaceUUID);
@@ -50,8 +61,11 @@ public class SessionManager {
 		}
 	}
 
-	public void notify(String workspaceUUID, String message) {
-		SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().lock();
+	public void notify(String workspaceUUID, String message) throws InterruptedException {
+		boolean lockAcquired = SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().tryLock(30, TimeUnit.SECONDS);
+		if (!lockAcquired) {
+			throw new InterruptedException(String.format("Could not acquire lock for workspace %s!", workspaceUUID));
+		}
 
 		try {
 			List<Session> sessions = workspaceSessions.get(workspaceUUID);
@@ -68,8 +82,11 @@ public class SessionManager {
 		}
 	}
 
-	public int listeners(String workspaceUUID) {
-		SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().lock();
+	public int listeners(String workspaceUUID) throws InterruptedException {
+		boolean lockAcquired = SynchronizationHelper.getWorkspaceLock(workspaceUUID).readLock().tryLock(30, TimeUnit.SECONDS);
+		if (!lockAcquired) {
+			throw new InterruptedException(String.format("Could not acquire lock for workspace %s!", workspaceUUID));
+		}
 
 		try {
 			List<Session> sessions = workspaceSessions.get(workspaceUUID);
