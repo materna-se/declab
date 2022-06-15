@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<small class="expression-description mb-1" v-if="expression.description !== null">{{expression.description}}</small>
+		<small class="expression-description mb-1" v-if="expression.description !== null" v-html="sanitizeDescription(expression.description)">asd</small>
 		<code v-if="expression.expressionType === 'LITERAL_EXPRESSION'">{{expression.text}}</code>
 		<table class="table table-bordered table-sm mb-0" v-else-if="expression.expressionType === 'CONTEXT'">
 			<tbody>
@@ -31,14 +31,14 @@
 						<div class="d-flex flex-column align-items-center">
 							<b>{{input.name}}</b>
 							<type-badge v-bind:type="input.type"/>
-							<small class="expression-description" v-if="input.description !== null">{{input.description}}</small>
+							<small class="expression-description" v-if="input.description !== null" v-html="sanitizeDescription(input.description)"></small>
 						</div>
 					</td>
 					<td v-for="output of expression.outputs">
 						<div class="d-flex flex-column align-items-center">
 							<b>{{output.name}}</b>
 							<type-badge v-bind:type="output.type"/>
-							<small class="expression-description" v-if="output.description !== null">{{output.description}}</small>
+							<small class="expression-description" v-if="output.description !== null" v-html="sanitizeDescription(output.description)"></small>
 						</div>
 					</td>
 					<td v-for="annotation of expression.annotations" class="text-center" style="vertical-align: middle">
@@ -48,7 +48,7 @@
 				<tr v-for="rule of expression.rules">
 					<td></td>
 					<td v-for="entry of rule.entries">
-						<small class="expression-description" v-if="entry.description !== null">{{entry.description}}</small>
+						<small class="expression-description" v-if="entry.description !== null" v-html="sanitizeDescription(entry.description)"></small>
 						<code>{{entry.text}}</code>
 					</td>
 				</tr>
@@ -81,7 +81,7 @@
 						<div class="d-flex flex-column align-items-center">
 							<b>{{column.name}}</b>
 							<type-badge v-bind:type="column.type"/>
-							<small class="expression-description" v-if="column.description !== null">{{column.description}}</small>
+							<small class="expression-description" v-if="column.description !== null" v-html="sanitizeDescription(column.description)"></small>
 						</div>
 					</td>
 				</tr>
@@ -121,7 +121,7 @@
 						<div class="d-flex flex-column align-items-center">
 							<b>{{binding.name}}</b>
 							<type-badge v-bind:type="binding.type"/>
-							<small class="expression-description" v-if="binding.description !== null">{{binding.description}}</small>
+							<small class="expression-description" v-if="binding.description !== null" v-html="sanitizeDescription(binding.description)"></small>
 						</div>
 					</td>
 					<td>
@@ -137,6 +137,7 @@
 <script>
 	import TypeBadge from "./type-badge";
 	import ParameterDocumentation from "./parameter-documentation";
+	import {sanitize} from "../../helpers/utility";
 
 	export default {
 		name: "expression-documentation",
@@ -150,6 +151,11 @@
 			ParameterDocumentation,
 			"type-badge": TypeBadge,
 		},
+		methods: {
+			sanitizeDescription(html) {
+				return sanitize(html);
+			},
+		}
 	}
 </script>
 

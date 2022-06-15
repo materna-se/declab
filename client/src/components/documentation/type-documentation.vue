@@ -1,7 +1,7 @@
 <template>
-	<div style="border: 1px solid rgb(222, 226, 230);display: table;" class="p-2">
-		<div class="d-flex align-items-center">
-			<b class="me-2">{{type.name}}</b>
+	<div style="border: 1px solid rgb(222, 226, 230);display: table;" class="p-2 pt-0 pe-0">
+		<div class="d-flex align-items-center mt-2" v-if="!root || type.type !== null || type.collection || type.allowedValues !== null">
+			<b class="me-2" v-if="!root">{{type.name}}</b>
 			<type-badge class="me-2" v-bind:type="type.type"/>
 
 			<span class="badge bg-light text-black d-block me-2" style="padding: 4px 0.35rem" v-if="type.collection">
@@ -17,7 +17,7 @@
 				<span>{{type.allowedValues}}</span>
 			</small>
 		</div>
-		<type-documentation v-for="child of type.children" v-bind:type="child" class="mt-2" style="margin-left: 2rem;" v-bind:key="child.name"/>
+		<type-documentation v-for="(child, childIndex) of type.children" v-bind:type="child" class="mt-2 me-2" style="margin-left: 2rem;" v-bind:key="child.name"/>
 	</div>
 </template>
 
@@ -30,6 +30,10 @@
 			type: {
 				type: Object,
 				required: true
+			},
+			root: {
+				type: Boolean,
+				default: false
 			}
 		},
 		components: {

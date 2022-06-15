@@ -49,7 +49,7 @@
 							<template v-if="importedModel.decisionServices.length > 0">
 								<h5 class="mb-2">Decision Services</h5>
 								<div class="dmn dmn-ds mb-2 me-2" v-for="decisionServiceName in importedModel.decisionServices">
-									<span v-on:click="toggleDecisionService(decisionServiceName, importedModel.namespace)" v-bind:class="[isCurrentDecisionService(decisionServiceName, importedModel.namespace) ? 'font-weight-bold' : null]">{{decisionServiceName}}</span>
+									<span v-on:click="toggleDecisionService(decisionServiceName, importedModel.namespace)" v-bind:class="[isCurrentDecisionService(decisionServiceName, importedModel.namespace) ? 'fw-bold' : null]">{{decisionServiceName}}</span>
 								</div>
 							</template>
 						</div>
