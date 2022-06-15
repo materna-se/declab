@@ -5,9 +5,16 @@ import org.kie.dmn.api.core.DMNModel
 import org.kie.dmn.api.core.DMNType
 import org.kie.dmn.api.core.ast.BusinessKnowledgeModelNode
 import org.kie.dmn.api.core.ast.DecisionNode
+import org.kie.dmn.api.core.ast.DecisionServiceNode
+import org.kie.dmn.api.core.ast.InputDataNode
 import org.kie.dmn.model.api.*
+import org.kie.dmn.model.v1_3.TInformationItem
 import org.kie.dmn.model.v1_3.TLiteralExpression
-import java.util.*
+import org.kie.dmn.model.v1_3.TOutputClause
+import org.slf4j.LoggerFactory
+import javax.xml.namespace.QName
+
+private val log = LoggerFactory.getLogger(ModelDocumentation::class.java)
 
 open class DMNElementDocumentation(element: DMNElement) {
 	var description: String? = null
@@ -22,9 +29,11 @@ class ModelDocumentation() {
 	var namespace: String? = null
 	var description: String? = null
 	var itemDefinitions: ArrayList<ItemDefinitionDocumentation>? = null
+	var inputs: ArrayList<InputDocumentation>? = null
 	var decisions: ArrayList<DecisionDocumentation>? = null
 	var knowledgeModels: ArrayList<KnowledgeModelDocumentation>? = null
-	var dependencies: ArrayList<String>? = null
+	var decisionServices: ArrayList<DecisionServiceDocumentation>? = null
+	var dependencies: ArrayList<ModelDependency>? = null
 
 	constructor(model: DMNModel) : this() {
 		name = model.definitions.name
@@ -33,23 +42,53 @@ class ModelDocumentation() {
 
 		itemDefinitions = ArrayList()
 		for (itemDefinition in model.itemDefinitions) {
-			itemDefinitions!!.add(ItemDefinitionDocumentation(itemDefinition.name, itemDefinition.type))
+			if (itemDefinition.modelNamespace == model.definitions.namespace) {
+				itemDefinitions!!.add(ItemDefinitionDocumentation(itemDefinition.name, itemDefinition.type))
+			}
+		}
+
+		inputs = ArrayList()
+		for (input in model.inputs) {
+			if (input.modelNamespace == model.definitions.namespace) {
+				inputs!!.add(InputDocumentation(input))
+			}
 		}
 
 		decisions = ArrayList()
 		for (decision in model.decisions) {
-			decisions!!.add(DecisionDocumentation(decision))
+			if (decision.modelNamespace == model.definitions.namespace) {
+				decisions!!.add(DecisionDocumentation(decision))
+			}
 		}
 
 		knowledgeModels = ArrayList()
 		for (knowledgeModel in model.businessKnowledgeModels) {
-			knowledgeModels!!.add(KnowledgeModelDocumentation(knowledgeModel))
+			if (knowledgeModel.modelNamespace == model.definitions.namespace) {
+				knowledgeModels!!.add(KnowledgeModelDocumentation(knowledgeModel))
+			}
+		}
+
+		decisionServices = ArrayList()
+		for (decisionService in model.decisionServices) {
+			if (decisionService.modelNamespace == model.definitions.namespace) {
+				decisionServices!!.add(DecisionServiceDocumentation(decisionService))
+			}
 		}
 
 		dependencies = ArrayList()
 		for (import in model.definitions.import) {
-			dependencies!!.add(import.namespace)
+			dependencies!!.add(ModelDependency(import.namespace, import.name))
 		}
+	}
+}
+
+class ModelDependency(namespace: String, alias: String) {
+	var namespace: String
+	var alias: String
+
+	init {
+		this.namespace = namespace
+		this.alias = alias
 	}
 }
 
@@ -61,33 +100,45 @@ class ItemDefinitionDocumentation(name: String, type: DMNType) {
 	var children: ArrayList<ItemDefinitionDocumentation>? = null
 
 	init {
+		// It seems like the id is not always transformed correctly, it is sometimes null.
+		// We are using the name as a workaround.
 		this.name = name
 		this.isCollection = type.isCollection
+
 		if (type.allowedValues.size > 0) {
 			this.allowedValues = StringUtils.join(type.allowedValues, ", ")
 		}
-		val baseType = getBaseType(type).name
-		if (baseType != name) {
-			this.type = baseType;
-		}
 
-		children = ArrayList()
-		for (field in type.fields) {
-			children!!.add(ItemDefinitionDocumentation(field.key, field.value))
+		val baseType = getBaseType(type).name
+		// If the name of the baseType equals the name of the item definition, it is a structure.
+		// In these cases, we want to resolve the children as well.
+		if (baseType == name) {
+			children = ArrayList()
+			for (field in type.fields) {
+				children!!.add(ItemDefinitionDocumentation(field.key, field.value))
+			}
+		}
+		else {
+			this.type = baseType
 		}
 	}
 }
 
-private fun getBaseType(type: DMNType): DMNType {
-	if (type.baseType == null) {
-		return type
-	}
+class InputDocumentation(inputNode: InputDataNode) {
+	var id: String
+	var name: String
+	var returnType: String? = null
 
-	return getBaseType(type.baseType)
+	init {
+		this.id = inputNode.id
+		this.name = inputNode.name
+		this.returnType = inputNode.type.name
+	}
 }
 
 class DecisionDocumentation(decisionNode: DecisionNode) {
-	var name: String? = null
+	var id: String
+	var name: String
 	var description: String? = null
 	var returnType: String? = null
 	var question: String? = null
@@ -97,26 +148,29 @@ class DecisionDocumentation(decisionNode: DecisionNode) {
 	init {
 		val decision = decisionNode.decision
 
+		this.id = decision.id
 		this.name = decision.name
 		this.description = decision.description
 
 		this.returnType = decision.variable.typeRef?.localPart
 		this.question = decision.question
 		this.answers = decision.allowedAnswers?.split("\n")
-		this.expression = resolveExpression(decision.expression)
+		this.expression = resolveExpression(decision.variable, decision.expression)
 	}
 }
 
-class KnowledgeModelDocumentation(knowledgeModel: BusinessKnowledgeModelNode) {
-	var name: String? = null
+class KnowledgeModelDocumentation(knowledgeModelNode: BusinessKnowledgeModelNode) {
+	var id: String
+	var name: String
 	var description: String? = null
 	var returnType: String? = null
 	var parameters: ArrayList<FunctionParameterDocumentation>? = null
 	var expression: ExpressionDocumentation? = null
 
 	init {
-		val knowledgeModel = knowledgeModel.businessKnowledModel
+		val knowledgeModel = knowledgeModelNode.businessKnowledModel
 
+		this.id = knowledgeModel.id
 		this.name = knowledgeModel.name
 		this.description = knowledgeModel.description
 		this.returnType = knowledgeModel.variable.typeRef?.localPart
@@ -126,7 +180,56 @@ class KnowledgeModelDocumentation(knowledgeModel: BusinessKnowledgeModelNode) {
 			this.parameters!!.add(FunctionParameterDocumentation(parameter.name, parameter.typeRef?.localPart))
 		}
 
-		this.expression = resolveExpression(knowledgeModel.encapsulatedLogic.expression)
+		this.expression = resolveExpression(knowledgeModel.variable, knowledgeModel.encapsulatedLogic.expression)
+	}
+}
+
+class DecisionServiceDocumentation(decisionServiceNode: DecisionServiceNode) {
+	var id: String
+	var name: String
+	var description: String? = null
+	var inputData: ArrayList<DecisionServiceReference>? = null
+	var inputDecisions: ArrayList<DecisionServiceReference>? = null
+	var encapsulatedDecisions: ArrayList<DecisionServiceReference>? = null
+	var outputDecisions: ArrayList<DecisionServiceReference>? = null
+
+	init {
+		val decisionService = decisionServiceNode.decisionService
+
+		this.id = decisionService.id
+		this.name = decisionService.name
+		this.description = decisionService.description
+
+		this.inputData = ArrayList()
+		for (inputData in decisionService.inputData) {
+			this.inputData!!.add(DecisionServiceReference(inputData))
+		}
+
+		this.inputDecisions = ArrayList()
+		for (inputDecision in decisionService.inputDecision) {
+			this.inputDecisions!!.add(DecisionServiceReference(inputDecision))
+		}
+
+		this.encapsulatedDecisions = ArrayList()
+		for (encapsulatedDecision in decisionService.encapsulatedDecision) {
+			this.encapsulatedDecisions!!.add(DecisionServiceReference(encapsulatedDecision))
+		}
+
+		this.outputDecisions = ArrayList()
+		for (outputDecision in decisionService.outputDecision) {
+			this.outputDecisions!!.add(DecisionServiceReference(outputDecision))
+		}
+	}
+}
+
+class DecisionServiceReference(reference: DMNElementReference) {
+	var namespace: String? = null
+	var id: String? = null
+
+	init {
+		val split = reference.href.split("#", limit = 2)
+		this.namespace = if (split[0] == "") null else split[0]
+		this.id = split[1]
 	}
 }
 
@@ -159,7 +262,7 @@ class FunctionParameterDocumentation(name: String, type: String?) {
 	}
 }
 
-class FunctionDefinitionDocumentation(functionDefinition: FunctionDefinition) : ExpressionDocumentation(ExpressionType.FUNCTION_DEFINITION, functionDefinition) {
+class FunctionDefinitionDocumentation(variable: InformationItem, functionDefinition: FunctionDefinition) : ExpressionDocumentation(ExpressionType.FUNCTION_DEFINITION, functionDefinition) {
 	var parameters: ArrayList<FunctionParameterDocumentation>? = null
 	var expression: ExpressionDocumentation? = null
 
@@ -169,7 +272,7 @@ class FunctionDefinitionDocumentation(functionDefinition: FunctionDefinition) : 
 			this.parameters!!.add(FunctionParameterDocumentation(parameter.name, parameter.typeRef?.localPart))
 		}
 
-		this.expression = resolveExpression(functionDefinition.expression)
+		this.expression = resolveExpression(variable, functionDefinition.expression)
 	}
 }
 
@@ -206,7 +309,7 @@ class RelationRowDocumentation(row: org.kie.dmn.model.api.List) {
 	init {
 		this.expressions = ArrayList()
 		for (expression in row.expression) {
-			expressions!!.add(resolveExpression(expression))
+			expressions!!.add(resolveExpression(null, expression))
 		}
 	}
 }
@@ -217,7 +320,7 @@ class ListDocumentation(list: org.kie.dmn.model.api.List) : ExpressionDocumentat
 	init {
 		this.expressions = ArrayList()
 		for (expression in list.expression) {
-			expressions!!.add(resolveExpression(expression))
+			expressions!!.add(resolveExpression(null, expression))
 		}
 	}
 }
@@ -246,7 +349,7 @@ class InvocationBindingDocumentation(binding: Binding) {
 		this.name = binding.parameter.name
 		this.type = binding.parameter.typeRef?.localPart
 		this.description = binding.parameter.description
-		this.expression = resolveExpression(binding.expression)
+		this.expression = resolveExpression(binding.parameter, binding.expression)
 	}
 }
 
@@ -289,11 +392,11 @@ class ContextEntryDocumentation(contextEntry: ContextEntry) : ExpressionDocument
 	init {
 		this.name = contextEntry.variable?.name
 		this.type = contextEntry.variable?.typeRef?.localPart
-		this.expression = resolveExpression(contextEntry.expression)
+		this.expression = resolveExpression(contextEntry.variable, contextEntry.expression)
 	}
 }
 
-class DecisionTableDocumentation(decisionTable: DecisionTable) : ExpressionDocumentation(ExpressionType.DECISION_TABLE, decisionTable) {
+class DecisionTableDocumentation(variable: InformationItem, decisionTable: DecisionTable) : ExpressionDocumentation(ExpressionType.DECISION_TABLE, decisionTable) {
 	var hitPolicy: String? = null
 	var inputs: ArrayList<DecisionTableInputDocumentation>? = null
 	var outputs: ArrayList<DecisionTableOutputDocumentation>? = null
@@ -309,13 +412,32 @@ class DecisionTableDocumentation(decisionTable: DecisionTable) : ExpressionDocum
 		}
 
 		outputs = ArrayList()
-		for (output in decisionTable.output) {
-			outputs!!.add(DecisionTableOutputDocumentation(output))
+		// TODO: Do we always have at least one output?
+		if (decisionTable.output.size > 1) {
+			for (output in decisionTable.output) {
+				println(output.javaClass.name)
+				outputs!!.add(DecisionTableOutputDocumentation(output))
+			}
+		}
+		else {
+			// If the output is simple, we inherit the name and type of the parent.
+			val clause = TOutputClause()
+			clause.name = variable.name
+			clause.description = decisionTable.output[0].description
+			clause.typeRef = variable.typeRef
+			outputs!!.add(DecisionTableOutputDocumentation(clause))
 		}
 
 		annotations = ArrayList()
-		for (annotation in decisionTable.annotation) {
-			annotations!!.add(DecisionTableAnnotationDocumentation(annotation))
+		// Rule annotations were not supported in version 1.1 of the specification.
+		// We simply ignore them in this case.
+		try {
+			for (annotation in decisionTable.annotation) {
+				annotations!!.add(DecisionTableAnnotationDocumentation(annotation))
+			}
+		}
+		catch (e: Exception) {
+			log.warn("Ignoring rule annotations as they are not supported in version 1.1 of the specification...")
 		}
 
 		rules = ArrayList()
@@ -364,8 +486,15 @@ class DecisionTableRuleDocumentation(rule: DecisionRule) {
 		for (entry in rule.outputEntry) {
 			entries!!.add(DecisionTableRuleEntryDocumentation(entry))
 		}
-		for (entry in rule.annotationEntry) {
-			entries!!.add(DecisionTableRuleEntryDocumentation(entry))
+		// Rule annotations were not supported in version 1.1 of the specification.
+		// We simply ignore them in this case.
+		try {
+			for (entry in rule.annotationEntry) {
+				entries!!.add(DecisionTableRuleEntryDocumentation(entry))
+			}
+		}
+		catch (e: Exception) {
+			log.warn("Ignoring rule annotations as they are not supported in version 1.1 of the specification...")
 		}
 	}
 }
@@ -389,7 +518,26 @@ class DecisionTableRuleEntryDocumentation {
 	}
 }
 
-fun resolveExpression(expression: Expression): ExpressionDocumentation {
+private fun getBaseType(type: DMNType): DMNType {
+	if (type.baseType == null) {
+		return type
+	}
+
+	return getBaseType(type.baseType)
+}
+
+/**
+ * TODO: We can't always determine the variable name (for example inside of a List)?
+ *       In such cases, we would not be able to resolve the expression.
+ */
+fun resolveExpression(_variable: InformationItem?, expression: Expression): ExpressionDocumentation {
+	var variable = _variable
+	if (variable == null) {
+		variable = TInformationItem()
+		variable.name = ""
+		variable.typeRef = null
+	}
+
 	if (expression is LiteralExpression) {
 		return LiteralExpressionDocumentation(expression)
 	}
@@ -399,11 +547,11 @@ fun resolveExpression(expression: Expression): ExpressionDocumentation {
 	}
 
 	if (expression is DecisionTable) {
-		return DecisionTableDocumentation(expression)
+		return DecisionTableDocumentation(variable, expression)
 	}
 
 	if (expression is FunctionDefinition) {
-		return FunctionDefinitionDocumentation(expression)
+		return FunctionDefinitionDocumentation(variable, expression)
 	}
 
 	if (expression is Relation) {
