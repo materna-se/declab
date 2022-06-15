@@ -14,7 +14,7 @@
 					<path d="M18.4 10.6C16.55 9 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16a8.002 8.002 0 017.6-5.5c1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" fill="currentColor"/>
 				</svg>
 			</button>
-			<div class="import-result" style="display: flex; align-items: center" v-bind:class="['import-result-' + importResult.state, importResult.state !== 'success' && importResult.messages.length > 0 ? 'c-pointer' : null]" v-if="importResult !== null" v-on:click="importResult.state !== 'success' ? importResultOpened = true : null">
+			<div class="import-result me-2" style="display: flex; align-items: center" v-bind:class="['import-result-' + importResult.state, importResult.state !== 'success' && importResult.messages.length > 0 ? 'c-pointer' : null]" v-if="importResult !== null" v-on:click="importResult.state !== 'success' ? importResultOpened = true : null">
 				<span style="line-height: 1;">{{importResult.message}}</span>
 				<div style="height: 24px">
 					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" class="ms-1" v-if="importResult.state !== 'success' && importResult.messages.length > 0">
@@ -56,12 +56,12 @@
 
 <script>
 	import Network from "../../../helpers/network";
-	import * as DmnEditor from "@kogito-tooling/kie-editors-standalone/dist/dmn"
-	import {v4 as uuid} from "uuid"
-	import dayjs from "dayjs"
-	import dayjsRelativeTimePlugin from "dayjs/plugin/relativeTime"
-	import dayjsUpdateLocalePlugin from "dayjs/plugin/updateLocale"
-	import _ from "lodash"
+	import * as DmnEditor from "@kogito-tooling/kie-editors-standalone/dist/dmn";
+	import {v4 as uuid} from "uuid";
+	import dayjs from "dayjs";
+	import dayjsRelativeTimePlugin from "dayjs/plugin/relativeTime";
+	import dayjsUpdateLocalePlugin from "dayjs/plugin/updateLocale";
+	import {debounce} from "lodash";
 
 	dayjs.extend(dayjsRelativeTimePlugin);
 	dayjs.extend(dayjsUpdateLocalePlugin);
@@ -71,7 +71,7 @@
 			future: "in %s",
 			past: "%s ago",
 			s: function (number, withoutSuffix, key, isFuture) {
-				if(number > 10) {
+				if (number > 10) {
 					number = Math.floor(Math.round(number / 10) * 10);
 				}
 				return number + " second" + (number === 1 ? "" : "s");
@@ -111,7 +111,7 @@
 		async mounted() {
 			const vue = this;
 
-			this.debouncedImportModel = _.debounce(this.importModel, 1000);
+			this.debouncedImportModel = debounce(this.importModel, 1000);
 
 			for (const model of await Network.getModel()) {
 				this.models.push({
@@ -142,11 +142,11 @@
 				}))
 			});
 			this.editor.subscribeToContentChanges(async (isDirty) => {
-				vue.debouncedImportModel(await this.editor.getContent());
+				vue.debouncedImportModel(await this.editor.getContent(), this.context);
 			});
 
 			// We will import the model once to get feedback on the health.
-			await this.debouncedImportModel(model.source);
+			await this.debouncedImportModel(model.source, "preflight");
 
 			setInterval(() => {
 				if (vue.importResult === null) {
@@ -165,11 +165,12 @@
 		methods: {
 			async onSocket(e) {
 				const data = JSON.parse(e.data);
-				if (data.type === "imported" && data.data !== this.context) {
+				if (data.type === "imported" && data.data !== "preflight" && data.data !== this.context) {
 					location.reload();
 				}
 			},
-			async importModel(content) {
+			async importModel(content, context) {
+				console.info("get throuzgh");
 				this.models[this.$route.params.index] = {
 					name: content.match(/name="(.+?)"/)[1],
 					namespace: content.match(/namespace="(.+?)"/)[1],
@@ -177,7 +178,7 @@
 				};
 
 				try {
-					const result = await Network.importModels(this.models, this.context);
+					const result = await Network.importModels(this.models, context);
 					this.importResult = this.getResultAlert(result);
 				}
 				catch (e) {

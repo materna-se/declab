@@ -1,9 +1,9 @@
 <template>
 	<div>
 		<div class="row">
-			<div class="col-4">
+			<div class="d-none d-sm-block col-sm-4">
 			</div>
-			<div class="col-4 mb-4">
+			<div class="col-12 col-sm-4 mb-4">
 				<h4 class="mb-2">Workspaces</h4>
 
 				<div class="row mb-4" v-if="demoMode === true">
@@ -47,7 +47,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-4">
+			<div class="d-none d-sm-block col-sm-4">
 			</div>
 		</div>
 	</div>

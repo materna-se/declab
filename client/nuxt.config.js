@@ -8,7 +8,7 @@ export default async function () {
 	return {
 		srcDir: './src',
 		generate: {
-			dir: '../server/src/main/webapp',
+			dir: '../server/src/main/resources',
 		},
 		head: {
 			htmlAttrs: {
@@ -17,6 +17,10 @@ export default async function () {
 			meta: [
 				{
 					charset: 'utf-8'
+				},
+				{
+					name: 'description',
+					content: "declab is a web-based decision model laboratory."
 				},
 				{
 					name: 'viewport',
