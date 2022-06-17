@@ -8,7 +8,7 @@ export default async function () {
 	return {
 		srcDir: './src',
 		generate: {
-			dir: '../server/src/main/resources',
+			dir: '../server/src/main/webapp',
 		},
 		head: {
 			htmlAttrs: {

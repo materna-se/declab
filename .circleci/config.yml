@@ -27,8 +27,11 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/project
+      #
       - run: cd ./declab && git checkout master
       - run: cd ./declab/server && mvn package -Dmaven.test.skip=true
+      # The java version requires that the client files are placed under ./resources/.
+      - run: cd ./declab/server/src/main && mv ./webapp/* ./resources/
       - run: cd ./declab && git checkout master-portable
       - run: cd ./declab/server && mvn package -Dmaven.test.skip=true
       - persist_to_workspace:
@@ -83,7 +86,7 @@ jobs:
       - attach_workspace:
           at: ~/project
       - run: cd ./declab/server/target && wget https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.14.1%2B1/OpenJDK11U-jre_x64_windows_hotspot_11.0.14.1_1.zip
-      - run: cd ./declab/server/target && tar -xvzf ./OpenJDK11U-jre_x64_windows_hotspot_11.0.14.1_1.zip
+      - run: cd ./declab/server/target && unzip OpenJDK11U-jre_x64_windows_hotspot_11.0.14.1_1.zip
       - run: cd ./declab/server/target && mv ./jdk-11.0.14.1+1-jre ./jre
       - run: cd ./declab/server/target && rm ./OpenJDK11U-jre_x64_windows_hotspot_11.0.14.1_1.zip
       - run: cd ./declab/server/target && zip -r ./declab-${CIRCLE_TAG}-windows.zip ./jre ./declab-${CIRCLE_TAG}.exe
