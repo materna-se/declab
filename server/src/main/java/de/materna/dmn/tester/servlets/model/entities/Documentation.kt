@@ -415,7 +415,6 @@ class DecisionTableDocumentation(variable: InformationItem, decisionTable: Decis
 		// TODO: Do we always have at least one output?
 		if (decisionTable.output.size > 1) {
 			for (output in decisionTable.output) {
-				println(output.javaClass.name)
 				outputs!!.add(DecisionTableOutputDocumentation(output))
 			}
 		}
@@ -423,6 +422,7 @@ class DecisionTableDocumentation(variable: InformationItem, decisionTable: Decis
 			// If the output is simple, we inherit the name and type of the parent.
 			val clause = TOutputClause()
 			clause.name = variable.name
+			clause.defaultOutputEntry = decisionTable.output[0].defaultOutputEntry
 			clause.description = decisionTable.output[0].description
 			clause.typeRef = variable.typeRef
 			outputs!!.add(DecisionTableOutputDocumentation(clause))
@@ -460,10 +460,12 @@ class DecisionTableInputDocumentation(input: InputClause) : DMNElementDocumentat
 class DecisionTableOutputDocumentation(output: OutputClause) : DMNElementDocumentation(output) {
 	var name: String? = null
 	var type: String? = null
+	var defaultValue: String? = null
 
 	init {
 		this.name = output.name
 		this.type = output.typeRef?.localPart
+		this.defaultValue = output.defaultOutputEntry?.text
 	}
 }
 

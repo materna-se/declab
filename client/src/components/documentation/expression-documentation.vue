@@ -38,6 +38,7 @@
 						<div class="d-flex flex-column align-items-center">
 							<b>{{output.name}}</b>
 							<type-badge v-bind:type="output.type"/>
+							<small class="badge bg-light badge-small text-black d-flex align-items-center d-block mt-1" style="padding: 4px 0.25rem" v-if="output.defaultValue !== null"><b>Default Value:</b> {{output.defaultValue}}</small>
 							<small class="expression-description" v-if="output.description !== null" v-html="sanitizeDescription(output.description)"></small>
 						</div>
 					</td>
