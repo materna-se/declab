@@ -18,7 +18,7 @@ public class Workspace {
 	private static final Logger log = LoggerFactory.getLogger(Workspace.class);
 
 	private PersistenceDirectoryManager<Challenge> challengeManager;
-	
+
 	private PersistenceDirectoryManager<String> modelManager;
 	private PersistenceDirectoryManager<Playground> playgroundManager;
 
@@ -51,7 +51,7 @@ public class Workspace {
 
 		DroolsHelper.importModels(this);
 	}
-	
+
 	public PersistenceDirectoryManager<Challenge> getChallengeManager() {
 		return challengeManager;
 	}

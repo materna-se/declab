@@ -2,7 +2,7 @@
 	<div>
 		<template v-if="developerMode === true">
 			<textarea class="form-control w-100 mb-1" v-model="editedValue"/>
-			<button class="btn btn-block btn-outline-secondary mb-2" v-on:click="applyValue">Apply</button>
+			<button class="btn btn-block btn-outline-primary mb-2" v-on:click="applyValue">Apply</button>
 		</template>
 		<json-builder-table v-if="value !== null" v-bind:path="['$']" v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues" v-on:update:path="exportPath($event)"/>
 		<json-builder-selector v-if="!fixed && !fixedRoot" v-bind:value="value" v-bind:mode="'edit'"/>
@@ -11,16 +11,20 @@
 
 <style>
 	.input-builder table tr td:nth-child(1) span {
-		background: #c6ddfd;
+		background: #aaceff;
+		border-color: #95b7e9;
 	}
 	.input-builder table table tr td:nth-child(1) span {
-		background: #e7ebee;
+		background: #f3f3f3;
+		border-color: #dadfe5;
 	}
 	.decision-builder table tr td:nth-child(1) span {
-		background: #fcf0a5;
+		background: #fdee8e;
+		border-color: #ead38f;
 	}
 	.decision-builder table table tr td:nth-child(1) span {
-		background: #e7ebee;
+		background: #f3f3f3;
+		border-color: #dadfe5;
 	}
 
 	.json-builder tr td:nth-child(1) span {

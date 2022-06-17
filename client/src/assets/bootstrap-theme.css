@@ -3,7 +3,6 @@ html {
 }
 
 body {
-	font-family: "PT Sans", sans-serif;
 	background: #f6f6f8;
 }
 
@@ -41,7 +40,6 @@ hr {
 
 pre, code {
 	word-break: break-all;
-	color: inherit;
 }
 
 .btn-outline-secondary {
@@ -80,18 +78,9 @@ pre, code {
 }
 
 .input-group-text-disabled {
-	background-color: #e7ebee;
-	border-color: #cfd4d8;
+	background-color: #eef2f7;
+	border-color: #dadfe5;
 	color: #495057;
-}
-
-.input-group-table {
-	background-color: #f8f9fa;
-	border-left-color: #dee2e6;
-	border-top-color: #dee2e6;
-	border-right-color: #dee2e6;
-	border-bottom-color: transparent;
-	border-radius: 0;
 }
 
 /* We can't select a dropdown item if there is a margin-top property. */
@@ -108,10 +97,6 @@ pre, code {
 .difference-plus {
 	background: yellow;
 	text-decoration: underline;
-}
-
-code {
-	font-size: 0.95rem;
 }
 
 small {
@@ -193,6 +178,7 @@ small {
 
 /* width */
 ::-webkit-scrollbar {
+	height: 8px;
 	width: 8px;
 }
 
@@ -212,4 +198,40 @@ small {
 }
 ::-webkit-scrollbar-thumb:active {
 	background: #606060;
+}
+
+.btn-block {
+	display: block;
+	width: 100%;
+}
+
+svg {
+	flex-shrink: 0;
+}
+
+/* See https://stackoverflow.com/questions/36247140/why-dont-flex-items-shrink-past-content-size */
+.flex-grow-1 {
+	min-width: 0;
+	min-height: 0;
+}
+
+.btn-block {
+	display: block;
+	width: 100%;
+}
+
+svg {
+	flex-shrink: 0;
+}
+
+/* See https://stackoverflow.com/questions/36247140/why-dont-flex-items-shrink-past-content-size */
+.flex-grow-1 {
+	min-width: 0;
+	min-height: 0;
+}
+
+.text-break {
+	word-wrap: anywhere;
+	word-break: break-word;
+	white-space: pre-wrap;
 }

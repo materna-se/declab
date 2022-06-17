@@ -37,6 +37,16 @@ export class Node {
         return this.subtree[index];
     }
 
+    getByValue(value) {
+        for (let x of this.subtree) {
+            if (x.values.includes(value)) {
+                return x;
+            }
+        }
+
+        return undefined;
+    }
+
     merge(other) {
         var node = this.getLast();
 

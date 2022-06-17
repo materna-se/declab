@@ -24,6 +24,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Path("/workspaces/{workspace}/model")
 public class ModelServlet {
@@ -51,11 +52,30 @@ public class ModelServlet {
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(models)).build();
 	}
 
+	@GET
+	@Path("/documentation")
+	@ReadAccess
+	@Produces("application/json")
+	public Response getModelDocumentation(@PathParam("workspace") String workspaceUUID) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+
+		List<de.materna.dmn.tester.servlets.model.entities.ModelDocumentation> documentations = new ArrayList<>();
+		for (DMNModel model : workspace.getDecisionSession().getDMNDecisionSession().getRuntime().getModels()) {
+			documentations.add(new de.materna.dmn.tester.servlets.model.entities.ModelDocumentation(model));
+		}
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(documentations)).build();
+	}
+
+
 	@PUT
 	@WriteAccess
 	@Consumes("application/json")
 	public Response importModels(@PathParam("workspace") String workspaceUUID, @QueryParam("context") String context, String body) throws Exception {
-		SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().lock();
+		boolean lockAcquired = SynchronizationHelper.getWorkspaceLock(workspaceUUID).writeLock().tryLock(30, TimeUnit.SECONDS);
+		if (!lockAcquired) {
+			throw new InterruptedException(String.format("Could not acquire lock for workspace %s!", workspaceUUID));
+		}
 
 		try {
 			List<Map<String, String>> models = SerializationHelper.getInstance().toClass(body, new TypeReference<LinkedList<Map<String, String>>>() {
@@ -133,7 +153,7 @@ public class ModelServlet {
 	@WriteAccess
 	@Consumes("application/json")
 	@Path("/decision-session")
-	public Response setDecisionSession(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+	public Response setDecisionSession(@PathParam("workspace") String workspaceUUID, String body) throws IOException, InterruptedException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 		Configuration configuration = workspace.getConfig();

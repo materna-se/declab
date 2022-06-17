@@ -8,7 +8,7 @@ export default async function () {
 	return {
 		srcDir: './src',
 		generate: {
-			dir: '../server/src/main/webapp',
+			dir: '../server/src/main/resources',
 		},
 		head: {
 			htmlAttrs: {
@@ -19,6 +19,10 @@ export default async function () {
 					charset: 'utf-8'
 				},
 				{
+					name: 'description',
+					content: "declab is a web-based decision model laboratory."
+				},
+				{
 					name: 'viewport',
 					content: "width=device-width,user-scalable=no,initial-scale=1"
 				}
@@ -26,7 +30,7 @@ export default async function () {
 			link: [
 				{
 					rel: 'stylesheet',
-					href: 'https://fonts.googleapis.com/css?family=PT+Sans:400,700|Source+Code+Pro:400'
+					href: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600|Source+Code+Pro:400'
 				},
 				{
 					rel: 'icon',
@@ -85,8 +89,14 @@ async function getDeveloperInformation() {
 	const droolsVersion = jDECPOM.dependencies.dependency.find((dependency) => {
 		return dependency.artifactId === "kie-dmn-core";
 	}).version;
+	const camundaVersion = jDECPOM.dependencies.dependency.find((dependency) => {
+		return dependency.artifactId === "dmn-engine";
+	}).version;
+	const jDMNVersion = jDECPOM.dependencies.dependency.find((dependency) => {
+		return dependency.artifactId === "jdmn-core";
+	}).version;
 
 	return "Build Time: " + new Date().toISOString().split("Z")[0].split("T").join(", ") + "<br>" +
 		"Build Environment: " + process.env.NODE_ENV + "<br>" +
-		"Dependencies: jDEC " + jDECVersion + ", Drools " + droolsVersion;
+		"Dependencies:<br>&nbsp;&nbsp;jDEC " + jDECVersion + ", Drools " + droolsVersion + ",<br>&nbsp;&nbsp;Camunda " + camundaVersion + ", jDMN " + jDMNVersion;
 }

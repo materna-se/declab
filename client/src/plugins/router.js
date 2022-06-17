@@ -17,7 +17,7 @@ export default (context) => {
 			}
 			else {
 				(async () => {
-					vue.store.commit("setName", (await Network.getWorkspace()).name);
+					vue.store.commit("setName", (await Network.getPublicWorkspace()).name);
 				})();
 			}
 
@@ -27,6 +27,12 @@ export default (context) => {
 		next();
 	});
 	vue.router.afterEach((to, from) => {
+		// Unfortunately, when we navigate to another page, we have to manually scroll to the defined anchor.
+		// When we navigate to the same page, vue-router does it for us.
+		if(from.name !== to.name && to.hash !== "") {
+			setTimeout(() => document.getElementById(to.hash.substring(1)).scrollIntoView(true), 500);
+		}
+
 		setTimeout(() => vue.store.commit("setLoading", false), 500);
 	});
 }

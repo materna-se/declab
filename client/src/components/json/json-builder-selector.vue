@@ -1,7 +1,7 @@
 <template>
 	<div class="input-group mt-1">
 		<input class="form-control" placeholder="Enter key..." v-model="key" v-if="mode === 'add' && value.type === 'object'">
-		<div v-bind:class="[(mode === 'add' && value.type === 'object') ? 'input-group-append': 'btn-group ml-auto']">
+		<div v-bind:class="[(mode === 'add' && value.type === 'object') ? 'input-group-append': 'btn-group ms-auto']">
 			<button type="button" class="btn btn-white" style="border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem" v-on:mouseenter="visible = true" v-on:mouseleave="visible = false">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
 					<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor" v-if="mode === 'add'"/>

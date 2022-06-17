@@ -161,29 +161,41 @@ public class WorkspaceServlet {
 			try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
 				Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).filter(path -> !Files.isDirectory(path)).forEach(path -> {
+				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).forEach(path -> {
 					try {
+						String relativePath = getRelativePath(path, workspaceUUID);
+						if (relativePath == null) {
+							return;
+						}
+
+						if (Files.isDirectory(path)) {
+							zipOutputStream.putNextEntry(new ZipEntry(relativePath + "/"));
+							zipOutputStream.closeEntry();
+							return;
+						}
+
 						if (path.endsWith("access.log")) {
+							// We don't want to export the access log.
 							return;
 						}
 
 						if (path.endsWith("configuration.json")) {
+							// We don't want to export all key-value pairs of the configuration.
+
 							Configuration clonedConfiguration = (Configuration) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(workspace.getConfig()), Configuration.class);
-							// Trim cloned configuration.
 							clonedConfiguration.setAccess(Access.PUBLIC);
 							clonedConfiguration.setToken(null);
 							clonedConfiguration.setSalt(null);
 							clonedConfiguration.setCreatedDate(0L);
 							clonedConfiguration.setModifiedDate(0L);
 
-							// Write trimmed copy of configuration
-							zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
+							zipOutputStream.putNextEntry(new ZipEntry(relativePath));
 							zipOutputStream.write(SerializationHelper.getInstance().toJSON(clonedConfiguration).getBytes(StandardCharsets.UTF_8));
 							zipOutputStream.closeEntry();
 							return;
 						}
 
-						zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
+						zipOutputStream.putNextEntry(new ZipEntry(relativePath));
 						zipOutputStream.write(Files.readAllBytes(path));
 						zipOutputStream.closeEntry();
 					}
@@ -219,17 +231,27 @@ public class WorkspaceServlet {
 						break;
 					}
 
+					String relativePath = zipEntry.getName();
+					// The .zip archive always contains separators of the operating system on which they were created.
+					// We need to normalize them.
+					if(File.separator.equals("/")) {
+						relativePath = relativePath.replace("\\", "/");
+					}
+					else {
+						relativePath = relativePath.replace("/", "\\");
+					}
+
 					// If the directory for the entity does not exist yet, it will be created.
-					java.nio.file.Path entityPath = rootPath.resolve(zipEntry.getName());
-					if(zipEntry.isDirectory()) {
-						Files.createDirectories(entityPath);
+					java.nio.file.Path absolutePath = rootPath.resolve(relativePath);
+					if (zipEntry.isDirectory()) {
+						Files.createDirectories(absolutePath);
 						continue;
 					}
 
 					// Normally, the parent directory should already exist. We'll check it anyway.
-					Files.createDirectories(entityPath.getParent());
+					Files.createDirectories(absolutePath.getParent());
 
-					if (zipEntry.getName().endsWith("configuration.json")) {
+					if (relativePath.endsWith("configuration.json")) {
 						Configuration currentConfiguration = workspace.getConfig();
 						Configuration importConfiguration = (Configuration) SerializationHelper.getInstance().toClass(new String(IOUtils.toByteArray(zipInputStream), StandardCharsets.UTF_8), Configuration.class);
 						// Model import order needs to be merged with the current configuration.
@@ -241,7 +263,7 @@ public class WorkspaceServlet {
 						continue;
 					}
 
-					Files.write(entityPath, IOUtils.toByteArray(zipInputStream));
+					Files.write(absolutePath, IOUtils.toByteArray(zipInputStream));
 				}
 			}
 			catch (JsonMappingException e) {
@@ -259,7 +281,14 @@ public class WorkspaceServlet {
 
 	private String getRelativePath(java.nio.file.Path path, String workspaceName) {
 		String pathName = path.getFileName().toString();
+		// If we walk through the workspace directory, one entry is the workspace directory itself.
+		// We don't want to add an entry for that.
+		if (pathName.equals(workspaceName)) {
+			return null;
+		}
+
 		String parentPathName = path.getParent().getFileName().toString();
+		// We've reached the destination and can return the path.
 		if (parentPathName.equals(workspaceName)) {
 			return pathName;
 		}

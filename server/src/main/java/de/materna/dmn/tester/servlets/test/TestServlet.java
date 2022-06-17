@@ -12,6 +12,7 @@ import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.dmn.tester.servlets.test.beans.TestResult;
 import de.materna.dmn.tester.servlets.test.beans.TestResultOutput;
+import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
 import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
 import de.materna.jdec.model.ExecutionResult;
 import de.materna.jdec.serialization.SerializationHelper;
@@ -85,6 +86,7 @@ public class TestServlet {
 	@Produces("application/json")
 	public Response runTest(@PathParam("workspace") String workspaceUUID, @PathParam("uuid") String testUUID) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		Configuration configuration = workspace.getConfig();
 		PersistenceDirectoryManager<PersistedInput> inputManager = workspace.getInputManager();
 
 		PersistedTest test = workspace.getTestManager().getFile(testUUID);
@@ -92,11 +94,20 @@ public class TestServlet {
 			throw new NotFoundException();
 		}
 
-		Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
+		String mainModelNamespace = DroolsHelper.getMainModelNamespace(workspace);
+		PersistedInput input = InputServlet.enrichInput(inputManager, inputManager.getFile(test.getInput()));
 
-		ExecutionResult executionResult = workspace.getDecisionSession().executeModel(DroolsHelper.getMainModelNamespace(workspace), InputServlet.enrichInput(inputManager, inputManager.getFile(test.getInput())).getValue());
+		ExecutionResult executionResult;
+		if (configuration.getDecisionService() == null) {
+			executionResult = workspace.getDecisionSession().executeModel(mainModelNamespace, input.getValue());
+		}
+		else {
+			executionResult = workspace.getDecisionSession().getDMNDecisionSession().executeModel(mainModelNamespace, configuration.getDecisionService().getName(), input.getValue());
+		}
+
 		Map<String, Object> calculatedOutputs = executionResult.getOutputs();
 
+		Map<String, PersistedOutput> expectedOutputs = workspace.getOutputManager().getFiles();
 		Map<String, TestResultOutput> comparedOutputs = new LinkedHashMap<>();
 		for (String outputUUID : test.getOutputs()) {
 			PersistedOutput expectedOutput = expectedOutputs.get(outputUUID);
