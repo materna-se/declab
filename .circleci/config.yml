@@ -144,11 +144,11 @@ workflows:
             tags:
               only: /.*/
 
-      #- publish_container:
-      #    requires:
-      #      - build_server
-      #    filters:
-      #      branches:
-      #        ignore: /.*/
-      #      tags:
-      #        only: /.*/
+      - publish_container:
+          requires:
+            - build_server
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
