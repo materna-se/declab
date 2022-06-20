@@ -401,15 +401,19 @@
   }
 
   @media print {
-    .virtual-page {
-      box-shadow: none;
-      border-radius: 0;
-      width: 100vw;
-    }
-
     .col-12 {
       padding-left: 0;
       padding-right: 0;
     }
+
+    .virtual-page {
+      box-shadow: none;
+      border-radius: 0;
+      width: 100%;
+    }
+
+		footer {
+			display: none;
+		}
   }
 </style>
