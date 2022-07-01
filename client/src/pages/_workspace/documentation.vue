@@ -67,7 +67,7 @@
 								<type-documentation v-bind:type="{name: input.name, type: input.returnType, collection: false, allowedValues: null}" v-bind:root="true" class="mt-2"/>
 							</template>
 						</template>
-						<p class="mb-2 text-muted" v-else>The model does not contain any decisions.</p>
+						<p class="mb-2 text-muted" v-else>The model does not contain any inputs.</p>
 
 						<h4 class="mt-2">{{modelIndex + 2}}.3. Knowledge Models</h4>
 						<template v-if="model.knowledgeModels.length > 0">
@@ -179,7 +179,7 @@
 								</table>
 							</template>
 						</template>
-						<p class="mb-2 text-muted" v-else>The model does not contain any decisions.</p>
+						<p class="mb-2 text-muted" v-else>The model does not contain any decision services.</p>
 					</template>
 				</div>
 				<div class="page" v-else>
