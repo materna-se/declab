@@ -3,36 +3,22 @@
 
 	<groupId>de.materna</groupId>
 	<artifactId>declab</artifactId>
-	<version>2.7.0</version>
-	<packaging>war</packaging>
+	<version>2.9.0</version>
+
+	<packaging>jar</packaging>
 
 	<properties>
 		<project.java.version>11</project.java.version>
+		<kotlin.version>1.6.20</kotlin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>jakarta.platform</groupId>
-			<artifactId>jakarta.jakartaee-api</artifactId>
-			<version>8.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-multipart-provider</artifactId>
-			<version>5.0.0.Final</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.websocket</groupId>
-			<artifactId>javax.websocket-api</artifactId>
-			<version>1.1</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.github.materna-se</groupId>
 			<artifactId>jdec</artifactId>
-			<version>2.8.9-SNAPSHOT</version>
+			<version>2.9.2-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -52,6 +38,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+			<version>2.13.3</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
 			<version>5.8.1</version>
@@ -63,12 +55,7 @@
 			<version>5.8.1</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-multipart</artifactId>
-			<version>2.35</version>
-			<scope>test</scope>
-		</dependency>
+
 		<dependency>
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
@@ -91,9 +78,29 @@
 			<version>9.4.44.v20210927</version>
 		</dependency>
 		<dependency>
-			<groupId>com.sun.jersey</groupId>
+			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-server</artifactId>
-			<version>1.9</version>
+			<version>2.35</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-common</artifactId>
+			<version>2.35</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet-core</artifactId>
+			<version>2.35</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.inject</groupId>
+			<artifactId>jersey-hk2</artifactId>
+			<version>2.35</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-multipart</artifactId>
+			<version>2.35</version>
 		</dependency>
 
 		<dependency>
@@ -116,21 +123,87 @@
 			<artifactId>hibernate-jpa-2.0-api</artifactId>
 			<version>1.0.1.Final</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.mindrot</groupId>
 			<artifactId>jbcrypt</artifactId>
 			<version>0.4</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib-jdk8</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib-jdk8</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-test</artifactId>
+			<version>${kotlin.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib-jdk8</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.jetbrains.kotlin</groupId>
+				<artifactId>kotlin-maven-plugin</artifactId>
+				<version>${kotlin.version}</version>
+				<executions>
+					<execution>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>test-compile</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>test-compile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<jvmTarget>1.8</jvmTarget>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
+				<executions>
+					<execution>
+						<id>compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>testCompile</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<source>${project.java.version}</source>
 					<target>${project.java.version}</target>
@@ -152,6 +225,108 @@
 				<configuration>
 					<resourceEncoding>${project.build.sourceEncoding}</resourceEncoding>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.4</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+										<exclude>META-INF/*.MF</exclude>
+									</excludes>
+								</filter>
+							</filters>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>de.materna.dmn.tester.StandaloneServer</mainClass>
+								</transformer>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer"/>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/kie.conf</resource>
+								</transformer>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/sisu/javax.inject.Named</resource>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.akathist.maven.plugins.launch4j</groupId>
+				<artifactId>launch4j-maven-plugin</artifactId>
+				<version>2.1.2</version>
+				<executions>
+					<execution>
+						<id>launch4j-package</id>
+						<phase>package</phase>
+						<goals>
+							<goal>launch4j</goal>
+						</goals>
+						<configuration>
+							<classPath>
+								<mainClass>de.materna.dmn.tester.StandaloneServer</mainClass>
+								<!--
+								<addDependencies>true</addDependencies>
+								<jarLocation>lib/</jarLocation>
+								-->
+							</classPath>
+							<dontWrapJar>false</dontWrapJar>
+							<headerType>console</headerType>
+							<jar>target/declab-2.9.0.jar</jar>
+							<outfile>target/declab-2.9.0.exe</outfile>
+							<errTitle/>
+							<cmdLine/>
+							<chdir>.</chdir>
+							<priority>normal</priority>
+							<downloadUrl>https://adoptium.net/releases.html?variant=openjdk11</downloadUrl>
+							<supportUrl/>
+							<stayAlive>false</stayAlive>
+							<restartOnCrash>false</restartOnCrash>
+							<manifest/>
+							<icon>../build/favicon.ico</icon>
+							<singleInstance>
+								<mutexName>declab</mutexName>
+								<windowTitle/>
+							</singleInstance>
+							<jre>
+								<path>./jre;%JAVA_HOME%;%PATH%</path>
+								<bundledJre64Bit>true</bundledJre64Bit>
+								<bundledJreAsFallback>false</bundledJreAsFallback>
+								<minVersion>11</minVersion>
+								<maxVersion/>
+								<jdkPreference>preferJre</jdkPreference>
+								<runtimeBits>64</runtimeBits>
+							</jre>
+							<versionInfo>
+								<fileVersion>2.9.0.0</fileVersion>
+								<txtFileVersion>2.9.0</txtFileVersion>
+								<fileDescription>declab</fileDescription>
+								<copyright>Developed and maintained by Materna Information &amp; Communications SE on GitHub. Available under the Apache 2.0 License.</copyright>
+								<productVersion>2.9.0.0</productVersion>
+								<txtProductVersion>2.9.0</txtProductVersion>
+								<productName>declab</productName>
+								<companyName/>
+								<internalName>declab</internalName>
+								<originalFilename>declab-2.9.0.exe</originalFilename>
+								<trademarks/>
+								<language>ENGLISH_US</language>
+							</versionInfo>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

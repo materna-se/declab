@@ -6,14 +6,14 @@
 					<h3 class="mb-0">Publisher</h3>
 				</div>
 				<div class="col-1 mb-2">
-					<button class="btn btn-block btn-outline-secondary" @click="expandAll">
+					<button class="btn btn-block btn-outline-primary" @click="expandAll">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 							<path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7m4.5-10.09l4.5-4.5V10h2V3h-7v2h3.59l-4.5 4.5 1.41 1.41z" fill="currentColor"/>
 						</svg>
 					</button>
 				</div>
 				<div class="col-1 mb-2">
-					<button class="btn btn-block btn-outline-secondary" @click="collapseAll">
+					<button class="btn btn-block btn-outline-primary" @click="collapseAll">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 							<path d="M19.5 3.09L15 7.59V4h-2v7h7V9h-3.59l4.5-4.5-1.41-1.41M4 13v2h3.59l-4.5 4.5 1.41 1.41 4.5-4.5V20h2v-7H4z" fill="currentColor"/>
 						</svg>

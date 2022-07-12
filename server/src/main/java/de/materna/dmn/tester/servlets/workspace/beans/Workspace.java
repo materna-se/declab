@@ -1,7 +1,5 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
-import java.io.IOException;
-
 import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
@@ -11,22 +9,27 @@ import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.playground.beans.Playground;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.jdec.HybridDecisionSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class Workspace {
+	private static final Logger log = LoggerFactory.getLogger(Workspace.class);
 
-	private final PersistenceDirectoryManager<Challenge> challengeManager;
+	private PersistenceDirectoryManager<Challenge> challengeManager;
 
-	private final PersistenceDirectoryManager<String> modelManager;
-	private final PersistenceDirectoryManager<Playground> playgroundManager;
+	private PersistenceDirectoryManager<String> modelManager;
+	private PersistenceDirectoryManager<Playground> playgroundManager;
 
-	private final PersistenceDirectoryManager<PersistedInput> inputManager;
-	private final PersistenceDirectoryManager<PersistedOutput> outputManager;
-	private final PersistenceDirectoryManager<PersistedTest> testManager;
+	private PersistenceDirectoryManager<PersistedInput> inputManager;
+	private PersistenceDirectoryManager<PersistedOutput> outputManager;
+	private PersistenceDirectoryManager<PersistedTest> testManager;
 
-	private final PersistenceFileManager configurationManager;
-	private final Configuration configuration;
-	private final PersistenceFileManager accessLogManager;
-	private final AccessLog accessLog;
+	private PersistenceFileManager configurationManager;
+	private Configuration configuration;
+	private PersistenceFileManager accessLogManager;
+	private AccessLog accessLog;
 
 	private HybridDecisionSession decisionSession;
 

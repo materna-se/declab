@@ -1,5 +1,23 @@
 package de.materna.dmn.tester.servlets.workspace;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import de.materna.dmn.tester.helpers.HashingHelper;
+import de.materna.dmn.tester.persistence.WorkspaceManager;
+import de.materna.dmn.tester.servlets.filters.ReadAccess;
+import de.materna.dmn.tester.servlets.filters.WriteAccess;
+import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
+import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
+import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
+import de.materna.jdec.serialization.SerializationHelper;
+import org.apache.commons.io.IOUtils;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,43 +31,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-
-import org.apache.commons.io.IOUtils;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
-import de.materna.dmn.tester.helpers.HashingHelper;
-import de.materna.dmn.tester.persistence.WorkspaceManager;
-import de.materna.dmn.tester.servlets.filters.ReadAccess;
-import de.materna.dmn.tester.servlets.filters.WriteAccess;
-import de.materna.dmn.tester.servlets.workspace.beans.Configuration;
-import de.materna.dmn.tester.servlets.workspace.beans.PublicConfiguration.Access;
-import de.materna.dmn.tester.servlets.workspace.beans.Workspace;
-import de.materna.jdec.serialization.SerializationHelper;
-
 @Path("/workspaces/{workspace}")
 public class WorkspaceServlet {
+	private static final Logger log = LoggerFactory.getLogger(WorkspaceServlet.class);
 
 	@GET
 	@Path("/public")
 	@Produces("application/json")
-	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID)
-			throws RuntimeException, IOException {
-		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		final Configuration configuration = workspace.getConfig();
+	public Response getWorkspacePublicConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		Configuration configuration = workspace.getConfig();
 
 		return Response.status(Response.Status.OK).entity(configuration.getPublicConfig().toJSON()).build();
 	}
@@ -58,10 +49,9 @@ public class WorkspaceServlet {
 	@WriteAccess
 	@Path("/config")
 	@Produces("application/json")
-	public Response getWorkspaceConfig(@PathParam("workspace") String workspaceUUID)
-			throws RuntimeException, IOException {
-		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		final Configuration configuration = workspace.getConfig();
+	public Response getWorkspaceConfig(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		Configuration configuration = workspace.getConfig();
 
 		return Response.status(Response.Status.OK).entity(configuration.toJSON()).build();
 	}
@@ -70,22 +60,20 @@ public class WorkspaceServlet {
 	@WriteAccess
 	@Path("/config")
 	@Consumes("application/json")
-	public Response editWorkspaceConfig(@PathParam("workspace") String workspaceUUID, String body)
-			throws RuntimeException, IOException {
-		final HashMap<String, String> params = SerializationHelper.getInstance().toClass(body,
-				new TypeReference<HashMap<String, String>>() {
-				});
+	public Response editWorkspaceConfig(@PathParam("workspace") String workspaceUUID, String body) throws RuntimeException, IOException {
+		HashMap<String, String> params = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, String>>() {
+		});
 
-		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
-		final Configuration configuration = workspace.getConfig();
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+		Configuration configuration = workspace.getConfig();
 
 		// Store changes in temporary configuration to avoid situations where a change
 		// to the configuration object has been made but not logged or serialized.
-		final Configuration tempConfiguration = new Configuration();
+		Configuration tempConfiguration = new Configuration();
 
 		// The name is optional, we will set it if the value is valid.
 		if (params.containsKey("name")) {
-			final String name = params.get("name");
+			String name = params.get("name");
 			if (name == null || name.length() == 0) {
 				throw new BadRequestException();
 			}
@@ -94,7 +82,7 @@ public class WorkspaceServlet {
 
 		// The description is optional, we will set it if the value is valid.
 		if (params.containsKey("description")) {
-			final String description = params.get("description");
+			String description = params.get("description");
 			if (description == null) {
 				throw new BadRequestException();
 			}
@@ -103,7 +91,7 @@ public class WorkspaceServlet {
 
 		// The token is optional if the access mode is set to public.
 		if (params.containsKey("token")) {
-			final String token = params.get("token");
+			String token = params.get("token");
 			if (token == null || token.length() == 0) {
 				throw new BadRequestException();
 			}
@@ -112,8 +100,8 @@ public class WorkspaceServlet {
 
 		// The access mode is optional, we will set it if the value is valid.
 		if (params.containsKey("access")) {
-			final Access access = Access.valueOf(params.get("access"));
-			if (access != Access.PUBLIC && tempConfiguration.getToken() == null && configuration.getToken() == null) {
+			Access access = Access.valueOf(params.get("access"));
+			if (access != Access.PUBLIC && (tempConfiguration.getToken() == null && configuration.getToken() == null)) {
 				throw new BadRequestException();
 			}
 			tempConfiguration.setAccess(access);
@@ -144,9 +132,8 @@ public class WorkspaceServlet {
 	@WriteAccess
 	@Path("/log")
 	@Produces("application/json")
-	public Response getWorkspaceAccessLog(@PathParam("workspace") String workspaceUUID)
-			throws RuntimeException, IOException {
-		final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+	public Response getWorkspaceAccessLog(@PathParam("workspace") String workspaceUUID) throws RuntimeException, IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
 		workspace.getAccessLog().writeMessage("Accessed log", System.currentTimeMillis());
 
@@ -156,7 +143,7 @@ public class WorkspaceServlet {
 	@DELETE
 	@WriteAccess
 	public Response deleteWorkspace(@PathParam("workspace") String workspaceUUID) throws IOException {
-		final WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
+		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
 		if (!workspaceManager.has(workspaceUUID)) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
@@ -170,88 +157,103 @@ public class WorkspaceServlet {
 	@Path("/backup")
 	@Produces("application/zip")
 	public Response exportWorkspace(@PathParam("workspace") String workspaceUUID) {
-		final StreamingOutput streamingOutput = (OutputStream outputStream) -> {
+		StreamingOutput streamingOutput = (OutputStream outputStream) -> {
 			try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
-				final Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+				Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString()))
-						.filter(path -> !Files.isDirectory(path)).forEach(path -> {
-							try {
-								if (path.endsWith("access.log")) {
-									return;
-								}
+				Files.walk(Paths.get(workspace.getTestManager().getDirectory().getParent().toString())).forEach(path -> {
+					try {
+						String relativePath = getRelativePath(path, workspaceUUID);
+						if (relativePath == null) {
+							return;
+						}
 
-								if (path.endsWith("configuration.json")) {
-									final Configuration clonedConfiguration = (Configuration) SerializationHelper
-											.getInstance()
-											.toClass(SerializationHelper.getInstance().toJSON(workspace.getConfig()),
-													Configuration.class);
-									// Trim cloned configuration.
-									clonedConfiguration.setAccess(Access.PUBLIC);
-									clonedConfiguration.setToken(null);
-									clonedConfiguration.setSalt(null);
-									clonedConfiguration.setCreatedDate(0L);
-									clonedConfiguration.setModifiedDate(0L);
+						if (Files.isDirectory(path)) {
+							zipOutputStream.putNextEntry(new ZipEntry(relativePath + "/"));
+							zipOutputStream.closeEntry();
+							return;
+						}
 
-									// Write trimmed copy of configuration
-									zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
-									zipOutputStream.write(SerializationHelper.getInstance().toJSON(clonedConfiguration)
-											.getBytes(StandardCharsets.UTF_8));
-									zipOutputStream.closeEntry();
-									return;
-								}
+						if (path.endsWith("access.log")) {
+							// We don't want to export the access log.
+							return;
+						}
 
-								zipOutputStream.putNextEntry(new ZipEntry(getRelativePath(path, workspaceUUID)));
-								zipOutputStream.write(Files.readAllBytes(path));
-								zipOutputStream.closeEntry();
-							} catch (final Exception e) {
-								System.err.println(e.getMessage() + " " + e);
-							}
-						});
+						if (path.endsWith("configuration.json")) {
+							// We don't want to export all key-value pairs of the configuration.
+
+							Configuration clonedConfiguration = (Configuration) SerializationHelper.getInstance().toClass(SerializationHelper.getInstance().toJSON(workspace.getConfig()), Configuration.class);
+							clonedConfiguration.setAccess(Access.PUBLIC);
+							clonedConfiguration.setToken(null);
+							clonedConfiguration.setSalt(null);
+							clonedConfiguration.setCreatedDate(0L);
+							clonedConfiguration.setModifiedDate(0L);
+
+							zipOutputStream.putNextEntry(new ZipEntry(relativePath));
+							zipOutputStream.write(SerializationHelper.getInstance().toJSON(clonedConfiguration).getBytes(StandardCharsets.UTF_8));
+							zipOutputStream.closeEntry();
+							return;
+						}
+
+						zipOutputStream.putNextEntry(new ZipEntry(relativePath));
+						zipOutputStream.write(Files.readAllBytes(path));
+						zipOutputStream.closeEntry();
+					}
+					catch (Exception e) {
+						log.error(e.getMessage(), e);
+					}
+				});
 			}
 		};
 
-		return Response.status(Response.Status.OK)
-				.header("Content-Disposition", "attachment; filename=\"" + workspaceUUID + ".dtar\"")
-				.entity(streamingOutput).build();
+		return Response.status(Response.Status.OK).header("Content-Disposition", "attachment; filename=\"" + workspaceUUID + ".dtar\"").entity(streamingOutput).build();
 	}
 
 	@PUT
 	@WriteAccess
 	@Path("/backup")
 	@Consumes("multipart/form-data")
-	public Response importWorkspace(@PathParam("workspace") String workspaceUUID,
-			MultipartFormDataInput multipartFormDataInput) throws Exception {
-		final WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
-		final Workspace workspace = workspaceManager.get(workspaceUUID);
+	public Response importWorkspace(@PathParam("workspace") String workspaceUUID, FormDataMultiPart multiPart) throws Exception {
+		WorkspaceManager workspaceManager = WorkspaceManager.getInstance();
+		Workspace workspace = workspaceManager.get(workspaceUUID);
 
-		final java.nio.file.Path rootPath = workspace.getTestManager().getDirectory().getParent();
+		java.nio.file.Path rootPath = workspace.getTestManager().getDirectory().getParent();
 
-		// Recursively delete all files in workspace folder except for the configuration
-		// file and the access log.
-		Files.walk(Paths.get(rootPath.toString())).sorted(Comparator.reverseOrder())
-				.filter(path -> !path.endsWith("configuration.json") && !path.endsWith("access.log"))
-				.map(java.nio.file.Path::toFile).forEach(File::delete);
+		// Recursively delete all files in workspace folder except for the configuration file and the access log.
+		Files.walk(Paths.get(rootPath.toString())).sorted(Comparator.reverseOrder()).filter(path -> !path.endsWith("configuration.json") && !path.endsWith("access.log")).map(java.nio.file.Path::toFile).forEach(File::delete);
 
 		// Iterate over all entries in the .zip archive and add them to the workspace.
-		try (InputStream inputStream = multipartFormDataInput.getFormDataMap().get("backup").get(0)
-				.getBody(InputStream.class, null)) {
+		try (InputStream inputStream = multiPart.getField("backup").getValueAs(InputStream.class)) {
 			try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
 				while (true) {
-					final ZipEntry zipEntry = zipInputStream.getNextEntry();
+					ZipEntry zipEntry = zipInputStream.getNextEntry();
 					if (zipEntry == null) {
 						break;
 					}
 
-					// If the directory for the entity does not exist yet, it will be created.
-					final java.nio.file.Path entityPath = rootPath.resolve(zipEntry.getName());
-					Files.createDirectories(entityPath.getParent());
+					String relativePath = zipEntry.getName();
+					// The .zip archive always contains separators of the operating system on which they were created.
+					// We need to normalize them.
+					if(File.separator.equals("/")) {
+						relativePath = relativePath.replace("\\", "/");
+					}
+					else {
+						relativePath = relativePath.replace("/", "\\");
+					}
 
-					if (zipEntry.getName().endsWith("configuration.json")) {
-						final Configuration currentConfiguration = workspace.getConfig();
-						final Configuration importConfiguration = (Configuration) SerializationHelper.getInstance()
-								.toClass(new String(IOUtils.toByteArray(zipInputStream), StandardCharsets.UTF_8),
-										Configuration.class);
+					// If the directory for the entity does not exist yet, it will be created.
+					java.nio.file.Path absolutePath = rootPath.resolve(relativePath);
+					if (zipEntry.isDirectory()) {
+						Files.createDirectories(absolutePath);
+						continue;
+					}
+
+					// Normally, the parent directory should already exist. We'll check it anyway.
+					Files.createDirectories(absolutePath.getParent());
+
+					if (relativePath.endsWith("configuration.json")) {
+						Configuration currentConfiguration = workspace.getConfig();
+						Configuration importConfiguration = (Configuration) SerializationHelper.getInstance().toClass(new String(IOUtils.toByteArray(zipInputStream), StandardCharsets.UTF_8), Configuration.class);
 						// Model import order needs to be merged with the current configuration.
 						if (importConfiguration.getVersion() == 2) {
 							currentConfiguration.setModels(importConfiguration.getModels());
@@ -261,9 +263,10 @@ public class WorkspaceServlet {
 						continue;
 					}
 
-					Files.write(entityPath, IOUtils.toByteArray(zipInputStream));
+					Files.write(absolutePath, IOUtils.toByteArray(zipInputStream));
 				}
-			} catch (final JsonMappingException e) {
+			}
+			catch (JsonMappingException e) {
 				return Response.status(Response.Status.BAD_REQUEST).build();
 			}
 		}
@@ -277,8 +280,15 @@ public class WorkspaceServlet {
 	}
 
 	private String getRelativePath(java.nio.file.Path path, String workspaceName) {
-		final String pathName = path.getFileName().toString();
-		final String parentPathName = path.getParent().getFileName().toString();
+		String pathName = path.getFileName().toString();
+		// If we walk through the workspace directory, one entry is the workspace directory itself.
+		// We don't want to add an entry for that.
+		if (pathName.equals(workspaceName)) {
+			return null;
+		}
+
+		String parentPathName = path.getParent().getFileName().toString();
+		// We've reached the destination and can return the path.
 		if (parentPathName.equals(workspaceName)) {
 			return pathName;
 		}

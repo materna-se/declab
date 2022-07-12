@@ -5,7 +5,7 @@
 				<h3 class="mb-0">Playgrounds</h3>
 			</div>
 			<div class="col-1 mb-2">
-				<button class="btn btn-block btn-outline-secondary" @click="setAddMode">
+				<button class="btn btn-block btn-outline-primary" @click="setAddMode">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 						<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
 					</svg>
@@ -16,7 +16,7 @@
 			<div class="col-3 mb-4">
 				<div class="row mb-2">
 					<div class="col-12">
-						<button class="btn btn-block btn-outline-secondary mb-2" @click="order = !order; getPlaygrounds()">
+						<button class="btn btn-block btn-outline-primary mb-2" @click="order = !order; getPlaygrounds()">
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block mx-auto">
 								<path d="M9.25 5l3.25-3.25L15.75 5h-6.5m-.36 9.3H6L5.28 17H2.91L6 7h3l3.13 10H9.67l-.78-2.7m-2.56-1.62h2.23l-.63-2.12-.26-.97-.25-.96h-.03l-.22.97-.24.98-.6 2.1M13.05 17v-1.26l4.75-6.77v-.06h-4.3V7h7.23v1.34L16.09 15v.08h4.71V17h-7.75z" fill="currentColor" v-if="order"/>
 								<path d="M15.75 19l-3.25 3.25L9.25 19h6.5m-6.86-4.7H6L5.28 17H2.91L6 7h3l3.13 10H9.67l-.78-2.7m-2.56-1.62h2.23l-.63-2.12-.26-.97-.25-.96h-.03l-.22.97-.24.98-.6 2.1M13.05 17v-1.26l4.75-6.77v-.06h-4.3V7h7.23v1.34L16.09 15v.08h4.71V17h-7.75z" fill="currentColor" v-else/>
@@ -27,15 +27,15 @@
 				<div class="list-group">
 					<template v-if="Object.keys(playgrounds).length !== 0">
 						<div class="list-group-item list-group-item-action c-pointer" v-for="(playground, uuid) in playgrounds" :key="uuid" @click.self="setViewMode(uuid)">
-							<span class="d-block float-left mr-4" @click="setViewMode(uuid)">{{playground.name}}</span>
-							<div class="float-right">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" @click="setEditMode(uuid)">
+							<span class="d-block float-start me-4" @click="setViewMode(uuid)">{{playground.name}}</span>
+							<div class="float-end">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start me-2" @click="setEditMode(uuid)">
 									<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
 								</svg>
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left mr-2" @click="setDuplicateMode(uuid)">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start me-2" @click="setDuplicateMode(uuid)">
 									<path d="M11 17H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12v2H4v12h7v-2l4 3-4 3v-2m8 4V7H8v6H6V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2h2v2h11z" fill="currentColor"/>
 								</svg>
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-left" @click="deletePlayground(uuid)">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block float-start" @click="deletePlayground(uuid)">
 									<path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12M8 9h8v10H8V9m7.5-5l-1-1h-5l-1 1H5v2h14V4h-3.5z" fill="currentColor"/>
 								</svg>
 							</div>
@@ -86,8 +86,8 @@
 
 						<hr>
 
-						<button class="btn btn-block btn-outline-secondary" v-if="mode === 'ADD'" @click="addPlayground">Save Playground</button>
-						<button class="btn btn-block btn-outline-secondary" v-if="mode === 'EDIT'" @click="editPlayground">Save Playground</button>
+						<button class="btn btn-block btn-outline-primary" v-if="mode === 'ADD'" @click="addPlayground">Save Playground</button>
+						<button class="btn btn-block btn-outline-primary" v-if="mode === 'EDIT'" @click="editPlayground">Save Playground</button>
 					</div>
 				</div>
 			</div>
