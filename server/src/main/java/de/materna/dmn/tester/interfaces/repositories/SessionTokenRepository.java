@@ -2,8 +2,6 @@ package de.materna.dmn.tester.interfaces.repositories;
 
 import java.util.List;
 
-import javax.xml.registry.JAXRException;
-
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
 import de.materna.dmn.tester.beans.user.User;
 
@@ -21,7 +19,7 @@ public interface SessionTokenRepository {
 
 	SessionToken put(SessionToken token);
 
-	SessionToken update(SessionToken token) throws JAXRException;
+	SessionToken update(SessionToken token);
 
 	boolean delete(SessionToken token);
 }

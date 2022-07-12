@@ -15,7 +15,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.xml.registry.JAXRException;
 
 import de.materna.dmn.tester.beans.sessiontoken.filter.UserUuidFilter;
 import de.materna.dmn.tester.beans.user.User;
@@ -72,7 +71,7 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	}
 
 	@Override
-	public SessionToken update(SessionToken token) throws JAXRException {
+	public SessionToken update(SessionToken token) {
 		if (token != null) {
 			token.setLastUpdate(LocalDate.now());
 			return put(token);

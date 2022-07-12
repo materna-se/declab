@@ -2,7 +2,7 @@ package de.materna.dmn.tester.servlets;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import de.materna.dmn.tester.persistence.WorkspaceManager;
-import de.materna.dmn.tester.servlets.exceptions.GeneralExceptionMapper;
+import de.materna.dmn.tester.servlets.exceptions.mapper.GeneralExceptionMapper;
 import de.materna.dmn.tester.servlets.filters.CSRFFilter;
 import de.materna.dmn.tester.servlets.filters.ReadAccessFilter;
 import de.materna.dmn.tester.servlets.filters.WriteAccessFilter;

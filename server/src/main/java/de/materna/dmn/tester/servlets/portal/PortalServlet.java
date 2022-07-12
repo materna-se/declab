@@ -9,7 +9,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.registry.JAXRException;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -417,7 +416,7 @@ public class PortalServlet {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateLaboratory(String body) throws SessionTokenNotFoundException, UserPermissionNotFoundException,
-			MissingRightsException, JAXRException {
+			MissingRightsException {
 		final UpdateLaboratoryRequest updateLaboratoryRequest = (UpdateLaboratoryRequest) SerializationHelper
 				.getInstance().toClass(body, UpdateLaboratoryRequest.class);
 
@@ -530,7 +529,7 @@ public class PortalServlet {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateWorkspace(String body) throws SessionTokenNotFoundException, UserPermissionNotFoundException,
-			MissingRightsException, JAXRException {
+			MissingRightsException {
 		final UpdateWorkspaceRequest updateWorkspaceRequest = (UpdateWorkspaceRequest) SerializationHelper.getInstance()
 				.toClass(body, UpdateWorkspaceRequest.class);
 
