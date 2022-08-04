@@ -1,5 +1,6 @@
 package de.materna.dmn.tester.servlets.portal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -400,12 +401,22 @@ public class PortalServlet {
 		final ReadLaboratoryRequest readLaboratoryRequest = (ReadLaboratoryRequest) SerializationHelper.getInstance()
 				.toClass(body, ReadLaboratoryRequest.class);
 
-		final Laboratory laboratory = laboratoryRepository.findByUuid(readLaboratoryRequest.getLaboratoryUuid());
-		if (laboratory != null) {
-			checkUserPermission(laboratory.getUuid(), readLaboratoryRequest.getSessionTokenUuid(),
-					UserPermissionGroup.GUEST);
+		if (readLaboratoryRequest.getLaboratoryUuid() != null) {
+			final Laboratory laboratory = laboratoryRepository.findByUuid(readLaboratoryRequest.getLaboratoryUuid());
+			if (laboratory != null) {
+				checkUserPermission(laboratory.getUuid(), readLaboratoryRequest.getSessionTokenUuid(),
+						UserPermissionGroup.GUEST);
+				List<Laboratory> laboratories = new ArrayList<>();
+				laboratories.add(laboratory);
 
-			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(laboratory))
+				return Response.status(Response.Status.FOUND)
+						.entity(SerializationHelper.getInstance().toJSON(laboratories)).build();
+			}
+		} else {
+			final User userCurrent = userRepository.findBySessionToken(readLaboratoryRequest.getSessionTokenUuid());
+			List<Laboratory> laboratories = laboratoryRepository.findByUser(userCurrent.getUuid());
+
+			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(laboratories))
 					.build();
 		}
 		return Response.status(Response.Status.NOT_FOUND).build();
@@ -415,8 +426,8 @@ public class PortalServlet {
 	@Path("/laboratory/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateLaboratory(String body) throws SessionTokenNotFoundException, UserPermissionNotFoundException,
-			MissingRightsException {
+	public Response updateLaboratory(String body)
+			throws SessionTokenNotFoundException, UserPermissionNotFoundException, MissingRightsException {
 		final UpdateLaboratoryRequest updateLaboratoryRequest = (UpdateLaboratoryRequest) SerializationHelper
 				.getInstance().toClass(body, UpdateLaboratoryRequest.class);
 
@@ -528,8 +539,8 @@ public class PortalServlet {
 	@Path("/workspace/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateWorkspace(String body) throws SessionTokenNotFoundException, UserPermissionNotFoundException,
-			MissingRightsException {
+	public Response updateWorkspace(String body)
+			throws SessionTokenNotFoundException, UserPermissionNotFoundException, MissingRightsException {
 		final UpdateWorkspaceRequest updateWorkspaceRequest = (UpdateWorkspaceRequest) SerializationHelper.getInstance()
 				.toClass(body, UpdateWorkspaceRequest.class);
 
