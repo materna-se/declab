@@ -56,6 +56,28 @@ export default {
 	},
 
 	//
+	// Portal
+	//
+	async login(input) {
+		const response = await this._authorizedFetch(this._endpoint + "/portal/user/login", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(input)
+		});
+		return await response.json();
+	},
+
+	async getLaboratoriesFromDb(input) {
+		const response = await this._authorizedFetch(this._endpoint + "/portal/laboratory/read", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(input)
+		});
+		return await response.json();
+	},
+
+
+	//
 	// Workspace
 	//
 	async createWorkspace(input) {
