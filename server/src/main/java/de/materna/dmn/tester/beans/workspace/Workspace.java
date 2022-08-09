@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 import de.materna.dmn.tester.enums.VisabilityType;
 
 @Entity
-@Table(name = "workspace", uniqueConstraints = @UniqueConstraint(columnNames = { "uuid" }))
+@Table(name = "`workspace`", uniqueConstraints = @UniqueConstraint(columnNames = { "uuid" }))
 public class Workspace {
 	@Id
 	@Column(name = "uuid", unique = true, nullable = false)

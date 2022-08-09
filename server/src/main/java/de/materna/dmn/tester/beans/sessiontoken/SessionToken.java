@@ -13,12 +13,12 @@ import javax.validation.constraints.NotNull;
 import de.materna.dmn.tester.beans.user.User;
 
 @Entity
-@Table(name = "sessiontoken", uniqueConstraints = @UniqueConstraint(columnNames = { "uuid" }))
+@Table(name = "`sessiontoken`", uniqueConstraints = @UniqueConstraint(columnNames = { "uuid" }))
 public class SessionToken {
 	@Id
 	@Column(name = "uuid", unique = true, nullable = false)
 	private String uuid;
-	@Column(name = "user")
+	@Column(name = "userUuid")
 	@NotNull
 	private String userUuid;
 	@Column(name = "initiation")

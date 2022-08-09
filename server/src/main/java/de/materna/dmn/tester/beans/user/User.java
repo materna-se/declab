@@ -14,7 +14,7 @@ import javax.validation.constraints.NotEmpty;
 import org.mindrot.jbcrypt.BCrypt;
 
 @Entity
-@Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = { "uuid" }))
+@Table(name = "`user`", uniqueConstraints = @UniqueConstraint(columnNames = { "uuid" }))
 public class User {
 
 	@Id

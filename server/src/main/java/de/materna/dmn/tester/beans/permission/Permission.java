@@ -13,7 +13,7 @@ import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.enums.PermissionType;
 
 @Entity
-@Table(name = "permission")
+@Table(name = "`permission`")
 public class Permission {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
