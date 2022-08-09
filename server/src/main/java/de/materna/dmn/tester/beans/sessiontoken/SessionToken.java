@@ -1,6 +1,8 @@
 package de.materna.dmn.tester.beans.sessiontoken;
 
-import java.time.LocalDate;
+import java.sql.Timestamp;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -22,11 +24,11 @@ public class SessionToken {
 	@NotNull
 	private String userUuid;
 	@Column(name = "initiation")
-	private LocalDate initiation;
+	private Timestamp initiation;
 	@Column(name = "expiration")
-	private LocalDate expiration;
+	private Timestamp expiration;
 	@Column(name = "update")
-	private LocalDate lastUpdate;
+	private Timestamp lastUpdate;
 
 	public SessionToken() {
 	}
@@ -38,6 +40,8 @@ public class SessionToken {
 	public SessionToken(String userUuid) {
 		this.uuid = UUID.randomUUID().toString();
 		setUserUuid(userUuid);
+		setInitiation(Timestamp.valueOf(LocalDateTime.now()));
+		setExpiration(Timestamp.valueOf(addWorkdays(LocalDateTime.now(), 3)));
 	}
 
 	public String getUuid() {
@@ -52,27 +56,72 @@ public class SessionToken {
 		this.userUuid = userUuid;
 	}
 
-	public LocalDate getInitiation() {
+	public Timestamp getInitiation() {
 		return initiation;
 	}
 
-	public void setInitiation(LocalDate initiation) {
+	public void setInitiation(Timestamp initiation) {
 		this.initiation = initiation;
 	}
 
-	public LocalDate getExpiration() {
+	public Timestamp getExpiration() {
 		return expiration;
 	}
 
-	public void setExpiration(LocalDate expiration) {
+	public void setExpiration(Timestamp expiration) {
 		this.expiration = expiration;
 	}
 
-	public LocalDate getLastUpdate() {
+	public Timestamp getLastUpdate() {
 		return lastUpdate;
 	}
 
-	public void setLastUpdate(LocalDate lastUpdate) {
+	public void setLastUpdate(Timestamp lastUpdate) {
 		this.lastUpdate = lastUpdate;
+	}
+
+	public LocalDateTime addWorkdays(LocalDateTime date, int workdays) {
+		if (workdays < 1) {
+			return date;
+		}
+
+		LocalDateTime result = date;
+		int addedDays = 0;
+		while (addedDays != workdays) {
+			result = workdays > 0 ? result.plusDays(1) : result.minusDays(1);
+			if (!(result.getDayOfWeek() == DayOfWeek.SATURDAY || result.getDayOfWeek() == DayOfWeek.SUNDAY)) {
+				addedDays = addedDays + (workdays > 0 ? 1 : -1);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * @param dayOfWeek    The day of week of the start day. The values are numbered
+	 *                     following the ISO-8601 standard, from 1 (Monday) to 7
+	 *                     (Sunday).
+	 * @param businessDays The number of business days to count from the day of
+	 *                     week. A negative number will count days in the past.
+	 * 
+	 * @return The absolute (positive) number of days including weekends.
+	 */
+	public long getAllDays(int dayOfWeek, long businessDays) {
+		long result = 0;
+		if (businessDays != 0) {
+			boolean isStartOnWorkday = dayOfWeek < 6;
+			long absBusinessDays = Math.abs(businessDays);
+
+			if (isStartOnWorkday) {
+				// if negative businessDays: count backwards by shifting weekday
+				int shiftedWorkday = businessDays > 0 ? dayOfWeek : 6 - dayOfWeek;
+				result = absBusinessDays + (absBusinessDays + shiftedWorkday - 1) / 5 * 2;
+			} else { // start on weekend
+				// if negative businessDays: count backwards by shifting weekday
+				int shiftedWeekend = businessDays > 0 ? dayOfWeek : 13 - dayOfWeek;
+				result = absBusinessDays + (absBusinessDays - 1) / 5 * 2 + (7 - shiftedWeekend);
+			}
+		}
+		return result;
 	}
 }
