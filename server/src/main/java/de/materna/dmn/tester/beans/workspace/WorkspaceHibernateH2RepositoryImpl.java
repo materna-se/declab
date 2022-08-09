@@ -15,16 +15,16 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import de.materna.dmn.tester.beans.userpermission.UserPermissionHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.permission.PermissionHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.filter.NameFilter;
 import de.materna.dmn.tester.beans.workspace.filter.VisabilityFilter;
 import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.filters.WorkspaceFilter;
-import de.materna.dmn.tester.interfaces.repositories.UserPermissionRepository;
+import de.materna.dmn.tester.interfaces.repositories.PermissionRepository;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 
 public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
-	private final UserPermissionRepository userPermissionRepository = new UserPermissionHibernateH2RepositoryImpl();
+	private final PermissionRepository permissionRepository = new PermissionHibernateH2RepositoryImpl();
 
 	private final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
 	private final EntityManager em = entityManagerFactory.createEntityManager();
@@ -59,10 +59,10 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	@Override
-	public List<Workspace> findByUser(String ownerUuid) {
-		return userPermissionRepository.findByUser(ownerUuid).stream()
-				.filter(userPermission -> userPermission.getWorkspace() != null)
-				.map(userPermission -> findByUuid(userPermission.getWorkspace())).collect(Collectors.toList());
+	public List<Workspace> findByUser(String userUuid) {
+		return permissionRepository.findByUserUuid(userUuid).stream()
+				.filter(permission -> permission.getWorkspaceUuid() != null)
+				.map(permission -> findByUuid(permission.getWorkspaceUuid())).collect(Collectors.toList());
 	}
 
 	@Override

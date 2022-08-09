@@ -17,14 +17,14 @@ import javax.persistence.criteria.Root;
 
 import de.materna.dmn.tester.beans.laboratory.filter.NameFilter;
 import de.materna.dmn.tester.beans.laboratory.filter.VisabilityFilter;
-import de.materna.dmn.tester.beans.userpermission.UserPermissionHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.permission.PermissionHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.filters.LaboratoryFilter;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
-import de.materna.dmn.tester.interfaces.repositories.UserPermissionRepository;
+import de.materna.dmn.tester.interfaces.repositories.PermissionRepository;
 
 public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository {
-	private final UserPermissionRepository userPermissionRepository = new UserPermissionHibernateH2RepositoryImpl();
+	private final PermissionRepository userPermissionRepository = new PermissionHibernateH2RepositoryImpl();
 
 	private final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("main");
 	private final EntityManager em = entityManagerFactory.createEntityManager();
@@ -59,10 +59,10 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	}
 
 	@Override
-	public List<Laboratory> findByUser(String ownerUuid) {
-		return userPermissionRepository.findByUser(ownerUuid).stream()
-				.filter(userPermission -> userPermission.getLaboratory() != null)
-				.map(userPermission -> findByUuid(userPermission.getLaboratory())).collect(Collectors.toList());
+	public List<Laboratory> findByUser(String userUuid) {
+		return userPermissionRepository.findByUserUuid(userUuid).stream()
+				.filter(userPermission -> userPermission.getLaboratoryUuid() != null)
+				.map(userPermission -> findByUuid(userPermission.getLaboratoryUuid())).collect(Collectors.toList());
 	}
 
 	@Override

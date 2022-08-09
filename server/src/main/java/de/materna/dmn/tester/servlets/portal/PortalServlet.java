@@ -15,19 +15,19 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import de.materna.dmn.tester.beans.laboratory.Laboratory;
 import de.materna.dmn.tester.beans.laboratory.LaboratoryHibernateH2RepositoryImpl;
+import de.materna.dmn.tester.beans.permission.Permission;
+import de.materna.dmn.tester.beans.permission.PermissionGroup;
+import de.materna.dmn.tester.beans.permission.PermissionHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
 import de.materna.dmn.tester.beans.sessiontoken.SessionTokenHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.user.User;
 import de.materna.dmn.tester.beans.user.UserHibernateH2RepositoryImpl;
-import de.materna.dmn.tester.beans.userpermission.UserPermission;
-import de.materna.dmn.tester.beans.userpermission.UserPermissionGroup;
-import de.materna.dmn.tester.beans.userpermission.UserPermissionHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.beans.workspace.WorkspaceHibernateH2RepositoryImpl;
-import de.materna.dmn.tester.enums.UserPermissionType;
+import de.materna.dmn.tester.enums.PermissionType;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
+import de.materna.dmn.tester.interfaces.repositories.PermissionRepository;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
-import de.materna.dmn.tester.interfaces.repositories.UserPermissionRepository;
 import de.materna.dmn.tester.interfaces.repositories.UserRepository;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 import de.materna.dmn.tester.servlets.exceptions.authorization.MissingRightsException;
@@ -41,6 +41,7 @@ import de.materna.dmn.tester.servlets.portal.dto.laboratory.CreateLaboratoryRequ
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.DeleteLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.ReadLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.UpdateLaboratoryRequest;
+import de.materna.dmn.tester.servlets.portal.dto.sessionToken.ReadSessionTokenRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ChangeEmailRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ChangePasswordRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ChangeSystemAdminStateRequest;
@@ -61,7 +62,7 @@ public class PortalServlet {
 	private final SessionTokenRepository sessionTokenRepository = new SessionTokenHibernateH2RepositoryImpl();
 	private final LaboratoryRepository laboratoryRepository = new LaboratoryHibernateH2RepositoryImpl();
 	private final WorkspaceRepository workspaceRepository = new WorkspaceHibernateH2RepositoryImpl();
-	private final UserPermissionRepository userPermissionRepository = new UserPermissionHibernateH2RepositoryImpl();
+	private final PermissionRepository permissionRepository = new PermissionHibernateH2RepositoryImpl();
 
 	@POST
 	@Path("/user/changeEmail")
@@ -206,9 +207,9 @@ public class PortalServlet {
 			if (userRepository.delete(userFound)) {
 				final String userUuid = deleteUserRequest.getUserUuid();
 
-				final List<UserPermission> allUserPermissions = userPermissionRepository.findByUser(userUuid);
-				for (final UserPermission userPermission : allUserPermissions) {
-					userPermissionRepository.delete(userPermission);
+				final List<Permission> allUserPermissions = permissionRepository.findByUserUuid(userUuid);
+				for (final Permission userPermission : allUserPermissions) {
+					permissionRepository.delete(userPermission);
 				}
 
 				final List<Workspace> allWorkspaces = workspaceRepository.findByUser(userUuid);
@@ -341,6 +342,26 @@ public class PortalServlet {
 	}
 
 	@POST
+	@Path("/token/read")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response readSessionToken(String body) throws SessionTokenNotFoundException {
+		final ReadSessionTokenRequest readSessionTokenRequest = (ReadSessionTokenRequest) SerializationHelper
+				.getInstance().toClass(body, ReadSessionTokenRequest.class);
+
+		final SessionToken sessionTokenFound = sessionTokenRepository
+				.findByUuid(readSessionTokenRequest.getSessionTokenUuid());
+
+		if (sessionTokenFound == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		return Response.status(Response.Status.FOUND)
+				.entity(SerializationHelper.getInstance().toJSON(sessionTokenFound)).build();
+
+	}
+
+	@POST
 	@Path("/laboratory/create")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -379,13 +400,13 @@ public class PortalServlet {
 		final Laboratory laboratory = laboratoryRepository.findByUuid(deleteLaboratoryRequest.getLaboratoryUuid());
 		if (laboratory != null) {
 			checkUserPermission(laboratory.getUuid(), deleteLaboratoryRequest.getSessionTokenUuid(),
-					UserPermissionGroup.ADMINISTRATOR);
+					PermissionGroup.ADMINISTRATOR);
 
 			if (laboratoryRepository.delete(laboratory)) {
-				final List<UserPermission> allUserPermissions = userPermissionRepository
-						.findByLaboratory(deleteLaboratoryRequest.getLaboratoryUuid());
-				for (final UserPermission userPermission : allUserPermissions) {
-					userPermissionRepository.delete(userPermission);
+				final List<Permission> allUserPermissions = permissionRepository
+						.findByLaboratoryUuid(deleteLaboratoryRequest.getLaboratoryUuid());
+				for (final Permission userPermission : allUserPermissions) {
+					permissionRepository.delete(userPermission);
 				}
 				return Response.status(Response.Status.OK).build();
 			}
@@ -405,7 +426,7 @@ public class PortalServlet {
 			final Laboratory laboratory = laboratoryRepository.findByUuid(readLaboratoryRequest.getLaboratoryUuid());
 			if (laboratory != null) {
 				checkUserPermission(laboratory.getUuid(), readLaboratoryRequest.getSessionTokenUuid(),
-						UserPermissionGroup.GUEST);
+						PermissionGroup.GUEST);
 				List<Laboratory> laboratories = new ArrayList<>();
 				laboratories.add(laboratory);
 
@@ -434,7 +455,7 @@ public class PortalServlet {
 		final Laboratory laboratory = laboratoryRepository.findByUuid(updateLaboratoryRequest.getLaboratoryUuid());
 		if (laboratory != null) {
 			checkUserPermission(laboratory.getUuid(), updateLaboratoryRequest.getSessionTokenUuid(),
-					UserPermissionGroup.CONTRIBUTOR);
+					PermissionGroup.CONTRIBUTOR);
 
 			laboratory.setName(updateLaboratoryRequest.getName());
 			laboratory.setDescription(updateLaboratoryRequest.getDescription());
@@ -498,17 +519,17 @@ public class PortalServlet {
 		if (workspace != null) {
 			try {
 				checkUserPermission(workspace.getUuid(), deleteWorkspaceRequest.getSessionTokenUuid(),
-						UserPermissionGroup.ADMINISTRATOR);
+						PermissionGroup.ADMINISTRATOR);
 			} catch (SessionTokenNotFoundException | MissingRightsException e) {
 				checkUserPermission(workspace.getLaboratoryUuid(), deleteWorkspaceRequest.getSessionTokenUuid(),
-						UserPermissionGroup.ADMINISTRATOR);
+						PermissionGroup.ADMINISTRATOR);
 			}
 
 			if (workspaceRepository.delete(workspace)) {
-				final List<UserPermission> allUserPermissions = userPermissionRepository
-						.findByWorkspace(deleteWorkspaceRequest.getWorkspaceUuid());
-				for (final UserPermission userPermission : allUserPermissions) {
-					userPermissionRepository.delete(userPermission);
+				final List<Permission> allUserPermissions = permissionRepository
+						.findByWorkspaceUuid(deleteWorkspaceRequest.getWorkspaceUuid());
+				for (final Permission userPermission : allUserPermissions) {
+					permissionRepository.delete(userPermission);
 				}
 				return Response.status(Response.Status.OK).build();
 			}
@@ -526,8 +547,7 @@ public class PortalServlet {
 
 		final Workspace workspace = workspaceRepository.findByUuid(readWorkspaceRequest.getWorkspaceUuid());
 		if (workspace != null) {
-			checkUserPermission(workspace.getUuid(), readWorkspaceRequest.getSessionTokenUuid(),
-					UserPermissionGroup.GUEST);
+			checkUserPermission(workspace.getUuid(), readWorkspaceRequest.getSessionTokenUuid(), PermissionGroup.GUEST);
 
 			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(workspace))
 					.build();
@@ -547,7 +567,7 @@ public class PortalServlet {
 		final Workspace workspace = workspaceRepository.findByUuid(updateWorkspaceRequest.getWorkspaceUuid());
 		if (workspace != null) {
 			checkUserPermission(workspace.getUuid(), updateWorkspaceRequest.getSessionTokenUuid(),
-					UserPermissionGroup.CONTRIBUTOR);
+					PermissionGroup.CONTRIBUTOR);
 
 			workspace.setName(updateWorkspaceRequest.getName());
 			workspace.setDescription(updateWorkspaceRequest.getDescription());
@@ -561,8 +581,8 @@ public class PortalServlet {
 		return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
-	private void checkUserPermission(String targetUuid, String sessionTokenUuid,
-			UserPermissionType[] userPermissionGroup) throws SessionTokenNotFoundException, MissingRightsException {
+	private void checkUserPermission(String targetUuid, String sessionTokenUuid, PermissionType[] userPermissionGroup)
+			throws SessionTokenNotFoundException, MissingRightsException {
 		final SessionToken sessionToken = sessionTokenRepository.findByUuid(sessionTokenUuid);
 
 		if (sessionToken == null) {
@@ -571,11 +591,11 @@ public class PortalServlet {
 
 		final String userUuid = sessionToken.getUserUuid();
 		if (!userRepository.findByUuid(userUuid).isSystemAdmin()) {
-			final UserPermission userPermissionLaboratory = userPermissionRepository.findByUserAndLaboratory(userUuid,
+			final Permission userPermissionLaboratory = permissionRepository.findByUserAndLaboratoryUuids(userUuid,
 					targetUuid);
 			if (userPermissionLaboratory == null
 					|| !Arrays.asList(userPermissionGroup).contains(userPermissionLaboratory.getType())) {
-				final UserPermission userPermissionWorkspace = userPermissionRepository.findByUserAndWorkspace(userUuid,
+				final Permission userPermissionWorkspace = permissionRepository.findByUserAndWorkspaceUuids(userUuid,
 						targetUuid);
 				if (userPermissionWorkspace == null
 						|| !Arrays.asList(userPermissionGroup).contains(userPermissionWorkspace.getType())) {
