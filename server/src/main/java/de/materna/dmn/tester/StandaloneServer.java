@@ -20,8 +20,6 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.materna.dmn.tester.beans.user.User;
-import de.materna.dmn.tester.beans.user.UserHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.servlets.MainApplication;
 import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
 import de.materna.dmn.tester.sockets.MainSocket;
@@ -96,19 +94,7 @@ public class StandaloneServer {
 		server.start();
 		log.info("The server has been started successfully.");
 
-		org.h2.tools.Server.createWebServer("-webPort", "8081").start();
-		log.info("h2!");
-
-		UserHibernateH2RepositoryImpl userRepository = new UserHibernateH2RepositoryImpl();
-
-		User userGeorg = userRepository.register("georg.wolffgang@materna.de", "Shazzarr", "password", "Georg",
-				"Wolffgang");
-		if (userGeorg != null) {
-			userGeorg.setSystemAdmin(true);
-		}
-		log.info("Saved new user Georg: " + userGeorg);
-		final User userMike = userRepository.register("mike.myers@materna.de", "Mikey", "päswoad", "Mike", "Myers");
-		log.info("Saved new user Mike: " + userMike);
+		Database.prepare();
 
 		if (Desktop.isDesktopSupported()) {
 			Desktop.getDesktop().browse(new URI("http://127.0.0.1:8080"));
@@ -116,4 +102,5 @@ public class StandaloneServer {
 
 		server.join();
 	}
+
 }
