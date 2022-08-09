@@ -3,7 +3,6 @@ package de.materna.dmn.tester.beans.permission;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -16,7 +15,8 @@ import de.materna.dmn.tester.enums.PermissionType;
 @Table(name = "`permission`")
 public class Permission {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue
+	@Column(name = "id", unique = true)
 	private Long id;
 	@Column(name = "userUuid")
 	private String userUuid;
