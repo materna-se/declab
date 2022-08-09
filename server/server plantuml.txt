@@ -150,71 +150,77 @@ class UserHibernateH2RepositoryImpl {
 + List<User> findByFilter(UserFilter... filterArray)
 }
 
-class UserPermission {
+class Permission {
 - Long id;
-- String user;
-- String laboratory;
-- String workspace;
-- UserPermissionType type;
+- String userUuid;
+- String laboratoryUuid;
+- String workspaceUuid;
+- PermissionType type;
 -- constructors --
-+ UserPermission()
++ Permission()
++ Permission(User user, Laboratory laboratory, PermissionType type)
++ Permission(User user, Workspace workspace, PermissionType type)
++ Permission(Laboratory laboratory, Workspace workspace, PermissionType type)
++ Permission(String userUuid, String laboratoryUuid, String workspaceUuid, PermissionType type)
 -- getter & setter --
 + Long getId()
-+ String getUser()
-+ void setUser(String user)
-+ String getLaboratory()
-+ void setLaboratory(String laboratory)
-+ String getWorkspace()
-+ void setWorkspace(String workspace)
-+ UserPermissionType getType()
-+ void setType(UserPermissionType type)
++ String getUserUuid()
++ void setUserUuid(String user)
++ String getLaboratoryUuid()
++ void setLaboratoryUuid(String laboratory)
++ String getWorkspaceUuid()
++ void setWorkspaceUuid(String workspace)
++ PermissionType getType()
++ void setType(PermissionType type)
 }
 
-interface UserPermissionRepository {
-  List<UserPermission> findAll()
-  UserPermission findByUuid(Long id)
-  List<UserPermission> findByUser(String ownerUuid)
-  List<UserPermission> findByLaboratory(String laboratoryUuid)
-  List<UserPermission> findByWorkspace(String workspaceUuid)
-  List<UserPermission> findByType(UserPermissionType type)
-  UserPermission findByUserAndLaboratory(String userUuid, String laboratoryUuid)
-  UserPermission findByUserAndWorkspace(String userUuid, String workspaceUuid)
-  UserPermission findByLaboratoryAndWorkspace(String laboratoryUuid, String workspaceUuid)
-  void put(UserPermission relationship)
-  void delete(UserPermission relationship)
+interface PermissionRepository {
+  List<Permission> findAll()
+  Permission findById(Long id)
+  List<Permission> findByUserUuid(String ownerUuid)
+  List<Permission> findByLaboratoryUuid(String laboratoryUuid)
+  List<Permission> findByWorkspaceUuid(String workspaceUuid)
+  List<Permission> findByType(PermissionType type)
+  Permission findByUserAndLaboratoryUuids(String userUuid, String laboratoryUuid)
+  Permission findByUserAndWorkspaceUuids(String userUuid, String workspaceUuid)
+  Permission findByLaboratoryAndWorkspaceUuids(String laboratoryUuid, String workspaceUuid)
+  Permission put(Permission permission)
+  Permission create(String userUuid, String laboratoryUuid, String workspaceUuid, PermissionType type)
+  boolean delete(Permission permission)
 }
 
-class UserPermissionHibernateH2RepositoryImpl {
+class PermissionHibernateH2RepositoryImpl {
 -- overriding --
-+ List<UserPermission> findAll()
-+ UserPermission findByUuid(Long id)
-+ List<UserPermission> findByUser(String ownerUuid)
-+ List<UserPermission> findByLaboratory(String laboratoryUuid)
-+ List<UserPermission> findByWorkspace(String workspaceUuid)
-+ List<UserPermission> findByType(UserPermissionType type)
-+ UserPermission findByUserAndLaboratory(String userUuid, String laboratoryUuid)
-+ UserPermission findByUserAndWorkspace(String userUuid, String workspaceUuid)
-+ UserPermission findByLaboratoryAndWorkspace(String laboratoryUuid, String workspaceUuid)
-+ void put(UserPermission relationship)
-+ void delete(UserPermission relationship)
++ List<Permission> findAll()
++ Permission findById(Long id)
++ List<Permission> findByUserUuid(String ownerUuid)
++ List<Permission> findByLaboratoryUuid(String laboratoryUuid)
++ List<Permission> findByWorkspaceUuid(String workspaceUuid)
++ List<Permission> findByType(PermissionType type)
++ Permission findByUserAndLaboratoryUuids(String userUuid, String laboratoryUuid)
++ Permission findByUserAndWorkspaceUuids(String userUuid, String workspaceUuid)
++ Permission findByLaboratoryAndWorkspaceUuids(String laboratoryUuid, String workspaceUuid)
++ Permission put(Permission permission)
++ Permission create(String userUuid, String laboratoryUuid, String workspaceUuid, PermissionType type)
++ boolean delete(Permission permission)
 -- additional --
-+ List<UserPermission> findByFilter(UserPermissionFilter... filterArray)
++ List<Permission> findByFilter(PermissionFilter... filterArray)
 }
 
-enum UserPermissionType {
+enum PermissionType {
   OWNER
   ADMINISTRATOR
   CONTRIBUTOR
   GUEST
 }
 
-class UserPermissionGroup {
-+ {static} UserPermissionType[] OWNER
-+ {static} UserPermissionType[] ADMINISTRATOR
-+ {static} UserPermissionType[] CONTRIBUTOR
-+ {static} UserPermissionType[] GUEST
+class PermissionGroup {
++ {static} PermissionType[] OWNER
++ {static} PermissionType[] ADMINISTRATOR
++ {static} PermissionType[] CONTRIBUTOR
++ {static} PermissionType[] GUEST
 -- constructors --
-+ UserPermissionGroup()
++ PermissionGroup()
 }
 
 enum VisabilityType {
@@ -277,14 +283,14 @@ SessionTokenRepository --> SessionToken : persists
 SessionTokenRepository <|.. SessionTokenHibernateH2RepositoryImpl : implements
 UserRepository --> User : persists
 UserRepository <|.. UserHibernateH2RepositoryImpl : implements
-User --> UserPermission : has level
+User --> Permission : has level
 User --> SessionToken : recieves
-UserPermission --> Laboratory : gives rights
-UserPermission --> Workspace : gives rights
-UserPermissionRepository --> UserPermission : persists
-UserPermissionRepository <|.. UserPermissionHibernateH2RepositoryImpl : implements
-UserPermissionType --> UserPermission : types
-UserPermissionGroup --> UserPermissionType : concentraits
+Permission --> Laboratory : gives rights
+Permission --> Workspace : gives rights
+PermissionRepository --> Permission : persists
+PermissionRepository <|.. PermissionHibernateH2RepositoryImpl : implements
+PermissionType --> Permission : types
+PermissionGroup --> PermissionType : concentraits
 Workspace --> Laboratory : is part of
 WorkspaceRepository --> Workspace : persists
 WorkspaceRepository <|.. WorkspaceHibernateH2RepositoryImpl : implements
