@@ -1,5 +1,5 @@
 package de.materna.dmn.tester.enums;
 
-public enum UserPermissionType {
+public enum PermissionType {
 	OWNER, ADMINISTRATOR, CONTRIBUTOR, GUEST
 }

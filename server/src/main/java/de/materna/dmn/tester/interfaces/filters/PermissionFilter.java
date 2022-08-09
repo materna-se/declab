@@ -5,8 +5,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import de.materna.dmn.tester.beans.userpermission.UserPermission;
+import de.materna.dmn.tester.beans.permission.Permission;
 
-public interface UserPermissionFilter {
-	public Predicate toPredicate(Root<UserPermission> root, CriteriaQuery<UserPermission> cq, CriteriaBuilder cb);
+public interface PermissionFilter {
+	public Predicate toPredicate(Root<Permission> root, CriteriaQuery<Permission> cq, CriteriaBuilder cb);
 }
