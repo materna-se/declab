@@ -67,24 +67,24 @@ class SessionToken {
 interface SessionTokenRepository {
   List<SessionToken> findAll()
   List<SessionToken> findAllByUserUuid(String userUuid)
-  SessionToken findByUuid(String tokenUuid)
+  SessionToken findByUuid(String sessionTokenUuid)
   SessionToken findCurrentByUser(User user)
   SessionToken findCurrentByUserUuid(String userUuid)
-  SessionToken put(SessionToken token)
-  SessionToken update(SessionToken token) throws JAXRException
-  boolean delete(SessionToken token)
+  SessionToken put(SessionToken sessionToken)
+  SessionToken update(SessionToken sessionToken) throws JAXRException
+  boolean delete(SessionToken sessionToken)
 }
 
 class SessionTokenHibernateH2RepositoryImpl {
 -- overriding --
 + List<SessionToken> findAll()
 + List<SessionToken> findAllByUserUuid(String userUuid)
-+ SessionToken findByUuid(String tokenUuid)
++ SessionToken findByUuid(String sessionTokenUuid)
 + SessionToken findCurrentByUser(User user)
 + SessionToken findCurrentByUserUuid(String userUuid)
-+ SessionToken put(SessionToken token)
-+ SessionToken update(SessionToken token) throws JAXRException
-+ boolean delete(SessionToken token)
++ SessionToken put(SessionToken sessionToken)
++ SessionToken update(SessionToken sessionToken) throws JAXRException
++ boolean delete(SessionToken sessionToken)
 -- additional --
 + List<SessionToken> findByFilter(SessionTokenFilter... filterArray)
 }

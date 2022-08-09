@@ -43,9 +43,9 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	}
 
 	@Override
-	public SessionToken findByUuid(String tokenUuid) {
+	public SessionToken findByUuid(String sessionTokenUuid) {
 		transaction.begin();
-		final SessionToken sessionToken = em.find(SessionToken.class, tokenUuid);
+		final SessionToken sessionToken = em.find(SessionToken.class, sessionTokenUuid);
 		transaction.commit();
 		return Optional.ofNullable(sessionToken).get();
 	}
@@ -63,18 +63,18 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	}
 
 	@Override
-	public SessionToken put(SessionToken token) {
+	public SessionToken put(SessionToken sessionToken) {
 		transaction.begin();
-		em.persist(token);
+		em.persist(sessionToken);
 		transaction.commit();
-		return findByUuid(token.getUuid()) != null ? token : null;
+		return findByUuid(sessionToken.getUuid()) != null ? sessionToken : null;
 	}
 
 	@Override
-	public SessionToken update(SessionToken token) {
-		if (token != null) {
-			token.setLastUpdate(LocalDate.now());
-			return put(token);
+	public SessionToken update(SessionToken sessionToken) {
+		if (sessionToken != null) {
+			sessionToken.setLastUpdate(LocalDate.now());
+			return put(sessionToken);
 		}
 		return null;
 	}

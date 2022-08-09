@@ -17,9 +17,9 @@ public interface SessionTokenRepository {
 
 	SessionToken findCurrentByUserUuid(String userUuid);
 
-	SessionToken put(SessionToken token);
+	SessionToken put(SessionToken sessionToken);
 
-	SessionToken update(SessionToken token);
+	SessionToken update(SessionToken sessionToken);
 
-	boolean delete(SessionToken token);
+	boolean delete(SessionToken sessionToken);
 }
