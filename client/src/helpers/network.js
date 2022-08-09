@@ -27,13 +27,13 @@ export default {
 				socketHost = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + location.pathname.substring(0, location.pathname.length - 1) + socketHost;
 			}
 
-			if(this._socket !== null) {
+			if (this._socket !== null) {
 				this._socket.close();
 			}
 			this._socket = new ReconnectingWebSocket(socketHost + "/sockets/" + workspace);
 			this._socket.addEventListener("message", (e) => {
 				const data = JSON.parse(e.data);
-				if(data.type === "listeners") {
+				if (data.type === "listeners") {
 					vue.store.commit("setListeners", data.data);
 				}
 			});
@@ -63,6 +63,26 @@ export default {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
+		});
+		return await response.json();
+	},
+
+	async getUserBySessionToken(sessionTokenUuid) {
+		const sessionToken = await this._authorizedFetch(this._endpoint + "/portal/token/read", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(sessionTokenUuid)
+		});
+
+		Promise.resolve(sessionToken).then((value) => console.log(value));
+
+		const response = await this._authorizedFetch(this._endpoint + "/portal/user/read", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify({
+				userUuid: sessionToken.getUserUuid(),
+				sessionTokenUuid: sessionTokenUuid
+			})
 		});
 		return await response.json();
 	},

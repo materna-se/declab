@@ -80,6 +80,9 @@
 				}
 			}
 		},
+		beforeCreate() {
+			this.$router.replace('/_portal/portal');
+		},
 		methods: {
 			async getWorkspaces() {
 				if (!this.demoMode) {
