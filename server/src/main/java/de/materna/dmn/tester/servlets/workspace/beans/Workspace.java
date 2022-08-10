@@ -1,5 +1,10 @@
 package de.materna.dmn.tester.servlets.workspace.beans;
 
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.materna.dmn.tester.drools.helpers.DroolsHelper;
 import de.materna.dmn.tester.persistence.PersistenceDirectoryManager;
 import de.materna.dmn.tester.persistence.PersistenceFileManager;
@@ -9,12 +14,9 @@ import de.materna.dmn.tester.servlets.output.beans.PersistedOutput;
 import de.materna.dmn.tester.servlets.playground.beans.Playground;
 import de.materna.dmn.tester.servlets.test.beans.PersistedTest;
 import de.materna.jdec.HybridDecisionSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 public class Workspace {
+	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(Workspace.class);
 
 	private PersistenceDirectoryManager<Challenge> challengeManager;
