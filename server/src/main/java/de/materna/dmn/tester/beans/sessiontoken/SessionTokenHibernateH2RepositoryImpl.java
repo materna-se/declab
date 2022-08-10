@@ -1,6 +1,6 @@
 package de.materna.dmn.tester.beans.sessiontoken;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -73,7 +73,8 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	@Override
 	public SessionToken update(SessionToken sessionToken) {
 		if (sessionToken != null) {
-			sessionToken.setLastUpdate(LocalDate.now());
+			sessionToken.setLastUpdate(LocalDateTime.now());
+			sessionToken.setExpiration(SessionToken.addWorkdays(LocalDateTime.now(), 3));
 			return put(sessionToken);
 		}
 		return null;

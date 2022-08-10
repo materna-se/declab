@@ -40,8 +40,8 @@ public class SessionToken {
 	public SessionToken(String userUuid) {
 		this.uuid = UUID.randomUUID().toString();
 		setUserUuid(userUuid);
-		setInitiation(Timestamp.valueOf(LocalDateTime.now()));
-		setExpiration(Timestamp.valueOf(addWorkdays(LocalDateTime.now(), 3)));
+		setInitiation(LocalDateTime.now());
+		setExpiration(addWorkdays(getInitiation(), 3));
 	}
 
 	public String getUuid() {
@@ -56,72 +56,44 @@ public class SessionToken {
 		this.userUuid = userUuid;
 	}
 
-	public Timestamp getInitiation() {
-		return initiation;
+	public LocalDateTime getInitiation() {
+		return initiation.toLocalDateTime();
 	}
 
-	public void setInitiation(Timestamp initiation) {
-		this.initiation = initiation;
+	public void setInitiation(LocalDateTime initiation) {
+		this.initiation = Timestamp.valueOf(initiation);
 	}
 
-	public Timestamp getExpiration() {
-		return expiration;
+	public LocalDateTime getExpiration() {
+		return expiration.toLocalDateTime();
 	}
 
-	public void setExpiration(Timestamp expiration) {
-		this.expiration = expiration;
+	public void setExpiration(LocalDateTime expiration) {
+		this.expiration = Timestamp.valueOf(expiration);
 	}
 
-	public Timestamp getLastUpdate() {
-		return lastUpdate;
+	public LocalDateTime getLastUpdate() {
+		return lastUpdate.toLocalDateTime();
 	}
 
-	public void setLastUpdate(Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
+	public void setLastUpdate(LocalDateTime lastUpdate) {
+		this.lastUpdate = Timestamp.valueOf(lastUpdate);
 	}
 
-	public LocalDateTime addWorkdays(LocalDateTime date, int workdays) {
+	public static LocalDateTime addWorkdays(LocalDateTime dateTime, int workdays) {
 		if (workdays < 1) {
-			return date;
+			return dateTime;
 		}
 
-		LocalDateTime result = date;
+		LocalDateTime calculatedDateTime = dateTime;
 		int addedDays = 0;
 		while (addedDays != workdays) {
-			result = workdays > 0 ? result.plusDays(1) : result.minusDays(1);
-			if (!(result.getDayOfWeek() == DayOfWeek.SATURDAY || result.getDayOfWeek() == DayOfWeek.SUNDAY)) {
+			calculatedDateTime = workdays > 0 ? calculatedDateTime.plusDays(1) : calculatedDateTime.minusDays(1);
+			if (!(calculatedDateTime.getDayOfWeek() == DayOfWeek.SATURDAY
+					|| calculatedDateTime.getDayOfWeek() == DayOfWeek.SUNDAY)) {
 				addedDays = addedDays + (workdays > 0 ? 1 : -1);
 			}
 		}
-
-		return result;
-	}
-
-	/**
-	 * @param dayOfWeek    The day of week of the start day. The values are numbered
-	 *                     following the ISO-8601 standard, from 1 (Monday) to 7
-	 *                     (Sunday).
-	 * @param businessDays The number of business days to count from the day of
-	 *                     week. A negative number will count days in the past.
-	 * 
-	 * @return The absolute (positive) number of days including weekends.
-	 */
-	public long getAllDays(int dayOfWeek, long businessDays) {
-		long result = 0;
-		if (businessDays != 0) {
-			boolean isStartOnWorkday = dayOfWeek < 6;
-			long absBusinessDays = Math.abs(businessDays);
-
-			if (isStartOnWorkday) {
-				// if negative businessDays: count backwards by shifting weekday
-				int shiftedWorkday = businessDays > 0 ? dayOfWeek : 6 - dayOfWeek;
-				result = absBusinessDays + (absBusinessDays + shiftedWorkday - 1) / 5 * 2;
-			} else { // start on weekend
-				// if negative businessDays: count backwards by shifting weekday
-				int shiftedWeekend = businessDays > 0 ? dayOfWeek : 13 - dayOfWeek;
-				result = absBusinessDays + (absBusinessDays - 1) / 5 * 2 + (7 - shiftedWeekend);
-			}
-		}
-		return result;
+		return calculatedDateTime;
 	}
 }
