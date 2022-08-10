@@ -1,7 +1,7 @@
 package de.materna.dmn.tester.servlets.portal;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -55,7 +55,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		if (token == null) {
 			throw new SessionTokenNotFoundException("SessionToken not found : " + tokenUuid);
 		}
-		if (token.getExpiration().isBefore(LocalDate.now())) {
+		if (token.getExpiration().isBefore(LocalDateTime.now())) {
 			throw new SessionTokenExpiredException("SessionToken expired : " + tokenUuid);
 		}
 	}
