@@ -80,6 +80,8 @@
 		created() {
 			if (!this.user) {
 				this.verifySessionToken();
+			} else {
+				this.updateSessionToken();
 			}
 		},
 		methods: {
@@ -139,6 +141,18 @@
 				if (sessionTokenUuid) {
 					this.user = await Network.getUserBySessionToken({
 						sessionTokenUuid: sessionTokenUuid
+					});
+				} else {
+					this.$router.replace('/_portal/login');
+				}
+			},
+
+			async updateSessionToken() {
+				const sessionTokenUuid = this.getCookie("sessionToken");
+				if (sessionTokenUuid) {
+					this.user = await Network.updateSessionToken({
+						sessionTokenUuid: sessionTokenUuid,
+						uuid: this.user.uuid
 					});
 				} else {
 					this.$router.replace('/_portal/login');
