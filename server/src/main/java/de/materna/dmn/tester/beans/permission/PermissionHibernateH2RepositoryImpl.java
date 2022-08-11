@@ -43,10 +43,18 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 
 	@Override
 	public Permission findById(Long id) {
-		transaction.begin();
-		final Permission relationship = em.find(Permission.class, id);
-		transaction.commit();
-		return Optional.ofNullable(relationship).get();
+		try {
+			transaction.begin();
+			final Permission relationship = em.find(Permission.class, id);
+			transaction.commit();
+			return Optional.ofNullable(relationship).get();
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return null;
+		}
 	}
 
 	@Override
@@ -92,10 +100,18 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 
 	@Override
 	public Permission put(Permission userPermission) {
-		transaction.begin();
-		em.persist(userPermission);
-		transaction.commit();
-		return userPermission;
+		try {
+			transaction.begin();
+			em.persist(userPermission);
+			transaction.commit();
+			return userPermission;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return null;
+		}
 	}
 
 	@Override
@@ -106,10 +122,18 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 
 	@Override
 	public boolean delete(Permission userPermission) {
-		transaction.begin();
-		em.remove(em.contains(userPermission) ? userPermission : em.merge(userPermission));
-		transaction.commit();
-		return findById(userPermission.getId()) == null;
+		try {
+			transaction.begin();
+			em.remove(em.contains(userPermission) ? userPermission : em.merge(userPermission));
+			transaction.commit();
+			return findById(userPermission.getId()) == null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return false;
+		}
 	}
 
 	public List<Permission> findByFilter(PermissionFilter... filterArray) {

@@ -41,10 +41,18 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 
 	@Override
 	public User findByUuid(String uuid) {
-		transaction.begin();
-		final User user = em.find(User.class, uuid);
-		transaction.commit();
-		return Optional.ofNullable(user).get();
+		try {
+			transaction.begin();
+			final User user = em.find(User.class, uuid);
+			transaction.commit();
+			return Optional.ofNullable(user).get();
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return null;
+		}
 	}
 
 	@Override
@@ -67,18 +75,34 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 
 	@Override
 	public User put(User user) {
-		transaction.begin();
-		em.persist(user);
-		transaction.commit();
-		return findByUuid(user.getUuid()) != null ? user : null;
+		try {
+			transaction.begin();
+			em.persist(user);
+			transaction.commit();
+			return findByUuid(user.getUuid()) != null ? user : null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return null;
+		}
 	}
 
 	@Override
 	public boolean delete(User user) {
-		transaction.begin();
-		em.remove(em.contains(user) ? user : em.merge(user));
-		transaction.commit();
-		return findByUuid(user.getUuid()) == null;
+		try {
+			transaction.begin();
+			em.remove(em.contains(user) ? user : em.merge(user));
+			transaction.commit();
+			return findByUuid(user.getUuid()) == null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return false;
+		}
 	}
 
 	@Override

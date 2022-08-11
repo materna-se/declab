@@ -42,10 +42,18 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 
 	@Override
 	public Workspace findByUuid(String uuid) {
-		transaction.begin();
-		final Workspace Workspace = em.find(Workspace.class, uuid);
-		transaction.commit();
-		return Optional.ofNullable(Workspace).get();
+		try {
+			transaction.begin();
+			final Workspace Workspace = em.find(Workspace.class, uuid);
+			transaction.commit();
+			return Optional.ofNullable(Workspace).get();
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return null;
+		}
 	}
 
 	@Override
@@ -73,10 +81,18 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 
 	@Override
 	public Workspace put(Workspace workspace) {
-		transaction.begin();
-		em.persist(workspace);
-		transaction.commit();
-		return findByUuid(workspace.getUuid()) != null ? workspace : null;
+		try {
+			transaction.begin();
+			em.persist(workspace);
+			transaction.commit();
+			return findByUuid(workspace.getUuid()) != null ? workspace : null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return null;
+		}
 	}
 
 	@Override
@@ -87,10 +103,18 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 
 	@Override
 	public boolean delete(Workspace workspace) {
-		transaction.begin();
-		em.remove(em.contains(workspace) ? workspace : em.merge(workspace));
-		transaction.commit();
-		return findByUuid(workspace.getUuid()) == null;
+		try {
+			transaction.begin();
+			em.remove(em.contains(workspace) ? workspace : em.merge(workspace));
+			transaction.commit();
+			return findByUuid(workspace.getUuid()) == null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return false;
+		}
 	}
 
 	public List<Workspace> findByFilter(WorkspaceFilter... filterArray) {

@@ -42,10 +42,18 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 
 	@Override
 	public Laboratory findByUuid(String laboratoryUuid) {
-		transaction.begin();
-		final Laboratory Laboratory = em.find(Laboratory.class, laboratoryUuid);
-		transaction.commit();
-		return Optional.ofNullable(Laboratory).get();
+		try {
+			transaction.begin();
+			final Laboratory Laboratory = em.find(Laboratory.class, laboratoryUuid);
+			transaction.commit();
+			return Optional.ofNullable(Laboratory).get();
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return null;
+		}
 	}
 
 	@Override
@@ -67,10 +75,18 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 
 	@Override
 	public Laboratory put(Laboratory laboratory) {
-		transaction.begin();
-		em.persist(laboratory);
-		transaction.commit();
-		return findByUuid(laboratory.getUuid()) != null ? laboratory : null;
+		try {
+			transaction.begin();
+			em.persist(laboratory);
+			transaction.commit();
+			return findByUuid(laboratory.getUuid()) != null ? laboratory : null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return null;
+		}
 	}
 
 	@Override
@@ -81,10 +97,18 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 
 	@Override
 	public boolean delete(Laboratory laboratory) {
-		transaction.begin();
-		em.remove(em.contains(laboratory) ? laboratory : em.merge(laboratory));
-		transaction.commit();
-		return findByUuid(laboratory.getUuid()) == null;
+		try {
+			transaction.begin();
+			em.remove(em.contains(laboratory) ? laboratory : em.merge(laboratory));
+			transaction.commit();
+			return findByUuid(laboratory.getUuid()) == null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return false;
+		}
 	}
 
 	public List<Laboratory> findByFilter(LaboratoryFilter... filterArray) {

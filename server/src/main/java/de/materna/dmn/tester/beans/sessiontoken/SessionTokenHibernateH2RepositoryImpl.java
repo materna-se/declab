@@ -43,11 +43,19 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	}
 
 	@Override
-	public SessionToken findByUuid(String sessionTokenUuid) {
-		transaction.begin();
-		final SessionToken sessionToken = em.find(SessionToken.class, sessionTokenUuid);
-		transaction.commit();
-		return Optional.ofNullable(sessionToken).get();
+	public SessionToken findByUuid(String uuid) {
+		try {
+			transaction.begin();
+			final SessionToken sessionToken = em.find(SessionToken.class, uuid);
+			transaction.commit();
+			return Optional.ofNullable(sessionToken).isPresent() ? Optional.ofNullable(sessionToken).get() : null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return null;
+		}
 	}
 
 	@Override
@@ -64,10 +72,18 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 
 	@Override
 	public SessionToken put(SessionToken sessionToken) {
-		transaction.begin();
-		em.persist(sessionToken);
-		transaction.commit();
-		return findByUuid(sessionToken.getUuid()) != null ? sessionToken : null;
+		try {
+			transaction.begin();
+			em.persist(sessionToken);
+			transaction.commit();
+			return findByUuid(sessionToken.getUuid()) != null ? sessionToken : null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return null;
+		}
 	}
 
 	@Override
@@ -82,10 +98,18 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 
 	@Override
 	public boolean delete(SessionToken sessionToken) {
-		transaction.begin();
-		em.remove(em.contains(sessionToken) ? sessionToken : em.merge(sessionToken));
-		transaction.commit();
-		return findByUuid(sessionToken.getUuid()) == null;
+		try {
+			transaction.begin();
+			em.remove(em.contains(sessionToken) ? sessionToken : em.merge(sessionToken));
+			transaction.commit();
+			return findByUuid(sessionToken.getUuid()) == null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			return false;
+		}
 	}
 
 	public List<SessionToken> findByFilter(SessionTokenFilter... filterArray) {
