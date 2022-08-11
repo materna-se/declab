@@ -12,7 +12,7 @@ export default {
 		this._vue = vue;
 		this._host = host;
 
-		this._endpoint = (host === "" ? "." : host) + "/api" + (workspace !== undefined ? "/workspaces/" + workspace : "");
+		this._endpoint = (host === "" ? "." : host) + "/api" + (workspace !== undefined ? `/workspaces/${workspace}` : "");
 
 		if (workspace !== undefined) {
 			let socketHost = host;
@@ -30,7 +30,7 @@ export default {
 			if (this._socket !== null) {
 				this._socket.close();
 			}
-			this._socket = new ReconnectingWebSocket(socketHost + "/sockets/" + workspace);
+			this._socket = new ReconnectingWebSocket(`${socketHost}/sockets/${workspace}`);
 			this._socket.addEventListener("message", (e) => {
 				const data = JSON.parse(e.data);
 				if (data.type === "listeners") {
@@ -59,7 +59,7 @@ export default {
 	// Portal
 	//
 	async login(input) {
-		const response = await this._authorizedFetch(this._endpoint + "/portal/user/login", {
+		const response = await this._authorizedFetch(`${this._endpoint}/portal/user/login`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
@@ -73,17 +73,17 @@ export default {
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
 		});
-
+		
 		if (await Promise.resolve(responseSessionToken).then((value) => value.ok)) {
 			var sessionToken = await responseSessionToken.json();
 			const responseUser = await this._authorizedFetch(`${this._endpoint}/portal/user/read`, {
-			method: "POST",
-			headers: {"Content-Type": "application/json"},
-			body: JSON.stringify({
+				method: "POST",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify({
 					userUuid: sessionToken.userUuid,
 					sessionTokenUuid: input.sessionTokenUuid
-			})
-		});
+				})
+			});
 			return await responseUser.json();
 		} else {
 			return null;
@@ -91,7 +91,7 @@ export default {
 	},
 
 	async getLaboratoriesFromDb(input) {
-		const response = await this._authorizedFetch(this._endpoint + "/portal/laboratory/read", {
+		const response = await this._authorizedFetch(`${this._endpoint}/portal/laboratory/read`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
@@ -104,7 +104,7 @@ export default {
 	// Workspace
 	//
 	async createWorkspace(input) {
-		const response = await this._authorizedFetch(this._endpoint + "/workspaces", {
+		const response = await this._authorizedFetch(`${this._endpoint}/workspaces`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
@@ -117,22 +117,22 @@ export default {
 			query = undefined;
 		}
 
-		const response = await this._authorizedFetch(this._endpoint + "/workspaces" + (query === undefined ? "" : ("?query=" + query)), {});
+		const response = await this._authorizedFetch(`${this._endpoint}/workspaces${query === undefined ? "" : ("?query=" + query)}`, {});
 		return await response.json();
 	},
 
 	async getPublicWorkspace() {
-		const response = await this._authorizedFetch(this._endpoint + "/public", {});
+		const response = await this._authorizedFetch(`${this._endpoint}/public`, {});
 		return await response.json();
 	},
 
 	async getWorkspace() {
-		const response = await this._authorizedFetch(this._endpoint + "/config", {});
+		const response = await this._authorizedFetch(`${this._endpoint}/config`, {});
 		return await response.json();
 	},
 
 	async editWorkspace(input) {
-		await this._authorizedFetch(this._endpoint + "/config", {
+		await this._authorizedFetch(`${this._endpoint}/config`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
@@ -140,7 +140,7 @@ export default {
 	},
 
 	async getWorkspaceLog() {
-		const response = await this._authorizedFetch(this._endpoint + "/log", {});
+		const response = await this._authorizedFetch(`${this._endpoint}/log`, {});
 		return await response.json();
 	},
 
@@ -148,7 +148,7 @@ export default {
 	// Model
 	//
 	async getModel() {
-		const response = await this._authorizedFetch(this._endpoint + "/model", {});
+		const response = await this._authorizedFetch(`${this._endpoint}/model`, {});
 		return await response.json();
 	},
 
@@ -156,7 +156,7 @@ export default {
 		const queryString = new URLSearchParams();
 		queryString.append("context", context);
 
-		const response = await this._authorizedFetch(this._endpoint + "/model?" + queryString.toString(), {
+		const response = await this._authorizedFetch(`${this._endpoint}/model?${queryString.toString()}`, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(models)
@@ -169,7 +169,7 @@ export default {
 	},
 
 	async importModelsAnonymous(models) {
-		const response = await this._authorizedFetch(this._endpoint + "/model/anonymous", {
+		const response = await this._authorizedFetch(`${this._endpoint}/model/anonymous`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(models)
@@ -185,12 +185,12 @@ export default {
 	},
 
 	async getDecisionSession() {
-		const response = await this._authorizedFetch(this._endpoint + "/model/decision-session", {});
+		const response = await this._authorizedFetch(`${this._endpoint}/model/decision-session`, {});
 		return await response.json();
 	},
 
 	async setDecisionSession(name) {
-		await this._authorizedFetch(this._endpoint + "/model/decision-session", {
+		await this._authorizedFetch(`${this._endpoint}/model/decision-session`, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(name)
@@ -198,12 +198,12 @@ export default {
 	},
 
 	async getModelInputs() {
-		const response = await this._authorizedFetch(this._endpoint + "/model/inputs", {});
+		const response = await this._authorizedFetch(`${this._endpoint}/model/inputs`, {});
 		return await response.json();
 	},
 
 	async executeModel(input) {
-		const response = await this._authorizedFetch(this._endpoint + "/model/execute", {
+		const response = await this._authorizedFetch(`${this._endpoint}/model/execute`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
@@ -212,7 +212,7 @@ export default {
 	},
 
 	async executeRaw(expression, context, engine) {
-		return await this._authorizedFetch(this._endpoint + "/model/execute/raw?engine=" + engine, {
+		return await this._authorizedFetch(`${this._endpoint}/model/execute/raw?engine=${engine}`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify({
@@ -229,17 +229,17 @@ export default {
 		const queryString = new URLSearchParams();
 		queryString.append("order", String(order === undefined ? false : order));
 
-		const response = await this._authorizedFetch(this._endpoint + "/challenges?" + queryString.toString(), {});
+		const response = await this._authorizedFetch(`${this._endpoint}/challenges?${queryString.toString()}`, {});
 		return await response.json();
 	},
 
 	async getChallenge(uuid) {
-		const response = await this._authorizedFetch(this._endpoint + "/challenges/" + uuid, {});
+		const response = await this._authorizedFetch(`${this._endpoint}/challenges/${uuid}`, {});
 		return await response.json();
 	},
 
 	async addChallenge(challenge) {
-		const response = await this._authorizedFetch(this._endpoint + "/challenges", {
+		const response = await this._authorizedFetch(`${this._endpoint}/challenges`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(challenge)
@@ -252,7 +252,7 @@ export default {
 	},
 
 	async editChallenge(uuid, challenge) {
-		await this._authorizedFetch(this._endpoint + "/challenges/" + uuid, {
+		await this._authorizedFetch(`${this._endpoint}/challenges/${uuid}`, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(challenge)
@@ -260,13 +260,13 @@ export default {
 	},
 
 	async deleteChallenge(uuid) {
-		await this._authorizedFetch(this._endpoint + "/challenges/" + uuid, {
+		await this._authorizedFetch(`${this._endpoint}/challenges/${uuid}`, {
 			method: "DELETE"
 		});
 	},
 
 	async executeModelChallengeList(models, decisionService, inputs) {
-		return await this._authorizedFetch(this._endpoint + "/challenges/execute_dmn_list", {
+		return await this._authorizedFetch(`${this._endpoint}/challenges/execute_dmn_list`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
@@ -284,17 +284,17 @@ export default {
 		const queryString = new URLSearchParams();
 		queryString.append("order", String(order === undefined ? false : order));
 
-		const response = await this._authorizedFetch(this._endpoint + "/playgrounds?" + queryString.toString(), {});
+		const response = await this._authorizedFetch(`${this._endpoint}/playgrounds?${queryString.toString()}`, {});
 		return await response.json();
 	},
 
 	async getPlayground(uuid) {
-		const response = await this._authorizedFetch(this._endpoint + "/playgrounds/" + uuid, {});
+		const response = await this._authorizedFetch(`${this._endpoint}/playgrounds/${uuid}`, {});
 		return await response.json();
 	},
 
 	async addPlayground(playground) {
-		const response = await this._authorizedFetch(this._endpoint + "/playgrounds", {
+		const response = await this._authorizedFetch(`${this._endpoint}/playgrounds`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(playground)
@@ -303,7 +303,7 @@ export default {
 	},
 
 	async editPlayground(uuid, playground) {
-		await this._authorizedFetch(this._endpoint + "/playgrounds/" + uuid, {
+		await this._authorizedFetch(`${this._endpoint}/playgrounds/${uuid}`, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(playground)
@@ -311,7 +311,7 @@ export default {
 	},
 
 	async deletePlayground(uuid) {
-		await this._authorizedFetch(this._endpoint + "/playgrounds/" + uuid, {
+		await this._authorizedFetch(`${this._endpoint}/playgrounds/${uuid}`, {
 			method: "DELETE"
 		});
 	},
@@ -324,7 +324,7 @@ export default {
 		queryString.append("merge", String(merge === undefined ? false : merge));
 		queryString.append("order", String(order === undefined ? false : order));
 
-		const response = await this._authorizedFetch(this._endpoint + "/inputs?" + queryString.toString(), {});
+		const response = await this._authorizedFetch(`${this._endpoint}/inputs?${queryString.toString()}`, {});
 		return await response.json();
 	},
 
@@ -332,12 +332,12 @@ export default {
 		const queryString = new URLSearchParams();
 		queryString.append("merge", String(merge === undefined ? false : merge));
 
-		const response = await this._authorizedFetch(this._endpoint + "/inputs/" + uuid + "?" + queryString.toString(), {});
+		const response = await this._authorizedFetch(`${this._endpoint}/inputs/${uuid}?${queryString.toString()}`, {});
 		return await response.json();
 	},
 
 	async addInput(input) {
-		const response = await this._authorizedFetch(this._endpoint + "/inputs", {
+		const response = await this._authorizedFetch(`${this._endpoint}/inputs`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
@@ -346,7 +346,7 @@ export default {
 	},
 
 	async editInput(uuid, input) {
-		await this._authorizedFetch(this._endpoint + "/inputs/" + uuid, {
+		await this._authorizedFetch(`${this._endpoint}/inputs/${uuid}`, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
@@ -354,7 +354,7 @@ export default {
 	},
 
 	async deleteInput(uuid) {
-		await this._authorizedFetch(this._endpoint + "/inputs/" + uuid, {
+		await this._authorizedFetch(`${this._endpoint}/inputs/${uuid}`, {
 			method: "DELETE"
 		});
 	},
@@ -366,12 +366,12 @@ export default {
 		const queryString = new URLSearchParams();
 		queryString.append("order", String(order === undefined ? false : order));
 
-		const response = await this._authorizedFetch(this._endpoint + "/outputs?" + queryString.toString(), {});
+		const response = await this._authorizedFetch(`${this._endpoint}/outputs?${queryString.toString()}`, {});
 		return await response.json();
 	},
 
 	async addOutput(output) {
-		const response = await this._authorizedFetch(this._endpoint + "/outputs", {
+		const response = await this._authorizedFetch(`${this._endpoint}/outputs`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(output)
@@ -380,7 +380,7 @@ export default {
 	},
 
 	async editOutput(uuid, output) {
-		await this._authorizedFetch(this._endpoint + "/outputs/" + uuid, {
+		await this._authorizedFetch(`${this._endpoint}/outputs/${uuid}`, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(output)
@@ -388,7 +388,7 @@ export default {
 	},
 
 	async deleteOutput(uuid) {
-		await this._authorizedFetch(this._endpoint + "/outputs/" + uuid, {
+		await this._authorizedFetch(`${this._endpoint}/outputs/${uuid}`, {
 			method: "DELETE"
 		});
 	},
@@ -400,12 +400,12 @@ export default {
 		const queryString = new URLSearchParams();
 		queryString.append("order", String(order === undefined ? false : order));
 
-		const response = await this._authorizedFetch(this._endpoint + "/tests?" + queryString.toString(), {});
+		const response = await this._authorizedFetch(`${this._endpoint}/tests?${queryString.toString()}`, {});
 		return await response.json();
 	},
 
 	async addTest(test) {
-		const response = await this._authorizedFetch(this._endpoint + "/tests", {
+		const response = await this._authorizedFetch(`${this._endpoint}/tests`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(test)
@@ -414,7 +414,7 @@ export default {
 	},
 
 	async editTest(uuid, test) {
-		await this._authorizedFetch(this._endpoint + "/tests/" + uuid, {
+		await this._authorizedFetch(`${this._endpoint}/tests/${uuid}`, {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(test)
@@ -422,14 +422,14 @@ export default {
 	},
 
 	async deleteTest(uuid) {
-		await this._authorizedFetch(this._endpoint + "/tests/" + uuid, {
+		await this._authorizedFetch(`${this._endpoint}/tests/${uuid}`, {
 			method: "DELETE"
 		});
 	},
 
 	async executeTest(uuid) {
 		const start = new Date().getTime();
-		const response = await this._authorizedFetch(this._endpoint + "/tests/" + uuid, {
+		const response = await this._authorizedFetch(`${this._endpoint}/tests/${uuid}`, {
 			method: "POST"
 		});
 		const end = new Date().getTime();
@@ -443,7 +443,7 @@ export default {
 		const formData = new FormData();
 		formData.append("backup", backup);
 
-		const response = await this._authorizedFetch(this._endpoint + "/backup", {
+		const response = await this._authorizedFetch(`${this._endpoint}/backup`, {
 			method: "PUT",
 			body: formData
 		});
@@ -454,7 +454,7 @@ export default {
 		};
 	},
 	async exportWorkspace() {
-		return this._authorizedFetch(this._endpoint + "/backup");
+		return this._authorizedFetch(`${this._endpoint}/backup`);
 	},
 
 	async deleteWorkspace() {
@@ -478,7 +478,7 @@ export default {
 				options.headers = {};
 			}
 
-			options.headers.Authorization = "Bearer " + token
+			options.headers.Authorization = `Bearer ${token}`
 		}
 
 		const response = await fetch(url, options);
