@@ -116,7 +116,7 @@ public abstract class Database {
 			user.setSystemAdmin(systemAdmin);
 			log.info("H2: Saved user '" + username + "': " + user);
 		} else {
-			log.info("H2: User '" + username + "' already existed.");
+			log.info("H2: User '" + username + "' already exists.");
 		}
 		return user;
 	}
