@@ -1,6 +1,5 @@
 package de.materna.dmn.tester;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -99,9 +98,9 @@ public class StandaloneServer {
 		Database.prepare();
 		log.info("The database has been prepared successfully.");
 
-		if (Desktop.isDesktopSupported()) {
-			Desktop.getDesktop().browse(new URI("http://127.0.0.1:8080"));
-		}
+//		if (Desktop.isDesktopSupported()) {
+//			Desktop.getDesktop().browse(new URI("http://127.0.0.1:8080"));
+//		}
 
 		server.join();
 	}
