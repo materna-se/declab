@@ -97,6 +97,7 @@ public class StandaloneServer {
 		log.info("The server has been started successfully.");
 
 		Database.prepare();
+		log.info("The database has been prepared successfully.");
 
 		if (Desktop.isDesktopSupported()) {
 			Desktop.getDesktop().browse(new URI("http://127.0.0.1:8080"));
