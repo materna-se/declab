@@ -6,7 +6,7 @@ public class UpdateSessionTokenRequest {
 	public UpdateSessionTokenRequest() {
 	}
 
-	public UpdateSessionTokenRequest(String userUuid, String sessionTokenUuid) {
+	public UpdateSessionTokenRequest(String sessionTokenUuid) {
 		this.setSessionTokenUuid(sessionTokenUuid);
 	}
 
