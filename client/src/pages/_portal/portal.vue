@@ -86,7 +86,7 @@
 		},
 		methods: {
 			getCookie(cname) {
-				const name = cname + "=";
+				const name = `${cname}=`;
 				let arrCookies = document.cookie.split(';');
 				for (let numCookie = 0; numCookie < arrCookies.length; numCookie++) {
 					let strCookieCurrent = arrCookies[numCookie];
@@ -118,7 +118,7 @@
 				let access = this.workspace.access;
 				if (access !== "PUBLIC" && token === undefined) {
 					this.$store.commit("displayAlert", {
-						message: "You need to enter a password when you set the access mode to " + access.toLowerCase() + ".",
+						message: `You need to enter a password when you set the access mode to ${access.toLowerCase()}.`,
 						state: "danger"
 					});
 				}
@@ -133,7 +133,7 @@
 				await this.getWorkspaces();
 			},
 			async enterWorkspace(id) {
-				await this.$router.push('/' + id + '/model');
+				await this.$router.push(`/${id}/model`);
 			},
 
 			async verifySessionToken() {
