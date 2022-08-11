@@ -274,7 +274,7 @@ public class PortalServlet {
 		final User userCurrent = userRepository.findByUuid(sessionToken.getUserUuid());
 
 		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
-			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(userFound))
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userFound))
 					.build();
 		}
 
@@ -334,7 +334,7 @@ public class PortalServlet {
 			userFound.setLastname(updateUserRequest.getLastname());
 			userFound.setFirstname(updateUserRequest.getFirstname());
 			final User userUpdated = userRepository.put(userFound);
-			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(userUpdated))
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
 					.build();
 		}
 
@@ -342,7 +342,7 @@ public class PortalServlet {
 	}
 
 	@POST
-	@Path("/token/read")
+	@Path("/sessiontoken/read")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response readSessionToken(String body) throws SessionTokenNotFoundException {
@@ -356,8 +356,8 @@ public class PortalServlet {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
-		return Response.status(Response.Status.FOUND)
-				.entity(SerializationHelper.getInstance().toJSON(sessionTokenFound)).build();
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(sessionTokenFound))
+				.build();
 
 	}
 
