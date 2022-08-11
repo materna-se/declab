@@ -67,24 +67,27 @@ export default {
 		return await response.json();
 	},
 
-	async getUserBySessionToken(sessionTokenUuid) {
-		const sessionToken = await this._authorizedFetch(this._endpoint + "/portal/token/read", {
+	async getUserBySessionToken(input) {
+		const responseSessionToken = await this._authorizedFetch(this._endpoint + "/portal/token/read", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
-			body: JSON.stringify(sessionTokenUuid)
+			body: JSON.stringify(input)
 		});
 
-		Promise.resolve(sessionToken).then((value) => console.log(value));
-
-		const response = await this._authorizedFetch(this._endpoint + "/portal/user/read", {
+		if (await Promise.resolve(responseSessionToken).then((value) => value.ok)) {
+			var sessionToken = await responseSessionToken.json();
+			const responseUser = await this._authorizedFetch(`${this._endpoint}/portal/user/read`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify({
-				userUuid: sessionToken.getUserUuid(),
-				sessionTokenUuid: sessionTokenUuid
+					userUuid: sessionToken.userUuid,
+					sessionTokenUuid: input.sessionTokenUuid
 			})
 		});
-		return await response.json();
+			return await responseUser.json();
+		} else {
+			return null;
+		}
 	},
 
 	async getLaboratoriesFromDb(input) {
