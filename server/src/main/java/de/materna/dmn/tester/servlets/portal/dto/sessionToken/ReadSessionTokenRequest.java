@@ -6,7 +6,7 @@ public class ReadSessionTokenRequest {
 	public ReadSessionTokenRequest() {
 	}
 
-	public ReadSessionTokenRequest(String userUuid, String sessionTokenUuid) {
+	public ReadSessionTokenRequest(String sessionTokenUuid) {
 		this.setSessionTokenUuid(sessionTokenUuid);
 	}
 
