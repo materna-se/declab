@@ -28,11 +28,11 @@ public class StandaloneServer {
 	private static final Logger log = LoggerFactory.getLogger(WorkspaceServlet.class);
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("     _           _       _     \n");
-		System.out.println("  __| | ___  ___| | __ _| |__  \n");
-		System.out.println(" / _` |/ _ \\/ __| |/ _` | '_ \\ \n");
-		System.out.println("| (_| |  __/ (__| | (_| | |_) |\n");
-		System.out.println(" \\__,_|\\___|\\___|_|\\__,_|_.__/ \n");
+		System.out.println("     _           _       _     ");
+		System.out.println("  __| | ___  ___| | __ _| |__  ");
+		System.out.println(" / _` |/ _ \\/ __| |/ _` | '_ \\ ");
+		System.out.println("| (_| |  __/ (__| | (_| | |_) |");
+		System.out.println(" \\__,_|\\___|\\___|_|\\__,_|_.__/ ");
 
 		log.info("Let's start...");
 		log.info("We'll use the detected Java version \"{}\".", System.getProperty("java.version"));
