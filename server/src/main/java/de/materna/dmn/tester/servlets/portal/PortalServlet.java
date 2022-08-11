@@ -42,6 +42,7 @@ import de.materna.dmn.tester.servlets.portal.dto.laboratory.DeleteLaboratoryRequ
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.ReadLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.UpdateLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.sessionToken.ReadSessionTokenRequest;
+import de.materna.dmn.tester.servlets.portal.dto.sessionToken.UpdateSessionTokenRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ChangeEmailRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ChangePasswordRequest;
 import de.materna.dmn.tester.servlets.portal.dto.user.ChangeSystemAdminStateRequest;
@@ -359,6 +360,31 @@ public class PortalServlet {
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(sessionTokenFound))
 				.build();
 
+	}
+
+	@POST
+	@Path("/sessiontoken/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateSessionToken(String body) throws SessionTokenNotFoundException {
+		final UpdateSessionTokenRequest updateSessionTokenRequest = (UpdateSessionTokenRequest) SerializationHelper
+				.getInstance().toClass(body, UpdateSessionTokenRequest.class);
+
+		final SessionToken sessionTokenFound = sessionTokenRepository
+				.findByUuid(updateSessionTokenRequest.getSessionTokenUuid());
+
+		if (sessionTokenFound == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		SessionToken sessionTokenUpdated = sessionTokenRepository.update(sessionTokenFound);
+
+		if (sessionTokenUpdated == null) {
+			return Response.status(Response.Status.NOT_MODIFIED).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(sessionTokenUpdated))
+				.build();
 	}
 
 	@POST
