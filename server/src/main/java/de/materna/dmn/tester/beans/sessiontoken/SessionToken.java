@@ -42,6 +42,7 @@ public class SessionToken {
 		setUserUuid(userUuid);
 		setInitiation(LocalDateTime.now());
 		setExpiration(addWorkdays(getInitiation(), 3));
+		setLastUpdate(getInitiation());
 	}
 
 	public String getUuid() {
