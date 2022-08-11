@@ -66,7 +66,6 @@
 			return {
 				query: null,
 
-				sessionToken: null,
 				user: null,
 
 				workspaces: [],
@@ -79,11 +78,9 @@
 			}
 		},
 		created() {
-			var cookie = document.cookie;
-			console.log("Cookies:  " + cookie);
-			this.sessionToken = this.getCookie("sessionToken");
-			console.log("TTTTTOOOOOKKKKEEEENNNN: " + this.sessionToken);
-			this.verifySessionToken();
+			if (!this.user) {
+				this.verifySessionToken();
+			}
 		},
 		methods: {
 			getCookie(cname) {
@@ -138,9 +135,14 @@
 			},
 
 			async verifySessionToken() {
-				this.user = await Network.getUserBySessionToken({
-					sessionTokenUuid: this.sessionToken
-				});
+				const sessionTokenUuid = this.getCookie("sessionToken");
+				if (sessionTokenUuid) {
+					this.user = await Network.getUserBySessionToken({
+						sessionTokenUuid: sessionTokenUuid
+					});
+				} else {
+					this.$router.replace('/_portal/login');
+				}
 			},
 
 			//
