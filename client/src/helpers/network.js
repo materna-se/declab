@@ -68,7 +68,7 @@ export default {
 	},
 
 	async getUserBySessionToken(input) {
-		const responseSessionToken = await this._authorizedFetch(this._endpoint + "/portal/token/read", {
+		const responseSessionToken = await this._authorizedFetch(`${this._endpoint}/portal/sessiontoken/read`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(input)
