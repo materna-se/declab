@@ -59,8 +59,11 @@
 					password: password
 				});
 
-				document.cookie = "sessionToken=" + sessionTokenUuid + "; path=/";
-				console.log(document.cookie);
+				
+				if (sessionTokenUuid) {
+					document.cookie = "sessionToken=" + sessionTokenUuid + "; path=/";
+					this.$router.replace('/_portal/portal');
+				}
 			},
 
 			//
