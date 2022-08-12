@@ -51,10 +51,10 @@
 </template>
 
 <script>
-	import EmptyCollectionComponent from "../../components/empty-collection.vue";
-	import ConfiguratorComponent from "../../components/configurator.vue";
-	import Network from "../../helpers/network";
-	import Alert from "../../components/alert/alert";
+	import EmptyCollectionComponent from "../components/empty-collection.vue";
+	import ConfiguratorComponent from "../components/configurator.vue";
+	import Network from "../helpers/network";
+	import Alert from "../components/alert/alert";
 
 	export default {
 		components: {
@@ -143,7 +143,7 @@
 						sessionTokenUuid: sessionTokenUuid
 					});
 				} else {
-					this.$router.replace('/_portal/login');
+					this.$router.replace('/login');
 				}
 			},
 
@@ -155,7 +155,7 @@
 						uuid: this.user.uuid
 					});
 				} else {
-					this.$router.replace('/_portal/login');
+					this.$router.replace('/login');
 				}
 			},
 

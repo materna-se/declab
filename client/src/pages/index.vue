@@ -81,7 +81,7 @@
 			}
 		},
 		beforeCreate() {
-			this.$router.replace('/_portal/portal');
+			this.$router.replace('/portal');
 		},
 		methods: {
 			async getWorkspaces() {
