@@ -2,7 +2,6 @@
 	<div>
 		<h5 class="mb-2">Username</h5>
 		<input placeholder="Enter your username..." class="form-control mb-4" v-model="value.username">
-
 		<h5 class="mb-2">Password</h5>
 		<input type="password" placeholder="Enter your password..." class="form-control mb-4" v-model="value.password">
 	</div>
