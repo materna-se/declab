@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import de.materna.dmn.tester.Database;
 import de.materna.dmn.tester.beans.laboratory.Laboratory;
 import de.materna.dmn.tester.beans.laboratory.LaboratoryHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.permission.Permission;
@@ -25,6 +26,7 @@ import de.materna.dmn.tester.beans.user.UserHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.beans.workspace.WorkspaceHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.enums.PermissionType;
+import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
 import de.materna.dmn.tester.interfaces.repositories.PermissionRepository;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
@@ -297,10 +299,13 @@ public class PortalServlet {
 			throw new UsernameInUseException("The username is already in use : " + username);
 		}
 		if (userRepository.findByEmail(registerRequest.getEmail()) != null) {
-			throw new EmailInUseException("The email is already in use : " + email);
+			throw new EmailInUseException("The email address is already in use : " + email);
 		}
 
 		final User newUser = userRepository.register(email, username, password);
+		Laboratory laboratory = laboratoryRepository.create(Database.MY_LAB.get("NAME"),
+				Database.MY_LAB.get("DESCRIPTION"), VisabilityType.PRIVATE);
+		permissionRepository.create(newUser.getUuid(), laboratory.getUuid(), null, PermissionType.OWNER);
 		return newUser != null
 				? Response.status(Response.Status.CREATED).entity(SerializationHelper.getInstance().toJSON(newUser))
 						.build()

@@ -44,7 +44,7 @@ public abstract class Database {
 			put("USERNAME", "demo");
 		}
 	};
-	private final static Map<String, String> MY_LAB = new HashMap<>() {
+	public final static Map<String, String> MY_LAB = new HashMap<>() {
 		private static final long serialVersionUID = 1L;
 		{
 			put("DESCRIPTION", "This is your laboratory alone. Only you can see it!");
