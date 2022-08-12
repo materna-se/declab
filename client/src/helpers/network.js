@@ -67,6 +67,15 @@ export default {
 		return await response.json();
 	},
 
+	async register(input) {
+		const response = await this._authorizedFetch(`${this._endpoint}/portal/user/register`, {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(input)
+		});
+		return await response.json();
+	},
+
 	async getUserBySessionToken(input) {
 		const responseSessionToken = await this._authorizedFetch(`${this._endpoint}/portal/sessiontoken/read`, {
 			method: "POST",
