@@ -5,15 +5,15 @@ public class ChangeEmailRequest {
 	private String userUuid;
 	private String email;
 
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public ChangeEmailRequest() {
 	}
 
-	public ChangeEmailRequest(String userUuid, String email, String sessionTokenUuid) {
+	public ChangeEmailRequest(String userUuid, String email, String jwt) {
 		setUserUuid(userUuid);
 		setEmail(email);
-		setSessionTokenUuid(sessionTokenUuid);
+		setJwt(jwt);
 	}
 
 	public String getUserUuid() {
@@ -32,11 +32,11 @@ public class ChangeEmailRequest {
 		this.email = email;
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

@@ -5,15 +5,15 @@ public class ChangeSystemAdminStateRequest {
 	private String userUuid;
 	private boolean systemAdmin;
 
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public ChangeSystemAdminStateRequest() {
 	}
 
-	public ChangeSystemAdminStateRequest(String userUuid, boolean systemAdmin, String sessionTokenUuid) {
+	public ChangeSystemAdminStateRequest(String userUuid, boolean systemAdmin, String jwt) {
 		setUserUuid(userUuid);
 		setSystemAdmin(systemAdmin);
-		setSessionTokenUuid(sessionTokenUuid);
+		setJwt(jwt);
 	}
 
 	public String getUserUuid() {
@@ -32,11 +32,11 @@ public class ChangeSystemAdminStateRequest {
 		this.systemAdmin = systemAdmin;
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

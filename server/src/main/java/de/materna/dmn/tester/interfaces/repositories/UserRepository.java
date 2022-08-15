@@ -14,7 +14,7 @@ public interface UserRepository {
 
 	User findByUsername(String username);
 
-	User findBySessionToken(String tokenUuid);
+	User findByJwt(String jwt);
 
 	User put(User user);
 

@@ -6,16 +6,16 @@ public class ChangePasswordRequest {
 	private String passwordNew;
 	private String passwordOld;
 
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public ChangePasswordRequest() {
 	}
 
-	public ChangePasswordRequest(String userUuid, String passwordNew, String passwordOld, String sessionTokenUuid) {
+	public ChangePasswordRequest(String userUuid, String passwordNew, String passwordOld, String jwt) {
 		setUserUuid(userUuid);
 		setPasswordNew(passwordNew);
 		setPasswordOld(passwordOld);
-		setSessionTokenUuid(sessionTokenUuid);
+		setJwt(jwt);
 	}
 
 	public String getUserUuid() {
@@ -42,11 +42,11 @@ public class ChangePasswordRequest {
 		this.passwordOld = passwordOld;
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

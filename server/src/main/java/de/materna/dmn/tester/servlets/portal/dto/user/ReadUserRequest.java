@@ -3,14 +3,14 @@ package de.materna.dmn.tester.servlets.portal.dto.user;
 public class ReadUserRequest {
 	private String userUuid;
 
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public ReadUserRequest() {
 	}
 
-	public ReadUserRequest(String userUuid, String sessionTokenUuid) {
+	public ReadUserRequest(String userUuid, String jwt) {
 		this.setUserUuid(userUuid);
-		this.setSessionTokenUuid(sessionTokenUuid);
+		this.setJwt(jwt);
 	}
 
 	public String getUserUuid() {
@@ -21,11 +21,11 @@ public class ReadUserRequest {
 		this.userUuid = userUuid;
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

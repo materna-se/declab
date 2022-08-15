@@ -1,20 +1,20 @@
 package de.materna.dmn.tester.servlets.portal.dto.sessionToken;
 
 public class ReadSessionTokenRequest {
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public ReadSessionTokenRequest() {
 	}
 
-	public ReadSessionTokenRequest(String sessionTokenUuid) {
-		this.setSessionTokenUuid(sessionTokenUuid);
+	public ReadSessionTokenRequest(String jwt) {
+		this.setJwt(jwt);
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

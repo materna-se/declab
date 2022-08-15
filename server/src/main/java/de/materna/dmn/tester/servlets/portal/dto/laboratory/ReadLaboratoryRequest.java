@@ -4,15 +4,15 @@ public class ReadLaboratoryRequest {
 	private String laboratoryUuid;
 	private String query;
 
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public ReadLaboratoryRequest() {
 	}
 
-	public ReadLaboratoryRequest(String laboratoryUuid, String query, String sessionTokenUuid) {
+	public ReadLaboratoryRequest(String laboratoryUuid, String query, String jwt) {
 		this.setLaboratoryUuid(laboratoryUuid);
 		this.setQuery(query);
-		this.setSessionTokenUuid(sessionTokenUuid);
+		this.setJwt(jwt);
 	}
 
 	public String getLaboratoryUuid() {
@@ -31,11 +31,11 @@ public class ReadLaboratoryRequest {
 		this.query = query;
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

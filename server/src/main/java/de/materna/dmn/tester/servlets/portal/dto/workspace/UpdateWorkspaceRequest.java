@@ -8,18 +8,18 @@ public class UpdateWorkspaceRequest {
 	private String description;
 	private VisabilityType visability;
 
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public UpdateWorkspaceRequest() {
 	}
 
 	public UpdateWorkspaceRequest(String workspaceUuid, String name, String description, VisabilityType visability,
-			String sessionTokenUuid) {
+			String jwt) {
 		setWorkspaceUuid(workspaceUuid);
 		setName(name);
 		setDescription(description);
 		setVisability(visability);
-		setSessionTokenUuid(sessionTokenUuid);
+		setJwt(jwt);
 	}
 
 	public String getWorkspaceUuid() {
@@ -54,11 +54,11 @@ public class UpdateWorkspaceRequest {
 		this.visability = visability;
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

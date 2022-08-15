@@ -8,19 +8,19 @@ public class UpdateUserRequest {
 	private String firstname;
 	private String lastname;
 
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public UpdateUserRequest() {
 	}
 
 	public UpdateUserRequest(String userUuid, String email, String username, String firstname, String lastname,
-			String sessionTokenUuid) {
+			String jwt) {
 		setUserUuid(userUuid);
 		setEmail(email);
 		setUsername(username);
 		setFirstname(firstname);
 		setLastname(lastname);
-		setSessionTokenUuid(sessionTokenUuid);
+		setJwt(jwt);
 	}
 
 	public String getUserUuid() {
@@ -63,11 +63,11 @@ public class UpdateUserRequest {
 		this.lastname = lastname;
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

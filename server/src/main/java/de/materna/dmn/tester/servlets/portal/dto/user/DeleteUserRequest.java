@@ -3,14 +3,14 @@ package de.materna.dmn.tester.servlets.portal.dto.user;
 public class DeleteUserRequest {
 	private String userUuid;
 
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public DeleteUserRequest() {
 	}
 
-	public DeleteUserRequest(String userUuid, String sessionTokenUuid) {
+	public DeleteUserRequest(String userUuid, String jwt) {
 		this.setUserUuid(userUuid);
-		this.setSessionTokenUuid(sessionTokenUuid);
+		this.setJwt(jwt);
 	}
 
 	public String getUserUuid() {
@@ -21,12 +21,12 @@ public class DeleteUserRequest {
 		this.userUuid = userUuid;
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 
 }

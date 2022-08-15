@@ -68,8 +68,8 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public User findBySessionToken(String tokenUuid) {
-		final SessionToken token = sessionTokenRepository.findByUuid(tokenUuid);
+	public User findByJwt(String jwt) {
+		final SessionToken token = sessionTokenRepository.findByJwt(jwt);
 		return findByUuid(token.getUserUuid());
 	}
 

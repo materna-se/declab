@@ -3,14 +3,14 @@ package de.materna.dmn.tester.servlets.portal.dto.workspace;
 public class DeleteWorkspaceRequest {
 	private String workspaceUuid;
 
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public DeleteWorkspaceRequest() {
 	}
 
-	public DeleteWorkspaceRequest(String workplaceUuid, String sessionTokenUuid) {
+	public DeleteWorkspaceRequest(String workplaceUuid, String jwt) {
 		this.setWorkspaceUuid(workplaceUuid);
-		this.setSessionTokenUuid(sessionTokenUuid);
+		this.setJwt(jwt);
 	}
 
 	public String getWorkspaceUuid() {
@@ -21,11 +21,11 @@ public class DeleteWorkspaceRequest {
 		this.workspaceUuid = workplaceUuid;
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

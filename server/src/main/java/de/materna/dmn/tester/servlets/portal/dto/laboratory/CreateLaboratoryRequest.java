@@ -7,17 +7,16 @@ public class CreateLaboratoryRequest {
 	private String description;
 	private VisabilityType visability;
 
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public CreateLaboratoryRequest() {
 	}
 
-	public CreateLaboratoryRequest(String name, String description, VisabilityType visability,
-			String sessionTokenUuid) {
+	public CreateLaboratoryRequest(String name, String description, VisabilityType visability, String jwt) {
 		setName(name);
 		setDescription(description);
 		setVisability(visability);
-		setSessionTokenUuid(sessionTokenUuid);
+		setJwt(jwt);
 	}
 
 	public String getName() {
@@ -44,11 +43,11 @@ public class CreateLaboratoryRequest {
 		this.visability = visability;
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

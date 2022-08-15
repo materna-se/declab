@@ -3,14 +3,14 @@ package de.materna.dmn.tester.servlets.portal.dto.laboratory;
 public class DeleteLaboratoryRequest {
 	private String laboratoryUuid;
 
-	private String sessionTokenUuid;
+	private String jwt;
 
 	public DeleteLaboratoryRequest() {
 	}
 
-	public DeleteLaboratoryRequest(String laboratoryUuid, String sessionTokenUuid) {
+	public DeleteLaboratoryRequest(String laboratoryUuid, String jwt) {
 		this.setLaboratoryUuid(laboratoryUuid);
-		this.setSessionTokenUuid(sessionTokenUuid);
+		this.setJwt(jwt);
 	}
 
 	public String getLaboratoryUuid() {
@@ -21,11 +21,11 @@ public class DeleteLaboratoryRequest {
 		this.laboratoryUuid = laboratoryUuid;
 	}
 
-	public String getSessionTokenUuid() {
-		return sessionTokenUuid;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setSessionTokenUuid(String sessionTokenUuid) {
-		this.sessionTokenUuid = sessionTokenUuid;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 }

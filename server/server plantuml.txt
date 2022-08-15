@@ -67,7 +67,8 @@ class SessionToken {
 interface SessionTokenRepository {
   List<SessionToken> findAll()
   List<SessionToken> findAllByUserUuid(String userUuid)
-  SessionToken findByUuid(String sessionTokenUuid)
+  SessionToken findByUuid(String uuid)
+  SessionToken findByJwt(String jwt)
   SessionToken findCurrentByUser(User user)
   SessionToken findCurrentByUserUuid(String userUuid)
   SessionToken put(SessionToken sessionToken)
@@ -79,7 +80,8 @@ class SessionTokenHibernateH2RepositoryImpl {
 -- overriding --
 + List<SessionToken> findAll()
 + List<SessionToken> findAllByUserUuid(String userUuid)
-+ SessionToken findByUuid(String sessionTokenUuid)
++ SessionToken findByUuid(String uuid)
++ SessionToken findByJwt(String jwt)
 + SessionToken findCurrentByUser(User user)
 + SessionToken findCurrentByUserUuid(String userUuid)
 + SessionToken put(SessionToken sessionToken)
