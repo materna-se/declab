@@ -16,10 +16,12 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import de.materna.dmn.tester.beans.sessiontoken.filter.JwtFilter;
 import de.materna.dmn.tester.beans.sessiontoken.filter.UserUuidFilter;
 import de.materna.dmn.tester.beans.user.User;
 import de.materna.dmn.tester.interfaces.filters.SessionTokenFilter;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
+import io.jsonwebtoken.JwtException;
 
 public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenRepository {
 
@@ -56,6 +58,13 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 			}
 			return null;
 		}
+	}
+
+	@Override
+	public SessionToken findByJwt(String jwt) throws JwtException {
+		Jwt.verify(jwt);
+		List<SessionToken> sessionTokens = findByFilter(new JwtFilter(jwt));
+		return sessionTokens.size() == 1 ? sessionTokens.get(0) : null;
 	}
 
 	@Override

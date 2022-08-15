@@ -17,9 +17,13 @@ import de.materna.dmn.tester.beans.user.User;
 @Entity
 @Table(name = "`sessiontoken`", uniqueConstraints = @UniqueConstraint(columnNames = { "uuid" }))
 public class SessionToken {
+
 	@Id
 	@Column(name = "uuid", unique = true, nullable = false)
 	private String uuid;
+	@Column(name = "jwt")
+	@NotNull
+	private String jwt;
 	@Column(name = "userUuid")
 	@NotNull
 	private String userUuid;
@@ -27,26 +31,32 @@ public class SessionToken {
 	private Timestamp initiation;
 	@Column(name = "expiration")
 	private Timestamp expiration;
-	@Column(name = "update")
+	@Column(name = "lastUpdate")
 	private Timestamp lastUpdate;
 
 	public SessionToken() {
 	}
 
 	public SessionToken(User user) {
-		this(user.getUuid());
-	}
-
-	public SessionToken(String userUuid) {
 		this.uuid = UUID.randomUUID().toString();
-		setUserUuid(userUuid);
+		setUserUuid(user.getUuid());
 		setInitiation(LocalDateTime.now());
 		setExpiration(addWorkdays(getInitiation(), 3));
 		setLastUpdate(getInitiation());
+		setJwt(Jwt.create(this));
 	}
 
 	public String getUuid() {
 		return uuid;
+	}
+
+	public String getJwt() {
+		return jwt;
+	}
+
+	public void setJwt(String jwt) {
+
+		this.jwt = jwt;
 	}
 
 	public String getUserUuid() {
@@ -83,13 +93,13 @@ public class SessionToken {
 
 	public static LocalDateTime addWorkdays(LocalDateTime dateTime, int workdays) {
 		if (workdays != 0) {
-		int addedDays = 0;
-		while (addedDays != workdays) {
+			int addedDays = 0;
+			while (addedDays != workdays) {
 				dateTime = dateTime.plusDays(workdays > 0 ? 1 : -1);
-				if (!(dateTime.getDayOfWeek() == DayOfWeek.SATURDAY || dateTime.getDayOfWeek() == DayOfWeek.SUNDAY)) {
+				if (((dateTime.getDayOfWeek() != DayOfWeek.SATURDAY) && (dateTime.getDayOfWeek() != DayOfWeek.SUNDAY))) {
 					addedDays += workdays > 0 ? 1 : -1;
+				}
 			}
-		}
 		}
 		return dateTime;
 	}

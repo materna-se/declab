@@ -13,6 +13,8 @@ public interface SessionTokenRepository {
 
 	SessionToken findByUuid(String tokenUuid);
 
+	SessionToken findByJwt(String jwt);
+
 	SessionToken findCurrentByUser(User user);
 
 	SessionToken findCurrentByUserUuid(String userUuid);

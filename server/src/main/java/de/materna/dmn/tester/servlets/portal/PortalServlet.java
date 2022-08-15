@@ -247,7 +247,7 @@ public class PortalServlet {
 			final SessionToken sessionToken = new SessionToken(user);
 			sessionTokenRepository.put(sessionToken);
 			return Response.status(Response.Status.OK)
-					.entity(SerializationHelper.getInstance().toJSON(sessionToken.getUuid())).build();
+					.entity(SerializationHelper.getInstance().toJSON(sessionToken.getJwt())).build();
 		}
 
 		return Response.status(Response.Status.UNAUTHORIZED).build();
