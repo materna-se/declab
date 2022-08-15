@@ -21,10 +21,10 @@ import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
 
 public abstract class Database {
 
-	static UserHibernateH2RepositoryImpl userRepository = new UserHibernateH2RepositoryImpl();
-	static PermissionHibernateH2RepositoryImpl permissionRepository = new PermissionHibernateH2RepositoryImpl();
-	static LaboratoryHibernateH2RepositoryImpl laboratoryRepository = new LaboratoryHibernateH2RepositoryImpl();
-	static WorkspaceHibernateH2RepositoryImpl workspaceRepository = new WorkspaceHibernateH2RepositoryImpl();
+	private static UserHibernateH2RepositoryImpl userRepository = new UserHibernateH2RepositoryImpl();
+	private static PermissionHibernateH2RepositoryImpl permissionRepository = new PermissionHibernateH2RepositoryImpl();
+	private static LaboratoryHibernateH2RepositoryImpl laboratoryRepository = new LaboratoryHibernateH2RepositoryImpl();
+	private static WorkspaceHibernateH2RepositoryImpl workspaceRepository = new WorkspaceHibernateH2RepositoryImpl();
 
 	private final static Logger log = LoggerFactory.getLogger(WorkspaceServlet.class);
 
@@ -36,6 +36,7 @@ public abstract class Database {
 			put("USERNAME", "administrator");
 		}
 	};
+
 	private final static Map<String, String> DEMO = new HashMap<>() {
 		private static final long serialVersionUID = 1L;
 		{
@@ -44,13 +45,7 @@ public abstract class Database {
 			put("USERNAME", "demo");
 		}
 	};
-	public final static Map<String, String> MY_LAB = new HashMap<>() {
-		private static final long serialVersionUID = 1L;
-		{
-			put("DESCRIPTION", "This is your laboratory alone. Only you can see it!");
-			put("NAME", "My lab");
-		}
-	};
+
 	private final static Map<String, String> PUBLIC_WORKSPACE = new HashMap<>() {
 		private static final long serialVersionUID = 1L;
 		{
@@ -58,6 +53,7 @@ public abstract class Database {
 			put("NAME", "A public workspace");
 		}
 	};
+
 	private final static Map<String, String> ELTERNGELD = new HashMap<>() {
 		private static final long serialVersionUID = 1L;
 		{
@@ -66,44 +62,23 @@ public abstract class Database {
 		}
 	};
 
-	public static void prepare() {
-		try {
-			Server.createWebServer("-webPort", "8081").start();
-			log.info("H2 created!");
-
-			// Administrator
-			User admin = addUser(ADMIN.get("USERNAME"), ADMIN.get("EMAIL"), ADMIN.get("PASSWORD"), "Administrator",
-					"Declab", true);
-			if (admin != null) {
-				Laboratory laboratory = addLaboratory(admin, MY_LAB.get("NAME"), MY_LAB.get("DESCRIPTION"),
-						VisabilityType.PRIVATE);
-				addWorkspace(admin, ELTERNGELD.get("NAME"), ELTERNGELD.get("DESCRIPTION"), VisabilityType.PROTECTED,
-						laboratory.getUuid());
-			}
-
-			// Demo
-			User demo = addUser(DEMO.get("USERNAME"), DEMO.get("EMAIL"), DEMO.get("PASSWORD"), "Demo", "Demo", false);
-			if (demo != null) {
-				Laboratory laboratory = addLaboratory(demo, MY_LAB.get("NAME"), MY_LAB.get("DESCRIPTION"),
-						VisabilityType.PRIVATE);
-				addWorkspace(demo, PUBLIC_WORKSPACE.get("NAME"), PUBLIC_WORKSPACE.get("DESCRIPTION"),
-						VisabilityType.PUBLIC, laboratory.getUuid());
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			log.info("H2 failed : " + e);
+	public final static Map<String, String> MY_LAB = new HashMap<>() {
+		private static final long serialVersionUID = 1L;
+		{
+			put("DESCRIPTION", "This is your laboratory alone. Only you can see it!");
+			put("NAME", "My lab");
 		}
-	}
+	};
 
 	private static Laboratory addLaboratory(User user, String name, String description, VisabilityType visability) {
-		Laboratory laboratory = laboratoryRepository.create(name, description, visability);
+		final Laboratory laboratory = laboratoryRepository.create(name, description, visability);
 		permissionRepository.create(user.getUuid(), laboratory.getUuid(), null, PermissionType.OWNER);
 		return laboratory;
 	}
 
 	private static Workspace addWorkspace(User user, String name, String description, VisabilityType visability,
 			String laboratoryUuid) {
-		Workspace workspace = workspaceRepository.create(name, description, visability, laboratoryUuid);
+		final Workspace workspace = workspaceRepository.create(name, description, visability, laboratoryUuid);
 		permissionRepository.create(null, laboratoryUuid, workspace.getUuid(), PermissionType.OWNER);
 		return workspace;
 	}
@@ -111,7 +86,7 @@ public abstract class Database {
 	private static User addUser(String username, String email, String password, String firstname, String lastname,
 			boolean systemAdmin) {
 
-		User user = userRepository.register(email, username, password, firstname, lastname);
+		final User user = userRepository.register(email, username, password, firstname, lastname);
 		if (user != null) {
 			user.setSystemAdmin(systemAdmin);
 			log.info("H2: Saved user '" + username + "': " + user);
@@ -119,5 +94,35 @@ public abstract class Database {
 			log.info("H2: User '" + username + "' already exists.");
 		}
 		return user;
+	}
+
+	protected static void prepare() {
+		try {
+			Server.createWebServer("-webPort", "8081").start();
+			log.info("H2 created!");
+
+			// Administrator
+			final User admin = addUser(ADMIN.get("USERNAME"), ADMIN.get("EMAIL"), ADMIN.get("PASSWORD"),
+					"Administrator", "Declab", true);
+			if (admin != null) {
+				final Laboratory laboratory = addLaboratory(admin, MY_LAB.get("NAME"), MY_LAB.get("DESCRIPTION"),
+						VisabilityType.PRIVATE);
+				addWorkspace(admin, ELTERNGELD.get("NAME"), ELTERNGELD.get("DESCRIPTION"), VisabilityType.PROTECTED,
+						laboratory.getUuid());
+			}
+
+			// Demo
+			final User demo = addUser(DEMO.get("USERNAME"), DEMO.get("EMAIL"), DEMO.get("PASSWORD"), "Demo", "Demo",
+					false);
+			if (demo != null) {
+				final Laboratory laboratory = addLaboratory(demo, MY_LAB.get("NAME"), MY_LAB.get("DESCRIPTION"),
+						VisabilityType.PRIVATE);
+				addWorkspace(demo, PUBLIC_WORKSPACE.get("NAME"), PUBLIC_WORKSPACE.get("DESCRIPTION"),
+						VisabilityType.PUBLIC, laboratory.getUuid());
+			}
+		} catch (final SQLException e) {
+			e.printStackTrace();
+			log.info("H2 failed : " + e);
+		}
 	}
 }

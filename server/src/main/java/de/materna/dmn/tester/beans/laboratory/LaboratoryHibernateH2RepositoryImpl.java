@@ -47,7 +47,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 			final Laboratory Laboratory = em.find(Laboratory.class, laboratoryUuid);
 			transaction.commit();
 			return Optional.ofNullable(Laboratory).get();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
@@ -80,7 +80,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 			em.persist(laboratory);
 			transaction.commit();
 			return findByUuid(laboratory.getUuid()) != null ? laboratory : null;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
@@ -102,7 +102,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 			em.remove(em.contains(laboratory) ? laboratory : em.merge(laboratory));
 			transaction.commit();
 			return findByUuid(laboratory.getUuid()) == null;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();

@@ -46,7 +46,7 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 			final User user = em.find(User.class, uuid);
 			transaction.commit();
 			return Optional.ofNullable(user).get();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
@@ -80,7 +80,7 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 			em.persist(user);
 			transaction.commit();
 			return findByUuid(user.getUuid()) != null ? user : null;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
@@ -96,7 +96,7 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 			em.remove(em.contains(user) ? user : em.merge(user));
 			transaction.commit();
 			return findByUuid(user.getUuid()) == null;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();

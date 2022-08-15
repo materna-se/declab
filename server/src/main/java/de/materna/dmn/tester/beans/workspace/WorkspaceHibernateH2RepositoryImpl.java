@@ -47,7 +47,7 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 			final Workspace Workspace = em.find(Workspace.class, uuid);
 			transaction.commit();
 			return Optional.ofNullable(Workspace).get();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
@@ -86,7 +86,7 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 			em.persist(workspace);
 			transaction.commit();
 			return findByUuid(workspace.getUuid()) != null ? workspace : null;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
@@ -108,7 +108,7 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 			em.remove(em.contains(workspace) ? workspace : em.merge(workspace));
 			transaction.commit();
 			return findByUuid(workspace.getUuid()) == null;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();

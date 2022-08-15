@@ -48,7 +48,7 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 			final Permission relationship = em.find(Permission.class, id);
 			transaction.commit();
 			return Optional.ofNullable(relationship).get();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
@@ -105,7 +105,7 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 			em.persist(userPermission);
 			transaction.commit();
 			return userPermission;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
@@ -116,7 +116,7 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 
 	@Override
 	public Permission create(String userUuid, String laboratoryUuid, String workspaceUuid, PermissionType type) {
-		Permission userPermission = new Permission(userUuid, laboratoryUuid, workspaceUuid, type);
+		final Permission userPermission = new Permission(userUuid, laboratoryUuid, workspaceUuid, type);
 		return put(userPermission);
 	}
 
@@ -127,7 +127,7 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 			em.remove(em.contains(userPermission) ? userPermission : em.merge(userPermission));
 			transaction.commit();
 			return findById(userPermission.getId()) == null;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
