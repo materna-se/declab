@@ -4,3 +4,4 @@ target/
 ##### Project #####
 src/main/webapp/*
 !src/main/webapp/WEB-INF/web.xml
+/.apt_generated/
