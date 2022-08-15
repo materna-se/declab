@@ -74,14 +74,14 @@
 					return;
 				}
 
-				const sessionTokenUuid = await Network.login({
+				const jwt = await Network.login({
 					username: username,
 					password: password
 				});
 
 				
-				if (sessionTokenUuid) {
-					document.cookie = "sessionToken=" + sessionTokenUuid + "; path=/";
+				if (jwt) {
+					document.cookie = "jwt=" + jwt + "; path=/";
 					this.$router.replace('/portal');
 				}
 			},

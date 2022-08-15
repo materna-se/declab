@@ -137,10 +137,10 @@
 			},
 
 			async verifySessionToken() {
-				const sessionTokenUuid = this.getCookie("sessionToken");
-				if (sessionTokenUuid) {
-					this.user = await Network.getUserBySessionToken({
-						sessionTokenUuid: sessionTokenUuid
+				const jwt = this.getCookie("jwt");
+				if (jwt) {
+					this.user = await Network.getUserByJwt({
+						jwt: jwt
 					});
 				} else {
 					this.$router.replace('/login');
@@ -148,10 +148,10 @@
 			},
 
 			async updateSessionToken() {
-				const sessionTokenUuid = this.getCookie("sessionToken");
-				if (sessionTokenUuid) {
+				const jwt = this.getCookie("jwt");
+				if (jwt) {
 					this.user = await Network.updateSessionToken({
-						sessionTokenUuid: sessionTokenUuid,
+						jwt: jwt,
 						uuid: this.user.uuid
 					});
 				} else {

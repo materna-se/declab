@@ -76,7 +76,7 @@ export default {
 		return await response.json();
 	},
 
-	async getUserBySessionToken(input) {
+	async getUserByJwt(input) {
 		const responseSessionToken = await this._authorizedFetch(`${this._endpoint}/portal/sessiontoken/read`, {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
@@ -90,7 +90,7 @@ export default {
 				headers: {"Content-Type": "application/json"},
 				body: JSON.stringify({
 					userUuid: sessionToken.userUuid,
-					sessionTokenUuid: input.sessionTokenUuid
+					jwt: sessionToken.jwt
 				})
 			});
 			return await responseUser.json();
