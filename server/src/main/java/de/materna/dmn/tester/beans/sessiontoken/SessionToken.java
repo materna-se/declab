@@ -82,19 +82,15 @@ public class SessionToken {
 	}
 
 	public static LocalDateTime addWorkdays(LocalDateTime dateTime, int workdays) {
-		if (workdays < 1) {
-			return dateTime;
-		}
-
-		LocalDateTime calculatedDateTime = dateTime;
+		if (workdays != 0) {
 		int addedDays = 0;
 		while (addedDays != workdays) {
-			calculatedDateTime = workdays > 0 ? calculatedDateTime.plusDays(1) : calculatedDateTime.minusDays(1);
-			if (!(calculatedDateTime.getDayOfWeek() == DayOfWeek.SATURDAY
-					|| calculatedDateTime.getDayOfWeek() == DayOfWeek.SUNDAY)) {
-				addedDays = addedDays + (workdays > 0 ? 1 : -1);
+				dateTime = dateTime.plusDays(workdays > 0 ? 1 : -1);
+				if (!(dateTime.getDayOfWeek() == DayOfWeek.SATURDAY || dateTime.getDayOfWeek() == DayOfWeek.SUNDAY)) {
+					addedDays += workdays > 0 ? 1 : -1;
 			}
 		}
-		return calculatedDateTime;
+		}
+		return dateTime;
 	}
 }
