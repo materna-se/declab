@@ -14,13 +14,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 public abstract class Jwt {
 
-	private static Key signingKey = new SecretKeySpec(DatatypeConverter.parseBase64Binary("secret"),
+	private static Key signingKey = new SecretKeySpec(DatatypeConverter.parseBase64Binary(
+			"secretKeyForSigningIn@Declab3.0WhichShouldBeLongEnoughAfterIAddedAFewMoreLettersAndNumbersLike1234567890AndSoOn.AndWellLetsSimplyRepeat:secretKeyForSigningIn@Declab3.0WhichShouldBeLongEnoughAfterIAddedAFewMoreLettersAndNumbersLike1234567890AndSoOn"),
 			SignatureAlgorithm.HS256.getJcaName());
 
 	protected static String create(SessionToken sessionToken) {
 
-		Date initiation = Date.from(sessionToken.getInitiation().atZone(ZoneId.systemDefault()).toInstant());
-		Date expiration = Date.from(sessionToken.getExpiration().atZone(ZoneId.systemDefault()).toInstant());
+		final Date initiation = Date.from(sessionToken.getInitiation().atZone(ZoneId.systemDefault()).toInstant());
+		final Date expiration = Date.from(sessionToken.getExpiration().atZone(ZoneId.systemDefault()).toInstant());
 
 		return Jwts.builder().setSubject(sessionToken.getUuid()).setIssuedAt(initiation).setExpiration(expiration)
 				.signWith(Jwt.signingKey, SignatureAlgorithm.HS256).compact();

@@ -51,7 +51,7 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 			final SessionToken sessionToken = em.find(SessionToken.class, uuid);
 			transaction.commit();
 			return Optional.ofNullable(sessionToken).isPresent() ? Optional.ofNullable(sessionToken).get() : null;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
@@ -63,7 +63,7 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	@Override
 	public SessionToken findByJwt(String jwt) throws JwtException {
 		Jwt.verify(jwt);
-		List<SessionToken> sessionTokens = findByFilter(new JwtFilter(jwt));
+		final List<SessionToken> sessionTokens = findByFilter(new JwtFilter(jwt));
 		return sessionTokens.size() == 1 ? sessionTokens.get(0) : null;
 	}
 
@@ -86,7 +86,7 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 			em.persist(sessionToken);
 			transaction.commit();
 			return findByUuid(sessionToken.getUuid()) != null ? sessionToken : null;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
@@ -112,7 +112,7 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 			em.remove(em.contains(sessionToken) ? sessionToken : em.merge(sessionToken));
 			transaction.commit();
 			return findByUuid(sessionToken.getUuid()) == null;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
