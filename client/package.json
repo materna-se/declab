@@ -33,7 +33,8 @@
 		"vue-router": "^3.5.2",
 		"vuedraggable": "^2.24.3",
 		"xlsx": "^0.17.3",
-		"xss": "^1.0.11"
+		"xss": "^1.0.11",
+		"vuex": "^3.6.2"
 	},
 	"devDependencies": {
 		"node-fetch": "^2.6.7",
