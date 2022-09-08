@@ -117,6 +117,15 @@ export default {
 		return await response.json();
 	},
 
+	async getWorkspacesFromDb(input) {
+		const response = await this._authorizedFetch(`${this._endpoint}/portal/workspace/read`, {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify(input)
+		});
+		return await response.json();
+	},
+
 
 	//
 	// Workspace
