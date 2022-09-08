@@ -7,17 +7,17 @@ import de.materna.dmn.tester.enums.VisabilityType;
 
 public interface WorkspaceRepository {
 
-	List<Workspace> findAll();
+	List<Workspace> getAll();
 
-	Workspace findByUuid(String workspaceUuid);
+	Workspace getByUuid(String workspaceUuid);
 
-	List<Workspace> findByName(String name);
+	List<Workspace> getByName(String name);
 
-	List<Workspace> findByVisability(VisabilityType visability);
+	List<Workspace> getByVisability(VisabilityType visability);
 
-	List<Workspace> findByUser(String ownerUuid);
+	List<Workspace> getByUser(String ownerUuid);
 
-	List<Workspace> findByLaboratory(String laboratoryUuid);
+	List<Workspace> getByLaboratory(String laboratoryUuid);
 
 	Workspace put(Workspace workspace);
 

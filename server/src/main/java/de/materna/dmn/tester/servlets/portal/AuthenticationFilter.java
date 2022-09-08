@@ -51,7 +51,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 	}
 
 	private void validateToken(String tokenUuid) throws SessionTokenNotFoundException, SessionTokenExpiredException {
-		final SessionToken token = new SessionTokenHibernateH2RepositoryImpl().findByUuid(tokenUuid);
+		final SessionToken token = new SessionTokenHibernateH2RepositoryImpl().getByUuid(tokenUuid);
 		if (token == null) {
 			throw new SessionTokenNotFoundException("SessionToken not found : " + tokenUuid);
 		}

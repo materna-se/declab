@@ -4,20 +4,21 @@ import java.util.List;
 
 import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
 import de.materna.dmn.tester.beans.user.User;
+import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
 
 public interface SessionTokenRepository {
 
-	List<SessionToken> findAll();
+	List<SessionToken> getAll();
 
-	List<SessionToken> findAllByUserUuid(String userUuid);
+	List<SessionToken> getAllByUserUuid(String userUuid);
 
-	SessionToken findByUuid(String tokenUuid);
+	SessionToken getByUuid(String tokenUuid) throws SessionTokenNotFoundException;
 
-	SessionToken findByJwt(String jwt);
+	SessionToken getByJwt(String jwt) throws SessionTokenNotFoundException;
 
-	SessionToken findCurrentByUser(User user);
+	SessionToken getCurrentByUser(User user) throws SessionTokenNotFoundException;
 
-	SessionToken findCurrentByUserUuid(String userUuid);
+	SessionToken getCurrentByUserUuid(String userUuid) throws SessionTokenNotFoundException;
 
 	SessionToken put(SessionToken sessionToken);
 

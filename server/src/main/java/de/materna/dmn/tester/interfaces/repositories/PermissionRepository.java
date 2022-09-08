@@ -7,23 +7,23 @@ import de.materna.dmn.tester.enums.PermissionType;
 
 public interface PermissionRepository {
 
-	List<Permission> findAll();
+	List<Permission> getAll();
 
-	Permission findById(Long id);
+	Permission getById(Long id);
 
-	List<Permission> findByUserUuid(String userUuid);
+	List<Permission> getByUserUuid(String userUuid);
 
-	List<Permission> findByLaboratoryUuid(String laboratoryUuid);
+	List<Permission> getByLaboratoryUuid(String laboratoryUuid);
 
-	List<Permission> findByWorkspaceUuid(String workspaceUuid);
+	List<Permission> getByWorkspaceUuid(String workspaceUuid);
 
-	List<Permission> findByType(PermissionType type);
+	List<Permission> getByType(PermissionType type);
 
-	Permission findByUserAndLaboratoryUuids(String userUuid, String laboratoryUuid);
+	Permission getByUserAndLaboratoryUuids(String userUuid, String laboratoryUuid);
 
-	Permission findByUserAndWorkspaceUuids(String userUuid, String workspaceUuid);
+	Permission getByUserAndWorkspaceUuids(String userUuid, String workspaceUuid);
 
-	Permission findByLaboratoryAndWorkspaceUuids(String laboratoryUuid, String workspaceUuid);
+	Permission getByLaboratoryAndWorkspaceUuids(String laboratoryUuid, String workspaceUuid);
 
 	Permission put(Permission relationship);
 

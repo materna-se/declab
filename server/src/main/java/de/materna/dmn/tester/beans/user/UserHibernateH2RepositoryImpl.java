@@ -21,6 +21,10 @@ import de.materna.dmn.tester.beans.user.filter.UsernameFilter;
 import de.materna.dmn.tester.interfaces.filters.UserFilter;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
 import de.materna.dmn.tester.interfaces.repositories.UserRepository;
+import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
+import de.materna.dmn.tester.servlets.exceptions.database.UserNotFoundException;
+import de.materna.dmn.tester.servlets.exceptions.registration.EmailInUseException;
+import de.materna.dmn.tester.servlets.exceptions.registration.UsernameInUseException;
 
 public class UserHibernateH2RepositoryImpl implements UserRepository {
 	private final SessionTokenRepository sessionTokenRepository = new SessionTokenHibernateH2RepositoryImpl();
@@ -30,7 +34,7 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 	private final EntityTransaction transaction = em.getTransaction();
 
 	@Override
-	public List<User> findAll() {
+	public List<User> getAll() {
 		final CriteriaBuilder cb = em.getCriteriaBuilder();
 		final CriteriaQuery<User> cq = cb.createQuery(User.class);
 		final Root<User> rootEntry = cq.from(User.class);
@@ -40,7 +44,7 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public User findByUuid(String uuid) {
+	public User getByUuid(String uuid) throws UserNotFoundException {
 		try {
 			transaction.begin();
 			final User user = em.find(User.class, uuid);
@@ -51,26 +55,38 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 			if (transaction.isActive()) {
 				transaction.rollback();
 			}
-			return null;
+			throw new UserNotFoundException("User not found by UUID : " + uuid);
 		}
 	}
 
 	@Override
-	public User findByEmail(String email) {
+	public User getByEmail(String email) throws UserNotFoundException {
 		final List<User> usersFound = findByFilter(new EmailFilter(email));
-		return usersFound.size() == 1 ? usersFound.get(0) : null;
+		if (usersFound.size() == 1) {
+			return usersFound.get(0);
+		}
+		throw new UserNotFoundException("User not found by email address : " + email);
 	}
 
 	@Override
-	public User findByUsername(String username) {
+	public User getByUsername(String username) throws UserNotFoundException {
 		final List<User> usersFound = findByFilter(new UsernameFilter(username));
-		return usersFound.size() == 1 ? usersFound.get(0) : null;
+		if (usersFound.size() == 1) {
+			return usersFound.get(0);
+		}
+		throw new UserNotFoundException("User not found by username : " + username);
 	}
 
 	@Override
-	public User findByJwt(String jwt) {
-		final SessionToken token = sessionTokenRepository.findByJwt(jwt);
-		return findByUuid(token.getUserUuid());
+	public User getByJwt(String jwt) throws UserNotFoundException {
+		SessionToken sessionToken;
+		try {
+			sessionToken = sessionTokenRepository.getByJwt(jwt);
+		} catch (final SessionTokenNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return getByUuid(sessionToken.getUserUuid());
 	}
 
 	@Override
@@ -79,7 +95,7 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 			transaction.begin();
 			em.persist(user);
 			transaction.commit();
-			return findByUuid(user.getUuid()) != null ? user : null;
+			return getByUuid(user.getUuid()) != null ? user : null;
 		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
@@ -95,7 +111,7 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 			transaction.begin();
 			em.remove(em.contains(user) ? user : em.merge(user));
 			transaction.commit();
-			return findByUuid(user.getUuid()) == null;
+			return getByUuid(user.getUuid()) == null;
 		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
@@ -106,17 +122,26 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public User register(String email, String username, String password) {
+	public User register(String email, String username, String password)
+			throws EmailInUseException, UsernameInUseException {
 		return register(email, username, password, "", "");
 	}
 
 	@Override
-	public User register(String email, String username, String password, String firstname, String lastname) {
-		if (findByEmail(email) == null) {
-			final User user = new User(email, username, password, firstname, lastname);
-			return put(user);
+	public User register(String email, String username, String password, String firstname, String lastname)
+			throws EmailInUseException, UsernameInUseException {
+		try {
+			getByUsername(username);
+			throw new UsernameInUseException("Username is already in use : " + username);
+		} catch (final UserNotFoundException e) {
+			try {
+				getByEmail(email);
+				throw new EmailInUseException("Email address is already in use : " + email);
+			} catch (final UserNotFoundException e2) {
+				final User user = new User(email, username, password, firstname, lastname);
+				return put(user);
+			}
 		}
-		return null;
 	}
 
 	public List<User> findByFilter(UserFilter... filterArray) {

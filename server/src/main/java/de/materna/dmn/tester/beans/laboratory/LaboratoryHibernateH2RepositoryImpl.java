@@ -31,7 +31,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	private final EntityTransaction transaction = em.getTransaction();
 
 	@Override
-	public List<Laboratory> findAll() {
+	public List<Laboratory> getAll() {
 		final CriteriaBuilder cb = em.getCriteriaBuilder();
 		final CriteriaQuery<Laboratory> cq = cb.createQuery(Laboratory.class);
 		final Root<Laboratory> rootEntry = cq.from(Laboratory.class);
@@ -41,7 +41,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	}
 
 	@Override
-	public Laboratory findByUuid(String laboratoryUuid) {
+	public Laboratory getByUuid(String laboratoryUuid) {
 		try {
 			transaction.begin();
 			final Laboratory Laboratory = em.find(Laboratory.class, laboratoryUuid);
@@ -57,20 +57,20 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	}
 
 	@Override
-	public List<Laboratory> findByName(String name) {
+	public List<Laboratory> getByName(String name) {
 		return findByFilter(new NameFilter(name));
 	}
 
 	@Override
-	public List<Laboratory> findByVisability(VisabilityType visability) {
+	public List<Laboratory> getByVisability(VisabilityType visability) {
 		return findByFilter(new VisabilityFilter(visability));
 	}
 
 	@Override
-	public List<Laboratory> findByUser(String userUuid) {
-		return userPermissionRepository.findByUserUuid(userUuid).stream()
+	public List<Laboratory> getByUser(String userUuid) {
+		return userPermissionRepository.getByUserUuid(userUuid).stream()
 				.filter(userPermission -> userPermission.getLaboratoryUuid() != null)
-				.map(userPermission -> findByUuid(userPermission.getLaboratoryUuid())).collect(Collectors.toList());
+				.map(userPermission -> getByUuid(userPermission.getLaboratoryUuid())).collect(Collectors.toList());
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 			transaction.begin();
 			em.persist(laboratory);
 			transaction.commit();
-			return findByUuid(laboratory.getUuid()) != null ? laboratory : null;
+			return getByUuid(laboratory.getUuid()) != null ? laboratory : null;
 		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
@@ -101,7 +101,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 			transaction.begin();
 			em.remove(em.contains(laboratory) ? laboratory : em.merge(laboratory));
 			transaction.commit();
-			return findByUuid(laboratory.getUuid()) == null;
+			return getByUuid(laboratory.getUuid()) == null;
 		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {

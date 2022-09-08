@@ -32,7 +32,7 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 	private final EntityTransaction transaction = em.getTransaction();
 
 	@Override
-	public List<Permission> findAll() {
+	public List<Permission> getAll() {
 		final CriteriaBuilder cb = em.getCriteriaBuilder();
 		final CriteriaQuery<Permission> cq = cb.createQuery(Permission.class);
 		final Root<Permission> rootEntry = cq.from(Permission.class);
@@ -42,7 +42,7 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 	}
 
 	@Override
-	public Permission findById(Long id) {
+	public Permission getById(Long id) {
 		try {
 			transaction.begin();
 			final Permission relationship = em.find(Permission.class, id);
@@ -58,41 +58,41 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 	}
 
 	@Override
-	public List<Permission> findByUserUuid(String userUuid) {
+	public List<Permission> getByUserUuid(String userUuid) {
 		return findByFilter(new UserUuidFilter(userUuid));
 	}
 
 	@Override
-	public List<Permission> findByLaboratoryUuid(String laboratoryUuid) {
+	public List<Permission> getByLaboratoryUuid(String laboratoryUuid) {
 		return findByFilter(new LaboratoryUuidFilter(laboratoryUuid));
 	}
 
 	@Override
-	public List<Permission> findByWorkspaceUuid(String workspaceUuid) {
+	public List<Permission> getByWorkspaceUuid(String workspaceUuid) {
 		return findByFilter(new WorkspaceUuidFilter(workspaceUuid));
 	}
 
 	@Override
-	public List<Permission> findByType(PermissionType type) {
+	public List<Permission> getByType(PermissionType type) {
 		return findByFilter(new PermissionTypeFilter(type));
 	}
 
 	@Override
-	public Permission findByUserAndLaboratoryUuids(String userUuid, String laboratoryUuid) {
+	public Permission getByUserAndLaboratoryUuids(String userUuid, String laboratoryUuid) {
 		final List<Permission> relationshipsFound = findByFilter(
 				new UserAndLaboratoryUuidsFilter(userUuid, laboratoryUuid));
 		return relationshipsFound.size() == 1 ? relationshipsFound.get(0) : null;
 	}
 
 	@Override
-	public Permission findByUserAndWorkspaceUuids(String userUuid, String workspaceUuid) {
+	public Permission getByUserAndWorkspaceUuids(String userUuid, String workspaceUuid) {
 		final List<Permission> relationshipsFound = findByFilter(
 				new UserAndWorkspaceUuidsFilter(userUuid, workspaceUuid));
 		return relationshipsFound.size() == 1 ? relationshipsFound.get(0) : null;
 	}
 
 	@Override
-	public Permission findByLaboratoryAndWorkspaceUuids(String laboratoryUuid, String workspaceUuid) {
+	public Permission getByLaboratoryAndWorkspaceUuids(String laboratoryUuid, String workspaceUuid) {
 		final List<Permission> relationshipsFound = findByFilter(
 				new LaboratoryAndWorkspaceUuidsFilter(laboratoryUuid, workspaceUuid));
 		return relationshipsFound.size() == 1 ? relationshipsFound.get(0) : null;
@@ -126,7 +126,7 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 			transaction.begin();
 			em.remove(em.contains(userPermission) ? userPermission : em.merge(userPermission));
 			transaction.commit();
-			return findById(userPermission.getId()) == null;
+			return getById(userPermission.getId()) == null;
 		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
@@ -150,4 +150,5 @@ public class PermissionHibernateH2RepositoryImpl implements PermissionRepository
 		final TypedQuery<Permission> query = em.createQuery(cquery);
 		return query.getResultList();
 	}
+
 }

@@ -7,15 +7,15 @@ import de.materna.dmn.tester.enums.VisabilityType;
 
 public interface LaboratoryRepository {
 
-	List<Laboratory> findAll();
+	List<Laboratory> getAll();
 
-	Laboratory findByUuid(String laboratoryUuid);
+	Laboratory getByUuid(String laboratoryUuid);
 
-	List<Laboratory> findByName(String name);
+	List<Laboratory> getByName(String name);
 
-	List<Laboratory> findByVisability(VisabilityType visability);
+	List<Laboratory> getByVisability(VisabilityType visability);
 
-	List<Laboratory> findByUser(String ownerUuid);
+	List<Laboratory> getByUser(String ownerUuid);
 
 	Laboratory put(Laboratory laboratory);
 

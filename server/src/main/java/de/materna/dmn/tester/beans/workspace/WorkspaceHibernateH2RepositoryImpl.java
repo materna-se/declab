@@ -31,7 +31,7 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	private final EntityTransaction transaction = em.getTransaction();
 
 	@Override
-	public List<Workspace> findAll() {
+	public List<Workspace> getAll() {
 		final CriteriaBuilder cb = em.getCriteriaBuilder();
 		final CriteriaQuery<Workspace> cq = cb.createQuery(Workspace.class);
 		final Root<Workspace> rootEntry = cq.from(Workspace.class);
@@ -41,7 +41,7 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	@Override
-	public Workspace findByUuid(String uuid) {
+	public Workspace getByUuid(String uuid) {
 		try {
 			transaction.begin();
 			final Workspace Workspace = em.find(Workspace.class, uuid);
@@ -57,25 +57,25 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	@Override
-	public List<Workspace> findByName(String name) {
+	public List<Workspace> getByName(String name) {
 		return findByFilter(new NameFilter(name));
 	}
 
 	@Override
-	public List<Workspace> findByVisability(VisabilityType visability) {
+	public List<Workspace> getByVisability(VisabilityType visability) {
 		return findByFilter(new VisabilityFilter(visability));
 	}
 
 	@Override
-	public List<Workspace> findByUser(String userUuid) {
-		return permissionRepository.findByUserUuid(userUuid).stream()
+	public List<Workspace> getByUser(String userUuid) {
+		return permissionRepository.getByUserUuid(userUuid).stream()
 				.filter(permission -> permission.getWorkspaceUuid() != null)
-				.map(permission -> findByUuid(permission.getWorkspaceUuid())).collect(Collectors.toList());
+				.map(permission -> getByUuid(permission.getWorkspaceUuid())).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<Workspace> findByLaboratory(String laboratoryUuid) {
-		return findAll().stream().filter(workspace -> workspace.getLaboratoryUuid() == laboratoryUuid)
+	public List<Workspace> getByLaboratory(String laboratoryUuid) {
+		return getAll().stream().filter(workspace -> workspace.getLaboratoryUuid() == laboratoryUuid)
 				.collect(Collectors.toList());
 	}
 
@@ -85,7 +85,7 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 			transaction.begin();
 			em.persist(workspace);
 			transaction.commit();
-			return findByUuid(workspace.getUuid()) != null ? workspace : null;
+			return getByUuid(workspace.getUuid()) != null ? workspace : null;
 		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
@@ -107,7 +107,7 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 			transaction.begin();
 			em.remove(em.contains(workspace) ? workspace : em.merge(workspace));
 			transaction.commit();
-			return findByUuid(workspace.getUuid()) == null;
+			return getByUuid(workspace.getUuid()) == null;
 		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {

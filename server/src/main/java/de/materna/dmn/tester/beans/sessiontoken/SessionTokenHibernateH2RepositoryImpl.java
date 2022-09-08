@@ -21,6 +21,7 @@ import de.materna.dmn.tester.beans.sessiontoken.filter.UserUuidFilter;
 import de.materna.dmn.tester.beans.user.User;
 import de.materna.dmn.tester.interfaces.filters.SessionTokenFilter;
 import de.materna.dmn.tester.interfaces.repositories.SessionTokenRepository;
+import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
 import io.jsonwebtoken.JwtException;
 
 public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenRepository {
@@ -30,7 +31,7 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	private final EntityTransaction transaction = em.getTransaction();
 
 	@Override
-	public List<SessionToken> findAll() {
+	public List<SessionToken> getAll() {
 		final CriteriaBuilder cb = em.getCriteriaBuilder();
 		final CriteriaQuery<SessionToken> cq = cb.createQuery(SessionToken.class);
 		final Root<SessionToken> rootEntry = cq.from(SessionToken.class);
@@ -40,12 +41,12 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 	}
 
 	@Override
-	public List<SessionToken> findAllByUserUuid(String userUuid) {
+	public List<SessionToken> getAllByUserUuid(String userUuid) {
 		return findByFilter(new UserUuidFilter(userUuid));
 	}
 
 	@Override
-	public SessionToken findByUuid(String uuid) {
+	public SessionToken getByUuid(String uuid) throws SessionTokenNotFoundException {
 		try {
 			transaction.begin();
 			final SessionToken sessionToken = em.find(SessionToken.class, uuid);
@@ -56,25 +57,25 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 			if (transaction.isActive()) {
 				transaction.rollback();
 			}
-			return null;
+			throw new SessionTokenNotFoundException("SessionToken not found by Uuid : " + uuid);
 		}
 	}
 
 	@Override
-	public SessionToken findByJwt(String jwt) throws JwtException {
+	public SessionToken getByJwt(String jwt) throws JwtException {
 		Jwt.verify(jwt);
 		final List<SessionToken> sessionTokens = findByFilter(new JwtFilter(jwt));
 		return sessionTokens.size() == 1 ? sessionTokens.get(0) : null;
 	}
 
 	@Override
-	public SessionToken findCurrentByUser(User user) {
-		return findCurrentByUserUuid(user.getUuid());
+	public SessionToken getCurrentByUser(User user) {
+		return getCurrentByUserUuid(user.getUuid());
 	}
 
 	@Override
-	public SessionToken findCurrentByUserUuid(String userUuid) {
-		final List<SessionToken> tokens = findAllByUserUuid(userUuid);
+	public SessionToken getCurrentByUserUuid(String userUuid) {
+		final List<SessionToken> tokens = getAllByUserUuid(userUuid);
 		Collections.sort(tokens, new SessionTokenComparator());
 		return tokens.get(0);
 	}
@@ -85,7 +86,7 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 			transaction.begin();
 			em.persist(sessionToken);
 			transaction.commit();
-			return findByUuid(sessionToken.getUuid()) != null ? sessionToken : null;
+			return getByUuid(sessionToken.getUuid()) != null ? sessionToken : null;
 		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
@@ -111,7 +112,7 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 			transaction.begin();
 			em.remove(em.contains(sessionToken) ? sessionToken : em.merge(sessionToken));
 			transaction.commit();
-			return findByUuid(sessionToken.getUuid()) == null;
+			return getByUuid(sessionToken.getUuid()) == null;
 		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
