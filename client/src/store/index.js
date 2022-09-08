@@ -35,6 +35,12 @@ export const mutations = {
 		}
 		state.alert = alert;
 	},
+	setUser(state, user) {
+		state.user = user;
+	},
+	setJwt(state, jwt) {
+		state.jwt = jwt;
+	},
 	setAuthenticationVisibility(state, visible) {
 		state.authentication.visible = visible;
 	},

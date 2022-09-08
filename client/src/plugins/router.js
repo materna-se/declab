@@ -7,6 +7,8 @@ export default (context) => {
 	vue.router.beforeEach((to, from, next) => {
 		vue.store.commit("setLoading", true);
 		vue.store.commit("displayAlert", null);
+		vue.store.commit("setUser", null);
+		vue.store.commit("setJwt", null);
 
 		const workspace = to.params.workspace;
 		if (workspace !== currentWorkspace) {
