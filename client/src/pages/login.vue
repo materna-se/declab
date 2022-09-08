@@ -57,16 +57,15 @@
 		},
 		methods: {
 			async loginUser() {
-				const username = this.login.username;
-				if (username === undefined) {
+				if (this.login.username === undefined) {
 					this.$store.commit("displayAlert", {
 						message: "You need to enter an username.",
 						state: "danger"
 					});
 					return;
 				}
-				const password = this.login.password;
-				if (password === undefined) {
+
+				if (this.login.password === undefined) {
 					this.$store.commit("displayAlert", {
 						message: "You need to enter a password.",
 						state: "danger"
@@ -75,14 +74,19 @@
 				}
 
 				const jwt = await Network.login({
-					username: username,
-					password: password
+					username: this.login.username,
+					password: this.login.password
 				});
-
 				
 				if (jwt) {
-					document.cookie = "jwt=" + jwt + "; path=/";
-					this.$router.replace('/portal');
+					this.$store.commit("setJwt", jwt);
+					console.log("this.$store.state.user:  " + this.$store.state.user)
+					if (!this.$store.state.user) {
+						this.$store.commit("setUser", await Network.getUserByJwt({
+							jwt: jwt
+						}));
+					}
+					this.$router.replace({ path: '/' });
 				}
 			},
 
@@ -157,6 +161,7 @@
 				if (user != null) {
 					this.login.username = this.register.username;
 					this.login.password = this.register.password;
+					this.$store.commit("setUser", user);
 				}
 				
 				await this.loginUser();
