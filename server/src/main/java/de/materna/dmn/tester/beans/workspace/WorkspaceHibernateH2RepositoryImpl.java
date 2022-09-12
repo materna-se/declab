@@ -22,6 +22,7 @@ import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.filters.WorkspaceFilter;
 import de.materna.dmn.tester.interfaces.repositories.PermissionRepository;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
+import de.materna.dmn.tester.servlets.exceptions.database.WorkspaceNotFoundException;
 
 public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	private final PermissionRepository permissionRepository = new PermissionHibernateH2RepositoryImpl();
@@ -41,18 +42,18 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	@Override
-	public Workspace getByUuid(String uuid) {
+	public Workspace getByUuid(String uuid) throws WorkspaceNotFoundException {
 		try {
 			transaction.begin();
-			final Workspace Workspace = em.find(Workspace.class, uuid);
+			final Workspace workspace = em.find(Workspace.class, uuid);
 			transaction.commit();
-			return Optional.ofNullable(Workspace).get();
+			return Optional.ofNullable(workspace).get();
 		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
 			}
-			return null;
+			throw new WorkspaceNotFoundException("Workspace not found by UUID : " + uuid);
 		}
 	}
 
@@ -69,8 +70,14 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	@Override
 	public List<Workspace> getByUser(String userUuid) {
 		return permissionRepository.getByUserUuid(userUuid).stream()
-				.filter(permission -> permission.getWorkspaceUuid() != null)
-				.map(permission -> getByUuid(permission.getWorkspaceUuid())).collect(Collectors.toList());
+				.filter(permission -> permission.getWorkspaceUuid() != null).map(permission -> {
+					try {
+						return getByUuid(permission.getWorkspaceUuid());
+					} catch (final WorkspaceNotFoundException e) {
+						e.printStackTrace();
+						return null;
+					}
+				}).collect(Collectors.toList());
 	}
 
 	@Override
@@ -80,23 +87,25 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 	}
 
 	@Override
-	public Workspace put(Workspace workspace) {
+	public Workspace put(Workspace workspace) throws WorkspaceNotFoundException {
 		try {
 			transaction.begin();
 			em.persist(workspace);
 			transaction.commit();
 			return getByUuid(workspace.getUuid()) != null ? workspace : null;
-		} catch (final Exception e) {
+		} catch (final IllegalStateException e) {
 			e.printStackTrace();
+		} finally {
 			if (transaction.isActive()) {
 				transaction.rollback();
 			}
-			return null;
 		}
+		return null;
 	}
 
 	@Override
-	public Workspace create(String name, String description, VisabilityType visability, String laboratoryUuid) {
+	public Workspace create(String name, String description, VisabilityType visability, String laboratoryUuid)
+			throws WorkspaceNotFoundException {
 		final Workspace workspace = new Workspace(name, description, visability, laboratoryUuid);
 		return put(workspace);
 	}
@@ -107,13 +116,10 @@ public class WorkspaceHibernateH2RepositoryImpl implements WorkspaceRepository {
 			transaction.begin();
 			em.remove(em.contains(workspace) ? workspace : em.merge(workspace));
 			transaction.commit();
-			return getByUuid(workspace.getUuid()) == null;
-		} catch (final Exception e) {
-			e.printStackTrace();
-			if (transaction.isActive()) {
-				transaction.rollback();
-			}
+			getByUuid(workspace.getUuid());
 			return false;
+		} catch (final WorkspaceNotFoundException e) {
+			return true; // all fine!
 		}
 	}
 

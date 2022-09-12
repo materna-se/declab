@@ -22,6 +22,7 @@ import de.materna.dmn.tester.enums.VisabilityType;
 import de.materna.dmn.tester.interfaces.filters.LaboratoryFilter;
 import de.materna.dmn.tester.interfaces.repositories.LaboratoryRepository;
 import de.materna.dmn.tester.interfaces.repositories.PermissionRepository;
+import de.materna.dmn.tester.servlets.exceptions.database.LaboratoryNotFoundException;
 
 public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository {
 	private final PermissionRepository userPermissionRepository = new PermissionHibernateH2RepositoryImpl();
@@ -41,7 +42,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	}
 
 	@Override
-	public Laboratory getByUuid(String laboratoryUuid) {
+	public Laboratory getByUuid(String laboratoryUuid) throws LaboratoryNotFoundException {
 		try {
 			transaction.begin();
 			final Laboratory Laboratory = em.find(Laboratory.class, laboratoryUuid);
@@ -52,7 +53,7 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 			if (transaction.isActive()) {
 				transaction.rollback();
 			}
-			return null;
+			throw new LaboratoryNotFoundException("Laboratory not found by UUID : " + laboratoryUuid);
 		}
 	}
 
@@ -69,30 +70,37 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 	@Override
 	public List<Laboratory> getByUser(String userUuid) {
 		return userPermissionRepository.getByUserUuid(userUuid).stream()
-				.filter(userPermission -> userPermission.getLaboratoryUuid() != null)
-				.map(userPermission -> getByUuid(userPermission.getLaboratoryUuid())).collect(Collectors.toList());
+				.filter(userPermission -> userPermission.getLaboratoryUuid() != null).map(userPermission -> {
+					try {
+						return getByUuid(userPermission.getLaboratoryUuid());
+					} catch (final LaboratoryNotFoundException e) {
+						e.printStackTrace();
+						return null;
+					}
+				}).collect(Collectors.toList());
 	}
 
 	@Override
-	public Laboratory put(Laboratory laboratory) {
+	public Laboratory put(Laboratory laboratory) throws LaboratoryNotFoundException {
 		try {
 			transaction.begin();
 			em.persist(laboratory);
 			transaction.commit();
-			return getByUuid(laboratory.getUuid()) != null ? laboratory : null;
-		} catch (final Exception e) {
+			return getByUuid(laboratory.getUuid());
+		} catch (final IllegalStateException e) {
 			e.printStackTrace();
+		} finally {
 			if (transaction.isActive()) {
 				transaction.rollback();
 			}
-			return null;
 		}
+		return null;
 	}
 
 	@Override
-	public Laboratory create(String name, String description, VisabilityType visability) {
-		final Laboratory laboratory = new Laboratory(name, description, visability);
-		return put(laboratory);
+	public Laboratory create(String name, String description, VisabilityType visability)
+			throws LaboratoryNotFoundException {
+		return put(new Laboratory(name, description, visability));
 	}
 
 	@Override
@@ -101,13 +109,10 @@ public class LaboratoryHibernateH2RepositoryImpl implements LaboratoryRepository
 			transaction.begin();
 			em.remove(em.contains(laboratory) ? laboratory : em.merge(laboratory));
 			transaction.commit();
-			return getByUuid(laboratory.getUuid()) == null;
-		} catch (final Exception e) {
-			e.printStackTrace();
-			if (transaction.isActive()) {
-				transaction.rollback();
-			}
+			getByUuid(laboratory.getUuid());
 			return false;
+		} catch (final LaboratoryNotFoundException e) {
+			return true; // all fine!
 		}
 	}
 

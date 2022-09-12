@@ -14,7 +14,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import de.materna.dmn.tester.beans.sessiontoken.SessionToken;
 import de.materna.dmn.tester.beans.sessiontoken.SessionTokenHibernateH2RepositoryImpl;
 import de.materna.dmn.tester.beans.user.filter.EmailFilter;
 import de.materna.dmn.tester.beans.user.filter.UsernameFilter;
@@ -24,7 +23,9 @@ import de.materna.dmn.tester.interfaces.repositories.UserRepository;
 import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.UserNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.registration.EmailInUseException;
+import de.materna.dmn.tester.servlets.exceptions.registration.RegistrationFailureException;
 import de.materna.dmn.tester.servlets.exceptions.registration.UsernameInUseException;
+import io.jsonwebtoken.JwtException;
 
 public class UserHibernateH2RepositoryImpl implements UserRepository {
 	private final SessionTokenRepository sessionTokenRepository = new SessionTokenHibernateH2RepositoryImpl();
@@ -78,31 +79,25 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public User getByJwt(String jwt) throws UserNotFoundException {
-		SessionToken sessionToken;
-		try {
-			sessionToken = sessionTokenRepository.getByJwt(jwt);
-		} catch (final SessionTokenNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return getByUuid(sessionToken.getUserUuid());
+	public User getByJwt(String jwt) throws JwtException, UserNotFoundException, SessionTokenNotFoundException {
+		return getByUuid(sessionTokenRepository.getByJwt(jwt).getUserUuid());
 	}
 
 	@Override
-	public User put(User user) {
+	public User put(User user) throws UserNotFoundException {
 		try {
 			transaction.begin();
 			em.persist(user);
 			transaction.commit();
-			return getByUuid(user.getUuid()) != null ? user : null;
-		} catch (final Exception e) {
+			return getByUuid(user.getUuid());
+		} catch (final IllegalStateException e) {
 			e.printStackTrace();
+		} finally {
 			if (transaction.isActive()) {
 				transaction.rollback();
 			}
-			return null;
 		}
+		return null;
 	}
 
 	@Override
@@ -111,35 +106,35 @@ public class UserHibernateH2RepositoryImpl implements UserRepository {
 			transaction.begin();
 			em.remove(em.contains(user) ? user : em.merge(user));
 			transaction.commit();
-			return getByUuid(user.getUuid()) == null;
-		} catch (final Exception e) {
-			e.printStackTrace();
-			if (transaction.isActive()) {
-				transaction.rollback();
-			}
+			getByUuid(user.getUuid());
 			return false;
+		} catch (final UserNotFoundException e) {
+			return true; // all fine!
 		}
 	}
 
 	@Override
-	public User register(String email, String username, String password)
-			throws EmailInUseException, UsernameInUseException {
+	public User register(String email, String username, String password) throws RegistrationFailureException {
 		return register(email, username, password, "", "");
 	}
 
 	@Override
 	public User register(String email, String username, String password, String firstname, String lastname)
-			throws EmailInUseException, UsernameInUseException {
+			throws RegistrationFailureException {
 		try {
 			getByUsername(username);
 			throw new UsernameInUseException("Username is already in use : " + username);
-		} catch (final UserNotFoundException e) {
+		} catch (final UserNotFoundException e1) {
 			try {
 				getByEmail(email);
 				throw new EmailInUseException("Email address is already in use : " + email);
 			} catch (final UserNotFoundException e2) {
-				final User user = new User(email, username, password, firstname, lastname);
-				return put(user);
+				try {
+					return put(new User(email, username, password, firstname, lastname));
+				} catch (final UserNotFoundException e) {
+					e.printStackTrace();
+					throw new RegistrationFailureException("User could not be added to database : " + username);
+				}
 			}
 		}
 	}

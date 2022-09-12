@@ -4,12 +4,13 @@ import java.util.List;
 
 import de.materna.dmn.tester.beans.workspace.Workspace;
 import de.materna.dmn.tester.enums.VisabilityType;
+import de.materna.dmn.tester.servlets.exceptions.database.WorkspaceNotFoundException;
 
 public interface WorkspaceRepository {
 
 	List<Workspace> getAll();
 
-	Workspace getByUuid(String workspaceUuid);
+	Workspace getByUuid(String workspaceUuid) throws WorkspaceNotFoundException;
 
 	List<Workspace> getByName(String name);
 
@@ -19,9 +20,10 @@ public interface WorkspaceRepository {
 
 	List<Workspace> getByLaboratory(String laboratoryUuid);
 
-	Workspace put(Workspace workspace);
+	Workspace put(Workspace workspace) throws WorkspaceNotFoundException;
 
-	Workspace create(String name, String description, VisabilityType visability, String laboratoryUuid);
+	Workspace create(String name, String description, VisabilityType visability, String laboratoryUuid)
+			throws WorkspaceNotFoundException;
 
 	boolean delete(Workspace workspace);
 

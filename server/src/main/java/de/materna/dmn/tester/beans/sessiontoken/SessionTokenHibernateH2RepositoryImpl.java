@@ -51,53 +51,62 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 			transaction.begin();
 			final SessionToken sessionToken = em.find(SessionToken.class, uuid);
 			transaction.commit();
-			return Optional.ofNullable(sessionToken).isPresent() ? Optional.ofNullable(sessionToken).get() : null;
+			if (Optional.ofNullable(sessionToken).isPresent()) {
+				return Optional.ofNullable(sessionToken).get();
+			}
 		} catch (final Exception e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
 			}
-			throw new SessionTokenNotFoundException("SessionToken not found by Uuid : " + uuid);
 		}
+		throw new SessionTokenNotFoundException("SessionToken not found by Uuid : " + uuid);
 	}
 
 	@Override
-	public SessionToken getByJwt(String jwt) throws JwtException {
+	public SessionToken getByJwt(String jwt) throws JwtException, SessionTokenNotFoundException {
 		Jwt.verify(jwt);
 		final List<SessionToken> sessionTokens = findByFilter(new JwtFilter(jwt));
-		return sessionTokens.size() == 1 ? sessionTokens.get(0) : null;
+
+		if (sessionTokens.size() == 1) {
+			return sessionTokens.get(0);
+		}
+		throw new SessionTokenNotFoundException("SessionToken not found by Jwt : " + jwt);
 	}
 
 	@Override
-	public SessionToken getCurrentByUser(User user) {
+	public SessionToken getCurrentByUser(User user) throws SessionTokenNotFoundException {
 		return getCurrentByUserUuid(user.getUuid());
 	}
 
 	@Override
-	public SessionToken getCurrentByUserUuid(String userUuid) {
-		final List<SessionToken> tokens = getAllByUserUuid(userUuid);
-		Collections.sort(tokens, new SessionTokenComparator());
-		return tokens.get(0);
+	public SessionToken getCurrentByUserUuid(String userUuid) throws SessionTokenNotFoundException {
+		final List<SessionToken> sessionTokens = getAllByUserUuid(userUuid);
+		Collections.sort(sessionTokens, new SessionTokenComparator());
+		if (sessionTokens.size() > 1) {
+			return sessionTokens.get(0);
+		}
+		throw new SessionTokenNotFoundException("SessionToken not found by Uuid : " + userUuid);
 	}
 
 	@Override
-	public SessionToken put(SessionToken sessionToken) {
+	public SessionToken put(SessionToken sessionToken) throws SessionTokenNotFoundException {
 		try {
 			transaction.begin();
 			em.persist(sessionToken);
 			transaction.commit();
 			return getByUuid(sessionToken.getUuid()) != null ? sessionToken : null;
-		} catch (final Exception e) {
+		} catch (final SessionTokenNotFoundException e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();
 			}
-			return null;
+			throw e;
 		}
 	}
 
 	@Override
-	public SessionToken update(SessionToken sessionToken) {
+	public SessionToken update(SessionToken sessionToken) throws SessionTokenNotFoundException {
 		if (sessionToken != null) {
 			sessionToken.setLastUpdate(LocalDateTime.now());
 			sessionToken.setExpiration(SessionToken.addWorkdays(LocalDateTime.now(), 3));
@@ -113,7 +122,7 @@ public class SessionTokenHibernateH2RepositoryImpl implements SessionTokenReposi
 			em.remove(em.contains(sessionToken) ? sessionToken : em.merge(sessionToken));
 			transaction.commit();
 			return getByUuid(sessionToken.getUuid()) == null;
-		} catch (final Exception e) {
+		} catch (final SessionTokenNotFoundException e) {
 			e.printStackTrace();
 			if (transaction.isActive()) {
 				transaction.rollback();

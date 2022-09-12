@@ -36,9 +36,12 @@ import de.materna.dmn.tester.interfaces.repositories.UserRepository;
 import de.materna.dmn.tester.interfaces.repositories.WorkspaceRepository;
 import de.materna.dmn.tester.servlets.exceptions.authorization.MissingRightsException;
 import de.materna.dmn.tester.servlets.exceptions.database.LaboratoryNotFoundException;
-import de.materna.dmn.tester.servlets.exceptions.database.PermissionNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.SessionTokenNotFoundException;
 import de.materna.dmn.tester.servlets.exceptions.database.UserNotFoundException;
+import de.materna.dmn.tester.servlets.exceptions.database.WorkspaceNotFoundException;
+import de.materna.dmn.tester.servlets.exceptions.registration.EmailInUseException;
+import de.materna.dmn.tester.servlets.exceptions.registration.RegistrationFailureException;
+import de.materna.dmn.tester.servlets.exceptions.registration.UsernameInUseException;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.CreateLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.DeleteLaboratoryRequest;
 import de.materna.dmn.tester.servlets.portal.dto.laboratory.ReadLaboratoryRequest;
@@ -58,6 +61,7 @@ import de.materna.dmn.tester.servlets.portal.dto.workspace.DeleteWorkspaceReques
 import de.materna.dmn.tester.servlets.portal.dto.workspace.ReadWorkspaceRequest;
 import de.materna.dmn.tester.servlets.portal.dto.workspace.UpdateWorkspaceRequest;
 import de.materna.jdec.serialization.SerializationHelper;
+import io.jsonwebtoken.JwtException;
 
 @Path("/portal")
 public class PortalServlet {
@@ -71,111 +75,132 @@ public class PortalServlet {
 	@Path("/user/changeEmail")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response changeEmail(String body) throws SessionTokenNotFoundException {
+	public Response changeEmail(String body) {
 		final ChangeEmailRequest changeEmailRequest = (ChangeEmailRequest) SerializationHelper.getInstance()
 				.toClass(body, ChangeEmailRequest.class);
 
-		final User userFound = userRepository.getByUuid(changeEmailRequest.getUserUuid());
+		User userCurrent = null, userTarget = null, userUpdated = null;
+		SessionToken sessionToken = null;
 
-		if (userFound == null) {
-			return Response.status(Response.Status.NO_CONTENT).build();
+		try {
+			userTarget = userRepository.getByUuid(changeEmailRequest.getUserUuid());
+		} catch (final UserNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, changeEmailRequest.getUserUuid())).build();
 		}
 
-		final SessionToken sessionToken = sessionTokenRepository.getByJwt(changeEmailRequest.getJwt());
-
-		if (sessionToken == null) {
-			throw new SessionTokenNotFoundException("SessionToken not found by JWT : " + changeEmailRequest.getJwt());
+		try {
+			sessionToken = sessionTokenRepository.getByJwt(changeEmailRequest.getJwt());
+			userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
+		} catch (final SessionTokenNotFoundException | UserNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.UNAUTHORIZED)
+					.entity(new RestError(RestErrorCode.BAD_JWT, changeEmailRequest.getJwt())).build();
 		}
 
-		final User userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
-
-		if (userCurrent == null) {
-			return Response.status(Response.Status.NO_CONTENT).build();
+		if (userCurrent.isSystemAdmin() || userTarget.getUuid() == userCurrent.getUuid()) {
+			userTarget.setEmail(changeEmailRequest.getEmail());
+			try {
+				userUpdated = userRepository.put(userTarget);
+				return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
+						.build();
+			} catch (final UserNotFoundException e) {
+				e.printStackTrace();
+				return Response.status(Response.Status.NO_CONTENT).entity(new RestError(RestErrorCode.NOT_MODIFIED))
+						.build();
+			}
 		}
-
-		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
-			userFound.setEmail(changeEmailRequest.getEmail());
-			final User userUpdated = userRepository.put(userFound);
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
-					.build();
-		}
-
-		return Response.status(Response.Status.FORBIDDEN).build();
+		return Response.status(Response.Status.FORBIDDEN).entity(new RestError(RestErrorCode.MISSING_RIGHTS)).build();
 	}
 
 	@POST
 	@Path("/user/changePassword")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response changePassword(String body) throws SessionTokenNotFoundException {
-		final ChangePasswordRequest changeEmailRequest = (ChangePasswordRequest) SerializationHelper.getInstance()
+	public Response changePassword(String body) {
+		final ChangePasswordRequest changePasswordRequest = (ChangePasswordRequest) SerializationHelper.getInstance()
 				.toClass(body, ChangePasswordRequest.class);
 
-		final User userFound = userRepository.getByUuid(changeEmailRequest.getUserUuid());
+		User userCurrent = null, userTarget = null, userUpdated = null;
+		SessionToken sessionToken = null;
 
-		if (userFound == null) {
-			return Response.status(Response.Status.NO_CONTENT).build();
+		try {
+			userTarget = userRepository.getByUuid(changePasswordRequest.getUserUuid());
+		} catch (final UserNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, changePasswordRequest.getUserUuid())).build();
 		}
 
-		final SessionToken sessionToken = sessionTokenRepository.getByJwt(changeEmailRequest.getJwt());
-
-		if (sessionToken == null) {
-			throw new SessionTokenNotFoundException("SessionToken not found by JWT : " + changeEmailRequest.getJwt());
+		try {
+			sessionToken = sessionTokenRepository.getByJwt(changePasswordRequest.getJwt());
+			userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
+		} catch (final SessionTokenNotFoundException | UserNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.UNAUTHORIZED)
+					.entity(new RestError(RestErrorCode.BAD_JWT, changePasswordRequest.getJwt())).build();
 		}
 
-		final User userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
-
-		if (userCurrent == null) {
-			return Response.status(Response.Status.NO_CONTENT).build();
+		if (userCurrent.isSystemAdmin() || userTarget.getUuid() == userCurrent.getUuid()
+				&& BCrypt.checkpw(changePasswordRequest.getPasswordOld(), userTarget.getPassword())) {
+			userTarget.setSalt(BCrypt.gensalt());
+			userTarget.setPassword(BCrypt.hashpw(changePasswordRequest.getPasswordNew(), userTarget.getSalt()));
+			try {
+				userUpdated = userRepository.put(userTarget);
+				return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
+						.build();
+			} catch (final UserNotFoundException e) {
+				e.printStackTrace();
+				return Response.status(Response.Status.NO_CONTENT).entity(new RestError(RestErrorCode.NOT_MODIFIED))
+						.build();
+			}
 		}
-
-		if ((userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin())
-				&& BCrypt.checkpw(changeEmailRequest.getPasswordOld(), userFound.getPassword())) {
-			userFound.setSalt(BCrypt.gensalt());
-			userFound.setPassword(BCrypt.hashpw(changeEmailRequest.getPasswordNew(), userFound.getSalt()));
-			final User userUpdated = userRepository.put(userFound);
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
-					.build();
-		}
-		return Response.status(Response.Status.FORBIDDEN).build();
+		return Response.status(Response.Status.FORBIDDEN).entity(new RestError(RestErrorCode.MISSING_RIGHTS)).build();
 	}
 
 	@POST
 	@Path("/user/changeSystemAdminState")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response changeSystemAdminState(String body) throws SessionTokenNotFoundException {
+	public Response changeSystemAdminState(String body) {
 		final ChangeSystemAdminStateRequest changeSystemAdminStateRequest = (ChangeSystemAdminStateRequest) SerializationHelper
 				.getInstance().toClass(body, ChangeSystemAdminStateRequest.class);
 
-		User userFound;
-		SessionToken sessionToken;
+		User userCurrent = null, userTarget = null, userUpdated = null;
+		SessionToken sessionToken = null;
+
 		try {
-			userFound = userRepository.getByUuid(changeSystemAdminStateRequest.getUserUuid());
-			sessionToken = sessionTokenRepository.getByJwt(changeSystemAdminStateRequest.getJwt());
+			userTarget = userRepository.getByUuid(changeSystemAdminStateRequest.getUserUuid());
 		} catch (final UserNotFoundException e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.NO_CONTENT).build();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, changeSystemAdminStateRequest.getUserUuid()))
+					.build();
 		}
 
-		if (sessionToken == null) {
-			throw new SessionTokenNotFoundException(
-					"SessionToken not found by JWT : " + changeSystemAdminStateRequest.getJwt());
+		try {
+			sessionToken = sessionTokenRepository.getByJwt(changeSystemAdminStateRequest.getJwt());
+			userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
+		} catch (final SessionTokenNotFoundException | UserNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.UNAUTHORIZED)
+					.entity(new RestError(RestErrorCode.BAD_JWT, changeSystemAdminStateRequest.getJwt())).build();
 		}
 
-		final User userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
-
-		if (userCurrent == null) {
-			return Response.status(Response.Status.NO_CONTENT).build();
-		}
-
-		if (userCurrent.isSystemAdmin()) {
-			userFound.setSystemAdmin(changeSystemAdminStateRequest.isSystemAdmin());
-			final User userUpdated = userRepository.put(userFound);
+		if (userCurrent.isSystemAdmin() && !"administrator".equals(userTarget.getUsername())) {
+			userTarget.setSystemAdmin(changeSystemAdminStateRequest.isSystemAdmin());
+			try {
+				userUpdated = userRepository.put(userTarget);
+			} catch (final UserNotFoundException e) {
+				e.printStackTrace();
+				return Response.status(Response.Status.NO_CONTENT).entity(new RestError(RestErrorCode.NOT_MODIFIED))
+						.build();
+			}
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
 					.build();
 		}
-		return Response.status(Response.Status.FORBIDDEN).build();
+		return Response.status(Response.Status.FORBIDDEN).entity(new RestError(RestErrorCode.MISSING_RIGHTS)).build();
 	}
 
 	@POST
@@ -185,29 +210,23 @@ public class PortalServlet {
 	public Response deleteUser(String body) {
 		final DeleteUserRequest deleteUserRequest = (DeleteUserRequest) SerializationHelper.getInstance().toClass(body,
 				DeleteUserRequest.class);
-
-		final User userFound = userRepository.getByUuid(deleteUserRequest.getUserUuid());
-
-		if (userFound == null) {
+		User userFound = null, userCurrent = null;
+		try {
+			userFound = userRepository.getByUuid(deleteUserRequest.getUserUuid());
+		} catch (final UserNotFoundException e) {
+			e.printStackTrace();
 			return Response.status(Response.Status.NO_CONTENT)
 					.entity(new RestError(RestErrorCode.NOT_FOUND, deleteUserRequest.getUserUuid())).build();
 		}
-
-		final SessionToken sessionToken = sessionTokenRepository.getByJwt(deleteUserRequest.getJwt());
-
-		if (sessionToken == null) {
+		try {
+			final SessionToken sessionToken = sessionTokenRepository.getByJwt(deleteUserRequest.getJwt());
+			userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
+		} catch (final UserNotFoundException | SessionTokenNotFoundException e) {
+			e.printStackTrace();
 			return Response.status(Response.Status.UNAUTHORIZED)
 					.entity(new RestError(RestErrorCode.BAD_JWT, deleteUserRequest.getJwt())).build();
 		}
-
-		final User userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
-
-		if (userCurrent == null) {
-			return Response.status(Response.Status.UNAUTHORIZED)
-					.entity(new RestError(RestErrorCode.BAD_JWT, deleteUserRequest.getJwt())).build();
-		}
-
-		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
+		if (userCurrent.isSystemAdmin() || userFound.getUuid() == userCurrent.getUuid()) {
 			if (userRepository.delete(userFound)) {
 				final String userUuid = deleteUserRequest.getUserUuid();
 
@@ -238,22 +257,26 @@ public class PortalServlet {
 	public Response login(String body) {
 		final LoginRequest loginRequest = (LoginRequest) SerializationHelper.getInstance().toClass(body,
 				LoginRequest.class);
-		final User user = userRepository.getByUsername(loginRequest.getUsername());
-
-		if (user == null) {
+		SessionToken sessionToken = null;
+		try {
+			final User user = userRepository.getByUsername(loginRequest.getUsername());
+			if (!BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
+				return Response.status(Response.Status.UNAUTHORIZED).entity(new RestError(RestErrorCode.PASSWORD_WRONG))
+						.build();
+			}
+			sessionToken = new SessionToken(user);
+			sessionTokenRepository.put(sessionToken);
+			return Response.status(Response.Status.OK)
+					.entity(SerializationHelper.getInstance().toJSON(sessionToken.getJwt())).build();
+		} catch (final UserNotFoundException e) {
+			e.printStackTrace();
 			return Response.status(Response.Status.UNAUTHORIZED).entity(new RestError(RestErrorCode.USERNAME_NOT_FOUND))
 					.build();
+		} catch (final SessionTokenNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_CREATED, sessionToken.getUuid())).build();
 		}
-
-		if (!BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
-			return Response.status(Response.Status.UNAUTHORIZED).entity(new RestError(RestErrorCode.PASSWORD_WRONG))
-					.build();
-		}
-
-		final SessionToken sessionToken = new SessionToken(user);
-		sessionTokenRepository.put(sessionToken);
-		return Response.status(Response.Status.OK)
-				.entity(SerializationHelper.getInstance().toJSON(sessionToken.getJwt())).build();
 	}
 
 	@POST
@@ -264,24 +287,36 @@ public class PortalServlet {
 		final ReadUserRequest readUserRequest = (ReadUserRequest) SerializationHelper.getInstance().toClass(body,
 				ReadUserRequest.class);
 
-		final User userFound = userRepository.getByUuid(readUserRequest.getUserUuid());
+		User userFound = null, userCurrent = null;
+		SessionToken sessionToken = null;
 
-		if (userFound == null) {
-			return Response.status(Response.Status.NO_CONTENT).build();
+		try {
+			userFound = userRepository.getByUuid(readUserRequest.getUserUuid());
+		} catch (final UserNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, readUserRequest.getUserUuid())).build();
 		}
 
-		final SessionToken sessionToken = sessionTokenRepository.getByJwt(readUserRequest.getJwt());
+		try {
+			sessionToken = sessionTokenRepository.getByJwt(readUserRequest.getJwt());
+			userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
+		} catch (final JwtException | SessionTokenNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.UNAUTHORIZED)
+					.entity(new RestError(RestErrorCode.BAD_JWT, readUserRequest.getJwt())).build();
+		} catch (final UserNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, sessionToken.getUserUuid())).build();
+		}
 
-		if (sessionToken != null) {
-			final User userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
-			if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
-				return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userFound))
-						.build();
-			}
-			return Response.status(Response.Status.FORBIDDEN).entity(new RestError(RestErrorCode.MISSING_RIGHTS))
+		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userFound))
 					.build();
 		}
-		return Response.status(Response.Status.UNAUTHORIZED).entity(new RestError(RestErrorCode.NOT_LOGGED_IN)).build();
+		return Response.status(Response.Status.FORBIDDEN).entity(new RestError(RestErrorCode.MISSING_RIGHTS)).build();
+
 	}
 
 	@POST
@@ -291,101 +326,128 @@ public class PortalServlet {
 	public Response register(String body) {
 		final RegisterRequest registerRequest = (RegisterRequest) SerializationHelper.getInstance().toClass(body,
 				RegisterRequest.class);
-		final String username = registerRequest.getUsername();
-		final String email = registerRequest.getEmail();
-		final String password = registerRequest.getPassword();
 
-		if (userRepository.getByUsername(username) != null) {
+		User newUser = null;
+
+		try {
+			newUser = userRepository.register(registerRequest.getEmail(), registerRequest.getUsername(),
+					registerRequest.getPassword());
+			final Laboratory laboratory = laboratoryRepository.create(Database.MY_LAB.get("NAME"),
+					Database.MY_LAB.get("DESCRIPTION"), VisabilityType.PRIVATE);
+			permissionRepository.create(newUser.getUuid(), laboratory.getUuid(), null, PermissionType.OWNER);
+		} catch (final EmailInUseException e) {
+			e.printStackTrace();
 			return Response.status(Response.Status.CONFLICT).entity(new RestError(RestErrorCode.USERNAME_TAKEN))
 					.build();
-		}
-
-		if (userRepository.getByEmail(registerRequest.getEmail()) != null) {
+		} catch (final UsernameInUseException e) {
+			e.printStackTrace();
 			return Response.status(Response.Status.CONFLICT).entity(new RestError(RestErrorCode.EMAIL_TAKEN)).build();
+		} catch (final RegistrationFailureException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT).entity(new RestError(RestErrorCode.NOT_MODIFIED))
+					.build();
+		} catch (final LaboratoryNotFoundException e) {
+			e.printStackTrace();
 		}
-
-		final User newUser = userRepository.register(email, username, password);
-		final Laboratory laboratory = laboratoryRepository.create(Database.MY_LAB.get("NAME"),
-				Database.MY_LAB.get("DESCRIPTION"), VisabilityType.PRIVATE);
-		permissionRepository.create(newUser.getUuid(), laboratory.getUuid(), null, PermissionType.OWNER);
-		return newUser != null
-				? Response.status(Response.Status.CREATED).entity(SerializationHelper.getInstance().toJSON(newUser))
-						.build()
-				: Response.status(Response.Status.NOT_MODIFIED).entity(new RestError(RestErrorCode.NOT_CREATED))
-						.build();
+		return Response.status(Response.Status.CREATED).entity(SerializationHelper.getInstance().toJSON(newUser))
+				.build();
 	}
 
 	@POST
 	@Path("/user/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateUser(String body) throws SessionTokenNotFoundException {
+	public Response updateUser(String body) {
 		final UpdateUserRequest updateUserRequest = (UpdateUserRequest) SerializationHelper.getInstance().toClass(body,
 				UpdateUserRequest.class);
 
-		final User userFound = userRepository.getByUuid(updateUserRequest.getUserUuid());
+		User userTarget = null, userCurrent = null, userUpdated = null;
+		SessionToken sessionToken = null;
 
-		if (userFound == null) {
-			return Response.status(Response.Status.NO_CONTENT).build();
+		try {
+			userTarget = userRepository.getByUuid(updateUserRequest.getUserUuid());
+		} catch (final UserNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, updateUserRequest.getUserUuid())).build();
 		}
 
-		final SessionToken sessionToken = sessionTokenRepository.getByJwt(updateUserRequest.getJwt());
-
-		if (sessionToken == null) {
-			throw new SessionTokenNotFoundException("SessionToken not found by JWT : " + updateUserRequest.getJwt());
+		try {
+			sessionToken = sessionTokenRepository.getByJwt(updateUserRequest.getJwt());
+			userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
+		} catch (final JwtException | SessionTokenNotFoundException | UserNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.UNAUTHORIZED)
+					.entity(new RestError(RestErrorCode.BAD_JWT, updateUserRequest.getJwt())).build();
 		}
 
-		final User userCurrent = userRepository.getByUuid(sessionToken.getUserUuid());
+		if (userCurrent.isSystemAdmin() || userTarget.getUuid() == userCurrent.getUuid()) {
+			try {
+				userTarget.setUsername(updateUserRequest.getUsername());
+				userTarget.setLastname(updateUserRequest.getLastname());
+				userTarget.setFirstname(updateUserRequest.getFirstname());
+				userUpdated = userRepository.put(userTarget);
 
-		if (userFound.getUuid() == userCurrent.getUuid() || userCurrent.isSystemAdmin()) {
-			userFound.setUsername(updateUserRequest.getUsername());
-			userFound.setLastname(updateUserRequest.getLastname());
-			userFound.setFirstname(updateUserRequest.getFirstname());
-			final User userUpdated = userRepository.put(userFound);
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
-					.build();
+				return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(userUpdated))
+						.build();
+			} catch (final UserNotFoundException e) {
+				e.printStackTrace();
+				return Response.status(Response.Status.NO_CONTENT)
+						.entity(new RestError(RestErrorCode.NOT_FOUND, updateUserRequest.getUserUuid())).build();
+			}
 		}
-
-		return Response.status(Response.Status.FORBIDDEN).build();
+		return Response.status(Response.Status.FORBIDDEN).entity(new RestError(RestErrorCode.MISSING_RIGHTS)).build();
 	}
 
 	@POST
 	@Path("/sessiontoken/read")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response readSessionToken(String body) throws SessionTokenNotFoundException {
+	public Response readSessionToken(String body) {
 		final ReadSessionTokenRequest readSessionTokenRequest = (ReadSessionTokenRequest) SerializationHelper
 				.getInstance().toClass(body, ReadSessionTokenRequest.class);
 
-		final SessionToken sessionTokenFound = sessionTokenRepository.getByJwt(readSessionTokenRequest.getJwt());
-
-		if (sessionTokenFound == null) {
-			return Response.status(Response.Status.NO_CONTENT).build();
+		SessionToken sessionTokenFound = null;
+		try {
+			sessionTokenFound = sessionTokenRepository.getByJwt(readSessionTokenRequest.getJwt());
+		} catch (final JwtException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.UNAUTHORIZED)
+					.entity(new RestError(RestErrorCode.BAD_JWT, readSessionTokenRequest.getJwt())).build();
+		} catch (final SessionTokenNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, readSessionTokenRequest.getJwt())).build();
 		}
 
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(sessionTokenFound))
 				.build();
-
 	}
 
 	@POST
 	@Path("/sessiontoken/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateSessionToken(String body) throws SessionTokenNotFoundException {
+	public Response updateSessionToken(String body) {
 		final UpdateSessionTokenRequest updateSessionTokenRequest = (UpdateSessionTokenRequest) SerializationHelper
 				.getInstance().toClass(body, UpdateSessionTokenRequest.class);
 
-		final SessionToken sessionTokenFound = sessionTokenRepository.getByJwt(updateSessionTokenRequest.getJwt());
+		SessionToken sessionTokenFound = null, sessionTokenUpdated = null;
 
-		if (sessionTokenFound == null) {
-			return Response.status(Response.Status.NO_CONTENT).build();
+		try {
+			sessionTokenFound = sessionTokenRepository.getByJwt(updateSessionTokenRequest.getJwt());
+		} catch (final JwtException | SessionTokenNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, updateSessionTokenRequest.getJwt())).build();
 		}
 
-		final SessionToken sessionTokenUpdated = sessionTokenRepository.update(sessionTokenFound);
-
-		if (sessionTokenUpdated == null) {
-			return Response.status(Response.Status.NOT_MODIFIED).build();
+		try {
+			sessionTokenUpdated = sessionTokenRepository.update(sessionTokenFound);
+		} catch (final SessionTokenNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NOT_MODIFIED)
+					.entity(new RestError(RestErrorCode.NOT_MODIFIED, updateSessionTokenRequest.getJwt())).build();
 		}
 
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(sessionTokenUpdated))
@@ -396,184 +458,250 @@ public class PortalServlet {
 	@Path("/laboratory/create")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createLaboratory(String body) throws UserNotFoundException, SessionTokenNotFoundException {
+	public Response createLaboratory(String body) {
 		final CreateLaboratoryRequest createLaboratoryRequest = (CreateLaboratoryRequest) SerializationHelper
 				.getInstance().toClass(body, CreateLaboratoryRequest.class);
 
-		final SessionToken sessionToken = sessionTokenRepository.getByJwt(createLaboratoryRequest.getJwt());
-
-		if (sessionToken == null) {
-			throw new SessionTokenNotFoundException(
-					"SessionToken not found by JWT : " + createLaboratoryRequest.getJwt());
+		Laboratory laboratoryNew = null;
+		SessionToken sessionToken = null;
+		try {
+			sessionToken = sessionTokenRepository.getByJwt(createLaboratoryRequest.getJwt());
+		} catch (final JwtException | SessionTokenNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.UNAUTHORIZED)
+					.entity(new RestError(RestErrorCode.BAD_JWT, createLaboratoryRequest.getJwt())).build();
 		}
 
-		if (userRepository.getByUuid(sessionToken.getUserUuid()) == null) {
-			throw new UserNotFoundException("User not found by session token : " + sessionToken.getUserUuid());
+		try {
+			userRepository.getByUuid(sessionToken.getUserUuid());
+		} catch (final UserNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, sessionToken.getUserUuid())).build();
 		}
 
-		final Laboratory laboratoryNew = laboratoryRepository.create(createLaboratoryRequest.getName(),
-				createLaboratoryRequest.getDescription(), createLaboratoryRequest.getVisability());
-		return laboratoryNew != null
-				? Response.status(Response.Status.CREATED)
-						.entity(SerializationHelper.getInstance().toJSON(laboratoryNew)).build()
-				: Response.status(Response.Status.NOT_MODIFIED).build();
+		try {
+			laboratoryNew = laboratoryRepository.create(createLaboratoryRequest.getName(),
+					createLaboratoryRequest.getDescription(), createLaboratoryRequest.getVisability());
+			return Response.status(Response.Status.CREATED)
+					.entity(SerializationHelper.getInstance().toJSON(laboratoryNew)).build();
+		} catch (final LaboratoryNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NOT_MODIFIED)
+					.entity(new RestError(RestErrorCode.NOT_CREATED, createLaboratoryRequest.getName())).build();
+		}
 	}
 
 	@POST
 	@Path("/laboratory/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteLaboratory(String body) throws SessionTokenNotFoundException, MissingRightsException {
+	public Response deleteLaboratory(String body) {
 		final DeleteLaboratoryRequest deleteLaboratoryRequest = (DeleteLaboratoryRequest) SerializationHelper
 				.getInstance().toClass(body, DeleteLaboratoryRequest.class);
 
-		final Laboratory laboratory = laboratoryRepository.getByUuid(deleteLaboratoryRequest.getLaboratoryUuid());
-		if (laboratory != null) {
-			checkUserPermission(laboratory.getUuid(), deleteLaboratoryRequest.getJwt(), PermissionGroup.ADMINISTRATOR);
-
-			if (laboratoryRepository.delete(laboratory)) {
-				final List<Permission> allUserPermissions = permissionRepository
-						.getByLaboratoryUuid(deleteLaboratoryRequest.getLaboratoryUuid());
-				for (final Permission userPermission : allUserPermissions) {
-					permissionRepository.delete(userPermission);
-				}
-				return Response.status(Response.Status.OK).build();
-			}
+		Laboratory laboratory;
+		try {
+			laboratory = laboratoryRepository.getByUuid(deleteLaboratoryRequest.getLaboratoryUuid());
+		} catch (final LaboratoryNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, deleteLaboratoryRequest.getLaboratoryUuid()))
+					.build();
 		}
-		return Response.status(Response.Status.NOT_MODIFIED).build();
+
+		try {
+			checkUserPermission(laboratory.getUuid(), deleteLaboratoryRequest.getJwt(), PermissionGroup.ADMINISTRATOR);
+		} catch (final MissingRightsException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.FORBIDDEN)
+					.entity(new RestError(RestErrorCode.MISSING_RIGHTS, laboratory.getUuid())).build();
+		}
+
+		if (laboratoryRepository.delete(laboratory)) {
+			final List<Permission> allUserPermissions = permissionRepository.getByLaboratoryUuid(laboratory.getUuid());
+			for (final Permission userPermission : allUserPermissions) {
+				permissionRepository.delete(userPermission);
+			}
+			return Response.status(Response.Status.OK).build();
+		}
+		return Response.status(Response.Status.NOT_MODIFIED)
+				.entity(new RestError(RestErrorCode.NOT_MODIFIED, laboratory.getUuid())).build();
 	}
 
 	@POST
 	@Path("/laboratory/read")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response readLaboratory(String body) throws SessionTokenNotFoundException, MissingRightsException {
+	public Response readLaboratory(String body) {
 		final ReadLaboratoryRequest readLaboratoryRequest = (ReadLaboratoryRequest) SerializationHelper.getInstance()
 				.toClass(body, ReadLaboratoryRequest.class);
 
 		if (readLaboratoryRequest.getLaboratoryUuid() == null) {
-			final User userCurrent = userRepository.getByJwt(readLaboratoryRequest.getJwt());
-			final List<Laboratory> laboratories = laboratoryRepository.getByUser(userCurrent.getUuid());
+			User userCurrent = null;
 
-			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(laboratories))
-					.build();
-		}
-		final Laboratory laboratory = laboratoryRepository.getByUuid(readLaboratoryRequest.getLaboratoryUuid());
-		if (laboratory != null) {
-			checkUserPermission(laboratory.getUuid(), readLaboratoryRequest.getJwt(), PermissionGroup.GUEST);
-			final List<Laboratory> laboratories = new ArrayList<>();
-			laboratories.add(laboratory);
+			try {
+				userCurrent = userRepository.getByJwt(readLaboratoryRequest.getJwt());
+			} catch (JwtException | UserNotFoundException | SessionTokenNotFoundException e) {
+				e.printStackTrace();
+				return Response.status(Response.Status.UNAUTHORIZED)
+						.entity(new RestError(RestErrorCode.BAD_JWT, readLaboratoryRequest.getJwt())).build();
+			}
+			final List<Laboratory> laboratories = laboratoryRepository.getByUser(userCurrent.getUuid());
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(laboratories))
 					.build();
 		}
-		return Response.status(Response.Status.NO_CONTENT).build();
+
+		try {
+			final Laboratory laboratory = laboratoryRepository.getByUuid(readLaboratoryRequest.getLaboratoryUuid());
+			checkUserPermission(laboratory.getUuid(), readLaboratoryRequest.getJwt(), PermissionGroup.GUEST);
+
+			return Response.status(Response.Status.OK)
+					.entity(SerializationHelper.getInstance().toJSON(new ArrayList<>().add(laboratory))).build();
+		} catch (final LaboratoryNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, readLaboratoryRequest.getLaboratoryUuid())).build();
+		} catch (final MissingRightsException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.FORBIDDEN)
+					.entity(new RestError(RestErrorCode.MISSING_RIGHTS, readLaboratoryRequest.getLaboratoryUuid()))
+					.build();
+		}
 	}
 
 	@POST
 	@Path("/laboratory/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateLaboratory(String body)
-			throws SessionTokenNotFoundException, PermissionNotFoundException, MissingRightsException {
+	public Response updateLaboratory(String body) {
 		final UpdateLaboratoryRequest updateLaboratoryRequest = (UpdateLaboratoryRequest) SerializationHelper
 				.getInstance().toClass(body, UpdateLaboratoryRequest.class);
 
-		final Laboratory laboratory = laboratoryRepository.getByUuid(updateLaboratoryRequest.getLaboratoryUuid());
-		if (laboratory != null) {
+		Laboratory laboratory = null;
+
+		try {
+			laboratory = laboratoryRepository.getByUuid(updateLaboratoryRequest.getLaboratoryUuid());
 			checkUserPermission(laboratory.getUuid(), updateLaboratoryRequest.getJwt(), PermissionGroup.CONTRIBUTOR);
 
 			laboratory.setName(updateLaboratoryRequest.getName());
 			laboratory.setDescription(updateLaboratoryRequest.getDescription());
 			laboratory.setVisability(updateLaboratoryRequest.getVisability());
-			final Laboratory laboratoryUpdated = laboratoryRepository.put(laboratory);
-			if (laboratoryUpdated != null) {
-				return Response.status(Response.Status.OK)
-						.entity(SerializationHelper.getInstance().toJSON(laboratoryUpdated)).build();
-			}
+		} catch (final LaboratoryNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, updateLaboratoryRequest.getLaboratoryUuid()))
+					.build();
+		} catch (final MissingRightsException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.FORBIDDEN)
+					.entity(new RestError(RestErrorCode.MISSING_RIGHTS, updateLaboratoryRequest.getLaboratoryUuid()))
+					.build();
 		}
-		return Response.status(Response.Status.NOT_MODIFIED).build();
+		try {
+			final Laboratory laboratoryUpdated = laboratoryRepository.put(laboratory);
+			return Response.status(Response.Status.OK)
+					.entity(SerializationHelper.getInstance().toJSON(laboratoryUpdated)).build();
+		} catch (final LaboratoryNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_CREATED, laboratory.getUuid())).build();
+		}
+
 	}
 
 	@POST
 	@Path("/workspace/create")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createWorkspace(String body)
-			throws UserNotFoundException, SessionTokenNotFoundException, LaboratoryNotFoundException {
+	public Response createWorkspace(String body) {
 		final CreateWorkspaceRequest createWorkspaceRequest = (CreateWorkspaceRequest) SerializationHelper.getInstance()
 				.toClass(body, CreateWorkspaceRequest.class);
 
-		final SessionToken sessionToken = sessionTokenRepository.getByJwt(createWorkspaceRequest.getJwt());
-
-		if (sessionToken == null) {
-			throw new SessionTokenNotFoundException(
-					"SessionToken not found by JWT : " + createWorkspaceRequest.getJwt());
-		}
-
-		if (userRepository.getByUuid(sessionToken.getUserUuid()) == null) {
-			throw new UserNotFoundException("User not found by session token : " + sessionToken.getUserUuid());
-		}
-
-		final String laboratoryUuid = createWorkspaceRequest.getLaboratoryUuid();
-		if (laboratoryUuid != null) {
-			if (laboratoryRepository.getByUuid(laboratoryUuid) == null) {
-				throw new LaboratoryNotFoundException("Laboratory not found by UUID : " + laboratoryUuid);
-			}
+		SessionToken sessionToken;
+		try {
+			sessionToken = sessionTokenRepository.getByJwt(createWorkspaceRequest.getJwt());
+			userRepository.getByUuid(sessionToken.getUserUuid());
+			final String laboratoryUuid = createWorkspaceRequest.getLaboratoryUuid();
+			laboratoryRepository.getByUuid(laboratoryUuid);
 
 			final Workspace workspaceNew = workspaceRepository.create(createWorkspaceRequest.getName(),
 					createWorkspaceRequest.getDescription(), createWorkspaceRequest.getVisability(), laboratoryUuid);
 
-			if (workspaceNew != null) {
-				return Response.status(Response.Status.CREATED)
-						.entity(SerializationHelper.getInstance().toJSON(workspaceNew)).build();
-			}
+			return Response.status(Response.Status.CREATED)
+					.entity(SerializationHelper.getInstance().toJSON(workspaceNew)).build();
+		} catch (final JwtException | SessionTokenNotFoundException | UserNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.UNAUTHORIZED)
+					.entity(new RestError(RestErrorCode.BAD_JWT, createWorkspaceRequest.getJwt())).build();
+		} catch (final LaboratoryNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, createWorkspaceRequest.getLaboratoryUuid())).build();
+		} catch (final WorkspaceNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_CREATED, createWorkspaceRequest.getName())).build();
 		}
-		return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
 
 	@POST
 	@Path("/workspace/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteWorkspace(String body) throws SessionTokenNotFoundException, MissingRightsException {
+	public Response deleteWorkspace(String body) {
 		final DeleteWorkspaceRequest deleteWorkspaceRequest = (DeleteWorkspaceRequest) SerializationHelper.getInstance()
 				.toClass(body, DeleteWorkspaceRequest.class);
 
-		final Workspace workspace = workspaceRepository.getByUuid(deleteWorkspaceRequest.getWorkspaceUuid());
-		if (workspace != null) {
+		Workspace workspace = null;
+
+		try {
+			workspace = workspaceRepository.getByUuid(deleteWorkspaceRequest.getWorkspaceUuid());
+			checkUserPermission(workspace.getUuid(), deleteWorkspaceRequest.getJwt(), PermissionGroup.ADMINISTRATOR);
+		} catch (final WorkspaceNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, deleteWorkspaceRequest.getWorkspaceUuid())).build();
+		} catch (final MissingRightsException e1) {
 			try {
-				checkUserPermission(workspace.getUuid(), deleteWorkspaceRequest.getJwt(),
-						PermissionGroup.ADMINISTRATOR);
-			} catch (SessionTokenNotFoundException | MissingRightsException e) {
 				checkUserPermission(workspace.getLaboratoryUuid(), deleteWorkspaceRequest.getJwt(),
 						PermissionGroup.ADMINISTRATOR);
-			}
-
-			if (workspaceRepository.delete(workspace)) {
-				final List<Permission> allUserPermissions = permissionRepository
-						.getByWorkspaceUuid(deleteWorkspaceRequest.getWorkspaceUuid());
-				for (final Permission userPermission : allUserPermissions) {
-					permissionRepository.delete(userPermission);
-				}
-				return Response.status(Response.Status.OK).build();
+			} catch (final MissingRightsException e2) {
+				e1.printStackTrace();
+				return Response.status(Response.Status.FORBIDDEN)
+						.entity(new RestError(RestErrorCode.MISSING_RIGHTS, deleteWorkspaceRequest.getWorkspaceUuid()))
+						.build();
 			}
 		}
-		return Response.status(Response.Status.NOT_MODIFIED).build();
+
+		if (workspaceRepository.delete(workspace)) {
+			final List<Permission> allUserPermissions = permissionRepository
+					.getByWorkspaceUuid(deleteWorkspaceRequest.getWorkspaceUuid());
+			for (final Permission userPermission : allUserPermissions) {
+				permissionRepository.delete(userPermission);
+			}
+			return Response.status(Response.Status.OK).build();
+		}
+		return Response.status(Response.Status.NOT_MODIFIED)
+				.entity(new RestError(RestErrorCode.NOT_MODIFIED, deleteWorkspaceRequest.getWorkspaceUuid())).build();
 	}
 
 	@POST
 	@Path("/workspace/read")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response readWorkspace(String body) throws SessionTokenNotFoundException, MissingRightsException {
+	public Response readWorkspace(String body) {
 		final ReadWorkspaceRequest readWorkspaceRequest = (ReadWorkspaceRequest) SerializationHelper.getInstance()
 				.toClass(body, ReadWorkspaceRequest.class);
 
+		final List<Workspace> workspaces = new ArrayList<>();
+		Workspace workspace = null;
+
 		if (readWorkspaceRequest.getWorkspaceUuid() == null) { // not only one single workspace
-			final List<Workspace> workspaces = new ArrayList<>();
-			final User userCurrent = userRepository.getByJwt(readWorkspaceRequest.getJwt());
-			if (userCurrent != null) {
+			try {
+
+				final User userCurrent = userRepository.getByJwt(readWorkspaceRequest.getJwt());
 				final List<Laboratory> laboratories = laboratoryRepository.getByUser(userCurrent.getUuid());
 				for (int lab = 0; lab < laboratories.size(); lab++) {
 					final List<Permission> permissions = permissionRepository
@@ -581,75 +709,104 @@ public class PortalServlet {
 					for (int permission = 0; permission < permissions.size(); permission++) {
 						final String workspaceUuid = permissions.get(permission).getWorkspaceUuid();
 						if (workspaceUuid != null) {
-							final Workspace workspace = workspaceRepository.getByUuid(workspaceUuid);
-							if (workspace != null) {
-								workspaces.add(workspace);
+							try {
+								workspaces.add(workspaceRepository.getByUuid(workspaceUuid));
+							} catch (final WorkspaceNotFoundException e) {
+								e.printStackTrace();
 							}
 						}
 					}
 				}
+				return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspaces))
+						.build();
+			} catch (JwtException | UserNotFoundException | SessionTokenNotFoundException e) {
+				e.printStackTrace();
+				return Response.status(Response.Status.UNAUTHORIZED)
+						.entity(new RestError(RestErrorCode.BAD_JWT, readWorkspaceRequest.getJwt())).build();
 			}
-			return Response.status(Response.Status.FOUND).entity(SerializationHelper.getInstance().toJSON(workspaces))
-					.build();
 		}
-		final Workspace workspace = workspaceRepository.getByUuid(readWorkspaceRequest.getWorkspaceUuid());
-		if (workspace != null) {
+
+		try {
+			workspace = workspaceRepository.getByUuid(readWorkspaceRequest.getWorkspaceUuid());
 			checkUserPermission(workspace.getUuid(), readWorkspaceRequest.getJwt(), PermissionGroup.GUEST);
-			final List<Workspace> workspaces = new ArrayList<>();
 			workspaces.add(workspace);
 
 			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspaces))
 					.build();
+		} catch (final WorkspaceNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, readWorkspaceRequest.getWorkspaceUuid())).build();
+		} catch (final MissingRightsException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.FORBIDDEN)
+					.entity(new RestError(RestErrorCode.MISSING_RIGHTS, readWorkspaceRequest.getWorkspaceUuid()))
+					.build();
 		}
-		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 
 	@POST
 	@Path("/workspace/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateWorkspace(String body)
-			throws SessionTokenNotFoundException, PermissionNotFoundException, MissingRightsException {
+	public Response updateWorkspace(String body) {
 		final UpdateWorkspaceRequest updateWorkspaceRequest = (UpdateWorkspaceRequest) SerializationHelper.getInstance()
 				.toClass(body, UpdateWorkspaceRequest.class);
 
-		final Workspace workspace = workspaceRepository.getByUuid(updateWorkspaceRequest.getWorkspaceUuid());
-		if (workspace != null) {
-			checkUserPermission(workspace.getUuid(), updateWorkspaceRequest.getJwt(), PermissionGroup.CONTRIBUTOR);
+		Workspace workspace = null, updatedWorkspace = null;
 
+		try {
+			workspace = workspaceRepository.getByUuid(updateWorkspaceRequest.getWorkspaceUuid());
+			checkUserPermission(workspace.getUuid(), updateWorkspaceRequest.getJwt(), PermissionGroup.CONTRIBUTOR);
 			workspace.setName(updateWorkspaceRequest.getName());
 			workspace.setDescription(updateWorkspaceRequest.getDescription());
 			workspace.setVisability(updateWorkspaceRequest.getVisability());
-			final Workspace updatedWorkspace = workspaceRepository.put(workspace);
-			if (updatedWorkspace != null) {
-				return Response.status(Response.Status.OK)
-						.entity(SerializationHelper.getInstance().toJSON(updatedWorkspace)).build();
-			}
+		} catch (final WorkspaceNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_FOUND, updateWorkspaceRequest.getWorkspaceUuid())).build();
+		} catch (final MissingRightsException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.FORBIDDEN)
+					.entity(new RestError(RestErrorCode.MISSING_RIGHTS, updateWorkspaceRequest.getWorkspaceUuid()))
+					.build();
 		}
-		return Response.status(Response.Status.NOT_MODIFIED).build();
+
+		try {
+			updatedWorkspace = workspaceRepository.put(workspace);
+			return Response.status(Response.Status.OK)
+					.entity(SerializationHelper.getInstance().toJSON(updatedWorkspace)).build();
+		} catch (final WorkspaceNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Response.Status.NO_CONTENT)
+					.entity(new RestError(RestErrorCode.NOT_CREATED, workspace.getUuid())).build();
+		}
 	}
 
 	private void checkUserPermission(String targetUuid, String jwt, PermissionType[] userPermissionGroup)
-			throws SessionTokenNotFoundException, MissingRightsException {
-		final SessionToken sessionToken = sessionTokenRepository.getByJwt(jwt);
+			throws MissingRightsException {
 
-		if (sessionToken == null) {
-			throw new SessionTokenNotFoundException("SessionToken not found by JWT : " + jwt);
-		}
+		SessionToken sessionToken = null;
 
-		final String userUuid = sessionToken.getUserUuid();
-		if (!userRepository.getByUuid(userUuid).isSystemAdmin()) {
-			final Permission userPermissionLaboratory = permissionRepository.getByUserAndLaboratoryUuids(userUuid,
-					targetUuid);
-			if (userPermissionLaboratory == null
-					|| !Arrays.asList(userPermissionGroup).contains(userPermissionLaboratory.getType())) {
-				final Permission userPermissionWorkspace = permissionRepository.getByUserAndWorkspaceUuids(userUuid,
+		try {
+			sessionToken = sessionTokenRepository.getByJwt(jwt);
+			final String userUuid = sessionToken.getUserUuid();
+			if (!userRepository.getByUuid(userUuid).isSystemAdmin()) {
+				final Permission userPermissionLaboratory = permissionRepository.getByUserAndLaboratoryUuids(userUuid,
 						targetUuid);
-				if (userPermissionWorkspace == null
-						|| !Arrays.asList(userPermissionGroup).contains(userPermissionWorkspace.getType())) {
-					throw new MissingRightsException("User is missing rights : " + targetUuid);
+				if (userPermissionLaboratory == null
+						|| !Arrays.asList(userPermissionGroup).contains(userPermissionLaboratory.getType())) {
+					final Permission userPermissionWorkspace = permissionRepository.getByUserAndWorkspaceUuids(userUuid,
+							targetUuid);
+					if (userPermissionWorkspace == null
+							|| !Arrays.asList(userPermissionGroup).contains(userPermissionWorkspace.getType())) {
+						throw new MissingRightsException("User is missing rights : " + targetUuid);
+					}
 				}
 			}
+		} catch (JwtException | SessionTokenNotFoundException | UserNotFoundException e) {
+			e.printStackTrace();
+			throw new MissingRightsException("User is missing rights : " + targetUuid);
 		}
 	}
 }
