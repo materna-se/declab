@@ -398,6 +398,7 @@ class ContextEntryDocumentation(contextEntry: ContextEntry) : ExpressionDocument
 
 class DecisionTableDocumentation(variable: InformationItem, decisionTable: DecisionTable) : ExpressionDocumentation(ExpressionType.DECISION_TABLE, decisionTable) {
 	var hitPolicy: String? = null
+	var aggregation: String? = null
 	var inputs: ArrayList<DecisionTableInputDocumentation>? = null
 	var outputs: ArrayList<DecisionTableOutputDocumentation>? = null
 	var annotations: ArrayList<DecisionTableAnnotationDocumentation>? = null
@@ -405,6 +406,9 @@ class DecisionTableDocumentation(variable: InformationItem, decisionTable: Decis
 
 	init {
 		this.hitPolicy = decisionTable.hitPolicy.name
+		if(decisionTable.aggregation != null) {
+			this.aggregation = decisionTable.aggregation.name
+		}
 
 		inputs = ArrayList()
 		for (input in decisionTable.input) {
