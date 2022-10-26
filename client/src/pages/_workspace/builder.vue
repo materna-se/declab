@@ -1,5 +1,5 @@
 <template>
-	<div class="container-fluid">
+	<div>
 		<div class="d-flex align-items-center mb-2">
 			<h3 class="mb-0 me-auto">Builder</h3>
 			<div class="me-2">

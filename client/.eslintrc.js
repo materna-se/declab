@@ -24,6 +24,9 @@ module.exports = {
 		"vue/multi-word-component-names": ["off"],
 		"vue/v-on-style": ["error", "longform"],
 		"vue/v-bind-style": ["error", "longform"],
-		"vue/html-self-closing": ["off"]
+		"vue/html-self-closing": ["off"],
+		"vue/component-definition-name-casing": ["error", "kebab-case"],
+		"vue/order-in-components": ["off"],
+		"vue/component-tags-order": ["off"],
 	}
 }
