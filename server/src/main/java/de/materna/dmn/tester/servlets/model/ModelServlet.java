@@ -232,7 +232,8 @@ public class ModelServlet {
 		String mainModelNamespace = DroolsHelper.getMainModelNamespace(workspace);
 
 		int NUM_RUNS = 10;
-		long totalRuntime = 0L, coldRuntime = 0L, start = 0L, finish = 0L;
+		double totalRuntime = 0L, coldRuntime = 0L;
+		long start = 0L, finish = 0L;
 		double averageRuntime = 0.0;
 		ExecutionResult result = new ExecutionResult();
 		ArrayList<ExecutionResult> results = new ArrayList<ExecutionResult>();
@@ -252,21 +253,23 @@ public class ModelServlet {
 			
 			// Measure cold runtime separately
 			if (i == 0) {
-				coldRuntime = finish - start;
+				coldRuntime = (double) (finish - start);
 			} else {
-				totalRuntime += finish - start;
+				totalRuntime += (double) finish - start;
 			}
 		}
 		
 		// Calculate average runtime
-		averageRuntime = (double) totalRuntime - NUM_RUNS;
-
+		averageRuntime = (double) totalRuntime / NUM_RUNS;
+		
+		// Convert nanoseconds to milliseconds
+		averageRuntime /= 1000000;
+		coldRuntime /= 1000000;
+		
 		Map<String, Object> context = new HashMap<>();
 		context.put("cold", coldRuntime);
 		context.put("average", averageRuntime);
-		context.put("results", context);
-		context.put("test", null);
-		context.put("shit", null);
+		context.put("results", results);
 		
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(context)).build();
 	}
