@@ -20,6 +20,17 @@
 			<artifactId>jdec</artifactId>
 			<version>2.9.2-SNAPSHOT</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.xmlunit</groupId>
+			<artifactId>xmlunit-core</artifactId>
+			<version>2.9.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.xmlunit</groupId>
+			<artifactId>xmlunit-matchers</artifactId>
+			<version>2.9.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -77,6 +88,7 @@
 			<artifactId>javax-websocket-server-impl</artifactId>
 			<version>9.4.44.v20210927</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-server</artifactId>
@@ -137,19 +149,9 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
-			<artifactId>kotlin-stdlib-jdk8</artifactId>
-			<version>${kotlin.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jetbrains.kotlin</groupId>
 			<artifactId>kotlin-test</artifactId>
 			<version>${kotlin.version}</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jetbrains.kotlin</groupId>
-			<artifactId>kotlin-stdlib-jdk8</artifactId>
-			<version>${kotlin.version}</version>
 		</dependency>
 		
 		<!-- JJWT :: API -->
@@ -354,6 +356,42 @@
 				<version>2.22.2</version>
 			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.jetbrains.kotlin
+										</groupId>
+										<artifactId>
+											kotlin-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.6.20,)
+										</versionRange>
+										<goals>
+											<goal>compile</goal>
+											<goal>test-compile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<repositories>
