@@ -18,6 +18,7 @@ import de.materna.dmn.tester.servlets.filters.CSRFFilter;
 import de.materna.dmn.tester.servlets.filters.ReadAccessFilter;
 import de.materna.dmn.tester.servlets.filters.WriteAccessFilter;
 import de.materna.dmn.tester.servlets.input.InputServlet;
+import de.materna.dmn.tester.servlets.merger.MergerServlet;
 import de.materna.dmn.tester.servlets.model.ModelServlet;
 import de.materna.dmn.tester.servlets.output.OutputServlet;
 import de.materna.dmn.tester.servlets.playground.PlaygroundServlet;
@@ -28,8 +29,8 @@ import de.materna.dmn.tester.servlets.workspace.WorkspaceServlet;
 
 @ApplicationPath("/api")
 public class MainApplication extends Application {
-	private Set<Object> singletons = new HashSet<>();
-	private Set<Class<?>> classes = new HashSet<>();
+	private final Set<Object> singletons = new HashSet<>();
+	private final Set<Class<?>> classes = new HashSet<>();
 
 	public MainApplication() throws IOException {
 		// Before we initialize the endpoints, we'll initialize all workspaces.
@@ -44,6 +45,7 @@ public class MainApplication extends Application {
 		singletons.add(new MetaWorkspaceServlet());
 		singletons.add(new WorkspaceServlet());
 		singletons.add(new PortalServlet());
+		singletons.add(new MergerServlet());
 
 		classes.add(CSRFFilter.class);
 		classes.add(ReadAccessFilter.class);
