@@ -73,57 +73,71 @@ public abstract class Database {
 		}
 	};
 
-	private static Laboratory addLaboratory(User user, String name, String description, VisabilityType visability)
-			throws LaboratoryNotFoundException {
-		final Laboratory laboratory = laboratoryRepository.create(name, description, visability);
-		permissionRepository.create(user.getUuid(), laboratory.getUuid(), null, PermissionType.OWNER);
-		return laboratory;
+	private static Laboratory addLaboratory(User user, String name, String description, VisabilityType visability) {
+		Laboratory laboratory;
+		try {
+			laboratory = laboratoryRepository.create(name, description, visability);
+			permissionRepository.create(user.getUuid(), laboratory.getUuid(), null, PermissionType.OWNER);
+			return laboratory;
+		} catch (final LaboratoryNotFoundException e) {
+			log.info("H2: " + e);
+			return null;
+		}
+
 	}
 
 	private static Workspace addWorkspace(User user, String name, String description, VisabilityType visability,
-			String laboratoryUuid) throws WorkspaceNotFoundException {
-		final Workspace workspace = workspaceRepository.create(name, description, visability, laboratoryUuid);
-		permissionRepository.create(null, laboratoryUuid, workspace.getUuid(), PermissionType.OWNER);
-		return workspace;
+			String laboratoryUuid) {
+		try {
+			final Workspace workspace = workspaceRepository.create(name, description, visability, laboratoryUuid);
+			permissionRepository.create(null, laboratoryUuid, workspace.getUuid(), PermissionType.OWNER);
+			return workspace;
+		} catch (final WorkspaceNotFoundException e) {
+			log.info("H2: Workspace '" + name + "' of user '" + user.getUsername() + "'could not be created : " + e);
+			return null;
+		}
 	}
 
 	private static User addUser(String username, String email, String password, String firstname, String lastname,
-			boolean systemAdmin) throws RegistrationFailureException {
-
-		final User user = userRepository.register(email, username, password, firstname, lastname);
-		if (user != null) {
+			boolean systemAdmin) {
+		try {
+			final User user = userRepository.register(email, username, password, firstname, lastname);
 			user.setSystemAdmin(systemAdmin);
 			log.info("H2: Saved user '" + username + "': " + user);
-		} else {
-			log.info("H2: User '" + username + "' already exists.");
+			return user;
+		} catch (final RegistrationFailureException e) {
+			log.info("H2: " + e);
+			return null;
 		}
-		return user;
 	}
 
 	protected static void prepare() {
 		try {
 			Server.createWebServer("-webPort", "8081").start();
-			log.info("H2 created!");
+			log.info("H2: Created!");
+			Laboratory laboratory;
 
 			// Administrator
 			final User admin = addUser(ADMIN.get("USERNAME"), ADMIN.get("EMAIL"), ADMIN.get("PASSWORD"),
 					"Administrator", "Declab", true);
-			Laboratory laboratory = addLaboratory(admin, MY_LAB.get("NAME"), MY_LAB.get("DESCRIPTION"),
-					VisabilityType.PRIVATE);
-			addWorkspace(admin, ELTERNGELD.get("NAME"), ELTERNGELD.get("DESCRIPTION"), VisabilityType.PROTECTED,
-					laboratory.getUuid());
+			if (admin != null) {
+				laboratory = addLaboratory(admin, MY_LAB.get("NAME"), MY_LAB.get("DESCRIPTION"),
+						VisabilityType.PRIVATE);
+				addWorkspace(admin, ELTERNGELD.get("NAME"), ELTERNGELD.get("DESCRIPTION"), VisabilityType.PROTECTED,
+						laboratory.getUuid());
+			}
 
 			// Demo
 			final User demo = addUser(DEMO.get("USERNAME"), DEMO.get("EMAIL"), DEMO.get("PASSWORD"), "Demo", "Demo",
 					false);
-			laboratory = addLaboratory(demo, MY_LAB.get("NAME"), MY_LAB.get("DESCRIPTION"), VisabilityType.PRIVATE);
-			addWorkspace(demo, PUBLIC_WORKSPACE.get("NAME"), PUBLIC_WORKSPACE.get("DESCRIPTION"), VisabilityType.PUBLIC,
-					laboratory.getUuid());
+			if (demo != null) {
+				laboratory = addLaboratory(demo, MY_LAB.get("NAME"), MY_LAB.get("DESCRIPTION"), VisabilityType.PRIVATE);
+				addWorkspace(demo, PUBLIC_WORKSPACE.get("NAME"), PUBLIC_WORKSPACE.get("DESCRIPTION"),
+						VisabilityType.PUBLIC, laboratory.getUuid());
+			}
 		} catch (final SQLException e) {
 			e.printStackTrace();
-			log.info("H2 failed : " + e);
-		} catch (final RegistrationFailureException | LaboratoryNotFoundException | WorkspaceNotFoundException e) {
-			e.printStackTrace();
+			log.info("H2: Failure! : " + e);
 		}
 	}
 }
