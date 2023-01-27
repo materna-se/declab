@@ -381,7 +381,8 @@
 			importInput(input) {
 				const currentInput = JSON.parse(JSON.stringify(this.model.input.template));
 				const templateInput = Converter.enrich(input);
-				this.model.input.template = Converter.merge(currentInput, templateInput);
+				const mergedInput = Converter.merge({type: "object", value: currentInput}, templateInput);
+				this.model.input.template = mergedInput.value;
 			},
 			copyToPlayground(context) {
 				const url = this.$router.resolve({path: 'playground', query: {context: base64.encode(JSON.stringify(context))}});
