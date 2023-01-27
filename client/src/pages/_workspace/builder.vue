@@ -18,7 +18,7 @@
 			</div>
 		</div>
 		<div class="d-flex">
-			<div class="mb-4" v-if="mode !== 2" style="flex: 1" :style="{'margin-right': mode === 0 ? '30px' : null}">
+			<div class="mb-4" v-if="mode !== 2" style="flex: 1" :style="{'margin-right': mode === 0 ? '30px' : null, 'max-width': mode === 0 ? '70%' : null}">
 				<div class="d-flex align-items-center mb-2">
 					<h4 class="mb-0 me-auto">Input Context</h4>
 					<div>
@@ -71,7 +71,7 @@
 					</div>
 				</div>
 
-				<h4 class="mb-2 mt-3" @click="accessLogVisible = !accessLogVisible">Access Log<small>&ensp;({{accessLogVisible ? 'click to hide' : 'click to show'}})</small></h4>
+				<h4 class="mb-2 mt-3" @click="toggleAccessLog">Access Log<small>&ensp;({{accessLogVisible ? 'click to hide' : 'click to show'}})</small></h4>
 				<access-log v-if="accessLogVisible" :entries="model.result.accessLog"></access-log>
 			</div>
 		</div>
@@ -253,7 +253,7 @@
 
 				try {
 					const input = Converter.clean(Converter.merge(this.model.input.value, this.model.decisions.value));
-					const result = await Network.executeModel(input === undefined ? {} : input);
+					const result = await Network.executeModel(input === undefined ? {} : input, this.accessLogVisible);
 					this.model.result.outputs = result.outputs;
 					this.model.result.context = result.context;
 					this.model.result.accessLog = result.accessLog;
@@ -386,6 +386,14 @@
 			copyToPlayground(context) {
 				const url = this.$router.resolve({path: 'playground', query: {context: base64.encode(JSON.stringify(context))}});
 				window.open(url.href, '_blank');
+			},
+			toggleAccessLog() {
+				const newState = !this.accessLogVisible;
+				this.accessLogVisible = newState;
+				// If newState is true (so we want to debug the model), we need to execute the model explicitly.
+				if(newState === true) {
+					this.executeModel();
+				}
 			},
 		}
 	};
