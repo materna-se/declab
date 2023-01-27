@@ -31,8 +31,8 @@
 		white-space: initial;
 	}
 	.json-builder table tr td:nth-child(1) {
-		max-width: 50%;
-		width: auto;
+		/*max-width: 50%;*/
+		/*width: auto;*/
 	}
 </style>
 
