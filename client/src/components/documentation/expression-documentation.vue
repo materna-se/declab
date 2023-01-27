@@ -25,7 +25,7 @@
 				<tbody>
 					<tr>
 						<td style="vertical-align: middle; text-align: center; writing-mode: vertical-rl; transform: rotate(180deg);" rowspan="0">
-							<b>{{expression.hitPolicy}}</b>
+							<b>{{expression.hitPolicy}}</b>&ensp;
 							<sup v-if="expression.aggregation !== null">{{expression.aggregation}}</sup>
 						</td>
 						<td v-for="input of expression.inputs" style="vertical-align: middle">
