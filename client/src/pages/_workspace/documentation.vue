@@ -64,7 +64,20 @@
 							<template v-for="(input, inputIndex) of model.inputs">
 								<h5 v-bind:id="model.namespace + '#' + input.id" class="mb-2 mt-2">{{modelIndex + 2}}.2.{{inputIndex + 1}}. Input <i>{{input.name}}</i></h5>
 
-								<type-documentation v-bind:type="{name: input.name, type: input.returnType, collection: false, allowedValues: null}" v-bind:root="true" class="mt-2"/>
+								<table class="table table-bordered table-sm mb-0" style="max-width: 100%;width: initial;">
+									<tbody>
+									<tr>
+										<td>
+											<div class="d-flex flex-column align-items-center">
+												<p class="entity-label">INPUT</p>
+												<p class="mb-0 text-center"><b>{{input.name}}</b></p>
+												<type-badge v-bind:type="input.returnType"/>
+												<small class="expression-description" v-if="input.description !== null" v-html="sanitizeDescription(input.description)"></small>
+											</div>
+										</td>
+									</tr>
+									</tbody>
+								</table>
 							</template>
 						</template>
 						<p class="mb-2 text-muted" v-else>The model does not contain any inputs.</p>
