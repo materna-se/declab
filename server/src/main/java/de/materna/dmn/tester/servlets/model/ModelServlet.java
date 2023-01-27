@@ -176,7 +176,6 @@ public class ModelServlet {
 		Configuration configuration = workspace.getConfig();
 		DMNModel mainModel = DroolsHelper.getMainModel(workspace);
 
-
 		Map<String, Object> context = new HashMap<>();
 		if (configuration.getDecisionService() == null) {
 			context.put("inputs", workspace.getDecisionSession().getInputStructure(mainModel.getNamespace()));
@@ -204,17 +203,17 @@ public class ModelServlet {
 	public Response calculateModelResult(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
 		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
 
-		Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
+		Map<String, Object> request = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
 		});
 
 		Configuration configuration = workspace.getConfig();
 		String mainModelNamespace = DroolsHelper.getMainModelNamespace(workspace);
 
 		if (configuration.getDecisionService() == null) {
-			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().executeModel(mainModelNamespace, inputs))).build();
+			return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getDMNDecisionSession().executeModel(mainModelNamespace, (Map<String, Object>) request.get("input"), (Boolean) request.get("debug")))).build();
 		}
 
-		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getDMNDecisionSession().executeModel(mainModelNamespace, configuration.getDecisionService().getName(), inputs))).build();
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getDMNDecisionSession().executeModel(mainModelNamespace, configuration.getDecisionService().getName(), (Map<String, Object>) request.get("input"), (Boolean) request.get("debug")))).build();
 	}
 
 	@POST

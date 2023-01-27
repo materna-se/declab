@@ -7,12 +7,12 @@ import org.kie.dmn.api.core.ast.BusinessKnowledgeModelNode
 import org.kie.dmn.api.core.ast.DecisionNode
 import org.kie.dmn.api.core.ast.DecisionServiceNode
 import org.kie.dmn.api.core.ast.InputDataNode
+import org.kie.dmn.core.ast.InputDataNodeImpl
 import org.kie.dmn.model.api.*
 import org.kie.dmn.model.v1_3.TInformationItem
 import org.kie.dmn.model.v1_3.TLiteralExpression
 import org.kie.dmn.model.v1_3.TOutputClause
 import org.slf4j.LoggerFactory
-import javax.xml.namespace.QName
 
 private val log = LoggerFactory.getLogger(ModelDocumentation::class.java)
 
@@ -127,11 +127,15 @@ class ItemDefinitionDocumentation(name: String, type: DMNType) {
 class InputDocumentation(inputNode: InputDataNode) {
 	var id: String
 	var name: String
+	var description: String? = null
 	var returnType: String? = null
 
 	init {
 		this.id = inputNode.id
 		this.name = inputNode.name
+		if (inputNode is InputDataNodeImpl) {
+			this.description = inputNode.inputData.description
+		}
 		this.returnType = inputNode.type.name
 	}
 }
