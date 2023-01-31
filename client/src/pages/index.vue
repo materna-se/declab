@@ -14,8 +14,9 @@
 
 				<div class="card mb-4">
 					<div class="card-body">
+						<alert v-if="Object.values(workspaces).find(_workspace => _workspace.name === workspace.name)" v-bind:alert="{message: 'The workspace name is already in use! Please select an alternative name.', state: 'warning'}" class="mb-3"/>
 						<configurator class="mb-4" v-model="workspace"></configurator>
-						<button class="btn btn-block btn-outline-primary" @click="createWorkspace">Create and enter workspace</button>
+						<button class="btn btn-block btn-outline-primary" v-on:click="createWorkspace" v-bind:disabled="Object.values(workspaces).find(_workspace => _workspace.name === workspace.name)">Create and enter workspace</button>
 					</div>
 				</div>
 
@@ -71,7 +72,7 @@
 
 				demoMode: process.env.DECLAB_DEMO_MODE,
 
-				workspaces: [],
+				workspaces: {},
 				workspace: {
 					name: null,
 					description: null,
