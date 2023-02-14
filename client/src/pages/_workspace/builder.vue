@@ -18,7 +18,7 @@
 			</div>
 		</div>
 		<div class="d-flex">
-			<div class="mb-4" v-if="mode !== 2" style="flex: 1" :style="{'margin-right': mode === 0 ? '30px' : null, 'max-width': mode === 0 ? '70%' : null}">
+			<div class="mb-4" v-if="mode !== 2" style="flex: 1" :style="{'margin-right': mode === 0 ? '30px' : null, 'max-width': mode === 0 ? '60%' : null}">
 				<div class="d-flex align-items-center mb-2">
 					<h4 class="mb-0 me-auto">Input Context</h4>
 					<div>

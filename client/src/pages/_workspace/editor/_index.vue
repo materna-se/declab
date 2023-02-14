@@ -88,7 +88,7 @@
 			y: "a year",
 			yy: "%d years"
 		}
-	})
+	});
 
 	export default {
 		head() {

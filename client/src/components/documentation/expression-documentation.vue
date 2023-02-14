@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<small class="expression-description mb-1" v-if="expression.description !== null" v-html="sanitizeDescription(expression.description)">asd</small>
+		<small class="expression-description mb-1" v-if="expression.description !== null" v-html="sanitizeDescription(expression.description)"></small>
 		<code v-if="expression.expressionType === 'LITERAL_EXPRESSION'">{{expression.text}}</code>
 		<table class="table table-bordered table-sm mb-0" v-else-if="expression.expressionType === 'CONTEXT'">
 			<tbody>
