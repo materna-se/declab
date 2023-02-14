@@ -16,7 +16,7 @@
 				<div class="card">
 					<div class="card-header d-flex align-items-center">
 						<h4 class="mb-0 me-auto">{{importedModel.name}} ({{importedModel.namespace}})</h4>
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" @click="editModel(index)" class="c-pointer me-2">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" @click="editModel(importedModel.namespace)" class="c-pointer me-2">
 							<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
 						</svg>
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" @click="downloadModel(index)" class="c-pointer me-2">
@@ -101,6 +101,7 @@
 	import draggable from 'vuedraggable'
 	import AlertHelper from "../../components/alert/alert-helper";
 	import {v4 as uuid} from 'uuid';
+	import base64 from "base-64";
 
 	export default {
 		head() {
@@ -200,8 +201,8 @@
 
 				await this.getModel();
 			},
-			editModel(index) {
-				window.open(this.$router.resolve('/' + this.$route.params.workspace + '/editor/' + index).href, '_blank', 'noopener');
+			editModel(namespace) {
+				window.open(this.$router.resolve('/' + this.$route.params.workspace + '/editor/' + base64.encode(namespace)).href, '_blank', 'noopener');
 			},
 			downloadModel(index) {
 				const model = this.models[index];

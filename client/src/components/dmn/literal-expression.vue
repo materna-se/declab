@@ -6,7 +6,7 @@
 	#monaco-container,
 	.monaco-editor {
 		width: 100%;
-		height: 200px;
+		height: 500px;
 	}
 </style>
 
@@ -28,7 +28,6 @@
 		data() {
 			return {
 				editor: null,
-				previousValue: null
 			}
 		},
 		watch: {
@@ -56,8 +55,9 @@
 			monaco.languages.setMonarchTokensProvider('feel-language', {
 				tokenizer: {
 					root: [
+						[/\/\/(.*)/, "feel-comment"],
 						[/(?:true|false)/, "feel-boolean"],
-						[/[0-9]+/, "feel-numeric"],
+						[/(?:[0-9]+)/, "feel-numeric"],
 						[/(?:"(?:.*?)")/, "feel-string"],
 						[/(?:(?:[a-z ]+\()|(?:\()|(?:\)))/, "feel-function"],
 						[/(?:if|then|else)/, "feel-keyword"],
@@ -156,6 +156,7 @@
 					{token: 'feel-boolean', foreground: 'd73a49'},
 					{token: 'feel-string', foreground: '22863a'},
 					{token: 'feel-function', foreground: '6f42c1'},
+					{token: 'feel-comment', foreground: 'a7aab6'},
 				],
 				colors: {
 					'editorLineNumber.foreground': '#000000',
@@ -187,9 +188,14 @@
 			});
 			this.editor = editor;
 
+			let previousValue = "";
+
 			editor.onKeyUp(function () {
 				const value = editor.getValue();
-				vue.previousValue = value;
+				if(value === previousValue) {
+					return;
+				}
+				previousValue = value;
 				vue.$emit('input', value);
 			});
 		}

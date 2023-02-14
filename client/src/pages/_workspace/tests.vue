@@ -29,17 +29,17 @@
 					<div class="list-group">
 						<template v-if="Object.keys(tests).length !== 0">
 							<div class="list-group-item list-group-item-action c-pointer d-flex align-items-center" style="display: flex; align-items: center" v-for="(test, uuid) in tests" :key="uuid" @click.self="setViewMode(uuid)" :class="[test.equal === undefined ? '' : (test.equal ? 'bg-success text-white' : 'bg-danger text-white')]">
-							<span class="me-auto" style="margin-right: auto" @click="setViewMode(uuid)">
-								<b>{{test.name}}</b>
-								<template v-if="test.description !== null">
-									<br>
-									<small class="text-muted text-break">{{test.description}}</small>
-								</template>
-							</span>
+								<span class="me-auto" style="margin-right: auto" @click="setViewMode(uuid)">
+									<b>{{test.name}}</b>
+									<template v-if="test.description !== null">
+										<br>
+										<small class="text-muted text-break">{{test.description}}</small>
+									</template>
+								</span>
 								<!--
-                <span class="badge badge-light badge-md d-block float-start me-2" v-if="test.tps !== undefined">{{test.tps}} / s</span>
-                -->
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="ms-4  me-2" @click="setEditMode(uuid)">
+								<span class="badge badge-light badge-md d-block float-start me-2" v-if="test.tps !== undefined">{{test.tps}} / s</span>
+								-->
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="ms-4 me-2" @click="setEditMode(uuid)">
 									<path d="M14.06 9l.94.94L5.92 19H5v-.92L14.06 9m3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="currentColor"/>
 								</svg>
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="me-2" @click="setDuplicateMode(uuid)">
@@ -93,10 +93,10 @@
 											<div style="white-space: pre">
 												<!-- eslint-disable-next-line vue/require-v-for-key -->
 												<span v-for="difference of getDifference(output.expected, output.calculated)">
-												<code class="difference-minus" v-if="difference[0] === -1">{{difference[1]}}</code>
-												<code class="difference-plus" v-else-if="difference[0] === 1">{{difference[1]}}</code>
-												<code v-else>{{difference[1]}}</code>
-											</span>
+													<code class="difference-minus" v-if="difference[0] === -1">{{difference[1]}}</code>
+													<code class="difference-plus" v-else-if="difference[0] === 1">{{difference[1]}}</code>
+													<code v-else>{{difference[1]}}</code>
+												</span>
 											</div>
 											<div v-if="!output.equal">
 												<button class="btn btn-block btn-outline-primary mt-4" @click="amendOutput(output)">Save as Correct</button>

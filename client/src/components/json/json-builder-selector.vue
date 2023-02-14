@@ -14,10 +14,32 @@
 						<path d="M6 11a2 2 0 0 1 2 2v4H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2m-2 2v2h2v-2H4m16 0v2h2v2h-2a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2v2h-2m-8-6v4h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V7h2m0 8h2v-2h-2v2z" fill="currentColor"/>
 					</svg>
 				</span>
-				<span class="dropdown-item" v-on:click="addValue('dateTime', value)">
+				<span class="dropdown-item" v-on:click="addValue('date', value)">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
-						<path d="M9 10v2H7v-2h2m4 0v2h-2v-2h2m4 0v2h-2v-2h2m2-7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h1V1h2v2h8V1h2v2h1m0 16V8H5v11h14M9 14v2H7v-2h2m4 0v2h-2v-2h2m4 0v2h-2v-2h2z" fill="currentColor"/>
+						<path d="M9 10H7v2h2v-2m4 0h-2v2h2v-2m4 0h-2v2h2v-2m2-7h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V8h14v11Z" fill="currentColor"/>
 					</svg>
+				</span>
+				<span class="dropdown-item" v-on:click="addValue('time', value)">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
+						<path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5Z" fill="currentColor"/>
+					</svg>
+				</span>
+				<span class="dropdown-item" v-on:click="addValue('date and time', value)">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
+						<path d="M15 13h1.5v2.82l2.44 1.41-.75 1.3L15 16.69V13m4-5H5v11h4.67c-.43-.91-.67-1.93-.67-3a7 7 0 0 1 7-7c1.07 0 2.09.24 3 .67V8M5 21a2 2 0 0 1-2-2V5c0-1.11.89-2 2-2h1V1h2v2h8V1h2v2h1a2 2 0 0 1 2 2v6.1c1.24 1.26 2 2.99 2 4.9a7 7 0 0 1-7 7c-1.91 0-3.64-.76-4.9-2H5m11-9.85A4.85 4.85 0 0 0 11.15 16c0 2.68 2.17 4.85 4.85 4.85A4.85 4.85 0 0 0 20.85 16c0-2.68-2.17-4.85-4.85-4.85Z" fill="currentColor"/>
+					</svg>
+				</span>
+				<span class="dropdown-item" v-on:click="addValue('days and time duration', value)">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 5.292 7.386" class="d-block">
+					<path d="M32.67 85.852a2.117 2.117 0 0 0 2.117-2.117 2.117 2.117 0 0 0-2.117-2.117 2.117 2.117 0 0 0-2.116 2.117 2.117 2.117 0 0 0 2.116 2.117m0-4.763a2.646 2.646 0 0 1 2.646 2.646 2.646 2.646 0 0 1-2.646 2.646 2.648 2.648 0 0 1-2.645-2.646 2.646 2.646 0 0 1 2.645-2.646m.133 1.323v1.39l1.19.706-.198.325-1.39-.833v-1.588z" fill="currentColor" style="display:inline;stroke-width:.264583" transform="translate(-30.025 -81.09)"/>
+					<path d="m31.836 88.475-.82-.82.82-.82.212.213-.456.457h2.157l-.456-.457.212-.212.82.82-.82.819-.212-.212.456-.457h-2.157l.456.457z" fill="currentColor" style="display:inline;stroke-width:.150413" transform="translate(-30.025 -81.09)"/>
+				</svg>
+				</span>
+				<span class="dropdown-item" v-on:click="addValue('years and months duration', value)">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 4.763 7.52" class="d-block">
+					<path d="M19.222 83.389h-.529v.529h.53v-.53m1.058 0h-.53v.53h.53v-.53m1.058 0h-.53v.53h.53v-.53m.53-1.851h-.266v-.53h-.529v.53h-2.116v-.53h-.53v.53h-.264a.53.53 0 0 0-.53.529v3.704a.53.53 0 0 0 .53.53h3.704a.53.53 0 0 0 .53-.53v-3.704a.53.53 0 0 0-.53-.53m0 4.234h-3.704v-2.91h3.704z" style="display:inline;stroke-width:.264583" transform="translate(-17.635 -81.007)" fill="currentColor"/>
+					<path d="m19.181 88.527-.82-.82.82-.82.212.213-.455.457h2.156l-.455-.457.212-.212.82.82-.82.82-.212-.213.455-.457h-2.156l.455.457z" fill="currentColor" style="display:inline;stroke-width:.150413" transform="translate(-17.635 -81.007)"/>
+				</svg>
 				</span>
 				<span class="dropdown-item" v-on:click="addValue('number', value)">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
@@ -72,7 +94,11 @@
 						case "array":
 							switch (type) {
 								case "string":
-								case "dateTime":
+								case "date":
+								case "time":
+								case "date and time":
+								case "days and time duration":
+								case "years and months duration":
 								case "number":
 								case "boolean":
 									value.value.push({type: type});
@@ -91,7 +117,11 @@
 						case "object":
 							switch (type) {
 								case "string":
-								case "dateTime":
+								case "date":
+								case "time":
+								case "date and time":
+								case "days and time duration":
+								case "years and months duration":
 								case "number":
 								case "boolean":
 									this.$set(value.value, this.key, {type: type});
@@ -113,7 +143,11 @@
 				if (this.mode === 'edit') {
 					switch (type) {
 						case "string":
-						case "dateTime":
+						case "date":
+						case "time":
+						case "date and time":
+						case "days and time duration":
+						case "years and months duration":
 						case "number":
 						case "boolean":
 							value.type = type;

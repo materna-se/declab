@@ -157,11 +157,14 @@ export default {
 		return await response.json();
 	},
 
-	async executeModel(input) {
+	async executeModel(input, debug = false) {
 		const response = await this._authorizedFetch(this._endpoint + "/model/execute", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
-			body: JSON.stringify(input)
+			body: JSON.stringify({
+				input: input,
+				debug: debug
+			})
 		});
 		return await response.json();
 	},

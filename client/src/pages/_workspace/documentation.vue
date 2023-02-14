@@ -64,7 +64,20 @@
 							<template v-for="(input, inputIndex) of model.inputs">
 								<h5 v-bind:id="model.namespace + '#' + input.id" class="mb-2 mt-2">{{modelIndex + 2}}.2.{{inputIndex + 1}}. Input <i>{{input.name}}</i></h5>
 
-								<type-documentation v-bind:type="{name: input.name, type: input.returnType, collection: false, allowedValues: null}" v-bind:root="true" class="mt-2"/>
+								<table class="table table-bordered table-sm mb-0" style="max-width: 100%;width: initial;">
+									<tbody>
+									<tr>
+										<td>
+											<div class="d-flex flex-column align-items-center">
+												<p class="entity-label">INPUT</p>
+												<p class="mb-0 text-center"><b>{{input.name}}</b></p>
+												<type-badge v-bind:type="input.returnType"/>
+												<small class="expression-description" v-if="input.description !== null" v-html="sanitizeDescription(input.description)"></small>
+											</div>
+										</td>
+									</tr>
+									</tbody>
+								</table>
 							</template>
 						</template>
 						<p class="mb-2 text-muted" v-else>The model does not contain any inputs.</p>
@@ -76,24 +89,24 @@
 
 								<table class="table table-bordered table-sm mb-0" style="max-width: 100%;width: initial;">
 									<tbody>
-									<tr>
-										<td class="d-flex flex-column align-items-center">
-											<p class="function-label">KNOWLEDGE MODEL</p>
-											<p class="mb-0 text-center"><b>{{knowledgeModel.name}}</b></p>
-											<type-badge v-bind:type="knowledgeModel.returnType"/>
-											<small class="expression-description" v-if="knowledgeModel.description !== null" v-html="sanitizeDescription(knowledgeModel.description)"></small>
-										</td>
-									</tr>
-									<tr>
-										<td class="d-flex flex-column align-items-center ">
-											<parameter-documentation v-bind:parameters="knowledgeModel.parameters"/>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<expression-documentation v-bind:expression="knowledgeModel.expression"></expression-documentation>
-										</td>
-									</tr>
+										<tr>
+											<td class="d-flex flex-column align-items-center">
+												<p class="function-label">KNOWLEDGE MODEL</p>
+												<p class="mb-0 text-center"><b>{{knowledgeModel.name}}</b></p>
+												<type-badge v-bind:type="knowledgeModel.returnType"/>
+												<small class="expression-description" v-if="knowledgeModel.description !== null" v-html="sanitizeDescription(knowledgeModel.description)"></small>
+											</td>
+										</tr>
+										<tr>
+											<td class="d-flex flex-column align-items-center ">
+												<parameter-documentation v-bind:parameters="knowledgeModel.parameters"/>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<expression-documentation v-bind:expression="knowledgeModel.expression"></expression-documentation>
+											</td>
+										</tr>
 									</tbody>
 								</table>
 							</template>
@@ -119,21 +132,21 @@
 
 								<table class="table table-bordered table-sm mb-0" style="max-width: 100%;width: initial;">
 									<tbody>
-									<tr>
-										<td>
-											<div class="d-flex flex-column align-items-center">
-												<p class="decision-label">DECISION</p>
-												<p class="mb-0 text-center"><b>{{decision.name}}</b></p>
-												<type-badge v-bind:type="decision.returnType"/>
-												<small class="expression-description" v-if="decision.description !== null" v-html="sanitizeDescription(decision.description)"></small>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<expression-documentation v-bind:expression="decision.expression"></expression-documentation>
-										</td>
-									</tr>
+										<tr>
+											<td>
+												<div class="d-flex flex-column align-items-center">
+													<p class="decision-label">DECISION</p>
+													<p class="mb-0 text-center"><b>{{decision.name}}</b></p>
+													<type-badge v-bind:type="decision.returnType"/>
+													<small class="expression-description" v-if="decision.description !== null" v-html="sanitizeDescription(decision.description)"></small>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<expression-documentation v-bind:expression="decision.expression"></expression-documentation>
+											</td>
+										</tr>
 									</tbody>
 								</table>
 							</template>
@@ -147,34 +160,34 @@
 
 								<table class="table table-bordered table-sm mb-0" style="max-width: 100%;width: initial;">
 									<tbody>
-									<tr>
-										<td>
-											<div class="d-flex flex-column align-items-center">
-												<p class="entity-label">DECISION SERVICE</p>
-												<p class="mb-0 text-center"><b>{{decisionService.name}}</b></p>
-												<small class="expression-description" v-if="decisionService.description !== null" v-html="sanitizeDescription(decisionService.description)"></small>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<p class="mb-0 text-center"><b>Input</b></p>
-											<p class="mb-0 c-pointer" v-for="inputData of decisionService.inputData" v-on:click="moveToReference(model, inputData)">{{resolveReference(model, "inputs", inputData)}}</p>
-											<p class="mb-0 c-pointer" v-for="inputDecision of decisionService.inputDecisions" v-on:click="moveToReference(model, inputDecision)">{{resolveReference(model, "decisions", inputDecision)}}</p>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<p class="mb-0 text-center"><b>Encapsulated Decisions</b></p>
-											<p class="mb-0 c-pointer" v-for="encapsulatedDecision of decisionService.encapsulatedDecisions" v-on:click="moveToReference(model, encapsulatedDecision)">{{resolveReference(model, "decisions", encapsulatedDecision)}}</p>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<p class="mb-0 text-center"><b>Output Decisions</b></p>
-											<p class="mb-0 c-pointer" v-for="outputDecision of decisionService.outputDecisions" v-on:click="moveToReference(model, outputDecision)">{{resolveReference(model, "decisions", outputDecision)}}</p>
-										</td>
-									</tr>
+										<tr>
+											<td>
+												<div class="d-flex flex-column align-items-center">
+													<p class="entity-label">DECISION SERVICE</p>
+													<p class="mb-0 text-center"><b>{{decisionService.name}}</b></p>
+													<small class="expression-description" v-if="decisionService.description !== null" v-html="sanitizeDescription(decisionService.description)"></small>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<p class="mb-0 text-center"><b>Input</b></p>
+												<p class="mb-0 c-pointer" v-for="inputData of decisionService.inputData" v-on:click="moveToReference(model, inputData)">{{resolveReference(model, "inputs", inputData)}}</p>
+												<p class="mb-0 c-pointer" v-for="inputDecision of decisionService.inputDecisions" v-on:click="moveToReference(model, inputDecision)">{{resolveReference(model, "decisions", inputDecision)}}</p>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<p class="mb-0 text-center"><b>Encapsulated Decisions</b></p>
+												<p class="mb-0 c-pointer" v-for="encapsulatedDecision of decisionService.encapsulatedDecisions" v-on:click="moveToReference(model, encapsulatedDecision)">{{resolveReference(model, "decisions", encapsulatedDecision)}}</p>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<p class="mb-0 text-center"><b>Output Decisions</b></p>
+												<p class="mb-0 c-pointer" v-for="outputDecision of decisionService.outputDecisions" v-on:click="moveToReference(model, outputDecision)">{{resolveReference(model, "decisions", outputDecision)}}</p>
+											</td>
+										</tr>
 									</tbody>
 								</table>
 							</template>

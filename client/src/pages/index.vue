@@ -14,17 +14,18 @@
 
 				<div class="card mb-4">
 					<div class="card-body">
+						<alert v-if="Object.values(workspaces).find(_workspace => _workspace.name === workspace.name)" v-bind:alert="{message: 'The workspace name is already in use! Please select an alternative name.', state: 'warning'}" class="mb-3"/>
 						<configurator class="mb-4" v-model="workspace"></configurator>
-						<button class="btn btn-block btn-outline-primary" @click="createWorkspace">Create and enter workspace</button>
+						<button class="btn btn-block btn-outline-primary" v-on:click="createWorkspace" v-bind:disabled="Object.values(workspaces).find(_workspace => _workspace.name === workspace.name)">Create and enter workspace</button>
 					</div>
 				</div>
 
 				<div class="input-group mb-2">
-						<span class="input-group-text">
-							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
-								<path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z" fill="currentColor"/>
-							</svg>
-						</span>
+					<span class="input-group-text">
+						<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
+							<path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z" fill="currentColor"/>
+						</svg>
+					</span>
 					<input placeholder="Search workspace..." class="form-control" v-model="query" @keyup="getWorkspaces">
 				</div>
 
@@ -71,7 +72,7 @@
 
 				demoMode: process.env.DECLAB_DEMO_MODE,
 
-				workspaces: [],
+				workspaces: {},
 				workspace: {
 					name: null,
 					description: null,

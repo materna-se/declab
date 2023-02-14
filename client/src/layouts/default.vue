@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<dmn-header></dmn-header>
-		<div class="container-fluid" style="padding-bottom: 50px">
+		<div class="container-fluid" style="margin-bottom: 50px; margin-top: calc(50px + 1rem)">
 			<div class="row mb-4" v-if="$store.state.alert.message !== null">
 				<div class="col-12">
 					<alert v-bind:alert="$store.state.alert"></alert>

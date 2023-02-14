@@ -26,7 +26,11 @@ public class MainSocket {
 	}
 
 	@OnError
-	public void onError(Session session, Throwable throwable) {
+	public void onError(@PathParam("workspace") String workspace, Session session, Throwable throwable) throws InterruptedException {
 		System.out.println("onError" + throwable.getMessage());
+
+		SessionManager sessionManager = SessionManager.getInstance();
+		sessionManager.remove(workspace, session);
+		sessionManager.notify(workspace, "{\"type\": \"listeners\", \"data\": " + sessionManager.listeners(workspace) + "}");
 	}
 }

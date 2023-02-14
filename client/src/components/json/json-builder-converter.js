@@ -2,6 +2,44 @@ export default {
 	enrich: function (value) {
 		switch (typeof value) {
 			case "string":
+				if(value.startsWith("\uE15A")) {
+					return {
+						type: "date",
+						value: value
+					}
+				}
+
+				if(value.startsWith("\uE15B")) {
+					return {
+						type: "time",
+						value: value
+					}
+				}
+
+				if(value.startsWith("\uE15C")) {
+					return {
+						type: "date and time",
+						value: value
+					}
+				}
+
+				if(value.startsWith("\uE15D")) {
+					return {
+						type: "days and time duration",
+						value: value
+					}
+				}
+				if(value.startsWith("\uE15E")) {
+					return {
+						type: "years and months duration",
+						value: value
+					}
+				}
+
+				return {
+					type: "string",
+					value: value
+				};
 			case "number":
 			case "boolean":
 				return {
@@ -51,7 +89,9 @@ export default {
 			case "string":
 			case "date":
 			case "time":
-			case "dateTime":
+			case "date and time":
+			case "days and time duration":
+			case "years and months duration":
 			case "number":
 				// It's a simple input
 				if (value.value === "") {
@@ -102,7 +142,7 @@ export default {
 			}
 			return {
 				type: "object",
-				value: mergedObject,
+				value: mergedObject
 			};
 		}
 
@@ -118,7 +158,7 @@ export default {
 			}
 			return {
 				type: "array",
-				value: mergedArray,
+				value: mergedArray
 			};
 		}
 

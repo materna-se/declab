@@ -1,5 +1,5 @@
 <template>
-	<nav class="navbar navbar-expand mb-3 p-0">
+	<nav class="navbar navbar-expand p-0">
 		<!-- Manual / route -->
 		<router-link to="/" class="navbar-brand">
 			<span class="navbar-brand-primary">dec</span>
@@ -46,6 +46,14 @@
 		background-color: rgb(255, 255, 255);
 		box-shadow: 0px 2px 8px 0px rgb(133 133 133 / 16%);
 		border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	}
+
+	.navbar {
+		position: fixed;
+		width: 100%;
+		top:0;
+		left:0;
+		z-index: 1000;
 	}
 
 	.dropdown-item.active, .dropdown-item:active {

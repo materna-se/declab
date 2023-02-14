@@ -2,7 +2,7 @@
 	<div>
 		<div class="d-flex align-items-center mb-2">
 			<div class="import-result me-2" v-if="models.length > 0">
-				<b>{{models[$route.params.index].name}}</b> ({{models[$route.params.index].namespace}})
+				<b>{{mainModel.name}}</b> ({{mainModel.namespace}})
 			</div>
 			<button class="btn btn-outline-primary" v-on:click="editor.undo()">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
@@ -56,12 +56,13 @@
 
 <script>
 	import Network from "../../../helpers/network";
-	import * as DmnEditor from "@kogito-tooling/kie-editors-standalone/dist/dmn";
+	import * as DmnEditor from "@materna/declab-kogito/dist/dmn";
 	import {v4 as uuid} from "uuid";
 	import dayjs from "dayjs";
 	import dayjsRelativeTimePlugin from "dayjs/plugin/relativeTime";
 	import dayjsUpdateLocalePlugin from "dayjs/plugin/updateLocale";
 	import {debounce} from "lodash";
+	import base64 from "base-64";
 
 	dayjs.extend(dayjsRelativeTimePlugin);
 	dayjs.extend(dayjsUpdateLocalePlugin);
@@ -87,18 +88,19 @@
 			y: "a year",
 			yy: "%d years"
 		}
-	})
+	});
 
 	export default {
 		head() {
-			const model = this.models[this.$route.params.index];
 			return {
-				title: "declab - Editor" + (model === undefined ? "" : (" for " + model.name)),
+				title: "declab - Editor" + (this.mainModel === null ? "" : (" for " + this.mainModel.name)),
 			}
 		},
 		name: "editor",
 		data() {
 			return {
+				mainModelNamespace: null,
+				mainModel: null,
 				models: [],
 				editor: null,
 				importTime: null,
@@ -121,8 +123,9 @@
 				});
 			}
 
-			const model = this.models[this.$route.params.index];
-			if (model === undefined) {
+			this.mainModelNamespace = base64.decode(this.$route.params.index);
+			this.mainModel = this.models.find((model) => model.namespace === this.mainModelNamespace);
+			if (this.mainModel === undefined) {
 				await this.$router.push('/' + this.$route.params.workspace + "/model");
 				return;
 			}
@@ -130,8 +133,8 @@
 			this.editor = DmnEditor.open({
 				container: document.getElementById("editor"),
 				readOnly: false,
-				initialContent: Promise.resolve(model.source),
-				resources: new Map(this.models.slice(0, this.$route.params.index).map((model, index) => {
+				initialContent: Promise.resolve(this.mainModel.source),
+				resources: new Map(this.models.slice(0, this.models.findIndex((model) => model.namespace === this.mainModelNamespace)).map((model, index) => {
 					return [
 						model.name + ".dmn",
 						{
@@ -146,7 +149,7 @@
 			});
 
 			// We will import the model once to get feedback on the health.
-			await this.debouncedImportModel(model.source, "preflight");
+			await this.debouncedImportModel(this.mainModel.source, "preflight");
 
 			setInterval(() => {
 				if (vue.importResult === null) {
@@ -165,13 +168,59 @@
 		methods: {
 			async onSocket(e) {
 				const data = JSON.parse(e.data);
-				if (data.type === "imported" && data.data !== "preflight" && data.data !== this.context) {
-					location.reload();
+				// We don't care about preflights as they don't change the model.
+				if (data.data === "preflight") {
+					return;
+				}
+
+				if (data.type === "imported") {
+					// We don't want to update the editor if the update was triggered by the editor itself.
+					if (data.data === this.context) {
+						return;
+					}
+
+					const currentClientModels = this.models;
+					const newClientModels = [];
+					const newServerModels = await Network.getModel();
+
+					for (const currentClientModel of currentClientModels) {
+						const newServerModel = newServerModels.find((model) => model.namespace === currentClientModel.namespace);
+						if (newServerModel === undefined) {
+							let isMainModel = currentClientModel.namespace === this.mainModelNamespace;
+							if (isMainModel) {
+								await this.$router.push('/' + this.$route.params.workspace + "/model");
+								return;
+							}
+							await this.editor.setContent(currentClientModel.name + ".dmn", "");
+						}
+					}
+
+					const mainModelIndex = newServerModels.findIndex((model) => model.namespace === this.mainModelNamespace);
+					for (let i = 0; i < newServerModels.length; i++) {
+						const newServerModel = newServerModels[i];
+
+						const newClientModel = {
+							namespace: newServerModel.namespace,
+							name: newServerModel.name,
+							source: newServerModel.source
+						};
+						newClientModels.push(newClientModel);
+
+						if (i <= mainModelIndex) {
+							let isMainModel = newServerModel.namespace === this.mainModelNamespace;
+							if (isMainModel) {
+								this.mainModel = newClientModel;
+							}
+							await this.editor.setContent(isMainModel ? "" : (newServerModel.name + ".dmn"), newServerModel.source);
+						}
+					}
+
+					this.models = newClientModels;
 				}
 			},
 			async importModel(content, context) {
-				console.info("get throuzgh");
-				this.models[this.$route.params.index] = {
+				const mainModelIndex = this.models.findIndex((model) => model.namespace === this.mainModelNamespace);
+				this.models[mainModelIndex] = {
 					name: content.match(/name="(.+?)"/)[1],
 					namespace: content.match(/namespace="(.+?)"/)[1],
 					source: content
@@ -182,7 +231,6 @@
 					this.importResult = this.getResultAlert(result);
 				}
 				catch (e) {
-					console.error(e);
 					this.importResult = this.getResultAlert({
 						successful: false,
 						messages: []
