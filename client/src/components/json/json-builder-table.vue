@@ -80,12 +80,13 @@
 			<p class="my-4 text-center text-muted" v-if="Object.keys(value.value).length === 0 && !fixed"><small>Please select a type!</small></p>
 			<table class="table table-bordered table-minimize mb-0 json-builder">
 				<tbody>
-					<tr v-for="(childValue, childKey) in value.value">
+				<template v-for="(childValue, childKey) in value.value">
+					<tr v-bind:key="childKey" v-if="hideEmpty === false || hasValue(childValue)">
 						<td class="td-minimize bg-light">
 							<span class="input-group-text input-group-text-disabled w-100" v-on:click="exportPath([...path, childKey])" v-html="breakKey(childKey)"></span>
 						</td>
 						<td>
-							<json-builder-table v-bind:path="[...path, childKey]" v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues" v-on:update:path="exportPath($event)"/>
+							<json-builder-table v-bind:path="[...path, childKey]" v-bind:value="childValue" v-bind:hide-empty="hideEmpty" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues" v-on:update:path="exportPath($event)"/>
 						</td>
 						<td class="td-minimize bg-light" v-if="!fixed">
 							<button type="button" class="btn btn-white" v-on:click="$delete(value.value, childKey)">
@@ -95,6 +96,7 @@
 							</button>
 						</td>
 					</tr>
+				</template>
 				</tbody>
 			</table>
 		</div>
@@ -107,9 +109,10 @@
 			</div>
 			<table class="table table-bordered table-minimize mb-0 json-builder">
 				<tbody>
-					<tr v-for="(childValue, childIndex) of value.value" v-bind:key="childIndex">
+				<template v-for="(childValue, childIndex) of value.value">
+					<tr v-bind:key="childIndex" v-if="hideEmpty === false || hasValue(childValue)">
 						<td>
-							<json-builder-table v-bind:path="[...path, childIndex]" v-bind:value="childValue" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues" v-on:update:path="exportPath($event)"/>
+							<json-builder-table v-bind:path="[...path, childIndex]" v-bind:value="childValue" v-bind:hide-empty="hideEmpty" v-bind:fixed="fixed" v-bind:fixed-values="fixedValues" v-on:update:path="exportPath($event)"/>
 						</td>
 						<td class="td-minimize bg-light" v-if="!fixedValues">
 							<button type="button" class="btn btn-white mb-1" v-on:click="value.value.splice(childIndex + 1, 0, JSON.parse(JSON.stringify(childValue)))">
@@ -129,6 +132,7 @@
 							</button>
 						</td>
 					</tr>
+				</template>
 				</tbody>
 			</table>
 		</div>
@@ -165,6 +169,7 @@ j
 			fixed: null,
 			fixedValues: null,
 			fixedRoot: null,
+			hideEmpty: null
 		},
 		methods: {
 			exportPath(path) {
@@ -176,6 +181,27 @@ j
 			setAllowedValue(event, value) {
 				this.$set(value, 'value', event.target.value);
 				event.target.value = "";
+			},
+			// check recursively if the value is undefined
+			hasValue(value) {
+				if (value.type === "object") {
+					for (let key in value.value) {
+						if (this.hasValue(value.value[key])) {
+							return true;
+						}
+					}
+					return false;
+				}
+				if (value.type === "array") {
+					for (let i = 0; i < value.value.length; i++) {
+						if (this.hasValue(value.value[i])) {
+							return true;
+						}
+					}
+					return false;
+				}
+
+				return value.value !== undefined;
 			}
 		}
 	}

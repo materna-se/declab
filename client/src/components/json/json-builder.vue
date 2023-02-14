@@ -4,7 +4,7 @@
 			<textarea class="form-control w-100 mb-1" v-model="editedValue"/>
 			<button class="btn btn-block btn-outline-primary mb-2" v-on:click="applyValue">Apply</button>
 		</template>
-		<json-builder-table v-if="value !== null" v-bind:path="['$']" v-bind:value="value" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues" v-on:update:path="exportPath($event)"/>
+		<json-builder-table v-if="value !== null" v-bind:path="['$']" v-bind:value="value" v-bind:hide-empty="hideEmpty" v-bind:root="true" v-bind:fixed="fixed" v-bind:fixed-root="fixedRoot" v-bind:fixed-values="fixedValues" v-on:update:path="exportPath($event)"/>
 		<json-builder-selector v-if="!fixed && !fixedRoot" v-bind:value="value" v-bind:mode="'edit'"/>
 	</div>
 </template>
@@ -68,6 +68,10 @@
 			},
 			// Does not allow a different root type
 			fixedRoot: {
+				default: false
+			},
+			// Hides empty fields
+			hideEmpty: {
 				default: false
 			},
 		},
