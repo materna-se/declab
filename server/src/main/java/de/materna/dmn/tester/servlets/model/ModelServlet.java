@@ -13,6 +13,7 @@ import de.materna.dmn.tester.sockets.managers.SessionManager;
 import de.materna.jdec.CamundaDecisionSession;
 import de.materna.jdec.DMNDecisionSession;
 import de.materna.jdec.GoldmanDecisionSession;
+import de.materna.jdec.dmn.DroolsAnalyzer;
 import de.materna.jdec.model.*;
 import de.materna.jdec.serialization.SerializationHelper;
 import org.kie.dmn.api.core.DMNModel;
@@ -182,7 +183,7 @@ public class ModelServlet {
 
 			Map<String, InputStructure> decisions = new HashMap<>();
 			for (DecisionNode decision : mainModel.getDecisions()) {
-				decisions.put(decision.getName(), new InputStructure(decision.getResultType().getName()));
+				decisions.put(decision.getName(), DroolsAnalyzer.getInputStructure(decision.getResultType()));
 			}
 			context.put("decisions", decisions);
 		}
