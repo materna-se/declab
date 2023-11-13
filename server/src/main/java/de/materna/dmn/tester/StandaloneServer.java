@@ -46,7 +46,7 @@ public class StandaloneServer {
 			// We're running inside a .jar.
 			//
 			log.info("Detected packaged execution...");
-			configurationPath = new URI(normalizedResourcePath.toString().substring(4, normalizedResourcePath.toString().indexOf('!'))).resolve("..");
+			configurationPath = new URI(normalizedResourcePath.toString().substring(4, normalizedResourcePath.toString().indexOf('!'))).resolve(".");
 		}
 		else {
 			configurationPath = normalizedResourcePath.resolve("..");
@@ -63,7 +63,7 @@ public class StandaloneServer {
 		}
 
 		String homeDirectory = properties.getProperty("persistence.directory", Paths.get(System.getProperty("user.home"), ".declab").toString());
-		log.info("We'll use the home directory \"{}\" to persist the workspaces.", homeDirectory);
+		log.info("We'll use the directory \"{}\" to persist the workspaces.", homeDirectory);
 		System.setProperty("jboss.server.data.dir", homeDirectory);
 
 		Server server = new Server();
