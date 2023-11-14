@@ -308,7 +308,7 @@ class RelationColumnDocumentation(column: InformationItem) : DMNElementDocumenta
 }
 
 class RelationRowDocumentation(row: org.kie.dmn.model.api.List) {
-	var expressions: ArrayList<ExpressionDocumentation>? = null
+	var expressions: ArrayList<ExpressionDocumentation?>? = null
 
 	init {
 		this.expressions = ArrayList()
@@ -319,7 +319,7 @@ class RelationRowDocumentation(row: org.kie.dmn.model.api.List) {
 }
 
 class ListDocumentation(list: org.kie.dmn.model.api.List) : ExpressionDocumentation(ExpressionType.LIST, list) {
-	var expressions: ArrayList<ExpressionDocumentation>? = null
+	var expressions: ArrayList<ExpressionDocumentation?>? = null
 
 	init {
 		this.expressions = ArrayList()
@@ -540,7 +540,7 @@ private fun getBaseType(type: DMNType): DMNType {
  * TODO: We can't always determine the variable name (for example inside of a List)?
  *       In such cases, we would not be able to resolve the expression.
  */
-fun resolveExpression(_variable: InformationItem?, expression: Expression): ExpressionDocumentation {
+fun resolveExpression(_variable: InformationItem?, expression: Expression?): ExpressionDocumentation? {
 	var variable = _variable
 	if (variable == null) {
 		variable = TInformationItem()
@@ -574,6 +574,10 @@ fun resolveExpression(_variable: InformationItem?, expression: Expression): Expr
 
 	if (expression is Invocation) {
 		return InvocationDocumentation(expression)
+	}
+
+	if(expression == null) {
+		return null;
 	}
 
 	val errorExpression = TLiteralExpression()
