@@ -9,7 +9,7 @@
 		"start": "nuxt start"
 	},
 	"dependencies": {
-		"@materna/declab-kogito": "latest",
+		"@materna/declab-kogito": "1.5.1",
 		"base-64": "^1.0.0",
 		"bootstrap": "^5.1.3",
 		"core-js": "^3.18.3",
