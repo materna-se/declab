@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: declab
 spec:
@@ -7,16 +7,38 @@ spec:
   selector:
     matchLabels:
       app: declab
+  serviceName: declab-0
   template:
     metadata:
       labels:
         app: declab
     spec:
       containers:
-      - name: declab
-        image: declab:1.4.1
-        ports:
-        - containerPort: 8080
+        - name: declab
+          image: maternase/declab:2.10.5
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: declab-storage
+              mountPath: /opt/jboss/wildfly/standalone/data/dmn
+          readinessProbe:
+            httpGet:
+              path: /api/workspaces
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+  volumeClaimTemplates:
+    - metadata:
+        name: declab-storage
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: 2G
 ---
 apiVersion: v1
 kind: Service
@@ -24,8 +46,8 @@ metadata:
   name: declab
 spec:
   selector:
-    app: declab
+    statefulset.kubernetes.io/pod-name: declab-0
   type: LoadBalancer
   ports:
-  - port: 80
-    targetPort: 8080
+    - port: 80
+      targetPort: 8080

@@ -75,6 +75,9 @@
 							["for", "for element in $1 return\n\t$0"],
 						],
 						Function: [
+							// Boolean
+							["not(negand)", "not($1)"],
+
 							// String
 							["substring(string, start position, length?)", "substring($1, $2, $3)"],
 							["string length(string)", "string length($1)"],
@@ -88,6 +91,8 @@
 							["ends with(string, match)", "ends with($1, $2)"],
 							["matches(input, pattern, flags?)", "matches($1, $2, $3)"],
 							["split(string, delimiter)", "split($1, $2)"],
+							["string join(list, delimiter) ", "string join($1, $2)"],
+							["string join(list)", "string join($1)"],
 
 							// List
 							["list contains(list, element)", "list contains($1, $2)"],
@@ -96,8 +101,8 @@
 							["max(list)", "max($1)"],
 							["sum(list)", "sum($1)"],
 							["mean(list)", "mean($1)"],
-							["and(list)", "and($1)"],
-							["or(list)", "or($1)"],
+							["all(list)", "all($1)"],
+							["any(list)", "any($1)"],
 							["sublist(list, start position, length?)", "sublist($1, $2, $3)"],
 							["append(list, item...)", "append($1, $2)"],
 							["concatenate(list...)", "concatenate($1)"],
@@ -117,6 +122,10 @@
 							["decimal(n, scale)", "decimal($1, $2)"],
 							["floor(n)", "floor($1)"],
 							["ceiling(n)", "ceiling($1)"],
+							["round up(n, scale)", "round up($1, $2)"],
+							["round down(n, scale)", "round down($1, $2)"],
+							["round half up(n, scale)", "round half up($1, $2)"],
+							["round half down(n, scale)", "round half down($1, $2)"],
 							["abs(n)", "abs($1)"],
 							["modulo(dividend, divisor)", "modulo($1, $2)"],
 							["sqrt(number)", "sqrt($1)"],
@@ -125,8 +134,44 @@
 							["odd(number)", "odd($1)"],
 							["even(number)", "even($1)"],
 
-							// Boolean
-							["not(negand)", "not($1)"],
+							// Date and Time
+							["is(first, second)", "is($1, $2)"],
+
+							// Range
+							["before(first, second)", "before($1, $2)"],
+							["after(first, second)", "after($1, $2)"],
+							["meets(first, second)", "meets($1, $2)"],
+							["met by(first, second)", "met by($1, $2)"],
+							["overlaps(first, second)", "overlaps($1, $2)"],
+							["overlaps before(first, second)", "overlaps before($1, $2)"],
+							["overlaps after(first, second)", "overlaps after($1, $2)"],
+							["finishes(first, second)", "finishes($1, $2)"],
+							["finished by(first, second)", "finished by($1, $2)"],
+							["includes(first, second)", "includes($1, $2)"],
+							["during(first, second)", "during($1, $2)"],
+							["starts(first, second)", "starts($1, $2)"],
+							["started by(first, second)", "started by($1, $2)"],
+							["coincides(first, second)", "coincides($1, $2)"],
+
+							// Temporal
+							["day of year(date)", "day of year($1)"],
+							["day of week(date)", "day of week($1)"],
+							["month of year(date)", "month of year($1)"],
+							["week of year(date)", "week of year($1)"],
+
+							// Sort
+							["sort(list, precedes)", "sort(list: $1, precedes: function($2) $3)"],
+
+							// Context
+							["get value(m, key)", "get value($1, $2)"],
+							["get entries(m)", "get entries($1)"],
+							["context(entries)", "context($1)"],
+							["context put(context, key, value)", "context put($1, $2, $3)"],
+							["context merge(first, second)", "context merge($1, $2)"],
+
+							// Miscellaneous
+							["now()", "now()"],
+							["today()", "today()"],
 						]
 					};
 					for (const key in suggestionTypes) {

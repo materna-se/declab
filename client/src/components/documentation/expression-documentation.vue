@@ -1,5 +1,8 @@
 <template>
-	<div>
+	<div v-if="expression === null">
+		<!-- we don't want to display anything if there is no expression -->
+	</div>
+	<div v-else>
 		<small class="expression-description mb-1" v-if="expression.description !== null" v-html="sanitizeDescription(expression.description)"></small>
 		<code v-if="expression.expressionType === 'LITERAL_EXPRESSION'">{{expression.text}}</code>
 		<table class="table table-bordered table-sm mb-0" v-else-if="expression.expressionType === 'CONTEXT'">
@@ -152,8 +155,8 @@
 		name: "expression-documentation",
 		props: {
 			expression: {
-				type: Object,
-				required: true
+				type: Object | null,
+				required: true,
 			}
 		},
 		components: {

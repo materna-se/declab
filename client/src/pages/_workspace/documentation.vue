@@ -414,19 +414,28 @@
   }
 
   @media print {
+		nav {
+			display: none!important;
+		}
+
     .col-12 {
-      padding-left: 0;
-      padding-right: 0;
+      padding-left: 0!important;
+      padding-right: 0!important;
     }
 
     .virtual-page {
-      box-shadow: none;
-      border-radius: 0;
-      width: 100%;
+      box-shadow: none!important;
+      border-radius: 0!important;
+      width: 100%!important;
     }
 
+		.container-fluid {
+			margin-top: 0!important;
+			margin-bottom: 0!important;
+		}
+
 		footer {
-			display: none;
+			display: none!important;
 		}
   }
 </style>
