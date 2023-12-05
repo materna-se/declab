@@ -2,34 +2,34 @@ export default {
 	enrich: function (value) {
 		switch (typeof value) {
 			case "string":
-				if(value.startsWith("\uE15A")) {
+				if (value.startsWith("\uE15A")) {
 					return {
 						type: "date",
 						value: value
 					}
 				}
 
-				if(value.startsWith("\uE15B")) {
+				if (value.startsWith("\uE15B")) {
 					return {
 						type: "time",
 						value: value
 					}
 				}
 
-				if(value.startsWith("\uE15C")) {
+				if (value.startsWith("\uE15C")) {
 					return {
 						type: "date and time",
 						value: value
 					}
 				}
 
-				if(value.startsWith("\uE15D")) {
+				if (value.startsWith("\uE15D")) {
 					return {
 						type: "days and time duration",
 						value: value
 					}
 				}
-				if(value.startsWith("\uE15E")) {
+				if (value.startsWith("\uE15E")) {
 					return {
 						type: "years and months duration",
 						value: value
@@ -146,16 +146,17 @@ export default {
 			};
 		}
 
-		if(existing.type === "array" && update.type === "array") {
-			// The first element will always exist. We will use it as a structure element.
-			const existingStructure = existing.value[0];
+		if (existing.type === "array" && update.type === "array") {
+			const existingElements = existing.value;
+			const updateElements = update.value;
+			const useFirstUpdateElement = existingElements.length !== updateElements.length;
 
 			const mergedArray = [];
-			for (const updateElement of update.value) {
-				const existingElement = JSON.parse(JSON.stringify(existingStructure));
 
-				mergedArray.push(this.merge(existingElement, updateElement));
+			for (let i = 0; i < existingElements.length; i++) {
+				mergedArray.push(this.merge(JSON.parse(JSON.stringify(existingElements[i])), updateElements[useFirstUpdateElement ? 0 : i]));
 			}
+
 			return {
 				type: "array",
 				value: mergedArray
@@ -170,7 +171,7 @@ export default {
 	},
 
 	addTemplate: function (existing, update) {
-		if(existing === undefined || update === undefined || existing.type !== update.type) {
+		if (existing === undefined || update === undefined || existing.type !== update.type) {
 			return;
 		}
 
