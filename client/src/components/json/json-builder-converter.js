@@ -153,8 +153,11 @@ export default {
 
 			const mergedArray = [];
 
-			for (let i = 0; i < existingElements.length; i++) {
-				mergedArray.push(this.merge(JSON.parse(JSON.stringify(existingElements[i])), updateElements[useFirstUpdateElement ? 0 : i]));
+			const length = Math.max(existingElements.length, updateElements.length);
+			for (let i = 0; i < length; i++) {
+				const existingElement = existingElements[i] === undefined ? (useFirstUpdateElement ? existingElements[0] : undefined) : JSON.parse(JSON.stringify(existingElements[i]));
+				const updateElement = updateElements[i] === undefined ? (useFirstUpdateElement ? updateElements[0] : undefined) : updateElements[i];
+				mergedArray.push(this.merge(existingElement, updateElement));
 			}
 
 			return {
