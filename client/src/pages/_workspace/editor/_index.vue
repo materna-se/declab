@@ -22,6 +22,27 @@
 					</svg>
 				</div>
 			</div>
+			<div class="ms-auto c-pointer" style="display: flex; align-items: center">
+				<span class="ms-auto me-2" style="line-height: 1;">Benchmarking input:</span>
+				<select id="form-inputs" class="import-result me-2" v-model="inputTemplateSelected">
+					<option v-for="(input, uuid) in inputTemplates" v-bind:value="uuid" style="line-height: 1;">{{input.name}}</option>
+				</select>
+				<button class="btn btn-outline-primary me-2" :disabled="inputTemplateSelected === null" v-on:click="benchmarkModel()">
+					<svg style="width:24px;height:24px" viewBox="0 0 24 24">
+						<path fill="currentColor" d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z" />
+					</svg>
+				</button>
+
+				<span class="ms-auto me-2" style="line-height: 1;" v-if="benchmarkResults.length > 0">Cold: {{this.benchmarkResults[this.benchmarkResults.length - 1]["cold"]}}ms</span>
+				<span class="ms-auto me-2" style="line-height: 1;" v-if="benchmarkResults.length > 0">Average: {{this.benchmarkResults[this.benchmarkResults.length - 1]["average"]}}ms</span>
+				
+				<button class="btn btn-outline-primary me-2" :disabled="benchmarkResults.length == 0" v-if="benchmarkResults.length > 0">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+						<path d="M12 8a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 2a2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0-2-2m-2 12c-.25 0-.46-.18-.5-.42l-.37-2.65c-.63-.25-1.17-.59-1.69-.99l-2.49 1.01c-.22.08-.49 0-.61-.22l-2-3.46a.493.493 0 0 1 .12-.64l2.11-1.66L4.5 12l.07-1-2.11-1.63a.493.493 0 0 1-.12-.64l2-3.46c.12-.22.39-.31.61-.22l2.49 1c.52-.39 1.06-.73 1.69-.98l.37-2.65c.04-.24.25-.42.5-.42h4c.25 0 .46.18.5.42l.37 2.65c.63.25 1.17.59 1.69.98l2.49-1c.22-.09.49 0 .61.22l2 3.46c.13.22.07.49-.12.64L19.43 11l.07 1-.07 1 2.11 1.63c.19.15.25.42.12.64l-2 3.46c-.12.22-.39.31-.61.22l-2.49-1c-.52.39-1.06.73-1.69.98l-.37 2.65c-.04.24-.25.42-.5.42h-4m1.25-18l-.37 2.61c-1.2.25-2.26.89-3.03 1.78L5.44 7.35l-.75 1.3L6.8 10.2a5.55 5.55 0 0 0 0 3.6l-2.12 1.56.75 1.3 2.43-1.04c.77.88 1.82 1.52 3.01 1.76l.37 2.62h1.52l.37-2.61c1.19-.25 2.24-.89 3.01-1.77l2.43 1.04.75-1.3-2.12-1.55c.4-1.17.4-2.44 0-3.61l2.11-1.55-.75-1.3-2.41 1.04a5.42 5.42 0 0 0-3.03-1.77L12.75 4h-1.5z" fill="currentColor"/>
+					</svg>
+				</button>
+			</div>
+
 			<div class="import-result ms-auto c-pointer" style="display: flex; align-items: center" v-on:click="editor.markAsSaved()">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="d-block">
 					<path d="m10 4 2 2h8a2 2 0 0 1 2 2v3.5a6.99 6.99 0 0 0-2-.5V8H4v10h9c.07.7.24 1.38.5 2H4a2 2 0 0 1-2-2V6c0-1.11.89-2 2-2h6m9 8v1.5a4 4 0 0 1 4 4c0 .82-.25 1.58-.67 2.21l-1.09-1.09c.17-.34.26-.72.26-1.12A2.5 2.5 0 0 0 19 15v1.5l-2.25-2.25-.03-.03c.06-.05.13-.09 2.28-2.22m0 11v-1.5a4 4 0 0 1-4-4c0-.82.25-1.58.67-2.21l1.09 1.09c-.17.34-.26.72-.26 1.12A2.5 2.5 0 0 0 19 20v-1.5l2.25 2.25.03.03c-.06.05-.13.09-2.28 2.22Z" fill="currentColor"/>
@@ -107,7 +128,10 @@
 				importResult: null,
 				importResultOpened: false,
 				context: uuid(),
-				debouncedImportModel: null
+				debouncedImportModel: null,
+				inputTemplates: [],
+				inputTemplateSelected: null,
+				benchmarkResults: [],
 			}
 		},
 		async mounted() {
@@ -161,6 +185,8 @@
 			}, 1000);
 
 			Network.addSocketListener(this.onSocket);
+
+			await this.getInputs();
 		},
 		beforeDestroy() {
 			Network.removeSocketListener(this.onSocket);
@@ -263,6 +289,14 @@
 					time: dayjs().unix()
 				};
 			},
+			async getInputs() {
+				this.inputTemplates = await Network.getInputs(true);
+			},
+			async benchmarkModel() {
+				const result = await Network.benchmarkModel(this.inputTemplates[this.inputTemplateSelected].value);
+
+				this.benchmarkResults.push(result);
+			}
 		}
 	}
 </script>

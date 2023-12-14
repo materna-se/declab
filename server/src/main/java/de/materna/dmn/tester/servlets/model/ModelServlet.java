@@ -216,6 +216,63 @@ public class ModelServlet {
 
 		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(workspace.getDecisionSession().getDMNDecisionSession().executeModel(mainModelNamespace, configuration.getDecisionService().getName(), (Map<String, Object>) request.get("input"), (Boolean) request.get("debug")))).build();
 	}
+	
+	@POST
+	@ReadAccess
+	@Path("/benchmark")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public Response benchmarkModel(@PathParam("workspace") String workspaceUUID, String body) throws IOException {
+		Workspace workspace = WorkspaceManager.getInstance().get(workspaceUUID);
+
+		Map<String, Object> inputs = SerializationHelper.getInstance().toClass(body, new TypeReference<HashMap<String, Object>>() {
+		});
+
+		Configuration configuration = workspace.getConfig();
+		String mainModelNamespace = DroolsHelper.getMainModelNamespace(workspace);
+
+		int NUM_RUNS = 10;
+		double totalRuntime = 0L, coldRuntime = 0L;
+		long start = 0L, finish = 0L;
+		double averageRuntime = 0.0;
+		ExecutionResult result = new ExecutionResult();
+		ArrayList<ExecutionResult> results = new ArrayList<ExecutionResult>();
+		
+		for (int i = 0; i < NUM_RUNS + 1; i++) {
+			start = System.nanoTime();
+			
+			if (configuration.getDecisionService() == null) {
+				result = workspace.getDecisionSession().executeModel(mainModelNamespace, inputs);
+			} else {
+				result = workspace.getDecisionSession().getDMNDecisionSession().executeModel(mainModelNamespace, configuration.getDecisionService().getName(), inputs);
+			}
+			
+			finish = System.nanoTime();
+			
+			results.add(result);
+			
+			// Measure cold runtime separately
+			if (i == 0) {
+				coldRuntime = (double) (finish - start);
+			} else {
+				totalRuntime += (double) finish - start;
+			}
+		}
+		
+		// Calculate average runtime
+		averageRuntime = (double) totalRuntime / NUM_RUNS;
+		
+		// Convert nanoseconds to milliseconds
+		averageRuntime /= 1000000;
+		coldRuntime /= 1000000;
+		
+		Map<String, Object> context = new HashMap<>();
+		context.put("cold", coldRuntime);
+		context.put("average", averageRuntime);
+		context.put("results", results);
+		
+		return Response.status(Response.Status.OK).entity(SerializationHelper.getInstance().toJSON(context)).build();
+	}
 
 	@POST
 	@ReadAccess
